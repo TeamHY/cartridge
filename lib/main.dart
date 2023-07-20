@@ -117,6 +117,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     reloadMods();
+
+    await Process.run('taskkill', ['/im', 'isaac-ng.exe']);
+    await Process.run(
+        'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\isaac-ng.exe',
+        []);
   }
 
   void loadPresets() async {
