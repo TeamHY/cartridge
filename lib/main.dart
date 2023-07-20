@@ -213,20 +213,40 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                       ),
                     ),
-                    ..._presets
-                        .map((preset) => PresetItem(
-                              preset: preset,
-                              onApply: (Preset preset) {
-                                applyMods(preset.mods);
-                              },
-                              onDelete: (Preset preset) {
-                                setState(() {
-                                  _presets.remove(preset);
-                                  savePresets();
-                                });
-                              },
-                            ))
-                        .toList(),
+                    Expanded(
+                      child: ReorderableListView.builder(
+                        buildDefaultDragHandles: false,
+                        itemCount: _presets.length,
+                        itemBuilder: (context, index) =>
+                            ReorderableDragStartListener(
+                          key: ValueKey(_presets[index]),
+                          index: index,
+                          child: PresetItem(
+                            preset: _presets[index],
+                            onApply: (Preset preset) {
+                              applyMods(preset.mods);
+                              _controller.text = preset.name;
+                            },
+                            onDelete: (Preset preset) {
+                              setState(() {
+                                _presets.remove(preset);
+                                savePresets();
+                              });
+                            },
+                          ),
+                        ),
+                        onReorder: ((oldIndex, newIndex) {
+                          setState(() {
+                            if (oldIndex < newIndex) {
+                              newIndex -= 1;
+                            }
+
+                            final item = _presets.removeAt(oldIndex);
+                            _presets.insert(newIndex, item);
+                          });
+                        }),
+                      ),
+                    )
                   ],
                 ),
               ),
