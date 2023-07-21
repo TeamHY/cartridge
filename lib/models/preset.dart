@@ -1,8 +1,8 @@
 import 'mod.dart';
 
 class Preset {
-  final String name;
-  final List<Mod> mods;
+  String name;
+  List<Mod> mods;
 
   Preset({required this.name, required this.mods});
 
@@ -18,7 +18,7 @@ class Preset {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'mods': mods,
+      'mods': mods.map((e) => e.toJson()).toList(),
     };
   }
 }

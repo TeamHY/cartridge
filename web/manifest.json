@@ -1,6 +1,6 @@
 {
-    "name": "isaac_mod_preset",
-    "short_name": "isaac_mod_preset",
+    "name": "cartridge",
+    "short_name": "cartridge",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "isaac_mod_preset" "\0"
+            VALUE "FileDescription", "cartridge" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "isaac_mod_preset" "\0"
+            VALUE "InternalName", "cartridge" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "isaac_mod_preset.exe" "\0"
-            VALUE "ProductName", "isaac_mod_preset" "\0"
+            VALUE "OriginalFilename", "cartridge.exe" "\0"
+            VALUE "ProductName", "cartridge" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

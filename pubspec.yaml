@@ -1,4 +1,4 @@
-name: isaac_mod_preset
+name: cartridge
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 0.1.0
+version: 0.3.0
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   path_provider: ^2.0.15
   xml: ^6.3.0
+  roulette: ^0.1.4
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,4 @@
-package com.example.isaac_mod_preset
+package com.example.cartridge
 
 import io.flutter.embedding.android.FlutterActivity
 
