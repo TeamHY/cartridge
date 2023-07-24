@@ -38,6 +38,7 @@ dependencies:
   path_provider: ^2.0.15
   xml: ^6.3.0
   roulette: ^0.1.4
+  fluent_ui: ^4.7.0
 
 dev_dependencies:
   flutter_test:
@@ -91,3 +92,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/fonts/Pretendard-Regular.otf
+          weight: 400
+        - asset: assets/fonts/Pretendard-Bold.otf
+          weight: 700
