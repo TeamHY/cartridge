@@ -5,12 +5,30 @@ import 'dart:math';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:path_provider/path_provider.dart';
 import 'package:roulette/roulette.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:window_manager/window_manager.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xpath.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = const WindowOptions(
+    backgroundColor: Colors.transparent,
+    skipTaskbar: false,
+    titleBarStyle: TitleBarStyle.hidden,
+    minimumSize: Size(600, 300),
+  );
+
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+
   runApp(const MyApp());
 }
 
@@ -21,9 +39,18 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return FluentApp(
       title: 'Cartridge',
-      theme: FluentThemeData(
-        fontFamily: 'Pretendard',
-      ),
+      debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TextDirection.ltr,
+          child: NavigationPaneTheme(
+            data: const NavigationPaneThemeData(
+              backgroundColor: Color.fromARGB(255, 245, 248, 252),
+            ),
+            child: child!,
+          ),
+        );
+      },
       home: const MyHomePage(title: 'Cartridge'),
     );
   }
@@ -67,6 +94,8 @@ Future<List<Mod>> loadMods() async {
       );
     }
   }
+
+  mods.sort((a, b) => a.name.compareTo(b.name));
 
   return mods;
 }
@@ -174,60 +203,97 @@ class _MyHomePageState extends State<MyHomePage> {
     return NavigationView(
       appBar: NavigationAppBar(
         automaticallyImplyLeading: false,
-        title: Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Text(widget.title),
+        title: DragToMoveArea(
+          child: Row(children: [
+            Text(widget.title),
+            const SizedBox(width: 8.0),
+            MediaQuery.of(context).size.width <= 800
+                ? const QuickBar()
+                : Container(),
+          ]),
         ),
-        actions: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+        actions: Stack(
           children: [
-            IconButton(
-              icon: const Icon(FluentIcons.refresh),
-              onPressed: () => reloadMods(),
-            ),
-            IconButton(
-              icon: const Icon(FluentIcons.settings),
-              onPressed: () => showDialog(
-                context: context,
-                builder: (context) => ContentDialog(
-                  title: const Text('설정'),
-                  content: Column(
-                    children: [
-                      Row(
-                        children: [],
-                      ),
-                    ],
-                  ),
-                  actions: [
-                    Button(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('닫기'),
-                    ),
-                  ],
+            MediaQuery.of(context).size.width > 800
+                ? const Center(child: QuickBar())
+                : Container(),
+            Row(
+              children: [
+                Expanded(child: Container()),
+                IconButton(
+                  icon: const Icon(FluentIcons.refresh, size: 20),
+                  onPressed: () => reloadMods(),
                 ),
-              ),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(FluentIcons.settings, size: 20),
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (context) => ContentDialog(
+                      title: const Text('설정'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InfoLabel(
+                            label: '아이작 설치 경로 (미구현)',
+                            child: const TextBox(
+                              placeholder:
+                                  'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth',
+                              enabled: false,
+                            ),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Row(
+                            children: [
+                              Button(
+                                onPressed: () =>
+                                    material.showLicensePage(context: context),
+                                child: const Text('라이센스'),
+                              ),
+                              const SizedBox(width: 8.0),
+                              const Text('v1.0.0'),
+                            ],
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        Button(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('취소'),
+                        ),
+                        FilledButton(
+                          onPressed: null,
+                          child: const Text('저장'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const SizedBox(
+                  width: 138,
+                  height: 50,
+                  child: WindowCaption(
+                    // brightness: theme.brightness,
+                    backgroundColor: Colors.transparent,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
-      content: Container(
-        color: FluentTheme.of(context).menuColor,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 300,
-              child: ScaffoldPage(
-                header: const Text(
-                  '프리셋',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                content: Column(
+      content: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 300,
+            child: material.Material(
+                color: Colors.transparent,
+                child: Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(16.0),
@@ -236,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           Flexible(
                             child: TextBox(
                               controller: _controller,
-                              placeholder: '프리셋 이름',
+                              placeholder: '새 프리셋',
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -304,12 +370,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: FluentTheme.of(context).menuColor,
+                        color: const Color.fromARGB(255, 245, 248, 252),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 0),
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 2,
+                            offset: const Offset(0, -2),
                           ),
                         ],
                       ),
@@ -317,7 +383,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         padding: const EdgeInsets.all(16.0),
                         child: Row(
                           children: [
-                            FilledButton(
+                            Button(
                               onPressed: _presets.isEmpty
                                   ? null
                                   : () => showDialog(
@@ -337,76 +403,151 @@ class _MyHomePageState extends State<MyHomePage> {
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
+                )),
+          ),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
                 color: FluentTheme.of(context).cardColor,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: _mods
-                              .map(
-                                (mod) => Row(
-                                  children: [
-                                    ToggleSwitch(
-                                      checked: !mod.isDisable,
-                                      onChanged: (value) {
-                                        setState(
-                                          () {
-                                            mod.isDisable = !value;
-                                            isSync = false;
-                                          },
-                                        );
-                                      },
-                                    ),
-                                    Text(mod.name),
-                                  ],
+                border:
+                    Border.all(color: Colors.black.withOpacity(0.1), width: 1),
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _mods
+                            .map(
+                              (mod) => SizedBox(
+                                width: double.infinity,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: ToggleSwitch(
+                                    checked: !mod.isDisable,
+                                    onChanged: (value) {
+                                      setState(
+                                        () {
+                                          mod.isDisable = !value;
+                                          isSync = false;
+                                        },
+                                      );
+                                    },
+                                    content: Text(mod.name),
+                                  ),
                                 ),
-                              )
-                              .toList(),
-                        ),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
-                    Padding(
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 2,
+                          offset: const Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ToggleSwitch(
-                            checked: isRerun,
-                            onChanged: (value) =>
-                                setState(() => isRerun = value),
+                          Checkbox(
                             content: const Text('자동 재시작'),
+                            checked: isRerun,
+                            onChanged: (value) => setState(() {
+                              isRerun = value!;
+                            }),
                           ),
-                          Expanded(child: Container()),
-                          HyperlinkButton(
-                            onPressed: () => reloadMods(),
-                            child: const Text("새로고침"),
-                          ),
-                          const SizedBox(width: 8),
                           FilledButton(
                             onPressed: isSync ? null : () => applyMods(_mods),
                             child: const Text("적용"),
                           ),
                         ],
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class QuickBar extends StatelessWidget {
+  const QuickBar({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Button(
+            onPressed: () async {
+              await launchUrl(
+                  Uri.parse('https://www.youtube.com/@HeonYeong_Isaac'));
+              await launchUrl(Uri.parse('https://www.twitch.tv/iwt2hw'));
+            },
+            child: const Text('생방송')),
+        const SizedBox(width: 4),
+        Button(
+            onPressed: () =>
+                launchUrl(Uri.parse('https://tgd.kr/s/iwt2hw/70142711')),
+            child: const Text('오픈채팅')),
+        const SizedBox(width: 4),
+        Button(
+            onPressed: () =>
+                launchUrl(Uri.parse('https://tgd.kr/s/iwt2hw/56745938')),
+            child: const Text('대결모드')),
+        const SizedBox(width: 4),
+        Button(
+            onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => ContentDialog(
+                    title: const Text('후원'),
+                    content: SizedBox(
+                      width: 400,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text("아래 QR코드를 인식하시면 후원이 가능합니다.",
+                              textAlign: TextAlign.center),
+                          const SizedBox(height: 8),
+                          Image.network(
+                              'https://raw.githubusercontent.com/TeamHY/cartridge/main/assets/images/donation_qr.png'),
+                          const SizedBox(height: 8),
+                          Image.asset(
+                              'assets/images/payment_icon_yellow_small.png'),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      Button(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('닫기'),
+                      ),
+                    ],
+                  ),
+                ),
+            child: const Text('후원')),
+      ],
     );
   }
 }
@@ -439,7 +580,6 @@ class PresetItem extends StatelessWidget {
             onPressed: () => onApply(preset),
             icon: const Icon(
               FluentIcons.play,
-              size: 16,
             ),
           ),
           const SizedBox(width: 8),
@@ -455,7 +595,6 @@ class PresetItem extends StatelessWidget {
             ),
             icon: const Icon(
               FluentIcons.edit,
-              size: 16,
             ),
           ),
           const SizedBox(width: 8),
@@ -490,7 +629,6 @@ class PresetItem extends StatelessWidget {
             ),
             icon: Icon(
               FluentIcons.delete,
-              size: 16,
               color: Colors.red.dark,
             ),
           )
@@ -565,16 +703,19 @@ class _PresetDialogState extends State<PresetDialog> {
                     .map(
                       (mod) => Row(
                         children: [
-                          ToggleButton(
-                            checked: !mod.isDisable,
-                            onChanged: (value) {
-                              setState(() {
-                                mod.isDisable = !value;
-                                isChanged = true;
-                              });
-                            },
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                            child: ToggleSwitch(
+                              checked: !mod.isDisable,
+                              onChanged: (value) {
+                                setState(() {
+                                  mod.isDisable = !value;
+                                  isChanged = true;
+                                });
+                              },
+                              content: Text(mod.name),
+                            ),
                           ),
-                          Text(mod.name),
                         ],
                       ),
                     )
@@ -589,7 +730,7 @@ class _PresetDialogState extends State<PresetDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("Cancel"),
+          child: const Text("취소"),
         ),
         FilledButton(
           onPressed: isChanged
@@ -598,7 +739,7 @@ class _PresetDialogState extends State<PresetDialog> {
                   Navigator.pop(context);
                 }
               : null,
-          child: const Text("Apply"),
+          child: const Text("적용"),
         ),
       ],
     );
@@ -668,6 +809,7 @@ class _RouletteDialogState extends State<RouletteDialog>
           color: Colors.black,
           fontSize: 16,
           fontWeight: FontWeight.bold,
+          fontFamily: 'Pretendard',
         ),
       ),
       vsync: this,
@@ -689,7 +831,9 @@ class _RouletteDialogState extends State<RouletteDialog>
           padding: const EdgeInsets.all(16.0),
           child: Roulette(
             controller: controller,
-            style: const RouletteStyle(centerStickSizePercent: 0),
+            style: const RouletteStyle(
+              centerStickSizePercent: 0,
+            ),
           ),
         ),
         const Arrow()
