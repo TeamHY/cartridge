@@ -22,6 +22,7 @@ void main() async {
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.hidden,
     minimumSize: Size(600, 300),
+    center: true,
   );
 
   windowManager.waitUntilReadyToShow(windowOptions, () async {
