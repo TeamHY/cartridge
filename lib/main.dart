@@ -15,6 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:xml/xml.dart';
 import 'package:xml/xpath.dart';
+import 'package:http/http.dart' as http;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -192,10 +193,12 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     _controller = TextEditingController();
 
-    ref.read(settingProvider.notifier).loadSetting();
+    Future.delayed(const Duration(milliseconds: 100), () {
+      ref.read(settingProvider.notifier).loadSetting();
 
-    reloadMods();
-    loadPresets();
+      reloadMods();
+      loadPresets();
+    });
   }
 
   @override
@@ -262,6 +265,65 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 color: Colors.transparent,
                 child: Column(
                   children: [
+                    Container(
+                      color: Colors.blue.lightest,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            const Expanded(
+                              child: Text(
+                                "대결",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                final response = await http.get(Uri.https(
+                                    'raw.githubusercontent.com',
+                                    'TeamHY/cartridge/main/assets/battle_presets.json'));
+
+                                if (response.statusCode != 200) {
+                                  if (context.mounted) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ContentDialog(
+                                          title: const Text("오류"),
+                                          content: Text(response.body),
+                                          actions: [
+                                            FilledButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('닫기'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
+
+                                  return;
+                                }
+
+                                final json = jsonDecode(response.body)
+                                    .cast<Map<String, dynamic>>();
+
+                                applyMods(List<Mod>.from(
+                                    json.map((e) => Mod.fromJson(e))));
+                              },
+                              icon: const Icon(
+                                color: Colors.white,
+                                FluentIcons.play,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Row(

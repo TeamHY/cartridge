@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^6.1.12
   file_picker: ^5.3.3
   flutter_riverpod: ^2.3.6
+  http: ^1.1.0
 
 dev_dependencies:
   flutter_test:
