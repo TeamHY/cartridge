@@ -2,6 +2,9 @@ import 'package:cartridge/providers/setting_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:pub_semver/pub_semver.dart';
+
+final currentVersion = Version(1, 0, 0);
 
 class SettingDialog extends ConsumerStatefulWidget {
   const SettingDialog({super.key});
@@ -53,7 +56,7 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
                 child: const Text('라이센스'),
               ),
               const SizedBox(width: 8.0),
-              const Text('v1.0.0'),
+              Text('v$currentVersion'),
             ],
           ),
         ],

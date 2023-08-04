@@ -10,6 +10,7 @@ import 'package:cartridge/models/preset.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:roulette/roulette.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
@@ -187,13 +188,73 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     file.writeAsString(jsonEncode(_presets));
   }
 
+  void checkVersion() async {
+    final response = await http.get(Uri.parse(
+      'https://api.github.com/repos/TeamHY/cartridge/releases/latest',
+    ));
+
+    if (response.statusCode != 200) {
+      return;
+    }
+
+    final latestVersion = Version.parse(jsonDecode(response.body)['tag_name']);
+
+    if (currentVersion.nextBreaking < latestVersion && context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return ContentDialog(
+            title: const Text('업데이트'),
+            content: const Text('너무 오래된 버전입니다. 새로운 버전을 사용해 주세요.'),
+            actions: [
+              FilledButton(
+                onPressed: () async {
+                  await launchUrl(Uri.parse(
+                      'https://github.com/TeamHY/cartridge/releases/latest'));
+                  exit(0);
+                },
+                child: const Text('확인'),
+              )
+            ],
+          );
+        },
+      );
+    } else if (currentVersion < latestVersion && context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return ContentDialog(
+            title: const Text('업데이트'),
+            content: const Text('새로운 버전을 다운로드 받으시겠습니까?'),
+            actions: [
+              Button(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('취소'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  launchUrl(Uri.parse(
+                      'https://github.com/TeamHY/cartridge/releases/latest'));
+                  Navigator.pop(context);
+                },
+                child: const Text('확인'),
+              )
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   void initState() {
     super.initState();
 
     _controller = TextEditingController();
 
-    Future.delayed(const Duration(milliseconds: 100), () {
+    checkVersion();
+
+    Future.delayed(Duration.zero, () {
       ref.read(settingProvider.notifier).loadSetting();
 
       reloadMods();
