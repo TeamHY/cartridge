@@ -2,10 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:cartridge/providers/setting_provider.dart';
+import 'package:cartridge/setting_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:roulette/roulette.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -30,7 +33,7 @@ void main() async {
     await windowManager.focus();
   });
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -57,20 +60,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-Future<List<Mod>> loadMods() async {
+Future<List<Mod>> loadMods(String path) async {
   final mods = <Mod>[];
 
-  final directory = Directory(
-      'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods');
+  final directory = Directory('$path\\mods');
 
   if (!await directory.exists()) {
     return mods;
@@ -101,7 +103,7 @@ Future<List<Mod>> loadMods() async {
   return mods;
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends ConsumerState<MyHomePage> {
   List<Preset> _presets = [];
 
   List<Mod> _mods = [];
@@ -112,7 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
   late TextEditingController _controller;
 
   void reloadMods() {
-    loadMods().then(
+    final path = ref.read(settingProvider).isaacPath;
+
+    loadMods(path).then(
       (value) => setState(
         () {
           _mods = value;
@@ -123,7 +127,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void applyMods(List<Mod> mods) async {
-    final currentMods = await loadMods();
+    final path = ref.read(settingProvider).isaacPath;
+
+    final currentMods = await loadMods(path);
 
     for (var mod in currentMods) {
       final isDisable = mods
@@ -156,9 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     if (isRerun) {
       await Process.run('taskkill', ['/im', 'isaac-ng.exe']);
-      await Process.run(
-          'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\isaac-ng.exe',
-          []);
+      await Process.run('$path\\isaac-ng.exe', []);
     }
   }
 
@@ -187,6 +191,8 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
 
     _controller = TextEditingController();
+
+    ref.read(settingProvider.notifier).loadSetting();
 
     reloadMods();
     loadPresets();
@@ -230,47 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   icon: const Icon(FluentIcons.settings, size: 20),
                   onPressed: () => showDialog(
                     context: context,
-                    builder: (context) => ContentDialog(
-                      title: const Text('설정'),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          InfoLabel(
-                            label: '아이작 설치 경로 (미구현)',
-                            child: const TextBox(
-                              placeholder:
-                                  'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth',
-                              enabled: false,
-                            ),
-                          ),
-                          const SizedBox(height: 16.0),
-                          Row(
-                            children: [
-                              Button(
-                                onPressed: () =>
-                                    material.showLicensePage(context: context),
-                                child: const Text('라이센스'),
-                              ),
-                              const SizedBox(width: 8.0),
-                              const Text('v1.0.0'),
-                            ],
-                          ),
-                        ],
-                      ),
-                      actions: [
-                        Button(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('취소'),
-                        ),
-                        FilledButton(
-                          onPressed: null,
-                          child: const Text('저장'),
-                        ),
-                      ],
-                    ),
+                    builder: (context) => const SettingDialog(),
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -639,7 +605,7 @@ class PresetItem extends StatelessWidget {
   }
 }
 
-class PresetDialog extends StatefulWidget {
+class PresetDialog extends ConsumerStatefulWidget {
   const PresetDialog({
     super.key,
     required this.preset,
@@ -650,10 +616,10 @@ class PresetDialog extends StatefulWidget {
   final Function(Preset oldPreset, Preset newPreset) onEdit;
 
   @override
-  State<PresetDialog> createState() => _PresetDialogState();
+  ConsumerState<PresetDialog> createState() => _PresetDialogState();
 }
 
-class _PresetDialogState extends State<PresetDialog> {
+class _PresetDialogState extends ConsumerState<PresetDialog> {
   bool isChanged = false;
   late Preset newPreset;
 
@@ -663,7 +629,9 @@ class _PresetDialogState extends State<PresetDialog> {
 
     newPreset = Preset(name: widget.preset.name, mods: []);
 
-    loadMods().then(
+    final path = ref.read(settingProvider).isaacPath;
+
+    loadMods(path).then(
       (value) async => setState(
         () {
           newPreset.mods = value
