@@ -1,162 +1,39 @@
 [
-  {
-    "name": "!! Mod Config Menu Pure",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\!!mod config menu_2681875787",
-    "isDisable": false
-  },
-  {
-    "name": "!!!quieter environment sfx",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\quieter environment sfx_2771824650",
-    "isDisable": false
-  },
-  {
-    "name": "!!~External item descriptions",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\external item descriptions_836319872",
-    "isDisable": false
-  },
-  {
-    "name": "!Detailed Respawn [REP]",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\detailed_respawn_rep_2729252633",
-    "isDisable": false
-  },
-  {
-    "name": "!Redrawn_Hard",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\redrawn_hard_2492350811",
-    "isDisable": false
-  },
-  {
-    "name": "'Enhanced Boss Bars",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\enhanced boss bars_2635267643",
-    "isDisable": false
-  },
-  {
-    "name": "Double tap Familiars",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\double tap lil portal_2854321975",
-    "isDisable": false
-  },
-  {
-    "name": "Duality Deal fix! - Now both work!",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\duality_2493691663",
-    "isDisable": false
-  },
-  {
-    "name": "Extra-Scared Scared Hearts",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\extra scared hearts_2559137447",
-    "isDisable": false
-  },
-  {
-    "name": "Familiar Counter",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\familiarcounter_2496751594",
-    "isDisable": false
-  },
-  {
-    "name": "Fogless!",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\fogless_835411179",
-    "isDisable": false
-  },
-  {
-    "name": "Hit Counter",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\hittracker_2825572127",
-    "isDisable": false
-  },
-  {
-    "name": "I'm Excited!!! visible timer",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\excited timer_2857131664",
-    "isDisable": false
-  },
-  {
-    "name": "Increasing Pitch (Shepard Tone)",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\crx_shepard_tone_2196484541",
-    "isDisable": false
-  },
-  {
-    "name": "Instant Fires and Poops",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\instant fires and poops_2833146105",
-    "isDisable": false
-  },
-  {
-    "name": "LilTimer",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\liltimer_2705902412",
-    "isDisable": false
-  },
-  {
-    "name": "No Jam",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\no jam_2369306194",
-    "isDisable": false
-  },
-  {
-    "name": "Old Wardrobe",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\old wardrobe_2488945061",
-    "isDisable": false
-  },
-  {
-    "name": "Planetarium Chance",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\planetarium chance_2489006943",
-    "isDisable": false
-  },
-  {
-    "name": "QuickPick",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\quickpick_3009418128",
-    "isDisable": false
-  },
-  {
-    "name": "Regret Pedestals",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\regret pedestals_2766379837",
-    "isDisable": false
-  },
-  {
-    "name": "Room Name Display",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\room name display_2939693747",
-    "isDisable": false
-  },
-  {
-    "name": "Silent Jupiter",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\silentjupiter_2754889358",
-    "isDisable": false
-  },
-  {
-    "name": "Silent flies with Beelzebub",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\silent flies with beelzebub_2824912795",
-    "isDisable": false
-  },
-  {
-    "name": "Tainted Item Charge Sound",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\tainted_item_charge_sound_2703981380",
-    "isDisable": false
-  },
-  {
-    "name": "TimeMachine",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\timemachine_2617557401",
-    "isDisable": false
-  },
-  {
-    "name": "Unique Birthrights",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\unique_birthrights_2690434875",
-    "isDisable": false
-  },
-  {
-    "name": "drop trinkets faster",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\drop trinkets faster_2801133098",
-    "isDisable": false
-  },
-  {
-    "name": "mars trigger",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\mars trigger_2596349614",
-    "isDisable": false
-  },
-  {
-    "name": "no more rain",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\no more rain_2816194127",
-    "isDisable": false
-  },
-  {
-    "name": "noscreenshake",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\noscreenshake_2643550620",
-    "isDisable": false
-  },
-  {
-    "name": "unintrusive pause menu",
-    "path": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth\\mods\\unintrusive pause menu_2769063897",
-    "isDisable": false
-  }
+  { "name": "!! Mod Config Menu Pure", "isDisable": false },
+  { "name": "!!!quieter environment sfx", "isDisable": false },
+  { "name": "!!~External item descriptions", "isDisable": false },
+  { "name": "!Detailed Respawn [REP]", "isDisable": false },
+  { "name": "!Redrawn_Hard", "isDisable": false },
+  { "name": "'Enhanced Boss Bars", "isDisable": false },
+  { "name": "Damo Indicator", "isDisable": false },
+  { "name": "Double tap Familiars", "isDisable": false },
+  { "name": "Duality Deal fix! - Now both work!", "isDisable": false },
+  { "name": "Extra-Scared Scared Hearts", "isDisable": false },
+  { "name": "Familiar Counter", "isDisable": false },
+  { "name": "Fogless!", "isDisable": false },
+  { "name": "Fun Golden Pennies", "isDisable": false },
+  { "name": "Glitched Crown Chest Fix", "isDisable": false },
+  { "name": "Hit Counter", "isDisable": false },
+  { "name": "I'm Excited!!! visible timer", "isDisable": false },
+  { "name": "Instant Fires and Poops", "isDisable": false },
+  { "name": "LilTimer", "isDisable": false },
+  { "name": "No Jam", "isDisable": false },
+  { "name": "Old Wardrobe", "isDisable": false },
+  { "name": "Planetarium Chance", "isDisable": false },
+  { "name": "QuickPick", "isDisable": false },
+  { "name": "Range fix for Bones & Sword", "isDisable": false },
+  { "name": "Regret Pedestals", "isDisable": false },
+  { "name": "Room_Name", "isDisable": false },
+  { "name": "ShellGame", "isDisable": false },
+  { "name": "Silent Jupiter", "isDisable": false },
+  { "name": "Silent flies with Beelzebub", "isDisable": false },
+  { "name": "Tainted Item Charge Sound", "isDisable": false },
+  { "name": "TimeMachine", "isDisable": false },
+  { "name": "Unique Birthrights", "isDisable": false },
+  { "name": "Visible Options!", "isDisable": false },
+  { "name": "Visible Tears! [REP]", "isDisable": false },
+  { "name": "drop trinkets faster", "isDisable": false },
+  { "name": "no more rain", "isDisable": false },
+  { "name": "noscreenshake", "isDisable": false },
+  { "name": "unintrusive pause menu", "isDisable": false }
 ]
