@@ -1,19 +1,26 @@
 class Mod {
-  String name;
-  String path;
+  final String name;
+  final String path;
+  final String? version;
+
   bool isDisable;
 
-  Mod({required this.name, required this.path, this.isDisable = false});
+  Mod({
+    required this.name,
+    required this.path,
+    this.version,
+    this.isDisable = false,
+  });
 
   factory Mod.fromJson(Map<String, dynamic> json) {
-    return Mod(
-        name: json['name'], path: json['path'], isDisable: json['isDisable']);
+    return Mod(name: json['name'], path: '', isDisable: json['isDisable']);
   }
+
+  static Mod none = Mod(name: '', path: '', isDisable: true);
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'path': path,
       'isDisable': isDisable,
     };
   }

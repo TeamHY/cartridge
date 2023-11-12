@@ -1,16 +1,5 @@
 # cartridge
+The Binding of Isaac: Repentance를 위한 모드 프리셋 저장 유틸리티입니다.
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 참고
+이 소프트웨어는 방송인 오헌영([유튜브](https://www.youtube.com/@HeonYeong_Isaac), [트위치](https://www.twitch.tv/iwt2hw))님을 위해 제작되었습니다. 일반 사용자에게 불필요한 기능이 있을 수 있습니다.
