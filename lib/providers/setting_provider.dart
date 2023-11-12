@@ -11,7 +11,7 @@ class SettingNotifier extends ChangeNotifier {
   }
 
   String _isaacPath =
-      "C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth";
+      'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth';
 
   String get isaacPath => _isaacPath;
 
@@ -25,7 +25,8 @@ class SettingNotifier extends ChangeNotifier {
 
     final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
 
-    _isaacPath = json['isaacPath'] as String;
+    _isaacPath = json['isaacPath'] as String? ??
+        'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth';
 
     notifyListeners();
   }

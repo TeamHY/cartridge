@@ -20,6 +20,8 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
   void initState() {
     super.initState();
     windowManager.addListener(this);
+
+    ref.read(storeProvider.notifier).checkAstroVersion();
   }
 
   @override

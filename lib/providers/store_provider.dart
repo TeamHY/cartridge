@@ -52,6 +52,7 @@ class StoreNotifier extends ChangeNotifier {
   StoreNotifier(this.ref) {
     reloadMods();
     loadPresets();
+    checkAstroVersion();
   }
 
   final Ref ref;
