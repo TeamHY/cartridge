@@ -35,20 +35,6 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
     ref.read(storeProvider.notifier).checkAstroVersion();
   }
 
-  String getInfoText() {
-    final store = ref.watch(storeProvider);
-
-    if (store.astroLocalVersion == null) {
-      return '대결모드가 설치되지 않았습니다.';
-    } else if (store.astroRemoteVersion == null) {
-      return '최신 버전을 확인할 수 없습니다.';
-    } else if (store.isAstroOutdated) {
-      return '${store.astroLocalVersion} -> ${store.astroRemoteVersion}';
-    } else {
-      return '${store.astroLocalVersion}';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final store = ref.watch(storeProvider);
@@ -62,162 +48,210 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
             Container(
               color: baseColor,
               child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Astrobirth',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Pretendard',
+                child: SizedBox(
+                  width: 400,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'Astrobirth',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Pretendard',
+                            ),
+                          ),
+                          QuickAction(),
+                        ],
                       ),
-                    ),
-                    Text(
-                      getInfoText(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.normal,
-                        fontFamily: 'Pretendard',
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 24),
-                    IconButton(
-                      style: ButtonStyle(
-                        border: ButtonState.all(
-                          const BorderSide(width: 1, color: Colors.white),
-                        ),
-                      ),
-                      icon: const Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Icon(
-                          FluentIcons.play_solid,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ),
-                      iconButtonMode: IconButtonMode.large,
-                      onPressed: () async {
-                        final response = await http.get(Uri.https(
-                            'raw.githubusercontent.com',
-                            'TeamHY/cartridge/main/assets/battle_presets.json'));
-
-                        if (response.statusCode != 200) {
-                          if (context.mounted) {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return ContentDialog(
-                                  title: const Text('오류'),
-                                  content: Text(response.body),
-                                  actions: [
-                                    FilledButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('닫기'),
+                      const SizedBox(height: 40),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    const Text(
+                                      '현재 버전',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        fontFamily: 'Pretendard',
+                                      ),
+                                      textAlign: TextAlign.center,
                                     ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      store.astroLocalVersion ?? '설치되지 않음',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Pretendard',
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    )
                                   ],
-                                );
-                              },
-                            );
-                          }
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    const Text(
+                                      '최신 버전',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                        fontFamily: 'Pretendard',
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      store.astroRemoteVersion ?? '확인되지 않음',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Pretendard',
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 40),
+                            IconButton(
+                              style: ButtonStyle(
+                                border: ButtonState.all(
+                                  const BorderSide(
+                                      width: 1, color: Colors.white),
+                                ),
+                              ),
+                              icon: const Padding(
+                                padding: EdgeInsets.all(4.0),
+                                child: Icon(
+                                  FluentIcons.play_solid,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                              iconButtonMode: IconButtonMode.large,
+                              onPressed: () async {
+                                final response = await http.get(Uri.https(
+                                    'raw.githubusercontent.com',
+                                    'TeamHY/cartridge/main/assets/battle_presets.json'));
 
-                          return;
-                        }
+                                if (response.statusCode != 200) {
+                                  if (context.mounted) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ContentDialog(
+                                          title: const Text('오류'),
+                                          content: Text(response.body),
+                                          actions: [
+                                            FilledButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('닫기'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
 
-                        final json = jsonDecode(response.body)
-                            .cast<Map<String, dynamic>>();
-                        final mods =
-                            List<Mod>.from(json.map((e) => Mod.fromJson(e)));
+                                  return;
+                                }
 
-                        if (store.isAstroOutdated && context.mounted) {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return ContentDialog(
-                                title: const Text('경고'),
-                                content:
-                                    const Text('원활한 업데이트를 위해 스팀이 강제 종료됩니다.'),
-                                actions: [
-                                  Button(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text('취소'),
-                                  ),
-                                  FilledButton(
-                                    onPressed: () {
-                                      store.applyMods(
-                                        mods,
-                                        isForceRerun: true,
-                                        isForceUpdate: true,
+                                final json = jsonDecode(response.body)
+                                    .cast<Map<String, dynamic>>();
+                                final mods = List<Mod>.from(
+                                    json.map((e) => Mod.fromJson(e)));
+
+                                if (store.isAstroOutdated && context.mounted) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return ContentDialog(
+                                        title: const Text('경고'),
+                                        content: const Text(
+                                            '원활한 업데이트를 위해 스팀이 강제 종료됩니다.'),
+                                        actions: [
+                                          Button(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('취소'),
+                                          ),
+                                          FilledButton(
+                                            onPressed: () {
+                                              store.applyMods(
+                                                mods,
+                                                isForceRerun: true,
+                                                isForceUpdate: true,
+                                              );
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text('확인'),
+                                          ),
+                                        ],
                                       );
-                                      Navigator.pop(context);
                                     },
-                                    child: const Text('확인'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
+                                  );
 
-                          return;
-                        }
+                                  return;
+                                }
 
-                        store.applyMods(mods, isForceRerun: true);
-                      },
-                    ),
-                  ],
+                                store.applyMods(mods, isForceRerun: true);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-            Column(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      iconButtonMode: IconButtonMode.large,
-                      icon: const Padding(
-                        padding: EdgeInsets.all(12.0),
-                        child: Icon(
-                          FluentIcons.back,
-                          color: Colors.white,
-                        ),
-                      ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  iconButtonMode: IconButtonMode.large,
+                  icon: const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Icon(
+                      FluentIcons.back,
+                      color: Colors.white,
                     ),
-                    const SizedBox(
-                      width: 138,
-                      height: 50,
-                      child: WindowCaption(
-                        brightness: Brightness.dark,
-                        backgroundColor: Colors.transparent,
-                      ),
-                    )
-                  ],
+                  ),
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: HyperlinkButton(
-                        child: const Text(
-                          '수동 업데이트',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w200,
-                            fontFamily: 'Pretendard',
-                          ),
-                        ),
-                        onPressed: () => launchUrl(
-                            Uri.parse('https://tgd.kr/s/iwt2hw/72349813'))),
+                const SizedBox(
+                  width: 138,
+                  height: 50,
+                  child: WindowCaption(
+                    brightness: Brightness.dark,
+                    backgroundColor: Colors.transparent,
                   ),
                 )
               ],
@@ -225,6 +259,53 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
           ],
         ),
       ),
+    );
+  }
+}
+
+class QuickAction extends StatelessWidget {
+  const QuickAction({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        HyperlinkButton(
+          child: const Text(
+            '수동 업데이트',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w200,
+              fontFamily: 'Pretendard',
+            ),
+          ),
+          onPressed: () => launchUrl(
+            Uri.parse(
+              'https://tgd.kr/s/iwt2hw/72349813',
+            ),
+          ),
+        ),
+        HyperlinkButton(
+          child: const Text(
+            '패치노트',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w200,
+              fontFamily: 'Pretendard',
+            ),
+          ),
+          onPressed: () => launchUrl(
+            Uri.parse(
+              'https://steamcommunity.com/sharedfiles/filedetails/changelog/2492350811',
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

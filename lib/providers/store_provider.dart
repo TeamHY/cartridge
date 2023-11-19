@@ -6,6 +6,7 @@ import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:html/parser.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -99,18 +100,15 @@ class StoreNotifier extends ChangeNotifier {
   }
 
   Future<String?> getAstroRemoteVersion() async {
-    final response = await http.get(Uri.https(
-      'raw.githubusercontent.com',
-      'TeamHY/Astrobirth/main/metadata.xml',
-    ));
+    final response = await http.get(Uri.https('tgd.kr', "s/iwt2hw/72435841"));
 
     if (response.statusCode != 200) {
       return null;
     }
 
-    final remoteMetadata = Metadata.fromString(response.body);
+    final document = parse(response.body);
 
-    return remoteMetadata.version;
+    return document.querySelector("#article-content > p")?.innerHtml;
   }
 
   void checkAstroVersion() async {

@@ -37,13 +37,13 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     final latestVersion = Version.parse(jsonDecode(response.body)['tag_name']);
 
-    if (currentVersion.nextBreaking <= latestVersion && context.mounted) {
+    if (currentVersion.nextMajor <= latestVersion && context.mounted) {
       showDialog(
         context: context,
         builder: (context) {
           return ContentDialog(
             title: const Text('업데이트'),
-            content: const Text('너무 오래된 버전입니다. 새로운 버전을 사용해 주세요.'),
+            content: const Text('이 버전은 사용할 수 없습니다. 새로운 버전을 사용해 주세요.'),
             actions: [
               FilledButton(
                 onPressed: () async {
