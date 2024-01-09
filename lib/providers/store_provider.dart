@@ -47,7 +47,7 @@ Future<List<Mod>> loadMods(String path) async {
   return mods;
 }
 
-const astrobirthName = '!Redrawn_Hard';
+const astrobirthName = '!Astrobirth';
 
 class StoreNotifier extends ChangeNotifier {
   StoreNotifier(this.ref) {
