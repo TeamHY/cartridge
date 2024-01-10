@@ -37,7 +37,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     final latestVersion = Version.parse(jsonDecode(response.body)['tag_name']);
 
-    if (currentVersion.nextMajor <= latestVersion && context.mounted) {
+    if (currentVersion.nextMinor <= latestVersion && context.mounted) {
       showDialog(
         context: context,
         builder: (context) {

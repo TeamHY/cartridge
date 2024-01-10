@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:pub_semver/pub_semver.dart';
 
-final currentVersion = Version(3, 2, 0);
+final currentVersion = Version(4, 0, 0);
 
 class SettingDialog extends ConsumerStatefulWidget {
   const SettingDialog({super.key});
