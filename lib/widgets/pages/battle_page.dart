@@ -285,7 +285,7 @@ class QuickAction extends StatelessWidget {
           ),
           onPressed: () => launchUrl(
             Uri.parse(
-              'https://tgd.kr/s/iwt2hw/72513786',
+              'https://cafe.naver.com/iwt2hw/128',
             ),
           ),
         ),

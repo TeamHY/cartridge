@@ -16,6 +16,9 @@ class QuickBar extends StatelessWidget {
               await launchUrl(
                   Uri.parse('https://www.youtube.com/@HeonYeong_Isaac'));
               await launchUrl(Uri.parse('https://www.twitch.tv/iwt2hw'));
+              await launchUrl(Uri.parse('https://bj.afreecatv.com/iwt2hw'));
+              await launchUrl(Uri.parse(
+                  'https://chzzk.naver.com/f409bd9619bb9d384159a82d8892f73a'));
             },
             child: const Text('생방송')),
         const SizedBox(width: 4),
@@ -26,12 +29,11 @@ class QuickBar extends StatelessWidget {
         const SizedBox(width: 4),
         Button(
             onPressed: () =>
-                launchUrl(Uri.parse('https://tgd.kr/s/iwt2hw/56745938')),
+                launchUrl(Uri.parse('https://cafe.naver.com/iwt2hw/2')),
             child: const Text('모드')),
         const SizedBox(width: 4),
         Button(
-            onPressed: () =>
-                launchUrl(Uri.parse('https://toon.at/donate/iwt2hw')),
+            onPressed: () => launchUrl(Uri.parse('https://toss.me/iwt2hw')),
             child: const Text('후원')),
       ],
     );
