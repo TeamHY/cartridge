@@ -31,7 +31,7 @@ class SettingNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void savePresets() async {
+  void saveSetting() async {
     final appSupportDir = await getApplicationSupportDirectory();
     final file = File('${appSupportDir.path}\\setting.json');
 
@@ -41,7 +41,7 @@ class SettingNotifier extends ChangeNotifier {
   void setIsaacPath(String path) {
     _isaacPath = path;
 
-    savePresets();
+    saveSetting();
     notifyListeners();
   }
 }

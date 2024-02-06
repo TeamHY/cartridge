@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/layout.dart';
 import 'package:cartridge/widgets/pages/battle_page.dart';
+import 'package:cartridge/widgets/pages/slot_machine_page.dart';
 import 'package:cartridge/widgets/preset_item.dart';
-import 'package:cartridge/widgets/roulette_dialog.dart';
 import 'package:cartridge/widgets/setting_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/models/mod.dart';
@@ -213,19 +213,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                             ),
                             const SizedBox(width: 4),
                             Button(
-                              onPressed: () => showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return RouletteDialog(
-                                    presets: store.presets,
-                                    onApply: (Preset preset) {
-                                      store.applyMods(preset.mods);
-                                      _controller.text = preset.name;
-                                    },
-                                  );
-                                },
+                              onPressed: () => Navigator.push(
+                                context,
+                                FluentPageRoute(
+                                  builder: (context) => const SlotMachinePage(),
+                                ),
                               ),
-                              child: const Text('돌림판'),
+                              child: const Text('슬롯 머신'),
                             ),
                           ],
                         ),
