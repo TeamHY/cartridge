@@ -1,7 +1,10 @@
 import 'package:cartridge/widgets/pages/home_page.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pub_semver/pub_semver.dart';
 import 'package:window_manager/window_manager.dart';
+
+final currentVersion = Version.parse('4.2.0');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

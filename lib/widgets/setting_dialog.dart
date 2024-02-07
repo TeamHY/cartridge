@@ -1,10 +1,8 @@
+import 'package:cartridge/main.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart' as material;
-import 'package:pub_semver/pub_semver.dart';
-
-final currentVersion = Version(4, 1, 0);
 
 class SettingDialog extends ConsumerStatefulWidget {
   const SettingDialog({super.key});

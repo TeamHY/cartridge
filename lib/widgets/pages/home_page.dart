@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cartridge/main.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/layout.dart';
 import 'package:cartridge/widgets/pages/battle_page.dart';
