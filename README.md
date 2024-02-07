@@ -1,4 +1,6 @@
 # cartridge
+![main workflow](https://github.com/TeamHY/cartridge/actions/workflows/main.yml/badge.svg)
+
 The Binding of Isaac: Repentance를 위한 모드 프리셋 저장 유틸리티입니다.
 
 ## 참고
