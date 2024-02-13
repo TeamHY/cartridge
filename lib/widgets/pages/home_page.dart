@@ -7,7 +7,6 @@ import 'package:cartridge/widgets/layout.dart';
 import 'package:cartridge/widgets/pages/battle_page.dart';
 import 'package:cartridge/widgets/pages/slot_machine_page.dart';
 import 'package:cartridge/widgets/preset_item.dart';
-import 'package:cartridge/widgets/setting_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
@@ -249,17 +248,62 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 width: double.infinity,
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
-                                  child: ToggleSwitch(
-                                    checked: !mod.isDisable,
-                                    onChanged: (value) {
-                                      setState(
-                                        () {
-                                          mod.isDisable = !value;
-                                          store.isSync = false;
+                                  child: Row(
+                                    children: [
+                                      ToggleSwitch(
+                                        checked: !mod.isDisable,
+                                        onChanged: (value) {
+                                          setState(
+                                            () {
+                                              mod.isDisable = !value;
+                                              store.isSync = false;
+                                            },
+                                          );
                                         },
-                                      );
-                                    },
-                                    content: Text(mod.name),
+                                        content: Text(mod.name),
+                                      ),
+                                      ToggleButton(
+                                        checked:
+                                            store.favorites.contains(mod.name),
+                                        onChanged: (value) {
+                                          if (value) {
+                                            store.addFavorite(mod.name);
+                                          } else {
+                                            store.removeFavorite(mod.name);
+                                          }
+
+                                          store.savePresets();
+                                        },
+                                        style: ToggleButtonThemeData(
+                                          checkedButtonStyle: ButtonStyle(
+                                            backgroundColor: ButtonState.all(
+                                                Colors.transparent),
+                                            padding: ButtonState.all(
+                                              const EdgeInsets.all(8),
+                                            ),
+                                            border: ButtonState.all(
+                                              BorderSide.none,
+                                            ),
+                                          ),
+                                          uncheckedButtonStyle: ButtonStyle(
+                                            backgroundColor: ButtonState.all(
+                                                Colors.transparent),
+                                            padding: ButtonState.all(
+                                              const EdgeInsets.all(8),
+                                            ),
+                                            border: ButtonState.all(
+                                              BorderSide.none,
+                                            ),
+                                          ),
+                                        ),
+                                        child: store.favorites
+                                                .contains(mod.name)
+                                            ? const Icon(
+                                                FluentIcons.favorite_star_fill)
+                                            : const Icon(
+                                                FluentIcons.favorite_star),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),

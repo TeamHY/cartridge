@@ -115,28 +115,26 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
 
     newPreset = Preset(name: widget.preset.name, mods: []);
 
-    final path = ref.read(settingProvider).isaacPath;
-
-    loadMods(path).then(
-      (value) async => setState(
-        () {
-          newPreset.mods = value
-              .map(
-                (mod) => Mod(
-                  name: mod.name,
-                  path: mod.path,
-                  isDisable: widget.preset.mods
-                      .firstWhere(
-                        (element) => element.name == mod.name,
-                        orElse: () => Mod.none,
-                      )
-                      .isDisable,
-                ),
-              )
-              .toList();
-        },
-      ),
-    );
+    ref.read(storeProvider).loadMods().then(
+          (value) async => setState(
+            () {
+              newPreset.mods = value
+                  .map(
+                    (mod) => Mod(
+                      name: mod.name,
+                      path: mod.path,
+                      isDisable: widget.preset.mods
+                          .firstWhere(
+                            (element) => element.name == mod.name,
+                            orElse: () => Mod.none,
+                          )
+                          .isDisable,
+                    ),
+                  )
+                  .toList();
+            },
+          ),
+        );
   }
 
   @override
