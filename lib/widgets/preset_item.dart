@@ -113,9 +113,11 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
   void initState() {
     super.initState();
 
+    final store = ref.read(storeProvider);
+
     newPreset = Preset(name: widget.preset.name, mods: []);
 
-    ref.read(storeProvider).loadMods().then(
+    store.loadMods().then(
           (value) async => setState(
             () {
               newPreset.mods = value
@@ -132,6 +134,18 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
                     ),
                   )
                   .toList();
+
+              newPreset.mods.sort((a, b) {
+                if (store.favorites.contains(a.name) &&
+                    !store.favorites.contains(b.name)) {
+                  return -1;
+                } else if (!store.favorites.contains(a.name) &&
+                    store.favorites.contains(b.name)) {
+                  return 1;
+                } else {
+                  return a.name.compareTo(b.name);
+                }
+              });
             },
           ),
         );
@@ -139,6 +153,8 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final store = ref.read(storeProvider);
+
     return ContentDialog(
       title: Text(widget.preset.name),
       content: Column(
@@ -150,22 +166,25 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: newPreset.mods
                     .map(
-                      (mod) => Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16.0),
-                            child: ToggleSwitch(
-                              checked: !mod.isDisable,
-                              onChanged: (value) {
-                                setState(() {
-                                  mod.isDisable = !value;
-                                  isChanged = true;
-                                });
-                              },
-                              content: Text(mod.name),
+                      (mod) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: ToggleSwitch(
+                          checked: !mod.isDisable,
+                          onChanged: (value) {
+                            setState(() {
+                              mod.isDisable = !value;
+                              isChanged = true;
+                            });
+                          },
+                          content: Text(
+                            mod.name,
+                            style: TextStyle(
+                              color: store.favorites.contains(mod.name)
+                                  ? Colors.blue
+                                  : Colors.black,
                             ),
                           ),
-                        ],
+                        ),
                       ),
                     )
                     .toList(),

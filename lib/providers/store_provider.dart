@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cartridge/models/mod.dart';
+import 'package:cartridge/models/option_preset.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -25,6 +26,8 @@ class StoreNotifier extends ChangeNotifier {
 
   List<Preset> presets = [];
 
+  List<OptionPreset> optionPresets = [];
+
   List<String> favorites = [];
 
   List<Mod> currentMods = [];
@@ -34,6 +37,8 @@ class StoreNotifier extends ChangeNotifier {
 
   String? astroLocalVersion;
   String? astroRemoteVersion;
+
+  String? selectOptionPresetId;
 
   get isAstroOutdated =>
       astroLocalVersion != astroRemoteVersion ||
@@ -115,6 +120,40 @@ class StoreNotifier extends ChangeNotifier {
     astroRemoteVersion = await getAstroRemoteVersion();
 
     notifyListeners();
+  }
+
+  void applyOptionPreset(String id) async {
+    try {
+      final optionPreset =
+          optionPresets.firstWhere((element) => element.id == id);
+
+      final optionFile = File(
+          '${Platform.environment['UserProfile']}\\Documents\\My Games\\Binding of Isaac Repentance\\options.ini');
+
+      if (!await optionFile.exists()) {
+        return;
+      }
+
+      final content = await optionFile.readAsString();
+
+      final newContent = content.split('\n').map((line) {
+        if (line.startsWith('WindowWidth=')) {
+          return 'WindowWidth=${optionPreset.windowWidth}';
+        } else if (line.startsWith('WindowHeight=')) {
+          return 'WindowHeight=${optionPreset.windowHeight}';
+        } else if (line.startsWith('WindowPosX=')) {
+          return 'WindowPosX=${optionPreset.windowPosX}';
+        } else if (line.startsWith('WindowPosY=')) {
+          return 'WindowPosY=${optionPreset.windowPosY}';
+        } else {
+          return line;
+        }
+      }).join('\n');
+
+      await optionFile.writeAsString(newContent);
+    } catch (e) {
+      //
+    }
   }
 
   void applyMods(
@@ -207,6 +246,10 @@ class StoreNotifier extends ChangeNotifier {
           .map((e) => Preset.fromJson(e))
           .toList();
 
+      optionPresets = (json['optionPresets'] as List<dynamic>)
+          .map((e) => OptionPreset.fromJson(e))
+          .toList();
+
       favorites = ((json['favorites'] as List<dynamic>?) ?? []).cast<String>();
     } else {
       return;
@@ -222,6 +265,7 @@ class StoreNotifier extends ChangeNotifier {
     file.writeAsString(jsonEncode({
       'version': 2,
       'presets': presets,
+      'optionPresets': optionPresets,
       'favorites': favorites,
     }));
   }

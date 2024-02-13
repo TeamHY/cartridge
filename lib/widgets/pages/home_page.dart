@@ -103,6 +103,19 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final store = ref.watch(storeProvider);
+    final currentMods = List.from(store.currentMods);
+
+    currentMods.sort((a, b) {
+      if (store.favorites.contains(a.name) &&
+          !store.favorites.contains(b.name)) {
+        return -1;
+      } else if (!store.favorites.contains(a.name) &&
+          store.favorites.contains(b.name)) {
+        return 1;
+      } else {
+        return a.name.compareTo(b.name);
+      }
+    });
 
     return Layout(
       child: Row(
@@ -159,6 +172,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                             preset: store.presets[index],
                             onApply: (Preset preset) {
                               store.applyMods(preset.mods);
+
+                              if (preset.optionPresetId != null) {
+                                store.applyOptionPreset(preset.optionPresetId!);
+                              }
+
                               _controller.text = preset.name;
                             },
                             onDelete: (Preset preset) {
@@ -242,7 +260,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: store.currentMods
+                        children: currentMods
                             .map(
                               (mod) => SizedBox(
                                 width: double.infinity,
@@ -260,7 +278,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                                             },
                                           );
                                         },
-                                        content: Text(mod.name),
+                                        content: Text(
+                                          mod.name,
+                                          style: TextStyle(
+                                            color: store.favorites
+                                                    .contains(mod.name)
+                                                ? Colors.blue
+                                                : Colors.black,
+                                          ),
+                                        ),
                                       ),
                                       ToggleButton(
                                         checked:
@@ -338,7 +364,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                           FilledButton(
                             onPressed: store.isSync
                                 ? null
-                                : () => store.applyMods(store.currentMods),
+                                : () {
+                                    store.applyMods(store.currentMods);
+
+                                    if (store.selectOptionPresetId != null) {
+                                      store.applyOptionPreset(
+                                          store.selectOptionPresetId!);
+                                    }
+                                  },
                             child: const Text("적용"),
                           ),
                         ],
