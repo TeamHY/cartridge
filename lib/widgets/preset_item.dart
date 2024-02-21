@@ -1,7 +1,8 @@
 import 'package:cartridge/models/mod.dart';
+import 'package:cartridge/models/option_preset.dart';
 import 'package:cartridge/models/preset.dart';
-import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
+import 'package:cartridge/widgets/option_preset_button.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -115,7 +116,11 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
 
     final store = ref.read(storeProvider);
 
-    newPreset = Preset(name: widget.preset.name, mods: []);
+    newPreset = Preset(
+      name: widget.preset.name,
+      optionPresetId: widget.preset.optionPresetId,
+      mods: [],
+    );
 
     store.loadMods().then(
           (value) async => setState(
@@ -156,38 +161,77 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
     final store = ref.read(storeProvider);
 
     return ContentDialog(
+      constraints: const BoxConstraints(maxWidth: 600, maxHeight: 500),
       title: Text(widget.preset.name),
       content: Column(
         children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: OptionPresetButton(
+                      checked: newPreset.optionPresetId == null,
+                      onChanged: (value) => setState(() {
+                        newPreset.optionPresetId = null;
+                        isChanged = true;
+                      }),
+                      content: '그대로',
+                    ),
+                  ),
+                  ...store.optionPresets.map(
+                    (option) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: OptionPresetButton(
+                        id: option.id,
+                        checked: option.id == newPreset.optionPresetId,
+                        onChanged: (value) => setState(() {
+                          newPreset.optionPresetId = option.id;
+                          isChanged = true;
+                        }),
+                        content: option.name,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: newPreset.mods
-                    .map(
-                      (mod) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: ToggleSwitch(
-                          checked: !mod.isDisable,
-                          onChanged: (value) {
-                            setState(() {
-                              mod.isDisable = !value;
-                              isChanged = true;
-                            });
-                          },
-                          content: Text(
-                            mod.name,
-                            style: TextStyle(
-                              color: store.favorites.contains(mod.name)
-                                  ? Colors.blue
-                                  : Colors.black,
+              child: SizedBox(
+                width: 600,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: newPreset.mods
+                      .map(
+                        (mod) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          child: ToggleSwitch(
+                            checked: !mod.isDisable,
+                            onChanged: (value) {
+                              setState(() {
+                                mod.isDisable = !value;
+                                isChanged = true;
+                              });
+                            },
+                            content: Text(
+                              mod.name,
+                              style: TextStyle(
+                                color: store.favorites.contains(mod.name)
+                                    ? Colors.blue
+                                    : Colors.black,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
+                      )
+                      .toList(),
+                ),
               ),
             ),
           ),

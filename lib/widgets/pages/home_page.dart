@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:cartridge/main.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/layout.dart';
+import 'package:cartridge/widgets/option_preset_button.dart';
+import 'package:cartridge/widgets/option_preset_dialog.dart';
 import 'package:cartridge/widgets/pages/battle_page.dart';
 import 'package:cartridge/widgets/pages/slot_machine_page.dart';
 import 'package:cartridge/widgets/preset_item.dart';
@@ -172,6 +174,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                             preset: store.presets[index],
                             onApply: (Preset preset) {
                               store.applyMods(preset.mods);
+                              store.selectOptionPreset(preset.optionPresetId);
 
                               if (preset.optionPresetId != null) {
                                 store.applyOptionPreset(preset.optionPresetId!);
@@ -188,6 +191,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                             onEdit: (oldPreset, newPreset) => setState(() {
                               oldPreset.name = newPreset.name;
                               oldPreset.mods = newPreset.mods;
+                              oldPreset.optionPresetId =
+                                  newPreset.optionPresetId;
 
                               store.savePresets();
                             }),
@@ -255,6 +260,87 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
               child: Column(
                 children: [
+                  SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: OptionPresetButton(
+                              checked: store.selectOptionPresetId == null,
+                              onChanged: (value) => store.selectOptionPreset(
+                                null,
+                              ),
+                              content: '그대로',
+                            ),
+                          ),
+                          ...store.optionPresets.map(
+                            (option) => Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: OptionPresetButton(
+                                id: option.id,
+                                checked:
+                                    option.id == store.selectOptionPresetId,
+                                onChanged: (value) {
+                                  store.isSync = false;
+                                  store.selectOptionPreset(
+                                    option.id,
+                                  );
+                                },
+                                onEdited: (id) => showDialog(
+                                  context: context,
+                                  builder: (context) => OptionPresetDialog(
+                                    id: id,
+                                  ),
+                                ),
+                                onDeleted: (id) => showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return ContentDialog(
+                                      title: const Text("프리셋 삭제"),
+                                      content: const Text(
+                                        "프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
+                                      ),
+                                      actions: [
+                                        Button(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text("취소"),
+                                        ),
+                                        FilledButton(
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                ButtonState.all<Color>(
+                                                    Colors.red.dark),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            store.removeOptionPreset(id);
+                                          },
+                                          child: const Text('삭제'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                                content: option.name,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(FluentIcons.add),
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) => const OptionPresetDialog(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(

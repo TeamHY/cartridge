@@ -204,15 +204,48 @@ class StoreNotifier extends ChangeNotifier {
     }
   }
 
+  void updateOptionPreset(OptionPreset optionPreset) {
+    final index =
+        optionPresets.indexWhere((element) => element.id == optionPreset.id);
+
+    if (index == -1) {
+      optionPresets.add(optionPreset);
+    } else {
+      optionPresets[index] = optionPreset;
+    }
+
+    savePresets();
+    notifyListeners();
+  }
+
+  void removeOptionPreset(String id) {
+    optionPresets.removeWhere((element) => element.id == id);
+
+    if (selectOptionPresetId == id) {
+      selectOptionPresetId = null;
+    }
+
+    savePresets();
+    notifyListeners();
+  }
+
+  void selectOptionPreset(String? id) {
+    selectOptionPresetId = id;
+
+    notifyListeners();
+  }
+
   void addFavorite(String name) {
     favorites.add(name);
 
+    savePresets();
     notifyListeners();
   }
 
   void removeFavorite(String name) {
     favorites.remove(name);
 
+    savePresets();
     notifyListeners();
   }
 

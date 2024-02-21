@@ -53,20 +53,20 @@ class _SlotViewState extends State<SlotView> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 120,
-      height: 200,
+      width: 180,
+      height: 380,
       child: Stack(
         children: [
           ListWheelScrollView.useDelegate(
             controller: _controller,
-            itemExtent: 48,
+            itemExtent: 100,
             physics: const FixedExtentScrollPhysics(),
             diameterRatio: 1,
             overAndUnderCenterOpacity: 0.2,
             childDelegate: ListWheelChildLoopingListDelegate(
                 children: widget.items
                     .map((value) =>
-                        SlotItem(width: 120, height: 48, text: value))
+                        SlotItem(width: 180, height: 100, text: value))
                     .toList()),
           ),
           MouseRegion(
