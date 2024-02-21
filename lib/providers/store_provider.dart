@@ -122,7 +122,7 @@ class StoreNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void applyOptionPreset(String id) async {
+  Future<void> applyOptionPreset(String id) async {
     try {
       final optionPreset =
           optionPresets.firstWhere((element) => element.id == id);
@@ -156,15 +156,15 @@ class StoreNotifier extends ChangeNotifier {
     }
   }
 
-  void applyMods(
-    List<Mod> mods, {
+  void applyPreset(
+    Preset preset, {
     bool isForceRerun = false,
     bool isForceUpdate = false,
   }) async {
     final currentMods = await loadMods();
 
     for (var mod in currentMods) {
-      final isDisable = mods
+      final isDisable = preset.mods
           .firstWhere(
             (element) => element.name == mod.name,
             orElse: () => Mod(
@@ -199,6 +199,16 @@ class StoreNotifier extends ChangeNotifier {
         await Process.run('taskkill', ['/f', '/im', 'steam.exe']);
       }
 
+      await Future.delayed(Duration(
+        milliseconds: ref.read(settingProvider).rerunDelay,
+      ));
+    }
+
+    if (preset.optionPresetId != null) {
+      await applyOptionPreset(preset.optionPresetId!);
+    }
+
+    if (isRerun || isForceRerun) {
       await Process.run(
           '${ref.read(settingProvider).isaacPath}/isaac-ng.exe', []);
     }

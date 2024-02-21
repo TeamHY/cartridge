@@ -15,6 +15,8 @@ class SettingNotifier extends ChangeNotifier {
 
   String get isaacPath => _isaacPath;
 
+  int rerunDelay = 1000;
+
   void loadSetting() async {
     final appSupportDir = await getApplicationSupportDirectory();
     final file = File('${appSupportDir.path}\\setting.json');
@@ -28,6 +30,8 @@ class SettingNotifier extends ChangeNotifier {
     _isaacPath = json['isaacPath'] as String? ??
         'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth';
 
+    rerunDelay = json['rerunDelay'] as int? ?? 1000;
+
     notifyListeners();
   }
 
@@ -35,13 +39,21 @@ class SettingNotifier extends ChangeNotifier {
     final appSupportDir = await getApplicationSupportDirectory();
     final file = File('${appSupportDir.path}\\setting.json');
 
-    file.writeAsString(jsonEncode({'isaacPath': _isaacPath}));
+    file.writeAsString(jsonEncode({
+      'isaacPath': _isaacPath,
+      'rerunDelay': rerunDelay,
+    }));
   }
 
   void setIsaacPath(String path) {
     _isaacPath = path;
 
-    saveSetting();
+    notifyListeners();
+  }
+
+  void setRerunDelay(int delay) {
+    rerunDelay = delay;
+
     notifyListeners();
   }
 }

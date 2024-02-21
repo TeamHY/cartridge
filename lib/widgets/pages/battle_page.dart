@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cartridge/models/mod.dart';
+import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -204,8 +205,8 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                           ),
                                           FilledButton(
                                             onPressed: () {
-                                              store.applyMods(
-                                                mods,
+                                              store.applyPreset(
+                                                Preset(name: '', mods: mods),
                                                 isForceRerun: true,
                                                 isForceUpdate: true,
                                               );
@@ -221,7 +222,8 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                   return;
                                 }
 
-                                store.applyMods(mods, isForceRerun: true);
+                                store.applyPreset(Preset(name: '', mods: mods),
+                                    isForceRerun: true);
                               },
                             ),
                           ],

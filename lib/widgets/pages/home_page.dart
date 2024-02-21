@@ -172,13 +172,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                           index: index,
                           child: PresetItem(
                             preset: store.presets[index],
-                            onApply: (Preset preset) {
-                              store.applyMods(preset.mods);
+                            onApply: (Preset preset) async {
                               store.selectOptionPreset(preset.optionPresetId);
-
-                              if (preset.optionPresetId != null) {
-                                store.applyOptionPreset(preset.optionPresetId!);
-                              }
+                              store.applyPreset(preset);
 
                               _controller.text = preset.name;
                             },
@@ -450,13 +446,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                           FilledButton(
                             onPressed: store.isSync
                                 ? null
-                                : () {
-                                    store.applyMods(store.currentMods);
-
-                                    if (store.selectOptionPresetId != null) {
-                                      store.applyOptionPreset(
-                                          store.selectOptionPresetId!);
-                                    }
+                                : () async {
+                                    store.applyPreset(Preset(
+                                      name: '',
+                                      optionPresetId:
+                                          store.selectOptionPresetId,
+                                      mods: store.currentMods,
+                                    ));
                                   },
                             child: const Text("적용"),
                           ),
