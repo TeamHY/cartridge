@@ -87,7 +87,7 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
                 const SizedBox(height: 16),
                 IconButton(
                   icon: const Icon(
-                    FluentIcons.play_solid,
+                    FluentIcons.sync,
                     size: 20,
                   ),
                   iconButtonMode: IconButtonMode.large,

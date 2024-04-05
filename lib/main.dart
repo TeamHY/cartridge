@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:window_manager/window_manager.dart';
 
-final currentVersion = Version.parse('4.5.0');
+final currentVersion = Version.parse('4.6.0');
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

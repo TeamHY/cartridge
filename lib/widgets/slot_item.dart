@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 
 class SlotItem extends StatelessWidget {
   const SlotItem({
@@ -14,16 +14,19 @@ class SlotItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Center(
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+    return Container(
+      color: Colors.white,
+      child: SizedBox(
+        width: width,
+        height: height,
+        child: Center(
+          child: Text(
+            text,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),

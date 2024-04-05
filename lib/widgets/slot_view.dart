@@ -16,14 +16,14 @@ class SlotView extends StatefulWidget {
     super.key,
     required this.items,
     required this.controller,
-    required this.onDeleted,
     required this.onEdited,
+    required this.onDeleted,
   });
 
   final List<String> items;
   final SlotViewController controller;
-  final void Function() onDeleted;
   final void Function(List<String> newItems) onEdited;
+  final void Function() onDeleted;
 
   @override
   State<SlotView> createState() => _SlotViewState();
@@ -33,28 +33,30 @@ class _SlotViewState extends State<SlotView> {
   FixedExtentScrollController _controller = FixedExtentScrollController();
   bool _isHovered = false;
 
+  void onStart() {
+    _controller.jumpToItem(_controller.selectedItem % widget.items.length);
+
+    _controller.animateToItem(
+      Random().nextInt(widget.items.length * 200) + widget.items.length * 5,
+      duration: Duration(
+        milliseconds: (3000 * ((Random().nextDouble() + 1) / 2)).toInt(),
+      ),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
   @override
   void initState() {
     super.initState();
 
-    widget.controller.start = () {
-      _controller.jumpToItem(_controller.selectedItem % widget.items.length);
-
-      _controller.animateToItem(
-        Random().nextInt(widget.items.length * 200) + widget.items.length * 5,
-        duration: Duration(
-          milliseconds: (3000 * ((Random().nextDouble() + 1) / 2)).toInt(),
-        ),
-        curve: Curves.easeInOutCubic,
-      );
-    };
+    widget.controller.start = onStart;
   }
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 180,
-      height: 380,
+      height: 320,
       child: Stack(
         children: [
           ListWheelScrollView.useDelegate(
@@ -69,84 +71,89 @@ class _SlotViewState extends State<SlotView> {
                         SlotItem(width: 180, height: 100, text: value))
                     .toList()),
           ),
-          MouseRegion(
-            onHover: (event) => setState(() => _isHovered = true),
-            onExit: (event) => setState(() => _isHovered = false),
-            child: ClipRect(
-              child: TweenAnimationBuilder(
-                  duration: const Duration(milliseconds: 100),
-                  tween: Tween<double>(begin: 0, end: _isHovered ? 1 : 0),
-                  curve: Curves.easeInOutCubic,
-                  builder: (context, value, child) {
-                    return BackdropFilter(
-                      filter: ImageFilter.blur(
-                        sigmaX: value * 4,
-                        sigmaY: value * 4,
-                      ),
-                      child: Opacity(
-                        opacity: value,
-                        child: Container(
-                          color: const Color.fromRGBO(245, 248, 252, 0.5),
-                          child: Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(FluentIcons.edit),
-                                  onPressed: () => showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return SlotDialog(
-                                        items: widget.items,
-                                        onEdit: widget.onEdited,
-                                      );
-                                    },
+          Center(
+            child: SizedBox(
+              width: 180,
+              height: 100,
+              child: MouseRegion(
+                onHover: (event) => setState(() => _isHovered = true),
+                onExit: (event) => setState(() => _isHovered = false),
+                child: ClipRect(
+                  child: TweenAnimationBuilder(
+                      duration: const Duration(milliseconds: 100),
+                      tween: Tween<double>(begin: 0, end: _isHovered ? 1 : 0),
+                      curve: Curves.easeInOutCubic,
+                      builder: (context, value, child) {
+                        return Opacity(
+                          opacity: value,
+                          child: Container(
+                            color: const Color.fromRGBO(255, 255, 255, 0.85),
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(FluentIcons.sync),
+                                    onPressed: onStart,
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  icon: Icon(
-                                    FluentIcons.delete,
-                                    color: Colors.red.dark,
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(FluentIcons.edit),
+                                    onPressed: () => showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return SlotDialog(
+                                          items: widget.items,
+                                          onEdit: widget.onEdited,
+                                        );
+                                      },
+                                    ),
                                   ),
-                                  onPressed: () => showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return ContentDialog(
-                                        title: const Text("슬롯 삭제"),
-                                        content: const Text(
-                                            '슬롯을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?'),
-                                        actions: [
-                                          Button(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('취소'),
-                                          ),
-                                          FilledButton(
-                                            style: ButtonStyle(
-                                              backgroundColor:
-                                                  ButtonState.all<Color>(
-                                                      Colors.red.dark),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: Icon(
+                                      FluentIcons.delete,
+                                      color: Colors.red.dark,
+                                    ),
+                                    onPressed: () => showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ContentDialog(
+                                          title: const Text("슬롯 삭제"),
+                                          content: const Text(
+                                              '슬롯을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?'),
+                                          actions: [
+                                            Button(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('취소'),
                                             ),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              widget.onDeleted();
-                                            },
-                                            child: const Text('삭제'),
-                                          ),
-                                        ],
-                                      );
-                                    },
+                                            FilledButton(
+                                              style: ButtonStyle(
+                                                backgroundColor:
+                                                    ButtonState.all<Color>(
+                                                        Colors.red.dark),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                widget.onDeleted();
+                                              },
+                                              child: const Text('삭제'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  }),
+                        );
+                      }),
+                ),
+              ),
             ),
           ),
         ],
