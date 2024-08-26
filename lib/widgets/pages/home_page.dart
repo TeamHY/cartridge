@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cartridge/main.dart';
+import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/layout.dart';
 import 'package:cartridge/widgets/option_preset_button.dart';
@@ -240,6 +241,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                               ),
                               child: const Text('슬롯 머신'),
                             ),
+                            const SizedBox(width: 4),
+                            Button(
+                              onPressed: () => store.applyPreset(
+                                null,
+                                isEnableMods: false,
+                              ),
+                              child: const Text('데일리 런'),
+                            ),
                           ],
                         ),
                       ),
@@ -382,25 +391,27 @@ class _HomePageState extends ConsumerState<HomePage> {
 
                                           store.savePresets();
                                         },
-                                        style: ToggleButtonThemeData(
+                                        style: const ToggleButtonThemeData(
                                           checkedButtonStyle: ButtonStyle(
-                                            backgroundColor: ButtonState.all(
-                                                Colors.transparent),
-                                            padding: ButtonState.all(
-                                              const EdgeInsets.all(8),
+                                            backgroundColor:
+                                                WidgetStatePropertyAll(
+                                                    Colors.transparent),
+                                            padding: WidgetStatePropertyAll(
+                                              EdgeInsets.all(8),
                                             ),
-                                            border: ButtonState.all(
-                                              BorderSide.none,
+                                            shape: WidgetStatePropertyAll(
+                                              RoundedRectangleBorder(),
                                             ),
                                           ),
                                           uncheckedButtonStyle: ButtonStyle(
-                                            backgroundColor: ButtonState.all(
-                                                Colors.transparent),
-                                            padding: ButtonState.all(
-                                              const EdgeInsets.all(8),
+                                            backgroundColor:
+                                                WidgetStatePropertyAll(
+                                                    Colors.transparent),
+                                            padding: WidgetStatePropertyAll(
+                                              EdgeInsets.all(8),
                                             ),
-                                            border: ButtonState.all(
-                                              BorderSide.none,
+                                            shape: WidgetStatePropertyAll(
+                                              RoundedRectangleBorder(),
                                             ),
                                           ),
                                         ),

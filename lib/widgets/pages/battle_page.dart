@@ -139,10 +139,13 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                             ),
                             const SizedBox(height: 40),
                             IconButton(
-                              style: ButtonStyle(
-                                border: ButtonState.all(
-                                  const BorderSide(
-                                      width: 1, color: Colors.white),
+                              style: const ButtonStyle(
+                                shape: WidgetStatePropertyAll(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.zero,
+                                    side: BorderSide(
+                                        width: 1, color: Colors.white),
+                                  ),
                                 ),
                               ),
                               icon: const Padding(

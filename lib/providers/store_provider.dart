@@ -15,6 +15,33 @@ import '../models/metadata.dart';
 
 const astrobirthName = '!Astrobirth';
 
+Future<void> setEnableMods(bool value) async {
+  try {
+    final optionFile = File(
+        '${Platform.environment['UserProfile']}\\Documents\\My Games\\Binding of Isaac Repentance\\options.ini');
+
+    if (!await optionFile.exists()) {
+      return;
+    }
+
+    final content = await optionFile.readAsString();
+
+    final newContent = content.split('\n').map((line) {
+      if (line.startsWith('EnableMods=')) {
+        return 'EnableMods=${value ? 1 : 0}';
+      } else if (line.startsWith('EnableDebugConsole=')) {
+        return 'EnableDebugConsole=${value ? 1 : 0}';
+      } else {
+        return line;
+      }
+    }).join('\n');
+
+    await optionFile.writeAsString(newContent);
+  } catch (e) {
+    //
+  }
+}
+
 class StoreNotifier extends ChangeNotifier {
   StoreNotifier(this.ref) {
     reloadMods();
@@ -157,36 +184,39 @@ class StoreNotifier extends ChangeNotifier {
   }
 
   void applyPreset(
-    Preset preset, {
+    Preset? preset, {
     bool isForceRerun = false,
     bool isForceUpdate = false,
+    bool isEnableMods = true,
   }) async {
     final currentMods = await loadMods();
 
-    for (var mod in currentMods) {
-      final isDisable = preset.mods
-          .firstWhere(
-            (element) => element.name == mod.name,
-            orElse: () => Mod(
-              name: "Null",
-              path: "Null",
-              isDisable: true,
-            ),
-          )
-          .isDisable;
+    if (preset != null) {
+      for (var mod in currentMods) {
+        final isDisable = preset.mods
+            .firstWhere(
+              (element) => element.name == mod.name,
+              orElse: () => Mod(
+                name: "Null",
+                path: "Null",
+                isDisable: true,
+              ),
+            )
+            .isDisable;
 
-      try {
-        if (isDisable) {
-          final disableFile = File('${mod.path}/disable.it');
+        try {
+          if (isDisable) {
+            final disableFile = File('${mod.path}/disable.it');
 
-          disableFile.createSync();
-        } else {
-          final disableFile = File('${mod.path}/disable.it');
+            disableFile.createSync();
+          } else {
+            final disableFile = File('${mod.path}/disable.it');
 
-          disableFile.deleteSync();
+            disableFile.deleteSync();
+          }
+        } catch (e) {
+          //
         }
-      } catch (e) {
-        //
       }
     }
 
@@ -204,9 +234,11 @@ class StoreNotifier extends ChangeNotifier {
       ));
     }
 
-    if (preset.optionPresetId != null) {
-      await applyOptionPreset(preset.optionPresetId!);
+    if (preset?.optionPresetId != null) {
+      await applyOptionPreset(preset!.optionPresetId!);
     }
+
+    await setEnableMods(isEnableMods);
 
     if (isRerun || isForceRerun) {
       await Process.run(
