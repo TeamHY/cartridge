@@ -1,6 +1,6 @@
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/quick_bar.dart';
-import 'package:cartridge/widgets/setting_dialog.dart';
+import 'package:cartridge/widgets/dialogs/setting_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';

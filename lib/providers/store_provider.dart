@@ -131,15 +131,17 @@ class StoreNotifier extends ChangeNotifier {
   }
 
   Future<String?> getAstroRemoteVersion() async {
-    final response = await http.get(Uri.https('tgd.kr', "s/iwt2hw/72435841"));
+    // final response = await http.get(Uri.https('tgd.kr', "s/iwt2hw/72435841"));
 
-    if (response.statusCode != 200) {
-      return null;
-    }
+    // if (response.statusCode != 200) {
+    //   return null;
+    // }
 
-    final document = parse(response.body);
+    // final document = parse(response.body);
 
-    return document.querySelector("#article-content > p")?.innerHtml;
+    // return document.querySelector("#article-content > p")?.innerHtml;
+
+    return null;
   }
 
   void checkAstroVersion() async {

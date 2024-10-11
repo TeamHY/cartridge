@@ -2,11 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cartridge/main.dart';
-import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/layout.dart';
 import 'package:cartridge/widgets/option_preset_button.dart';
-import 'package:cartridge/widgets/option_preset_dialog.dart';
+import 'package:cartridge/widgets/dialogs/option_preset_dialog.dart';
 import 'package:cartridge/widgets/pages/battle_page.dart';
 import 'package:cartridge/widgets/pages/slot_machine_page.dart';
 import 'package:cartridge/widgets/preset_item.dart';
@@ -27,7 +26,8 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  late TextEditingController _controller;
+  late TextEditingController _presetNameController;
+  late TextEditingController _searchController;
 
   void checkAppVersion() async {
     final response = await http.get(Uri.parse(
@@ -91,14 +91,19 @@ class _HomePageState extends ConsumerState<HomePage> {
   void initState() {
     super.initState();
 
-    _controller = TextEditingController();
+    _presetNameController = TextEditingController();
+    _searchController = TextEditingController();
+    _searchController.addListener(() {
+      setState(() {});
+    });
 
     checkAppVersion();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _presetNameController.dispose();
+    _searchController.dispose();
 
     super.dispose();
   }
@@ -106,7 +111,16 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final store = ref.watch(storeProvider);
-    final currentMods = List.from(store.currentMods);
+    final currentMods = List<Mod>.from(store.currentMods)
+        .where(
+          (mod) =>
+              mod.name.toLowerCase().replaceAll(RegExp('\\s'), "").contains(
+                    _searchController.text
+                        .toLowerCase()
+                        .replaceAll(RegExp('\\s'), ""),
+                  ),
+        )
+        .toList();
 
     currentMods.sort((a, b) {
       if (store.favorites.contains(a.name) &&
@@ -136,7 +150,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         children: [
                           Flexible(
                             child: TextBox(
-                              controller: _controller,
+                              controller: _presetNameController,
                               placeholder: '새 프리셋',
                             ),
                           ),
@@ -147,8 +161,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                               setState(() {
                                 store.presets.add(
                                   Preset(
-                                    name: _controller.value.text != ''
-                                        ? _controller.value.text
+                                    name: _presetNameController.value.text != ''
+                                        ? _presetNameController.value.text
                                         : '새 프리셋',
                                     mods: store.currentMods
                                         .map(
@@ -177,7 +191,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               store.selectOptionPreset(preset.optionPresetId);
                               store.applyPreset(preset);
 
-                              _controller.text = preset.name;
+                              _presetNameController.text = preset.name;
                             },
                             onDelete: (Preset preset) {
                               setState(() {
@@ -271,16 +285,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: OptionPresetButton(
-                              checked: store.selectOptionPresetId == null,
-                              onChanged: (value) => store.selectOptionPreset(
-                                null,
-                              ),
-                              content: '그대로',
-                            ),
-                          ),
                           ...store.optionPresets.map(
                             (option) => Padding(
                               padding: const EdgeInsets.only(right: 8),
@@ -289,6 +293,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 checked:
                                     option.id == store.selectOptionPresetId,
                                 onChanged: (value) {
+                                  if (!value) {
+                                    store.selectOptionPreset(
+                                      null,
+                                    );
+                                    return;
+                                  }
+
                                   store.isSync = false;
                                   store.selectOptionPreset(
                                     option.id,
@@ -379,6 +390,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                                           ),
                                         ),
                                       ),
+                                      const Padding(
+                                        padding: EdgeInsets.only(right: 8),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                            FluentIcons.folder_horizontal),
+                                        onPressed: () => Process.run(
+                                          'explorer "${mod.path.replaceAll(RegExp('/'), "\\")}"',
+                                          [],
+                                        ),
+                                      ),
                                       ToggleButton(
                                         checked:
                                             store.favorites.contains(mod.name),
@@ -428,6 +450,19 @@ class _HomePageState extends ConsumerState<HomePage> {
                               ),
                             )
                             .toList(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextBox(
+                      controller: _searchController,
+                      placeholder: '검색',
+                      suffix: IgnorePointer(
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: const Icon(FluentIcons.search),
+                        ),
                       ),
                     ),
                   ),
