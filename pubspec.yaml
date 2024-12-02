@@ -47,6 +47,7 @@ dependencies:
   pub_semver: ^2.1.4
   html: ^0.15.4
   uuid: ^4.2.2
+  supabase_flutter: ^2.8.1
 
 dev_dependencies:
   flutter_test:

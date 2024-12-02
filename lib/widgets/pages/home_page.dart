@@ -7,6 +7,7 @@ import 'package:cartridge/widgets/layout.dart';
 import 'package:cartridge/widgets/option_preset_button.dart';
 import 'package:cartridge/widgets/dialogs/option_preset_dialog.dart';
 import 'package:cartridge/widgets/pages/battle_page.dart';
+import 'package:cartridge/widgets/pages/record_page.dart';
 import 'package:cartridge/widgets/pages/slot_machine_page.dart';
 import 'package:cartridge/widgets/preset_item.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -240,10 +241,10 @@ class _HomePageState extends ConsumerState<HomePage> {
                               onPressed: () => Navigator.push(
                                 context,
                                 FluentPageRoute(
-                                  builder: (context) => const BattlePage(),
+                                  builder: (context) => const RecordPage(),
                                 ),
                               ),
-                              child: const Text('대결 모드'),
+                              child: const Text('기록 모드'),
                             ),
                             const SizedBox(width: 4),
                             Button(
