@@ -1,12 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
+import 'package:cartridge/models/mod.dart';
+import 'package:cartridge/models/preset.dart';
+import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
+import 'package:cartridge/utils/recorder_mod.dart';
 import 'package:cartridge/widgets/dialogs/sign_in_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_up_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:http/http.dart' as http;
 
 class RecordPage extends ConsumerStatefulWidget {
   const RecordPage({super.key});
@@ -65,9 +72,72 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     return '$hours:$minutes:$seconds.$milliseconds';
   }
 
+  void startGame() async {
+    try {
+      final store = ref.watch(storeProvider);
+      final setting = ref.read(settingProvider);
+
+      final response = await http.get(Uri.https('raw.githubusercontent.com',
+          'TeamHY/cartridge/main/assets/record_presets.json'));
+
+      if (response.statusCode != 200) {
+        throw Exception(response.body);
+      }
+
+      final json = jsonDecode(response.body).cast<Map<String, dynamic>>();
+      final mods = List<Mod>.from(json.map((e) => Mod.fromJson(e)));
+
+      final recorderDirectory =
+          Directory('${setting.isaacPath}\\mods\\CartridgeRecorder');
+      recorderDirectory.deleteSync(recursive: true);
+      recorderDirectory.createSync();
+
+      final supabase = Supabase.instance.client;
+      final today = DateTime.now();
+      final data = (await supabase
+          .from("daily_challenges")
+          .select()
+          .eq("date", "${today.year}-${today.month}-${today.day}"))[0];
+
+      final mainFile = File("${recorderDirectory.path}\\main.lua");
+      mainFile.createSync();
+      mainFile
+          .writeAsString(RecorderMod.getModMain(data["seed"], data["boss"]));
+
+      final metadataFile = File("${recorderDirectory.path}\\metadata.xml");
+      metadataFile.createSync();
+      metadataFile.writeAsString(RecorderMod.modMetadata);
+
+      store.applyPreset(
+        Preset(name: '', mods: mods),
+        isForceRerun: true,
+        isNoDelay: true,
+      );
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return ContentDialog(
+              title: const Text('오류'),
+              content: Text(e.toString()),
+              actions: [
+                FilledButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('닫기'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final store = ref.watch(storeProvider);
     final baseColor = Colors.blue.lightest;
 
     final time = _stopwatch.elapsed;
@@ -135,13 +205,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                             ),
                           ),
                           iconButtonMode: IconButtonMode.large,
-                          onPressed: () async {
-                            if (_stopwatch.isRunning) {
-                              return _stopwatch.stop();
-                            }
-
-                            _stopwatch.start();
-                          },
+                          onPressed: startGame,
                         ),
                       ],
                     ),

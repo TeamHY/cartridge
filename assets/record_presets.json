@@ -1,9 +1,9 @@
 [
-  { "name": "CartridgeRecorder", "isDisable": false },
   { "name": "!! Mod Config Menu Pure", "isDisable": false },
   { "name": "!!!quieter environment sfx", "isDisable": false },
   { "name": "!!~External item descriptions", "isDisable": false },
   { "name": "!Detailed Respawn [REP]", "isDisable": false },
+  { "name": "!Astrobirth", "isDisable": false },
   { "name": "'Enhanced Boss Bars", "isDisable": false },
   { "name": "Damo Indicator", "isDisable": false },
   { "name": "Double tap Familiars", "isDisable": false },

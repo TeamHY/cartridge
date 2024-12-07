@@ -5,6 +5,7 @@ import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/option_preset.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
+import 'package:cartridge/utils/isaac_log_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:html/parser.dart';
@@ -15,10 +16,12 @@ import '../models/metadata.dart';
 
 const astrobirthName = '!Astrobirth';
 
+final isaacDocumentPath =
+    '${Platform.environment['UserProfile']}\\Documents\\My Games\\Binding of Isaac Repentance';
+
 Future<void> setEnableMods(bool value) async {
   try {
-    final optionFile = File(
-        '${Platform.environment['UserProfile']}\\Documents\\My Games\\Binding of Isaac Repentance\\options.ini');
+    final optionFile = File('$isaacDocumentPath\\options.ini');
 
     if (!await optionFile.exists()) {
       return;
@@ -51,6 +54,8 @@ class StoreNotifier extends ChangeNotifier {
 
   final Ref ref;
 
+  final IsaacLogFile logFile = IsaacLogFile('$isaacDocumentPath\\log.txt');
+
   List<Preset> presets = [];
 
   List<OptionPreset> optionPresets = [];
@@ -71,6 +76,13 @@ class StoreNotifier extends ChangeNotifier {
       astroLocalVersion != astroRemoteVersion ||
       astroLocalVersion == null ||
       astroRemoteVersion == null;
+
+  @override
+  void dispose() {
+    logFile.dispose();
+
+    super.dispose();
+  }
 
   Future<List<Mod>> loadMods() async {
     final path = ref.read(settingProvider).isaacPath;
@@ -156,8 +168,7 @@ class StoreNotifier extends ChangeNotifier {
       final optionPreset =
           optionPresets.firstWhere((element) => element.id == id);
 
-      final optionFile = File(
-          '${Platform.environment['UserProfile']}\\Documents\\My Games\\Binding of Isaac Repentance\\options.ini');
+      final optionFile = File('$isaacDocumentPath\\options.ini');
 
       if (!await optionFile.exists()) {
         return;
@@ -190,6 +201,7 @@ class StoreNotifier extends ChangeNotifier {
     bool isForceRerun = false,
     bool isForceUpdate = false,
     bool isEnableMods = true,
+    bool isNoDelay = false,
   }) async {
     final currentMods = await loadMods();
 
@@ -231,9 +243,11 @@ class StoreNotifier extends ChangeNotifier {
         await Process.run('taskkill', ['/f', '/im', 'steam.exe']);
       }
 
-      await Future.delayed(Duration(
-        milliseconds: ref.read(settingProvider).rerunDelay,
-      ));
+      if (!isNoDelay) {
+        await Future.delayed(Duration(
+          milliseconds: ref.read(settingProvider).rerunDelay,
+        ));
+      }
     }
 
     if (preset?.optionPresetId != null) {
