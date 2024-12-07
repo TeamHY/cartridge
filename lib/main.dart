@@ -1,5 +1,6 @@
 import 'package:cartridge/widgets/pages/home_page.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -8,6 +9,8 @@ import 'package:window_manager/window_manager.dart';
 final currentVersion = Version.parse('4.8.0');
 
 void main() async {
+  await dotenv.load(fileName: '.env');
+
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
@@ -25,8 +28,8 @@ void main() async {
   });
 
   await Supabase.initialize(
-    url: '',
-    anonKey: '',
+    url: dotenv.env['SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
 
   runApp(const ProviderScope(child: MyApp()));

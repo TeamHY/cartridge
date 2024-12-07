@@ -1,13 +1,8 @@
-// Follow this setup guide to integrate the Deno language server with your editor:
-// https://deno.land/manual/getting_started/setup_your_environment
-// This enables autocomplete, go to definition, etc.
-
-// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 function isFutureDate(date: string) {
-  const today = new Date();
+  const today = new Date(Date.now() + 9 * 60 * 60 * 1000);
   const targetDate = new Date(date);
 
   return today.getFullYear() < targetDate.getFullYear() ||
@@ -16,6 +11,22 @@ function isFutureDate(date: string) {
     (today.getFullYear() === targetDate.getFullYear() &&
       today.getMonth() === targetDate.getMonth() &&
       today.getDate() < targetDate.getDate());
+}
+
+function validateSeed(seed: string): boolean {
+  const allowedCharacters = "ABCDEFGHJKLMNPQRSTWXYZ01234V6789";
+
+  if (seed.length !== 8) {
+    return false;
+  }
+
+  for (const char of seed) {
+    if (!allowedCharacters.includes(char)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 async function create(req: Request) {
@@ -42,9 +53,18 @@ async function create(req: Request) {
       });
     }
 
-    const { data, error } = await supabase.from("daily_challenges").insert([
-      { date, seed, boss },
-    ]);
+    if (!validateSeed(seed)) {
+      return new Response("seed가 올바르지 않습니다", {
+        status: 400,
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("daily_challenges")
+      .insert([
+        { date, seed, boss },
+      ])
+      .select();
 
     if (error) {
       throw error;
@@ -79,11 +99,15 @@ async function update(req: Request) {
       });
     }
 
-    const { data, error } = await supabase.from("daily_challenges").update({
-      date,
-      seed,
-      boss,
-    }).eq("id", id);
+    const { data, error } = await supabase
+      .from("daily_challenges")
+      .update({
+        date,
+        seed,
+        boss,
+      })
+      .eq("id", id)
+      .select();
 
     if (error) {
       throw error;

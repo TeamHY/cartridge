@@ -5,19 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class SignUpDialog extends ConsumerStatefulWidget {
-  const SignUpDialog({super.key});
+class SignInDialog extends ConsumerStatefulWidget {
+  const SignInDialog({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _SignUpDialogState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _SignInDialogState();
 }
 
-class _SignUpDialogState extends ConsumerState<SignUpDialog> {
+class _SignInDialogState extends ConsumerState<SignInDialog> {
   bool _isChanged = false;
 
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
-  late TextEditingController _nicknameController;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -27,7 +26,6 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
 
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
-    _nicknameController = TextEditingController();
   }
 
   @override
@@ -37,26 +35,19 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
     super.dispose();
   }
 
-  Future<void> onSignUp() async {
+  Future<void> onSignIn() async {
     final supabase = Supabase.instance.client;
 
     final email = _emailController.text;
     final password = _passwordController.text;
-    final nickname = _nicknameController.text;
 
-    await supabase.auth.signUp(
-      email: email,
-      password: password,
-      data: {
-        'display_name': nickname,
-      },
-    );
+    await supabase.auth.signInWithPassword(email: email, password: password);
   }
 
   @override
   Widget build(BuildContext context) {
     return ContentDialog(
-      title: const Text('회원가입'),
+      title: const Text('로그인'),
       content: Form(
         key: _formKey,
         child: Column(
@@ -90,20 +81,6 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
                 controller: _passwordController,
               ),
             ),
-            const SizedBox(height: 16.0),
-            InfoLabel(
-              label: '닉네임',
-              child: TextFormBox(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '닉네임을 입력해주세요.';
-                  }
-
-                  return null;
-                },
-                controller: _nicknameController,
-              ),
-            ),
           ],
         ),
       ),
@@ -120,10 +97,10 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
               return;
             }
 
-            onSignUp();
+            onSignIn();
             Navigator.pop(context);
           },
-          child: const Text('회원가입'),
+          child: const Text('로그인'),
         ),
       ],
     );
