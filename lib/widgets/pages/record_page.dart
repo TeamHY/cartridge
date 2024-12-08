@@ -111,11 +111,11 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       metadataFile.createSync();
       metadataFile.writeAsString(RecorderMod.modMetadata);
 
-      // store.applyPreset(
-      //   Preset(name: '', mods: mods),
-      //   isForceRerun: true,
-      //   isNoDelay: true,
-      // );
+      store.applyPreset(
+        Preset(name: '', mods: mods),
+        isForceRerun: true,
+        isNoDelay: true,
+      );
     } catch (e) {
       if (context.mounted) {
         showDialog(
