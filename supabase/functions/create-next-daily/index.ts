@@ -55,18 +55,15 @@ Deno.serve(async (req) => {
       },
     );
 
-    const today = new Date(Date.now() + 9 * 60 * 60 * 1000);
+    const tomorrow = new Date(Date.now() + (24 + 9) * 60 * 60 * 1000);
     
-    const date = `${today.getFullYear()}-${today.getMonth()}-${
-      today.getDate() + 1
-    }`;
     const seed = generateSeed();
     const boss = getRandomBoss();
 
     const { data, error } = await supabase
       .from("daily_challenges")
       .insert([
-        { date, seed, boss },
+        { date: tomorrow, seed, boss },
       ])
       .select();
 

@@ -10,7 +10,7 @@ local BOSSES = {
   ["the_lamb"] = "273.0.0",
   ["mega_satan"] = "275.0.0",
   ["mother"] = "912.10.0",
-  ["the_beast"] "951.0.0",
+  ["the_beast"] = "951.0.0",
   ["delirium"] = "412.0.0"
 }
 

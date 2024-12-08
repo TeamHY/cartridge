@@ -87,32 +87,35 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       final json = jsonDecode(response.body).cast<Map<String, dynamic>>();
       final mods = List<Mod>.from(json.map((e) => Mod.fromJson(e)));
 
+      await Process.run('taskkill', ['/im', 'isaac-ng.exe']);
+
       final recorderDirectory =
-          Directory('${setting.isaacPath}\\mods\\CartridgeRecorder');
+          Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
       recorderDirectory.deleteSync(recursive: true);
       recorderDirectory.createSync();
 
       final supabase = Supabase.instance.client;
       final today = DateTime.now();
-      final data = (await supabase
+      final todayChallenge = (await supabase
           .from("daily_challenges")
           .select()
-          .eq("date", "${today.year}-${today.month}-${today.day}"))[0];
+          .gte("date", today)
+          .lte("date", today))[0];
 
       final mainFile = File("${recorderDirectory.path}\\main.lua");
       mainFile.createSync();
-      mainFile
-          .writeAsString(RecorderMod.getModMain(data["seed"], data["boss"]));
+      mainFile.writeAsString(RecorderMod.getModMain(
+          todayChallenge["seed"], todayChallenge["boss"]));
 
       final metadataFile = File("${recorderDirectory.path}\\metadata.xml");
       metadataFile.createSync();
       metadataFile.writeAsString(RecorderMod.modMetadata);
 
-      store.applyPreset(
-        Preset(name: '', mods: mods),
-        isForceRerun: true,
-        isNoDelay: true,
-      );
+      // store.applyPreset(
+      //   Preset(name: '', mods: mods),
+      //   isForceRerun: true,
+      //   isNoDelay: true,
+      // );
     } catch (e) {
       if (context.mounted) {
         showDialog(

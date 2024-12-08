@@ -9,7 +9,7 @@ async function checkSeed(
 
   const { data, error } = await supabase.from("daily_challenges").select().eq(
     "date",
-    `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`,
+    today.toISOString().split("T")[0],
   ).eq(
     "seed",
     seed,
