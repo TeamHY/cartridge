@@ -54,8 +54,6 @@ class StoreNotifier extends ChangeNotifier {
 
   final Ref ref;
 
-  final IsaacLogFile logFile = IsaacLogFile('$isaacDocumentPath\\log.txt');
-
   List<Preset> presets = [];
 
   List<OptionPreset> optionPresets = [];
@@ -79,8 +77,6 @@ class StoreNotifier extends ChangeNotifier {
 
   @override
   void dispose() {
-    logFile.dispose();
-
     super.dispose();
   }
 

@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, SupabaseClient } from "jsr:@supabase/supabase-js@2";
 
-async function checkSeed(
+async function getChallengeId(
   supabase: SupabaseClient<any, "public", any>,
   seed: string,
 ) {
@@ -15,15 +15,15 @@ async function checkSeed(
     seed,
   );
 
-  if (data && !error) {
-    return true;
+  if (data && data[0] && !error) {
+    return data[0].id;
   }
 
-  return false;
+  return null;
 }
 
 async function create(req: Request) {
-  const { time, seed, data: reqData } = await req.json();
+  const { time, seed, character, data: reqData } = await req.json();
 
   if (!time || !seed || !reqData) {
     return new Response("누락된 필드가 존재합니다", { status: 400 });
@@ -43,14 +43,16 @@ async function create(req: Request) {
       return new Response("사용자 정보를 찾을 수 없습니다", { status: 401 });
     }
 
-    if (!checkSeed(supabase, seed)) {
-      return new Response("seed가 올바르지 않습니다", { status: 400 });
+    const challengeId = await getChallengeId(supabase, seed);
+
+    if (!challengeId) {
+      return new Response("데일리 챌린지를 찾을 수 없습니다", { status: 400 });
     }
 
     const { data, error } = await supabase
       .from("daily_challenge_records")
       .insert([
-        { user_id: user.id, data: reqData, time },
+        { user_id: user.id, challenge_id: challengeId, data: reqData, time, character },
       ])
       .select();
 

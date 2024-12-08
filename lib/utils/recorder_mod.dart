@@ -25,7 +25,8 @@ local game = Game()
 mod:AddCallback(
 	ModCallbacks.MC_POST_GAME_STARTED,
 	function(_, isContinue)
-		Isaac.ExecuteCommand("seed " .. DAILY_SEED)
+  print(DAILY_SEED:sub(1, 4) .. " " .. DAILY_SEED:sub(5, 8))
+		Isaac.ExecuteCommand("seed " .. DAILY_SEED:sub(1, 4) .. " " .. DAILY_SEED:sub(5, 8))
 
 		local seed = game:GetSeeds():GetStartSeedString():gsub(" ", "")
 		local player = Isaac.GetPlayer()
@@ -41,7 +42,7 @@ mod:AddCallback(
 			local seed = game:GetSeeds():GetStartSeedString():gsub(" ", "")
 			local player = Isaac.GetPlayer()
 
-			Isaac.DebugString("[CR]END:" .. game.Difficulty .. ":" .. player:GetPlayerType() .. ":" .. seed)
+			Isaac.DebugString("[CR]END:" .. game.Difficulty .. "." .. player:GetPlayerType() .. "." .. seed)
 		end
 	end
 )

@@ -6,6 +6,7 @@ import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
+import 'package:cartridge/utils/isaac_log_file.dart';
 import 'package:cartridge/utils/recorder_mod.dart';
 import 'package:cartridge/widgets/dialogs/sign_in_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_up_dialog.dart';
@@ -28,6 +29,13 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
   late Timer _timer;
   late StreamSubscription<AuthState> _authSubscription;
+  late IsaacLogFile _logFile;
+
+  Map<String, dynamic>? _todayChallenge;
+  int _character = 0;
+  String _seed = '';
+  bool _isBossKilled = false;
+  Map<String, dynamic> _data = {};
 
   @override
   void initState() {
@@ -45,6 +53,11 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     _authSubscription = _supabase.auth.onAuthStateChange.listen((data) {
       setState(() {});
     });
+
+    _logFile = IsaacLogFile(
+      '$isaacDocumentPath\\log.txt',
+      onMessage: onMessage,
+    );
   }
 
   @override
@@ -53,6 +66,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
     _timer.cancel();
     _authSubscription.cancel();
+    _logFile.dispose();
 
     super.dispose();
   }
@@ -60,6 +74,17 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   @override
   void onWindowFocus() {
     ref.read(storeProvider.notifier).checkAstroVersion();
+  }
+
+  void postRecord(String time) async {
+    final res = await _supabase.functions.invoke('daily-record', body: {
+      'time': time,
+      'seed': _seed,
+      'character': _character,
+      'data': _data
+    });
+
+    print(res.data);
   }
 
   String getTimeString(Duration time) {
@@ -70,6 +95,39 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         ((time.inMilliseconds % 1000) / 10).floor().toString().padLeft(2, '0');
 
     return '$hours:$minutes:$seconds.$milliseconds';
+  }
+
+  void onMessage(String type, List<String> data) {
+    final store = ref.read(storeProvider.notifier);
+
+    if (type == 'START') {
+      _stopwatch.stop();
+      _stopwatch.reset();
+
+      if (data[0] == '1' && data[2] == _todayChallenge?['seed']) {
+        _stopwatch.start();
+        _character = int.parse(data[1]);
+        _seed = data[2];
+        _isBossKilled = false;
+        _data = {};
+      }
+    } else if (type == 'END') {
+      if (data[0] == '1' &&
+          data[2] == _todayChallenge?['seed'] &&
+          _isBossKilled == true) {
+        _character = int.parse(data[1]);
+        _seed = data[2];
+
+        postRecord(getTimeString(_stopwatch.elapsed));
+      }
+
+      _stopwatch.stop();
+      _stopwatch.reset();
+    } else if (type == 'BOSS') {
+      _isBossKilled = true;
+    } else if (type == 'STAGE') {
+      _data.addAll({getTimeString(_stopwatch.elapsed): "스테이지 ${data[0]} 입장"});
+    }
   }
 
   void startGame() async {
@@ -94,9 +152,8 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       recorderDirectory.deleteSync(recursive: true);
       recorderDirectory.createSync();
 
-      final supabase = Supabase.instance.client;
       final today = DateTime.now();
-      final todayChallenge = (await supabase
+      _todayChallenge = (await _supabase
           .from("daily_challenges")
           .select()
           .gte("date", today)
@@ -105,7 +162,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       final mainFile = File("${recorderDirectory.path}\\main.lua");
       mainFile.createSync();
       mainFile.writeAsString(RecorderMod.getModMain(
-          todayChallenge["seed"], todayChallenge["boss"]));
+          _todayChallenge!["seed"], _todayChallenge!["boss"]));
 
       final metadataFile = File("${recorderDirectory.path}\\metadata.xml");
       metadataFile.createSync();

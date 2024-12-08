@@ -7,8 +7,8 @@ function getChecksum(seed: number): number {
 
   while (true) {
       checksum = (checksum + (seed & 0xFF)) & 0xFF;
-      checksum = (2 * checksum + (checksum >> 7)) & 0xFF;
-      seed = seed >> 5;
+      checksum = (2 * checksum + (checksum >>> 7)) & 0xFF;
+      seed = seed >>> 5;
       if (seed === 0) break;
   }
   
@@ -20,13 +20,13 @@ function generateSeed(): string {
   
   const checksum = getChecksum(randomSeed);
 
-  const combined = ((randomSeed ^ 0xFEF7FFD) << 8) | checksum;
+  const combined = ((BigInt(randomSeed) ^ 0xFEF7FFDn) << 8n) | BigInt(checksum);
 
   const lookupTable = "ABCDEFGHJKLMNPQRSTWXYZ01234V6789";
   const result: string[] = [];
   for (let i = 0; i < 8; i++) {
-      const charIndex = (combined >> (35 - i * 5)) & 0x1F;
-      result.push(lookupTable[charIndex]);
+      const charIndex = (combined >> BigInt(35 - i * 5)) & 0x1Fn;
+      result.push(lookupTable[Number(charIndex)]);
   }
 
   return result.join("");
