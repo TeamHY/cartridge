@@ -5,12 +5,10 @@ import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/option_preset.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
-import 'package:cartridge/utils/isaac_log_file.dart';
+import 'package:cartridge/utils/process_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:html/parser.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:http/http.dart' as http;
 
 import '../models/metadata.dart';
 
@@ -192,7 +190,7 @@ class StoreNotifier extends ChangeNotifier {
     }
   }
 
-  void applyPreset(
+  Future<void> applyPreset(
     Preset? preset, {
     bool isForceRerun = false,
     bool isForceUpdate = false,
@@ -233,10 +231,10 @@ class StoreNotifier extends ChangeNotifier {
     reloadMods();
 
     if (isRerun || isForceRerun) {
-      await Process.run('taskkill', ['/im', 'isaac-ng.exe']);
+      await ProcessUtil.killIsaac();
 
       if (isForceUpdate) {
-        await Process.run('taskkill', ['/f', '/im', 'steam.exe']);
+        await ProcessUtil.killSteam();
       }
 
       if (!isNoDelay) {

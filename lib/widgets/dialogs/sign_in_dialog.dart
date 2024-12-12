@@ -1,8 +1,6 @@
-import 'package:cartridge/main.dart';
-import 'package:cartridge/providers/setting_provider.dart';
+import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart' as material;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignInDialog extends ConsumerStatefulWidget {
@@ -13,8 +11,6 @@ class SignInDialog extends ConsumerStatefulWidget {
 }
 
 class _SignInDialogState extends ConsumerState<SignInDialog> {
-  bool _isChanged = false;
-
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
 
@@ -42,6 +38,25 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
     final password = _passwordController.text;
 
     await supabase.auth.signInWithPassword(email: email, password: password);
+  }
+
+  Future<void> onSubmit(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    try {
+      await onSignIn();
+    } catch (e) {
+      if (context.mounted) {
+        showErrorDialog(context, e.toString());
+      }
+      return;
+    }
+
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -79,6 +94,7 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
                   return null;
                 },
                 controller: _passwordController,
+                onFieldSubmitted: (_) => onSubmit(context),
               ),
             ),
           ],
@@ -92,14 +108,7 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
           child: const Text('취소'),
         ),
         FilledButton(
-          onPressed: () {
-            if (!_formKey.currentState!.validate()) {
-              return;
-            }
-
-            onSignIn();
-            Navigator.pop(context);
-          },
+          onPressed: () => onSubmit(context),
           child: const Text('로그인'),
         ),
       ],

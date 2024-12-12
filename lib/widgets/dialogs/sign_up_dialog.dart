@@ -1,8 +1,6 @@
-import 'package:cartridge/main.dart';
-import 'package:cartridge/providers/setting_provider.dart';
+import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/material.dart' as material;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignUpDialog extends ConsumerStatefulWidget {
@@ -13,8 +11,6 @@ class SignUpDialog extends ConsumerStatefulWidget {
 }
 
 class _SignUpDialogState extends ConsumerState<SignUpDialog> {
-  bool _isChanged = false;
-
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
   late TextEditingController _nicknameController;
@@ -53,6 +49,25 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
     );
   }
 
+  Future<void> onSubmit(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    try {
+      await onSignUp();
+    } catch (e) {
+      if (context.mounted) {
+        showErrorDialog(context, e.toString());
+      }
+      return;
+    }
+
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ContentDialog(
@@ -85,6 +100,10 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
                     return '비밀번호를 입력해주세요.';
                   }
 
+                  if (value.length < 6) {
+                    return '비밀번호는 6자 이상이어야 합니다.';
+                  }
+
                   return null;
                 },
                 controller: _passwordController,
@@ -102,6 +121,7 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
                   return null;
                 },
                 controller: _nicknameController,
+                onFieldSubmitted: (_) => onSubmit(context),
               ),
             ),
           ],
@@ -115,14 +135,7 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
           child: const Text('취소'),
         ),
         FilledButton(
-          onPressed: () {
-            if (!_formKey.currentState!.validate()) {
-              return;
-            }
-
-            onSignUp();
-            Navigator.pop(context);
-          },
+          onPressed: () => onSubmit(context),
           child: const Text('회원가입'),
         ),
       ],

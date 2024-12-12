@@ -7,7 +7,11 @@ import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/utils/isaac_log_file.dart';
+import 'package:cartridge/utils/process_util.dart';
 import 'package:cartridge/utils/recorder_mod.dart';
+import 'package:cartridge/widgets/back_arrow_view.dart';
+import 'package:cartridge/widgets/daily_challenge_ranking.dart';
+import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_in_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_up_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -15,6 +19,34 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:http/http.dart' as http;
+
+class RecorderState {
+  RecorderState({
+    this.character = 0,
+    this.seed = '',
+    this.isBossKilled = false,
+    this.data = const {},
+  });
+
+  int character;
+  String seed;
+  bool isBossKilled;
+  Map<String, dynamic> data;
+}
+
+class DailyRecord {
+  DailyRecord({
+    required this.time,
+    required this.seed,
+    required this.character,
+    required this.data,
+  });
+
+  final String time;
+  final String seed;
+  final int character;
+  final Map<String, dynamic> data;
+}
 
 class RecordPage extends ConsumerStatefulWidget {
   const RecordPage({super.key});
@@ -30,12 +62,13 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   late Timer _timer;
   late StreamSubscription<AuthState> _authSubscription;
   late IsaacLogFile _logFile;
+  late DateTime _targetDate;
 
   Map<String, dynamic>? _todayChallenge;
-  int _character = 0;
-  String _seed = '';
-  bool _isBossKilled = false;
-  Map<String, dynamic> _data = {};
+
+  List<DailyRecord> _dailyRecords = [];
+
+  RecorderState _recorder = RecorderState();
 
   @override
   void initState() {
@@ -58,6 +91,10 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       '$isaacDocumentPath\\log.txt',
       onMessage: onMessage,
     );
+
+    _targetDate = DateTime.now();
+
+    syncChallenge();
   }
 
   @override
@@ -79,9 +116,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   void postRecord(String time) async {
     final res = await _supabase.functions.invoke('daily-record', body: {
       'time': time,
-      'seed': _seed,
-      'character': _character,
-      'data': _data
+      'seed': _recorder.seed,
+      'character': _recorder.character,
+      'data': _recorder.data
     });
 
     print(res.data);
@@ -98,25 +135,24 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   }
 
   void onMessage(String type, List<String> data) {
-    final store = ref.read(storeProvider.notifier);
-
     if (type == 'START') {
       _stopwatch.stop();
       _stopwatch.reset();
 
       if (data[0] == '1' && data[2] == _todayChallenge?['seed']) {
         _stopwatch.start();
-        _character = int.parse(data[1]);
-        _seed = data[2];
-        _isBossKilled = false;
-        _data = {};
+
+        _recorder = RecorderState(
+          character: int.parse(data[1]),
+          seed: data[2],
+        );
       }
     } else if (type == 'END') {
       if (data[0] == '1' &&
           data[2] == _todayChallenge?['seed'] &&
-          _isBossKilled == true) {
-        _character = int.parse(data[1]);
-        _seed = data[2];
+          _recorder.isBossKilled == true) {
+        _recorder.character = int.parse(data[1]);
+        _recorder.seed = data[2];
 
         postRecord(getTimeString(_stopwatch.elapsed));
       }
@@ -124,16 +160,63 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       _stopwatch.stop();
       _stopwatch.reset();
     } else if (type == 'BOSS') {
-      _isBossKilled = true;
+      _recorder.isBossKilled = true;
     } else if (type == 'STAGE') {
-      _data.addAll({getTimeString(_stopwatch.elapsed): "스테이지 ${data[0]} 입장"});
+      _recorder.data.addAll(
+        {_stopwatch.elapsedMilliseconds.toString(): "스테이지 ${data[0]} 입장"},
+      );
+    }
+  }
+
+  Future<void> syncChallenge() async {
+    final today = DateTime.now();
+
+    final daily = await _supabase
+        .from("daily_challenges")
+        .select()
+        .gte("date", today)
+        .lte("date", today);
+
+    final dailyRecords = await _supabase
+        .from("daily_challenge_records")
+        .select()
+        .eq("challenge_id", daily[0]["id"]);
+
+    print(dailyRecords);
+
+    setState(() {
+      _todayChallenge = daily.firstOrNull;
+    });
+  }
+
+  Future<void> createRecorderMod() async {
+    try {
+      await syncChallenge();
+
+      final setting = ref.read(settingProvider);
+      final recorderDirectory =
+          Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
+      await recorderDirectory.delete(recursive: true);
+      await recorderDirectory.create();
+
+      final mainFile = File("${recorderDirectory.path}\\main.lua");
+      await mainFile.create();
+      mainFile.writeAsString(RecorderMod.getModMain(
+          _todayChallenge!["seed"], _todayChallenge!["boss"]));
+
+      final metadataFile = File("${recorderDirectory.path}\\metadata.xml");
+      await metadataFile.create();
+      metadataFile.writeAsString(RecorderMod.modMetadata);
+    } catch (e) {
+      if (context.mounted) {
+        showErrorDialog(context, "모드 생성 중 오류가 발생했습니다.");
+      }
     }
   }
 
   void startGame() async {
     try {
       final store = ref.watch(storeProvider);
-      final setting = ref.read(settingProvider);
 
       final response = await http.get(Uri.https('raw.githubusercontent.com',
           'TeamHY/cartridge/main/assets/record_presets.json'));
@@ -145,53 +228,18 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       final json = jsonDecode(response.body).cast<Map<String, dynamic>>();
       final mods = List<Mod>.from(json.map((e) => Mod.fromJson(e)));
 
-      await Process.run('taskkill', ['/im', 'isaac-ng.exe']);
+      await ProcessUtil.killIsaac();
 
-      final recorderDirectory =
-          Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
-      recorderDirectory.deleteSync(recursive: true);
-      recorderDirectory.createSync();
+      await createRecorderMod();
 
-      final today = DateTime.now();
-      _todayChallenge = (await _supabase
-          .from("daily_challenges")
-          .select()
-          .gte("date", today)
-          .lte("date", today))[0];
-
-      final mainFile = File("${recorderDirectory.path}\\main.lua");
-      mainFile.createSync();
-      mainFile.writeAsString(RecorderMod.getModMain(
-          _todayChallenge!["seed"], _todayChallenge!["boss"]));
-
-      final metadataFile = File("${recorderDirectory.path}\\metadata.xml");
-      metadataFile.createSync();
-      metadataFile.writeAsString(RecorderMod.modMetadata);
-
-      store.applyPreset(
+      await store.applyPreset(
         Preset(name: '', mods: mods),
         isForceRerun: true,
         isNoDelay: true,
       );
     } catch (e) {
       if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return ContentDialog(
-              title: const Text('오류'),
-              content: Text(e.toString()),
-              actions: [
-                FilledButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('닫기'),
-                ),
-              ],
-            );
-          },
-        );
+        showErrorDialog(context, e.toString());
       }
     }
   }
@@ -203,107 +251,74 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     final time = _stopwatch.elapsed;
     final session = _supabase.auth.currentSession;
 
-    return NavigationView(
-      content: Stack(
+    return BackArrowView(
+      color: baseColor,
+      child: Row(
         children: [
-          Container(
-            color: baseColor,
-            child: Center(
-              child: SizedBox(
-                width: 600,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          Flexible(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          session?.user.userMetadata?['display_name'] ??
-                              '로그인 필요',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 40,
-                            fontWeight: FontWeight.w900,
-                            fontFamily: 'Pretendard',
-                          ),
-                        ),
-                        AuthAction(
-                          isSignedIn: session != null,
-                        )
-                      ],
+                    Text(
+                      session?.user.userMetadata?['display_name'] ?? '로그인 필요',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 40,
+                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Pretendard',
+                      ),
+                    ),
+                    AuthAction(
+                      isSignedIn: session != null,
+                    )
+                  ],
+                ),
+                const SizedBox(height: 40),
+                Column(
+                  children: [
+                    Text(
+                      getTimeString(time),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 64,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Pretendard',
+                          fontFeatures: [FontFeature.tabularFigures()]),
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 40),
-                    Column(
-                      children: [
-                        Text(
-                          getTimeString(time),
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 64,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Pretendard',
-                              fontFeatures: [FontFeature.tabularFigures()]),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 40),
-                        IconButton(
-                          style: const ButtonStyle(
-                            shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.zero,
-                                side: BorderSide(width: 1, color: Colors.white),
-                              ),
-                            ),
+                    IconButton(
+                      style: const ButtonStyle(
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                            side: BorderSide(width: 1, color: Colors.white),
                           ),
-                          icon: const Padding(
-                            padding: EdgeInsets.all(4.0),
-                            child: Icon(
-                              FluentIcons.play_solid,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                          iconButtonMode: IconButtonMode.large,
-                          onPressed: startGame,
                         ),
-                      ],
+                      ),
+                      icon: const Padding(
+                        padding: EdgeInsets.all(4.0),
+                        child: Icon(
+                          FluentIcons.play_solid,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                      iconButtonMode: IconButtonMode.large,
+                      onPressed: startGame,
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
-          Row(
-            children: [
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                iconButtonMode: IconButtonMode.large,
-                icon: const Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: Icon(
-                    FluentIcons.back,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: DragToMoveArea(
-                  child: Container(
-                    height: 50,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 138,
-                height: 50,
-                child: WindowCaption(
-                  brightness: Brightness.dark,
-                  backgroundColor: Colors.transparent,
-                ),
-              )
-            ],
-          )
+          Flexible(
+            child: DailyChallengeRanking(date: "231", seed: "231", boss: "231"),
+          ),
         ],
       ),
     );
