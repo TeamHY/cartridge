@@ -13,7 +13,7 @@ class SignUpDialog extends ConsumerStatefulWidget {
 class _SignUpDialogState extends ConsumerState<SignUpDialog> {
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
-  late TextEditingController _nicknameController;
+  late TextEditingController _passwordConfirmController;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -23,7 +23,7 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
 
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
-    _nicknameController = TextEditingController();
+    _passwordConfirmController = TextEditingController();
   }
 
   @override
@@ -38,14 +38,10 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
 
     final email = _emailController.text;
     final password = _passwordController.text;
-    final nickname = _nicknameController.text;
 
     await supabase.auth.signUp(
       email: email,
       password: password,
-      data: {
-        'display_name': nickname,
-      },
     );
   }
 
@@ -111,17 +107,20 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
             ),
             const SizedBox(height: 16.0),
             InfoLabel(
-              label: '닉네임',
-              child: TextFormBox(
+              label: '비밀번호 확인',
+              child: PasswordFormBox(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '닉네임을 입력해주세요.';
+                    return '비밀번호를 입력해주세요.';
+                  }
+
+                  if (value != _passwordController.text) {
+                    return '비밀번호가 일치하지 않습니다.';
                   }
 
                   return null;
                 },
-                controller: _nicknameController,
-                onFieldSubmitted: (_) => onSubmit(context),
+                controller: _passwordConfirmController,
               ),
             ),
           ],

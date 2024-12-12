@@ -38,7 +38,7 @@ class IsaacLogFile {
         .transform(utf8.decoder)
         .forEach((text) {
       text.split('\n').forEach((line) {
-        if (line.contains(_prefix)) {
+        if (line.startsWith(_prefix)) {
           final message = line.substring(_prefix.length);
           final parts = message.split(':');
 

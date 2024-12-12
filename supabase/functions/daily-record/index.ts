@@ -22,6 +22,40 @@ async function getChallengeId(
   return null;
 }
 
+async function find(challengeId: string) {
+  try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    );
+
+    const { data, error } = await supabase
+      .from("daily_challenge_records")
+      .select("id, time, character, users(email), data")
+      .eq("challenge_id", Number(challengeId));
+
+    if (error) {
+      throw error;
+    }
+
+    data.map((record: any) => {
+      record.users.email = record.users.email.replace(
+        /(?<=.{2}).(?=.*@)/g,
+        "*",
+      );
+      record.nickname = record.users.email;
+      delete record.users;
+    })
+
+    return new Response(JSON.stringify({ data }), {
+      headers: { "Content-Type": "application/json" },
+      status: 200,
+    });
+  } catch (err) {
+    return new Response(String(err?.message ?? err), { status: 500 });
+  }
+}
+
 async function create(req: Request) {
   const { time, seed, character, data: reqData } = await req.json();
 
@@ -52,7 +86,13 @@ async function create(req: Request) {
     const { data, error } = await supabase
       .from("daily_challenge_records")
       .insert([
-        { user_id: user.id, challenge_id: challengeId, data: reqData, time, character },
+        {
+          user_id: user.id,
+          challenge_id: challengeId,
+          data: reqData,
+          time,
+          character,
+        },
       ])
       .select();
 
@@ -70,7 +110,16 @@ async function create(req: Request) {
 }
 
 Deno.serve(async (req) => {
+  const url = new URL(req.url);
+  const command = url.pathname.split("/").pop();
+  const id = command;
+
   switch (req.method) {
+    case "GET":
+      if (id) {
+        return await find(id);
+      }
+      break;
     case "POST":
       return await create(req);
   }

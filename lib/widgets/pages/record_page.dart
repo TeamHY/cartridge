@@ -2,11 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cartridge/models/daily_challenge.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/utils/isaac_log_file.dart';
+import 'package:cartridge/utils/format_util.dart';
 import 'package:cartridge/utils/process_util.dart';
 import 'package:cartridge/utils/recorder_mod.dart';
 import 'package:cartridge/widgets/back_arrow_view.dart';
@@ -15,6 +17,7 @@ import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_in_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_up_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
@@ -25,27 +28,12 @@ class RecorderState {
     this.character = 0,
     this.seed = '',
     this.isBossKilled = false,
-    this.data = const {},
   });
 
   int character;
   String seed;
   bool isBossKilled;
-  Map<String, dynamic> data;
-}
-
-class DailyRecord {
-  DailyRecord({
-    required this.time,
-    required this.seed,
-    required this.character,
-    required this.data,
-  });
-
-  final String time;
-  final String seed;
-  final int character;
-  final Map<String, dynamic> data;
+  Map<String, dynamic> data = {};
 }
 
 class RecordPage extends ConsumerStatefulWidget {
@@ -62,13 +50,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   late Timer _timer;
   late StreamSubscription<AuthState> _authSubscription;
   late IsaacLogFile _logFile;
-  late DateTime _targetDate;
 
-  Map<String, dynamic>? _todayChallenge;
-
-  List<DailyRecord> _dailyRecords = [];
-
-  RecorderState _recorder = RecorderState();
+  DailyChallenge? _todayChallenge;
+  RecorderState? _recorder = RecorderState();
 
   @override
   void initState() {
@@ -92,9 +76,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       onMessage: onMessage,
     );
 
-    _targetDate = DateTime.now();
-
-    syncChallenge();
+    refreshChallenge();
   }
 
   @override
@@ -113,33 +95,105 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     ref.read(storeProvider.notifier).checkAstroVersion();
   }
 
-  void postRecord(String time) async {
-    final res = await _supabase.functions.invoke('daily-record', body: {
+  void postRecord(int time) async {
+    if (_recorder == null) {
+      return;
+    }
+
+    await _supabase.functions.invoke('daily-record', body: {
       'time': time,
-      'seed': _recorder.seed,
-      'character': _recorder.character,
-      'data': _recorder.data
+      'seed': _recorder!.seed,
+      'character': _recorder!.character,
+      'data': _recorder!.data
     });
 
-    print(res.data);
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return ContentDialog(
+            title: const Text('기록 완료'),
+            content: Text(
+              FormatUtil.getTimeString(Duration(milliseconds: time)),
+            ),
+            actions: [
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('닫기'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
-  String getTimeString(Duration time) {
-    final hours = time.inHours.toString().padLeft(2, '0');
-    final minutes = (time.inMinutes % 60).toString().padLeft(2, '0');
-    final seconds = (time.inSeconds % 60).toString().padLeft(2, '0');
-    final milliseconds =
-        ((time.inMilliseconds % 1000) / 10).floor().toString().padLeft(2, '0');
+  Future<Preset> getRecordPreset() async {
+    final response =
+        await http.get(Uri.parse(dotenv.env['RECORD_PRESET_URL'] ?? ''));
 
-    return '$hours:$minutes:$seconds.$milliseconds';
+    if (response.statusCode != 200) {
+      throw Exception(response.body);
+    }
+
+    final json = jsonDecode(response.body).cast<Map<String, dynamic>>();
+    final mods = List<Mod>.from(json.map((e) => Mod.fromJson(e)));
+
+    return Preset(name: 'record', mods: mods);
+  }
+
+  void onLoad() async {
+    if (!(await checkRecordPreset())) {
+      ProcessUtil.killIsaac();
+
+      if (context.mounted) {
+        showErrorDialog(context, '허가되지 않은 모드가 감지되었습니다. 게임을 종료합니다.');
+      }
+    }
+
+    final setting = ref.read(settingProvider);
+
+    final recorderDirectory =
+        Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
+
+    if (recorderDirectory.existsSync()) {
+      recorderDirectory.deleteSync(recursive: true);
+    }
+  }
+
+  void resetRecorder() {
+    _stopwatch.stop();
+    _stopwatch.reset();
+    _recorder = null;
+  }
+
+  Future<bool> checkRecordPreset() async {
+    final store = ref.read(storeProvider);
+    final preset = await getRecordPreset();
+
+    final currentMods = (await store.loadMods())
+        .where((mod) => !mod.isDisable)
+        .map((mod) => mod.name)
+        .toSet();
+    final presetMods = preset.mods
+        .where((mod) => !mod.isDisable)
+        .map((mod) => mod.name)
+        .toSet();
+
+    return presetMods.containsAll(currentMods);
   }
 
   void onMessage(String type, List<String> data) {
-    if (type == 'START') {
-      _stopwatch.stop();
-      _stopwatch.reset();
+    if (type == 'LOAD') {
+      onLoad();
+    } else if (type == 'RESET') {
+      resetRecorder();
+    } else if (type == 'START') {
+      resetRecorder();
 
-      if (data[0] == '1' && data[2] == _todayChallenge?['seed']) {
+      if (data[0] == '1' && data[2] == _todayChallenge?.seed) {
         _stopwatch.start();
 
         _recorder = RecorderState(
@@ -148,27 +202,27 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         );
       }
     } else if (type == 'END') {
-      if (data[0] == '1' &&
-          data[2] == _todayChallenge?['seed'] &&
-          _recorder.isBossKilled == true) {
-        _recorder.character = int.parse(data[1]);
-        _recorder.seed = data[2];
+      if (_recorder != null &&
+          data[0] == '1' &&
+          data[2] == _todayChallenge?.seed &&
+          _recorder!.isBossKilled == true) {
+        _recorder!.character = int.parse(data[1]);
+        _recorder!.seed = data[2];
 
-        postRecord(getTimeString(_stopwatch.elapsed));
+        postRecord(_stopwatch.elapsedMilliseconds);
       }
 
-      _stopwatch.stop();
-      _stopwatch.reset();
+      resetRecorder();
     } else if (type == 'BOSS') {
-      _recorder.isBossKilled = true;
+      _recorder?.isBossKilled = true;
     } else if (type == 'STAGE') {
-      _recorder.data.addAll(
+      _recorder?.data.addAll(
         {_stopwatch.elapsedMilliseconds.toString(): "스테이지 ${data[0]} 입장"},
       );
     }
   }
 
-  Future<void> syncChallenge() async {
+  Future<void> refreshChallenge() async {
     final today = DateTime.now();
 
     final daily = await _supabase
@@ -177,39 +231,49 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         .gte("date", today)
         .lte("date", today);
 
-    final dailyRecords = await _supabase
-        .from("daily_challenge_records")
-        .select()
-        .eq("challenge_id", daily[0]["id"]);
-
-    print(dailyRecords);
-
     setState(() {
-      _todayChallenge = daily.firstOrNull;
+      if (daily.isEmpty) {
+        _todayChallenge = null;
+        return;
+      }
+
+      _todayChallenge = DailyChallenge.fromJson(daily.first);
     });
   }
 
   Future<void> createRecorderMod() async {
     try {
-      await syncChallenge();
+      await refreshChallenge();
+
+      if (_todayChallenge == null) {
+        throw Exception("오늘의 챌린지가 없습니다.");
+      }
 
       final setting = ref.read(settingProvider);
       final recorderDirectory =
           Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
-      await recorderDirectory.delete(recursive: true);
+
+      if (await recorderDirectory.exists()) {
+        await recorderDirectory.delete(recursive: true);
+      }
+
       await recorderDirectory.create();
 
       final mainFile = File("${recorderDirectory.path}\\main.lua");
       await mainFile.create();
-      mainFile.writeAsString(RecorderMod.getModMain(
-          _todayChallenge!["seed"], _todayChallenge!["boss"]));
+      mainFile.writeAsString(
+        await RecorderMod.getModMain(
+          _todayChallenge!.seed,
+          _todayChallenge!.boss,
+        ),
+      );
 
       final metadataFile = File("${recorderDirectory.path}\\metadata.xml");
       await metadataFile.create();
       metadataFile.writeAsString(RecorderMod.modMetadata);
     } catch (e) {
       if (context.mounted) {
-        showErrorDialog(context, "모드 생성 중 오류가 발생했습니다.");
+        showErrorDialog(context, e.toString());
       }
     }
   }
@@ -218,24 +282,15 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     try {
       final store = ref.watch(storeProvider);
 
-      final response = await http.get(Uri.https('raw.githubusercontent.com',
-          'TeamHY/cartridge/main/assets/record_presets.json'));
-
-      if (response.statusCode != 200) {
-        throw Exception(response.body);
-      }
-
-      final json = jsonDecode(response.body).cast<Map<String, dynamic>>();
-      final mods = List<Mod>.from(json.map((e) => Mod.fromJson(e)));
-
       await ProcessUtil.killIsaac();
 
       await createRecorderMod();
 
       await store.applyPreset(
-        Preset(name: '', mods: mods),
+        await getRecordPreset(),
         isForceRerun: true,
         isNoDelay: true,
+        isDebugConsole: false,
       );
     } catch (e) {
       if (context.mounted) {
@@ -251,147 +306,170 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     final time = _stopwatch.elapsed;
     final session = _supabase.auth.currentSession;
 
-    return BackArrowView(
-      color: baseColor,
-      child: Row(
-        children: [
-          Flexible(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+    if (session == null || session.isExpired) {
+      return BackArrowView(
+        color: baseColor,
+        child: Row(
+          children: [
+            Flexible(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      session?.user.userMetadata?['display_name'] ?? '로그인 필요',
-                      style: const TextStyle(
+                    const Text(
+                      '로그인이 필요합니다',
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 40,
                         fontWeight: FontWeight.w900,
                         fontFamily: 'Pretendard',
                       ),
                     ),
-                    AuthAction(
-                      isSignedIn: session != null,
-                    )
+                    const SizedBox(height: 40),
+                    HyperlinkButton(
+                      child: const Text(
+                        '로그인',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w200,
+                          fontFamily: 'Pretendard',
+                        ),
+                      ),
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) => const SignInDialog(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    HyperlinkButton(
+                      child: const Text(
+                        '회원가입',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w200,
+                          fontFamily: 'Pretendard',
+                        ),
+                      ),
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) => const SignUpDialog(),
+                      ),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 40),
-                Column(
-                  children: [
-                    Text(
-                      getTimeString(time),
-                      style: const TextStyle(
+              ),
+            ),
+            Flexible(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(8)),
+                ),
+                child: const DailyChallengeRanking(),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return BackArrowView(
+      color: baseColor,
+      child: Row(
+        children: [
+          Flexible(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  HyperlinkButton(
+                    child: const Text(
+                      '로그아웃',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w200,
+                        fontFamily: 'Pretendard',
+                      ),
+                    ),
+                    onPressed: () async {
+                      await Supabase.instance.client.auth.signOut();
+                    },
+                  ),
+                  const SizedBox(height: 40),
+                  Column(
+                    children: [
+                      Text(
+                        _todayChallenge?.boss ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Pretendard',
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        FormatUtil.getTimeString(time),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 64,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Pretendard',
-                          fontFeatures: [FontFeature.tabularFigures()]),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 40),
-                    IconButton(
-                      style: const ButtonStyle(
-                        shape: WidgetStatePropertyAll(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero,
-                            side: BorderSide(width: 1, color: Colors.white),
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        _todayChallenge?.seed ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                          fontFamily: 'Pretendard',
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 40),
+                      IconButton(
+                        style: const ButtonStyle(
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.zero,
+                              side: BorderSide(width: 1, color: Colors.white),
+                            ),
                           ),
                         ),
-                      ),
-                      icon: const Padding(
-                        padding: EdgeInsets.all(4.0),
-                        child: Icon(
-                          FluentIcons.play_solid,
-                          color: Colors.white,
-                          size: 16,
+                        icon: const Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Icon(
+                            FluentIcons.play_solid,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                         ),
+                        iconButtonMode: IconButtonMode.large,
+                        onPressed: startGame,
                       ),
-                      iconButtonMode: IconButtonMode.large,
-                      onPressed: startGame,
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           Flexible(
-            child: DailyChallengeRanking(date: "231", seed: "231", boss: "231"),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(8)),
+              ),
+              child: const DailyChallengeRanking(),
+            ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class AuthAction extends StatelessWidget {
-  const AuthAction({
-    super.key,
-    this.isSignedIn = false,
-  });
-
-  final bool isSignedIn;
-
-  List<Widget> getButtons(BuildContext context) {
-    if (isSignedIn) {
-      return [
-        HyperlinkButton(
-          child: const Text(
-            '로그아웃',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w200,
-              fontFamily: 'Pretendard',
-            ),
-          ),
-          onPressed: () async {
-            await Supabase.instance.client.auth.signOut();
-          },
-        ),
-      ];
-    }
-
-    return [
-      HyperlinkButton(
-        child: const Text(
-          '로그인',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w200,
-            fontFamily: 'Pretendard',
-          ),
-        ),
-        onPressed: () => showDialog(
-          context: context,
-          builder: (context) => const SignInDialog(),
-        ),
-      ),
-      HyperlinkButton(
-        child: const Text(
-          '회원가입',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w200,
-            fontFamily: 'Pretendard',
-          ),
-        ),
-        onPressed: () => showDialog(
-          context: context,
-          builder: (context) => const SignUpDialog(),
-        ),
-      ),
-    ];
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: getButtons(context),
     );
   }
 }

@@ -30,11 +30,31 @@ Future<void> setEnableMods(bool value) async {
     final newContent = content.split('\n').map((line) {
       if (line.startsWith('EnableMods=')) {
         return 'EnableMods=${value ? 1 : 0}';
-      } else if (line.startsWith('EnableDebugConsole=')) {
-        return 'EnableDebugConsole=${value ? 1 : 0}';
-      } else {
-        return line;
       }
+      return line;
+    }).join('\n');
+
+    await optionFile.writeAsString(newContent);
+  } catch (e) {
+    //
+  }
+}
+
+Future<void> setDebugConsole(bool value) async {
+  try {
+    final optionFile = File('$isaacDocumentPath\\options.ini');
+
+    if (!await optionFile.exists()) {
+      return;
+    }
+
+    final content = await optionFile.readAsString();
+
+    final newContent = content.split('\n').map((line) {
+      if (line.startsWith('EnableDebugConsole=')) {
+        return 'EnableDebugConsole=${value ? 1 : 0}';
+      }
+      return line;
     }).join('\n');
 
     await optionFile.writeAsString(newContent);
@@ -195,6 +215,7 @@ class StoreNotifier extends ChangeNotifier {
     bool isForceRerun = false,
     bool isForceUpdate = false,
     bool isEnableMods = true,
+    bool isDebugConsole = true,
     bool isNoDelay = false,
   }) async {
     final currentMods = await loadMods();
@@ -249,6 +270,7 @@ class StoreNotifier extends ChangeNotifier {
     }
 
     await setEnableMods(isEnableMods);
+    await setDebugConsole(isDebugConsole);
 
     if (isRerun || isForceRerun) {
       await Process.run(

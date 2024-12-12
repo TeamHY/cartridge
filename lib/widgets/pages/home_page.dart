@@ -261,6 +261,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                               onPressed: () => store.applyPreset(
                                 null,
                                 isEnableMods: false,
+                                isDebugConsole: false,
                               ),
                               child: const Text('데일리 런'),
                             ),

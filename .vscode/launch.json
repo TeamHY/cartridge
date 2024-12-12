@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "isaac_mod_preset",
+            "name": "cartridge",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "isaac_mod_preset (profile mode)",
+            "name": "cartridge (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "isaac_mod_preset (release mode)",
+            "name": "cartridge (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
