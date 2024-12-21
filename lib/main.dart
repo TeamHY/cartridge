@@ -6,7 +6,7 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
-final currentVersion = Version.parse('4.9.0');
+final currentVersion = Version.parse('4.10.0');
 
 void main() async {
   await dotenv.load(fileName: '.env');
