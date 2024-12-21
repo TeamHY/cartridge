@@ -15,7 +15,7 @@ import '../models/metadata.dart';
 const astrobirthName = '!Astrobirth';
 
 final isaacDocumentPath =
-    '${Platform.environment['UserProfile']}\\Documents\\My Games\\Binding of Isaac Repentance';
+    '${Platform.environment['UserProfile']}\\Documents\\My Games\\Binding of Isaac Repentance+';
 
 Future<void> setEnableMods(bool value) async {
   try {
