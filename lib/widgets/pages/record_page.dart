@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:cartridge/models/daily_challenge.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
+import 'package:cartridge/models/weekly_challenge.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/utils/isaac_log_file.dart';
@@ -16,6 +17,7 @@ import 'package:cartridge/widgets/daily_challenge_ranking.dart';
 import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_in_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_up_dialog.dart';
+import 'package:cartridge/widgets/weekly_challenge_ranking.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,7 +53,10 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   late StreamSubscription<AuthState> _authSubscription;
   late IsaacLogFile _logFile;
 
+  int _rankingTabIndex = 0;
+
   DailyChallenge? _todayChallenge;
+  WeeklyChallenge? _weeklyChallenge;
   RecorderState? _recorder = RecorderState();
 
   @override
@@ -306,166 +311,196 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     final time = _stopwatch.elapsed;
     final session = _supabase.auth.currentSession;
 
-    if (session == null || session.isExpired) {
-      return BackArrowView(
-        color: baseColor,
-        child: Row(
-          children: [
-            Flexible(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '로그인이 필요합니다',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontWeight: FontWeight.w900,
-                        fontFamily: 'Pretendard',
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    HyperlinkButton(
-                      child: const Text(
-                        '로그인',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w200,
-                          fontFamily: 'Pretendard',
-                        ),
-                      ),
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (context) => const SignInDialog(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    HyperlinkButton(
-                      child: const Text(
-                        '회원가입',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w200,
-                          fontFamily: 'Pretendard',
-                        ),
-                      ),
-                      onPressed: () => showDialog(
-                        context: context,
-                        builder: (context) => const SignUpDialog(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Flexible(
-              child: Container(
-                decoration: const BoxDecoration(
+    final stopwatchView = (session == null || session.isExpired)
+        ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                '로그인이 필요합니다',
+                style: TextStyle(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(8)),
+                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  fontFamily: 'Pretendard',
                 ),
-                child: const DailyChallengeRanking(),
               ),
-            ),
-          ],
-        ),
-      );
-    }
+              const SizedBox(height: 40),
+              HyperlinkButton(
+                child: const Text(
+                  '로그인',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w200,
+                    fontFamily: 'Pretendard',
+                  ),
+                ),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => const SignInDialog(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              HyperlinkButton(
+                child: const Text(
+                  '회원가입',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w200,
+                    fontFamily: 'Pretendard',
+                  ),
+                ),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => const SignUpDialog(),
+                ),
+              ),
+            ],
+          )
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              HyperlinkButton(
+                child: const Text(
+                  '로그아웃',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w200,
+                    fontFamily: 'Pretendard',
+                  ),
+                ),
+                onPressed: () async {
+                  await Supabase.instance.client.auth.signOut();
+                },
+              ),
+              const SizedBox(height: 40),
+              Column(
+                children: [
+                  Text(
+                    _todayChallenge?.boss ?? '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Pretendard',
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    FormatUtil.getTimeString(time),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 64,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Pretendard',
+                      fontFeatures: [FontFeature.tabularFigures()],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    _todayChallenge?.seed ?? '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: 'Pretendard',
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 40),
+                  IconButton(
+                    style: const ButtonStyle(
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                          side: BorderSide(width: 1, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    icon: const Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: Icon(
+                        FluentIcons.play_solid,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                    iconButtonMode: IconButtonMode.large,
+                    onPressed: startGame,
+                  ),
+                ],
+              ),
+            ],
+          );
 
     return BackArrowView(
       color: baseColor,
       child: Row(
         children: [
           Flexible(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  HyperlinkButton(
-                    child: const Text(
-                      '로그아웃',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w200,
-                        fontFamily: 'Pretendard',
-                      ),
-                    ),
-                    onPressed: () async {
-                      await Supabase.instance.client.auth.signOut();
-                    },
-                  ),
-                  const SizedBox(height: 40),
-                  Column(
-                    children: [
-                      Text(
-                        _todayChallenge?.boss ?? '',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Pretendard',
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        FormatUtil.getTimeString(time),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 64,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Pretendard',
-                          fontFeatures: [FontFeature.tabularFigures()],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        _todayChallenge?.seed ?? '',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Pretendard',
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 40),
-                      IconButton(
-                        style: const ButtonStyle(
-                          shape: WidgetStatePropertyAll(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
-                              side: BorderSide(width: 1, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        icon: const Padding(
-                          padding: EdgeInsets.all(4.0),
-                          child: Icon(
-                            FluentIcons.play_solid,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                        ),
-                        iconButtonMode: IconButtonMode.large,
-                        onPressed: startGame,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+            child: Center(child: stopwatchView),
           ),
           Flexible(
             child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(8)),
+              decoration: BoxDecoration(
+                color: Colors.grey[30],
+                borderRadius:
+                    const BorderRadius.only(topLeft: Radius.circular(8)),
               ),
-              child: const DailyChallengeRanking(),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      HyperlinkButton(
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(
+                            _rankingTabIndex == 0
+                                ? Colors.white
+                                : Colors.grey[30],
+                          ),
+                        ),
+                        child: const Text('일간 랭킹'),
+                        onPressed: () {
+                          setState(() {
+                            _rankingTabIndex = 0;
+                          });
+                        },
+                      ),
+                      HyperlinkButton(
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(
+                            _rankingTabIndex == 1
+                                ? Colors.white
+                                : Colors.grey[30],
+                          ),
+                        ),
+                        child: const Text('주간 랭킹'),
+                        onPressed: () {
+                          setState(() {
+                            _rankingTabIndex = 1;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  if (_rankingTabIndex == 0) ...[
+                    Expanded(
+                        child: Container(
+                      color: Colors.white,
+                      child: const DailyChallengeRanking(),
+                    )),
+                  ] else ...[
+                    Expanded(
+                        child: Container(
+                      color: Colors.white,
+                      child: const WeeklyChallengeRanking(),
+                    )),
+                  ],
+                ],
+              ),
             ),
           ),
         ],

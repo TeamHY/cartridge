@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
+import { validateSeed } from "../common/helper.ts";
 
 function isFutureDate(date: string) {
   const today = new Date(Date.now() + 9 * 60 * 60 * 1000);
@@ -11,22 +12,6 @@ function isFutureDate(date: string) {
     (today.getFullYear() === targetDate.getFullYear() &&
       today.getMonth() === targetDate.getMonth() &&
       today.getDate() < targetDate.getDate());
-}
-
-function validateSeed(seed: string): boolean {
-  const allowedCharacters = "ABCDEFGHJKLMNPQRSTWXYZ01234V6789";
-
-  if (seed.length !== 8) {
-    return false;
-  }
-
-  for (const char of seed) {
-    if (!allowedCharacters.includes(char)) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 async function create(req: Request) {
@@ -47,7 +32,7 @@ async function create(req: Request) {
       return new Response("누락된 필드가 존재합니다", { status: 400 });
     }
 
-    if (!isFutureDate) {
+    if (!isFutureDate(date)) {
       return new Response("과거와 오늘은 등록할 수 없습니다", {
         status: 400,
       });

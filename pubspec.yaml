@@ -50,6 +50,7 @@ dependencies:
   supabase_flutter: ^2.8.1
   flutter_dotenv: ^5.2.1
   tailf: ^1.1.0
+  week_of_year: ^2.2.0
 
 dev_dependencies:
   flutter_test:

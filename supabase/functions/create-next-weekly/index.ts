@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import { generateSeed, getRandomBoss } from "../common/helper.ts";
+import { day, generateSeed, getRandomBoss, getRandomCharacter, getTodayString } from "../common/helper.ts";
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
@@ -13,15 +13,16 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
 
-    const tomorrow = new Date(Date.now() + (24 + 9) * 60 * 60 * 1000);
+    const nextWeek = day(getTodayString()).add(1, "week");
     
     const seed = generateSeed();
     const boss = getRandomBoss();
+    const character = getRandomCharacter();
 
     const { data, error } = await supabase
-      .from("daily_challenges")
+      .from("weekly_challenges")
       .insert([
-        { date: tomorrow, seed, boss },
+        { year: nextWeek.isoWeekYear(), week: nextWeek.isoWeek(), seed, boss, character },
       ])
       .select();
 
