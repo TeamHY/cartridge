@@ -12,7 +12,8 @@ class RecorderMod {
 </metadata>
 """;
 
-  static Future<String> getModMain(String seed, String boss) async {
+  static Future<String> getModMain(String dailySeed, String dailyBoss,
+      String weeklySeed, String weeklyBoss, int weeklyCharacter) async {
     final response =
         await http.get(Uri.parse(dotenv.env['RECORDER_MOD_URL'] ?? ''));
 
@@ -22,6 +23,11 @@ class RecorderMod {
 
     final modMain = response.body;
 
-    return modMain.replaceFirst('%SEED%', seed).replaceFirst('%BOSS%', boss);
+    return modMain
+        .replaceFirst('%DAILY_SEED%', dailySeed)
+        .replaceFirst('%DAILY_BOSS%', dailyBoss)
+        .replaceFirst('%WEEKLY_SEED%', weeklySeed)
+        .replaceFirst('%WEEKLY_BOSS%', weeklyBoss)
+        .replaceFirst('%WEEKLY_CHARACTER%', weeklyCharacter.toString());
   }
 }

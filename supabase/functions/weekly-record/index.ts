@@ -16,6 +16,9 @@ async function getChallengeId(
   ).eq(
     "week",
     week,
+  ).eq(
+    "seed",
+    seed,
   );
 
   if (data && data[0] && !error) {
@@ -48,7 +51,7 @@ async function find(challengeId: string) {
       );
       record.nickname = record.users.email;
       delete record.users;
-    })
+    });
 
     return new Response(JSON.stringify({ data }), {
       headers: { "Content-Type": "application/json" },

@@ -23,15 +23,20 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:week_of_year/week_of_year.dart';
 import 'package:http/http.dart' as http;
+
+enum ChallengeType { daily, weekly }
 
 class RecorderState {
   RecorderState({
+    this.type = ChallengeType.daily,
     this.character = 0,
     this.seed = '',
     this.isBossKilled = false,
   });
 
+  ChallengeType type;
   int character;
   String seed;
   bool isBossKilled;
@@ -55,7 +60,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
   int _rankingTabIndex = 0;
 
-  DailyChallenge? _todayChallenge;
+  DailyChallenge? _dailyChallenge;
   WeeklyChallenge? _weeklyChallenge;
   RecorderState? _recorder = RecorderState();
 
@@ -100,12 +105,47 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     ref.read(storeProvider.notifier).checkAstroVersion();
   }
 
-  void postRecord(int time) async {
+  void postDailyRecord(int time) async {
     if (_recorder == null) {
       return;
     }
 
     await _supabase.functions.invoke('daily-record', body: {
+      'time': time,
+      'seed': _recorder!.seed,
+      'character': _recorder!.character,
+      'data': _recorder!.data
+    });
+
+    if (context.mounted) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return ContentDialog(
+            title: const Text('기록 완료'),
+            content: Text(
+              FormatUtil.getTimeString(Duration(milliseconds: time)),
+            ),
+            actions: [
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('닫기'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void postWeeklyRecord(int time) async {
+    if (_recorder == null) {
+      return;
+    }
+
+    await _supabase.functions.invoke('weekly-record', body: {
       'time': time,
       'seed': _recorder!.seed,
       'character': _recorder!.character,
@@ -198,23 +238,50 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     } else if (type == 'START') {
       resetRecorder();
 
-      if (data[0] == '1' && data[2] == _todayChallenge?.seed) {
-        _stopwatch.start();
+      final type = data[0];
+      final character = int.parse(data[1]);
+      final seed = data[2];
 
-        _recorder = RecorderState(
-          character: int.parse(data[1]),
-          seed: data[2],
-        );
+      if (type == 'D') {
+        if (seed == _dailyChallenge?.seed) {
+          _stopwatch.start();
+
+          _recorder = RecorderState(
+            type: ChallengeType.daily,
+            character: character,
+            seed: seed,
+          );
+        }
+      } else if (type == 'W') {
+        if (character == _weeklyChallenge?.character &&
+            seed == _weeklyChallenge?.seed) {
+          _stopwatch.start();
+
+          _recorder = RecorderState(
+            type: ChallengeType.weekly,
+            character: character,
+            seed: seed,
+          );
+        }
       }
     } else if (type == 'END') {
-      if (_recorder != null &&
-          data[0] == '1' &&
-          data[2] == _todayChallenge?.seed &&
-          _recorder!.isBossKilled == true) {
-        _recorder!.character = int.parse(data[1]);
-        _recorder!.seed = data[2];
+      final type = data[0];
+      final character = int.parse(data[1]);
+      final seed = data[2];
 
-        postRecord(_stopwatch.elapsedMilliseconds);
+      if (_recorder != null && _recorder!.isBossKilled == true) {
+        if (_recorder!.type == ChallengeType.daily &&
+            type == 'D' &&
+            seed == _dailyChallenge?.seed) {
+          postDailyRecord(_stopwatch.elapsedMilliseconds);
+        } else if (_recorder!.type == ChallengeType.weekly &&
+            type == 'W' &&
+            seed == _weeklyChallenge?.seed) {
+          postWeeklyRecord(_stopwatch.elapsedMilliseconds);
+        }
+
+        _recorder!.character = character;
+        _recorder!.seed = seed;
       }
 
       resetRecorder();
@@ -222,13 +289,18 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       _recorder?.isBossKilled = true;
     } else if (type == 'STAGE') {
       _recorder?.data.addAll(
-        {_stopwatch.elapsedMilliseconds.toString(): "스테이지 ${data[0]} 입장"},
+        {
+          _stopwatch.elapsedMilliseconds.toString():
+              "스테이지 ${data[0]}.${data[1]} 입장"
+        },
       );
     }
   }
 
   Future<void> refreshChallenge() async {
     final today = DateTime.now();
+    final week = today.weekOfYear;
+    final year = today.day > 15 && week == 1 ? today.year + 1 : today.year;
 
     final daily = await _supabase
         .from("daily_challenges")
@@ -236,13 +308,23 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         .gte("date", today)
         .lte("date", today);
 
+    final weekly = await _supabase
+        .from("weekly_challenges")
+        .select()
+        .eq("week", week)
+        .eq("year", year);
+
     setState(() {
-      if (daily.isEmpty) {
-        _todayChallenge = null;
-        return;
+      _dailyChallenge = null;
+      _weeklyChallenge = null;
+
+      if (daily.isNotEmpty) {
+        _dailyChallenge = DailyChallenge.fromJson(daily.first);
       }
 
-      _todayChallenge = DailyChallenge.fromJson(daily.first);
+      if (weekly.isNotEmpty) {
+        _weeklyChallenge = WeeklyChallenge.fromJson(weekly.first);
+      }
     });
   }
 
@@ -250,7 +332,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     try {
       await refreshChallenge();
 
-      if (_todayChallenge == null) {
+      if (_dailyChallenge == null || _weeklyChallenge == null) {
         throw Exception("오늘의 챌린지가 없습니다.");
       }
 
@@ -268,8 +350,11 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       await mainFile.create();
       mainFile.writeAsString(
         await RecorderMod.getModMain(
-          _todayChallenge!.seed,
-          _todayChallenge!.boss,
+          _dailyChallenge!.seed,
+          _dailyChallenge!.boss,
+          _weeklyChallenge!.seed,
+          _weeklyChallenge!.boss,
+          _weeklyChallenge!.character,
         ),
       );
 
@@ -291,11 +376,14 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
       await createRecorderMod();
 
+      final email = _supabase.auth.currentSession?.user.email;
+      final isDebugConsole = email == "tester1@test.com";
+
       await store.applyPreset(
         await getRecordPreset(),
         isForceRerun: true,
         isNoDelay: true,
-        isDebugConsole: false,
+        isDebugConsole: isDebugConsole,
       );
     } catch (e) {
       if (context.mounted) {
@@ -378,16 +466,106 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
               const SizedBox(height: 40),
               Column(
                 children: [
-                  Text(
-                    _todayChallenge?.boss ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Pretendard',
-                    ),
-                    textAlign: TextAlign.center,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        children: [
+                          const Text(
+                            '일간 목표',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Pretendard',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            _dailyChallenge?.boss ?? '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              fontFamily: 'Pretendard',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            _dailyChallenge?.seed ?? '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              fontFamily: 'Pretendard',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const Text(
+                            '',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              fontFamily: 'Pretendard',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 32),
+                      Column(
+                        children: [
+                          const Text(
+                            '주간 목표',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Pretendard',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            _weeklyChallenge?.boss ?? '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              fontFamily: 'Pretendard',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            _weeklyChallenge?.seed ?? '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              fontFamily: 'Pretendard',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Text(
+                            _weeklyChallenge?.character != null
+                                ? FormatUtil.getCharacterName(
+                                    _weeklyChallenge!.character,
+                                  )
+                                : '',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.normal,
+                              fontFamily: 'Pretendard',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      )
+                    ],
                   ),
+                  const SizedBox(height: 24),
                   Text(
                     FormatUtil.getTimeString(time),
                     style: const TextStyle(
@@ -396,16 +574,6 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Pretendard',
                       fontFeatures: [FontFeature.tabularFigures()],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    _todayChallenge?.seed ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      fontFamily: 'Pretendard',
                     ),
                     textAlign: TextAlign.center,
                   ),
