@@ -198,14 +198,14 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       }
     }
 
-    final setting = ref.read(settingProvider);
+    // final setting = ref.read(settingProvider);
 
-    final recorderDirectory =
-        Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
+    // final recorderDirectory =
+    //     Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
 
-    if (recorderDirectory.existsSync()) {
-      recorderDirectory.deleteSync(recursive: true);
-    }
+    // if (recorderDirectory.existsSync()) {
+    //   recorderDirectory.deleteSync(recursive: true);
+    // }
   }
 
   void resetRecorder() {
@@ -236,6 +236,15 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     } else if (type == 'RESET') {
       resetRecorder();
     } else if (type == 'START') {
+      final setting = ref.read(settingProvider);
+
+      final recorderDirectory =
+          Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
+
+      if (recorderDirectory.existsSync()) {
+        recorderDirectory.deleteSync(recursive: true);
+      }
+
       resetRecorder();
 
       final type = data[0];
@@ -352,6 +361,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         await RecorderMod.getModMain(
           _dailyChallenge!.seed,
           _dailyChallenge!.boss,
+          _dailyChallenge!.character ?? 0,
           _weeklyChallenge!.seed,
           _weeklyChallenge!.boss,
           _weeklyChallenge!.character,
@@ -502,9 +512,13 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const Text(
-                            '',
-                            style: TextStyle(
+                          Text(
+                            _dailyChallenge?.character != null
+                                ? FormatUtil.getCharacterName(
+                                    _weeklyChallenge!.character,
+                                  )
+                                : '',
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
