@@ -193,18 +193,20 @@ class DailyChallengeRankingItem extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
+            flex: 1,
             child: Text(
               '${rank.toString()}위',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.normal,
+                fontWeight: rank <= 3 ? FontWeight.bold : FontWeight.normal,
                 fontFamily: 'Pretendard',
-                fontFeatures: [FontFeature.tabularFigures()],
+                fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
           ),
           const SizedBox(width: 8),
           Expanded(
+            flex: 3,
             child: Text(
               nickname,
               style: const TextStyle(

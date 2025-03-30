@@ -15,6 +15,7 @@ import 'package:cartridge/utils/recorder_mod.dart';
 import 'package:cartridge/widgets/back_arrow_view.dart';
 import 'package:cartridge/widgets/daily_challenge_ranking.dart';
 import 'package:cartridge/widgets/dialogs/error_dialog.dart';
+import 'package:cartridge/widgets/dialogs/nickname_edit_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_in_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_up_dialog.dart';
 import 'package:cartridge/widgets/weekly_challenge_ranking.dart';
@@ -22,6 +23,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:week_of_year/week_of_year.dart';
 import 'package:http/http.dart' as http;
@@ -386,8 +388,15 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
       await createRecorderMod();
 
-      final email = _supabase.auth.currentSession?.user.email;
-      final isDebugConsole = email == "tester1@test.com";
+      final userId = _supabase.auth.currentSession?.user.id;
+
+      final user = await _supabase
+          .from('users')
+          .select()
+          .eq('id', userId ?? '')
+          .single();
+
+      final isDebugConsole = user['is_tester'] ?? false;
 
       await store.applyPreset(
         await getRecordPreset(),
@@ -459,21 +468,40 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         : Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              FilledButton(
+                child: const Text(
+                  '규칙 확인',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Pretendard',
+                  ),
+                ),
+                onPressed: () async {
+                  await launchUrl(
+                      Uri.parse('https://cafe.naver.com/iwt2hw/4478'));
+                },
+              ),
+              const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  FilledButton(
+                  HyperlinkButton(
                     child: const Text(
-                      '규칙',
+                      '닉네임 변경',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w200,
                         fontFamily: 'Pretendard',
                       ),
                     ),
-                    onPressed: () async {
-                      await Supabase.instance.client.auth.signOut();
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const NicknameEditDialog(),
+                      );
                     },
                   ),
                   HyperlinkButton(
