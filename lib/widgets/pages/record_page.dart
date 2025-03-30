@@ -58,7 +58,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   late StreamSubscription<AuthState> _authSubscription;
   late IsaacLogFile _logFile;
 
-  int _rankingTabIndex = 0;
+  int _rankingTabIndex = 1;
 
   DailyChallenge? _dailyChallenge;
   WeeklyChallenge? _weeklyChallenge;
@@ -459,19 +459,38 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         : Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              HyperlinkButton(
-                child: const Text(
-                  '로그아웃',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w200,
-                    fontFamily: 'Pretendard',
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FilledButton(
+                    child: const Text(
+                      '규칙',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Pretendard',
+                      ),
+                    ),
+                    onPressed: () async {
+                      await Supabase.instance.client.auth.signOut();
+                    },
                   ),
-                ),
-                onPressed: () async {
-                  await Supabase.instance.client.auth.signOut();
-                },
+                  HyperlinkButton(
+                    child: const Text(
+                      '로그아웃',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w200,
+                        fontFamily: 'Pretendard',
+                      ),
+                    ),
+                    onPressed: () async {
+                      await Supabase.instance.client.auth.signOut();
+                    },
+                  ),
+                ],
               ),
               const SizedBox(height: 40),
               Column(
@@ -512,20 +531,6 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          Text(
-                            _dailyChallenge?.character != null
-                                ? FormatUtil.getCharacterName(
-                                    _weeklyChallenge!.character,
-                                  )
-                                : '',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                              fontFamily: 'Pretendard',
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
                         ],
                       ),
                       const SizedBox(width: 32),
@@ -553,20 +558,6 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                           ),
                           Text(
                             _weeklyChallenge?.seed ?? '',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                              fontFamily: 'Pretendard',
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            _weeklyChallenge?.character != null
-                                ? FormatUtil.getCharacterName(
-                                    _weeklyChallenge!.character,
-                                  )
-                                : '',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,

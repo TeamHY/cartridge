@@ -178,6 +178,7 @@ class _WeeklyChallengeRankingState
             itemBuilder: (context, index) {
               final record = _records[index];
               return WeeklyChallengeRankingItem(
+                rank: index + 1,
                 time: record.time,
                 character: record.character,
                 nickname: record.nickname,
@@ -193,10 +194,13 @@ class _WeeklyChallengeRankingState
 class WeeklyChallengeRankingItem extends StatelessWidget {
   const WeeklyChallengeRankingItem({
     super.key,
+    required this.rank,
     required this.time,
     required this.character,
     required this.nickname,
   });
+
+  final int rank;
 
   final int time;
 
@@ -212,7 +216,7 @@ class WeeklyChallengeRankingItem extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              FormatUtil.getTimeString(Duration(milliseconds: time)),
+              '${rank.toString()}위',
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
@@ -225,17 +229,6 @@ class WeeklyChallengeRankingItem extends StatelessWidget {
           Expanded(
             child: Text(
               nickname,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                fontFamily: 'Pretendard',
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              FormatUtil.getCharacterName(character),
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,

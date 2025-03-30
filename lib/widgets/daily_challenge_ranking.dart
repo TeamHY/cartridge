@@ -160,7 +160,7 @@ class _DailyChallengeRankingState extends ConsumerState<DailyChallengeRanking> {
             itemBuilder: (context, index) {
               final record = _records[index];
               return DailyChallengeRankingItem(
-                time: record.time,
+                rank: index + 1,
                 character: record.character,
                 nickname: record.nickname,
               );
@@ -175,12 +175,12 @@ class _DailyChallengeRankingState extends ConsumerState<DailyChallengeRanking> {
 class DailyChallengeRankingItem extends StatelessWidget {
   const DailyChallengeRankingItem({
     super.key,
-    required this.time,
+    required this.rank,
     required this.character,
     required this.nickname,
   });
 
-  final int time;
+  final int rank;
 
   final int character;
 
@@ -194,7 +194,7 @@ class DailyChallengeRankingItem extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              FormatUtil.getTimeString(Duration(milliseconds: time)),
+              '${rank.toString()}위',
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
@@ -207,17 +207,6 @@ class DailyChallengeRankingItem extends StatelessWidget {
           Expanded(
             child: Text(
               nickname,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
-                fontFamily: 'Pretendard',
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              FormatUtil.getCharacterName(character),
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.normal,
