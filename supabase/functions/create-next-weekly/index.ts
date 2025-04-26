@@ -16,7 +16,8 @@ Deno.serve(async (req) => {
     const nextWeek = day(getTodayString()).add(1, "week");
     
     const seed = generateSeed();
-    const boss = getRandomBoss();
+    // const boss = getRandomBoss();
+    const boss = "perfection";
     const character = getRandomCharacter();
 
     const { data, error } = await supabase

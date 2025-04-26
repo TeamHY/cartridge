@@ -16,7 +16,8 @@ Deno.serve(async (req) => {
     const tomorrow = new Date(Date.now() + (24 + 9) * 60 * 60 * 1000);
     
     const seed = generateSeed();
-    const boss = getRandomBoss();
+    // const boss = getRandomBoss();
+    const boss = "perfection";
 
     const { data, error } = await supabase
       .from("daily_challenges")

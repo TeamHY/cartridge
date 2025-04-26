@@ -66,6 +66,8 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   WeeklyChallenge? _weeklyChallenge;
   RecorderState? _recorder = RecorderState();
 
+  bool _isAdmin = false;
+
   @override
   void initState() {
     super.initState();
@@ -80,7 +82,20 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     });
 
     _authSubscription = _supabase.auth.onAuthStateChange.listen((data) {
-      setState(() {});
+      _supabase
+          .from('users')
+          .select()
+          .eq('id', data.session?.user.id ?? '')
+          .single()
+          .then((user) {
+        setState(() {
+          _isAdmin = user['is_tester'] ?? false;
+        });
+      }).catchError((e) {
+        setState(() {
+          _isAdmin = false;
+        });
+      });
     });
 
     _logFile = IsaacLogFile(
@@ -691,13 +706,17 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                     Expanded(
                         child: Container(
                       color: Colors.white,
-                      child: const DailyChallengeRanking(),
+                      child: DailyChallengeRanking(
+                        isAdmin: _isAdmin,
+                      ),
                     )),
                   ] else ...[
                     Expanded(
                         child: Container(
                       color: Colors.white,
-                      child: const WeeklyChallengeRanking(),
+                      child: WeeklyChallengeRanking(
+                        isAdmin: _isAdmin,
+                      ),
                     )),
                   ],
                 ],

@@ -9,7 +9,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:week_of_year/week_of_year.dart';
 
 class WeeklyChallengeRanking extends ConsumerStatefulWidget {
-  const WeeklyChallengeRanking({super.key});
+  const WeeklyChallengeRanking({super.key, this.isAdmin = false});
+
+  final bool isAdmin;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() =>
@@ -182,6 +184,7 @@ class _WeeklyChallengeRankingState
                 time: record.time,
                 character: record.character,
                 nickname: record.nickname,
+                isAdmin: widget.isAdmin,
               );
             },
           ),
@@ -198,6 +201,7 @@ class WeeklyChallengeRankingItem extends StatelessWidget {
     required this.time,
     required this.character,
     required this.nickname,
+    this.isAdmin = false,
   });
 
   final int rank;
@@ -208,12 +212,15 @@ class WeeklyChallengeRankingItem extends StatelessWidget {
 
   final String nickname;
 
+  final bool isAdmin;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisSize: MainAxisSize.max,
+        spacing: 8,
         children: [
           Expanded(
             flex: 1,
@@ -227,7 +234,6 @@ class WeeklyChallengeRankingItem extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 8),
           Expanded(
             flex: 3,
             child: Text(
@@ -239,6 +245,18 @@ class WeeklyChallengeRankingItem extends StatelessWidget {
               ),
             ),
           ),
+          if (isAdmin)
+            Expanded(
+              flex: 3,
+              child: Text(
+                FormatUtil.getTimeString(Duration(milliseconds: time)),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: 'Pretendard',
+                ),
+              ),
+            ),
         ],
       ),
     );

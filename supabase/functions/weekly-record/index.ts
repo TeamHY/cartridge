@@ -37,7 +37,7 @@ async function find(challengeId: string) {
 
     const { data, error } = await supabase
       .from("weekly_challenge_records")
-      .select("id, time, character, users(email), data")
+      .select("id, time, character, users(id, email), data")
       .eq("challenge_id", Number(challengeId));
 
     if (error) {
@@ -50,10 +50,20 @@ async function find(challengeId: string) {
         "*",
       );
       record.nickname = record.users.email;
-      delete record.users;
+    })
+
+    const userBestRecords = new Map<string, any>();
+    
+    data.forEach((record: any) => {
+      const userId = record.users.id;
+      
+      if (!userBestRecords.has(userId) || record.time < userBestRecords.get(userId).time) {
+        userBestRecords.set(userId, record);
+        delete record.users;
+      }
     });
 
-    return new Response(JSON.stringify({ data }), {
+    return new Response(JSON.stringify({ data: Array.from(userBestRecords.values()) }), {
       headers: { "Content-Type": "application/json" },
       status: 200,
     });
