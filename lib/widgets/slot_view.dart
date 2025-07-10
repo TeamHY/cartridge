@@ -190,7 +190,8 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
   Widget build(BuildContext context) {
     return ContentDialog(
       title: const Text("슬롯 수정"),
-      content: Center(
+      constraints: const BoxConstraints(maxWidth: 368, maxHeight: 600),
+      content: SingleChildScrollView(
         child: Column(
           children: [
             for (var i = 0; i < newItems.length; i++)
