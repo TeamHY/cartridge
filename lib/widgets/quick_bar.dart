@@ -13,8 +13,7 @@ class QuickBar extends StatelessWidget {
       children: [
         Button(
             onPressed: () async {
-              await launchUrl(
-                  Uri.parse('https://www.youtube.com/@HeonYeong_Isaac'));
+              await launchUrl(Uri.parse('https://www.youtube.com/@아이작오헌영'));
               await launchUrl(Uri.parse('https://www.twitch.tv/iwt2hw'));
               await launchUrl(Uri.parse('https://bj.afreecatv.com/iwt2hw'));
               await launchUrl(Uri.parse(
