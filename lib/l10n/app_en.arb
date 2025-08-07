@@ -1,0 +1,203 @@
+{
+  "@@locale": "en",
+
+  "@home": {
+    "description": "Home screen UI"
+  },
+  "home_preset_placeholder": "New preset",
+  "home_button_record": "Record\nMode",
+  "home_button_slot_machine": "Slot\nMachine",
+  "home_button_daily_run": "Daily\nRun",
+  "home_dialog_delete_title": "Delete Preset",
+  "home_dialog_delete_description": "Once deleted, the preset cannot be recovered. Do you really want to delete it?",
+  "home_dialog_update_title": "Update",
+  "home_dialog_update_required": "This version is no longer supported. Please use the latest version.",
+  "home_dialog_update_optional": "Would you like to download the latest version?",
+  "home_checkbox_rerun": "Auto Restart",
+
+  "@quick": {
+    "description": "Quick bar button labels"
+  },
+  "quick_live": "Live",
+  "quick_chat": "Open Chat",
+  "quick_mods": "Mods",
+  "quick_donation": "Donate",
+
+  "@preset": {
+    "description": "Preset item related texts"
+  },
+  "preset_delete_title": "Delete Preset",
+  "preset_delete_message": "Deleting a preset cannot be undone. Are you sure you want to continue?",
+
+  "@setting": {
+    "description": "Settings Dialog"
+  },
+  "setting_dialog_title": "Settings",
+  "setting_isaac_path_label": "Isaac installation path",
+  "setting_rerun_delay_label": "Restart delay (1000 = 1 second)",
+  "setting_language_label": "Language",
+  "setting_language_ko": "Korean",
+  "setting_language_en": "English",
+  "setting_license_button": "License",
+
+  "@option": {
+    "description": "Option Preset Dialog"
+  },
+  "option_preset_fallback_name": "New Preset",
+  "option_dialog_title": "Option Preset",
+  "option_name_label": "Name",
+  "option_window_size_title": "Window Size",
+  "option_window_width_label": "Width",
+  "option_window_height_label": "Height",
+  "option_window_position_title": "Window Position",
+  "option_window_pos_x_label": "X",
+  "option_window_pos_y_label": "Y",
+
+  "@nickname": {
+    "description": "Nickname edit dialog"
+  },
+  "nickname_dialog_title": "Edit Nickname",
+  "nickname_label": "Nickname",
+  "nickname_hint": "Please enter your nickname.",
+
+  "@signin": {
+    "description": "Sign in dialog"
+  },
+  "signin_dialog_title": "Sign In",
+  "signin_email_label": "Email",
+  "signin_password_label": "Password",
+  "signin_email_hint": "Please enter your email.",
+  "signin_password_hint": "Please enter your password.",
+  "signin_submit": "Sign In",
+
+  "@signup": {
+    "description": "Sign up dialog"
+  },
+  "signup_dialog_title": "Sign Up",
+  "signup_email_label": "Email",
+  "signup_password_label": "Password",
+  "signup_password_confirm_label": "Confirm Password",
+  "signup_email_hint": "Please enter your email.",
+  "signup_password_hint": "Please enter your password.",
+  "signup_password_min_length": "Password must be at least 6 characters.",
+  "signup_password_mismatch": "Passwords do not match.",
+  "signup_submit": "Sign Up",
+
+  "@record": {
+    "description": "Record mode page UI and dialogs"
+  },
+  "record_login_required": "Login is required",
+  "record_signin": "Sign In",
+  "record_signup": "Sign Up",
+  "record_nickname_edit": "Edit Nickname",
+  "record_signout": "Sign Out",
+  "record_check_rules": "View Rules",
+  "record_daily_target": "Daily Goal",
+  "record_weekly_target": "Weekly Goal",
+  "record_record_complete_title": "Record Complete",
+  "record_invalid_mod_warning": "Unauthorized mods detected. The game will be closed.",
+  "record_no_challenge": "No challenge available today.",
+  "record_daily_ranking": "Daily Ranking",
+  "record_weekly_ranking": "Weekly Ranking",
+
+  "@ranking": {
+    "description": "Daily and weekly challenge ranking page"
+  },
+  "ranking_loading": "Loading...",
+  "ranking_no_data": "No data",
+  "ranking_daily": "Daily Ranking",
+  "ranking_weekly": "Weekly Ranking",
+  "ranking_boss_label": "Boss",
+  "ranking_seed_label": "Seed",
+  "ranking_rank": "Rank {rank}",
+  "ranking_date_format": "Week {week}, {year}",
+
+  "@slot": {
+    "description": "Slot machine UI"
+  },
+  "slot_edit_title": "Edit Slot",
+  "slot_delete_title": "Delete Slot",
+  "slot_delete_message": "Deleting a slot cannot be undone. Are you sure?",
+  "slot_add_item": "Add Item",
+  "slot_remove_item": "Remove Item",
+  "slot_default": "Default",
+
+  "@roulette": {
+    "description": "Roulette dialog messages"
+  },
+  "roulette_dialog_title": "Roulette",
+  "roulette_result_confirm": "Would you like to apply this preset?",
+  "roulette_start_button": "Spin",
+
+  "@battle": {
+    "description": "Battle page strings"
+  },
+  "battle_title": "Astrobirth",
+  "battle_current_version": "Current Version",
+  "battle_latest_version": "Latest Version",
+  "battle_manual_update": "Manual Update",
+  "battle_patch_notes": "Patch Notes",
+  "battle_warning_title": "Warning",
+  "battle_warning_message": "Steam will be force closed to ensure a smooth update.",
+  "battle_not_installed": "Not Installed",
+  "battle_unknown_version": "Unknown",
+
+  "@common": {
+    "description": "Common"
+  },
+  "common_cancel": "Cancel",
+  "common_save": "Save",
+  "common_search_placeholder": "Search",
+  "common_apply": "Apply",
+  "common_confirm": "Confirm",
+  "common_delete": "Delete",
+  "common_error": "Error",
+  "common_close": "Close",
+  "common_update": "Update",
+  "common_edit": "Edit",
+
+
+  "@character": { "description": "Character names" },
+  "character_isaac": "Isaac",
+  "character_magdalene": "Magdalene",
+  "character_cain": "Cain",
+  "character_judas": "Judas",
+  "character_question_mark": "???",
+  "character_eve": "Eve",
+  "character_samson": "Samson",
+  "character_azazel": "Azazel",
+  "character_lazarus": "Lazarus",
+  "character_eden": "Eden",
+  "character_the_lost": "The Lost",
+  "character_lazarus2": "Lazarus Risen",
+  "character_black_judas": "Dark Judas",
+  "character_lilith": "Lilith",
+  "character_keeper": "Keeper",
+  "character_apollyon": "Apollyon",
+  "character_the_forgotten": "The Forgotten",
+  "character_the_soul": "The Soul",
+  "character_bethany": "Bethany",
+  "character_jacob": "Jacob",
+  "character_esau": "Esau",
+  "character_tainted_isaac": "Tainted Isaac",
+  "character_tainted_magdalene": "Tainted Magdalene",
+  "character_tainted_cain": "Tainted Cain",
+  "character_tainted_judas": "Tainted Judas",
+  "character_tainted_question_mark": "Tainted ???",
+  "character_tainted_eve": "Tainted Eve",
+  "character_tainted_samson": "Tainted Samson",
+  "character_tainted_azazel": "Tainted Azazel",
+  "character_tainted_lazarus": "Tainted Lazarus",
+  "character_tainted_eden": "Tainted Eden",
+  "character_tainted_the_lost": "Tainted Lost",
+  "character_tainted_lilith": "Tainted Lilith",
+  "character_tainted_keeper": "Tainted Keeper",
+  "character_tainted_apollyon": "Tainted Apollyon",
+  "character_tainted_the_forgotten": "Tainted Forgotten",
+  "character_tainted_bethany": "Tainted Bethany",
+  "character_tainted_jacob_and_esau": "Tainted Jacob",
+  "character_tainted_lazarus2": "Tainted Lazarus Risen",
+  "character_tainted_jacob2": "Tainted Jacob 2",
+  "character_tainted_the_soul": "Tainted Soul",
+  "character_unknown": "Unknown"
+}

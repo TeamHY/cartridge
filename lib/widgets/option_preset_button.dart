@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class OptionPresetButton extends StatefulWidget {
   const OptionPresetButton({
@@ -28,6 +29,8 @@ class OptionPresetButtonState extends State<OptionPresetButton> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return FlyoutTarget(
       controller: _menuController,
       child: material.Material(
@@ -55,7 +58,7 @@ class OptionPresetButtonState extends State<OptionPresetButton> {
                 return MenuFlyout(items: [
                   MenuFlyoutItem(
                     leading: const Icon(FluentIcons.edit),
-                    text: const Text('수정'),
+                    text: Text(loc.common_edit),
                     onPressed: () {
                       Flyout.of(context).close();
                       widget.onEdited!(widget.id!);
@@ -66,7 +69,7 @@ class OptionPresetButtonState extends State<OptionPresetButton> {
                       FluentIcons.delete,
                       color: Colors.red,
                     ),
-                    text: const Text('삭제'),
+                    text: Text(loc.common_delete),
                     onPressed: () {
                       Flyout.of(context).close();
                       widget.onDeleted!(widget.id!);

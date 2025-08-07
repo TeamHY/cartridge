@@ -3,6 +3,7 @@ import 'package:cartridge/providers/setting_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart' as material;
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class SettingDialog extends ConsumerStatefulWidget {
   const SettingDialog({super.key});
@@ -16,15 +17,17 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
 
   late TextEditingController _pathController;
   late TextEditingController _rerunDelayController;
+  late String _selectedLanguageCode;
 
   @override
   void initState() {
     super.initState();
 
-    _pathController =
-        TextEditingController(text: ref.read(settingProvider).isaacPath);
-    _rerunDelayController = TextEditingController(
-        text: ref.read(settingProvider).rerunDelay.toString());
+    final settings = ref.read(settingProvider);
+    _pathController = TextEditingController(text: settings.isaacPath);
+    _rerunDelayController =
+        TextEditingController(text: settings.rerunDelay.toString());
+    _selectedLanguageCode = settings.languageCode ?? 'ko';
   }
 
   @override
@@ -36,14 +39,16 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return ContentDialog(
-      title: const Text('설정'),
+      title: Text(loc.setting_dialog_title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InfoLabel(
-            label: '아이작 설치 경로',
+            label: loc.setting_isaac_path_label,
             child: TextBox(
               controller: _pathController,
               onChanged: (_) => setState(() => _isChanged = true),
@@ -51,10 +56,29 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
           ),
           const SizedBox(height: 16.0),
           InfoLabel(
-            label: '재시작 지연시간 (1000 = 1초)',
+            label: loc.setting_rerun_delay_label,
             child: TextBox(
               controller: _rerunDelayController,
               onChanged: (_) => setState(() => _isChanged = true),
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          InfoLabel(
+            label: loc.setting_language_label,
+            child: ComboBox<String>(
+              value: _selectedLanguageCode,
+              items: [
+                ComboBoxItem(value: 'ko', child: Text(loc.setting_language_ko)),
+                ComboBoxItem(value: 'en', child: Text(loc.setting_language_en)),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedLanguageCode = value;
+                    _isChanged = true;
+                  });
+                }
+              },
             ),
           ),
           const SizedBox(height: 16.0),
@@ -62,7 +86,7 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
             children: [
               Button(
                 onPressed: () => material.showLicensePage(context: context),
-                child: const Text('라이센스'),
+                child: Text(loc.setting_license_button),
               ),
               const SizedBox(width: 8.0),
               Text('v$currentVersion'),
@@ -75,7 +99,7 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('취소'),
+          child: Text(loc.common_cancel),
         ),
         FilledButton(
           onPressed: _isChanged
@@ -86,12 +110,13 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
                   setting.setRerunDelay(
                     int.parse(_rerunDelayController.text),
                   );
+                  setting.setLanguageCode(_selectedLanguageCode);
                   setting.saveSetting();
 
                   Navigator.pop(context);
                 }
               : null,
-          child: const Text('저장'),
+          child: Text(loc.common_save),
         ),
       ],
     );

@@ -1,6 +1,7 @@
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/widgets/dialogs/preset_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class PresetItem extends StatelessWidget {
   const PresetItem({
@@ -21,6 +22,8 @@ class PresetItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -53,14 +56,14 @@ class PresetItem extends StatelessWidget {
               context: context,
               builder: (context) {
                 return ContentDialog(
-                  title: const Text("프리셋 삭제"),
-                  content: const Text('프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?'),
+                  title: Text(loc.preset_delete_title),
+                  content: Text(loc.preset_delete_message),
                   actions: [
                     Button(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: const Text('취소'),
+                      child: Text(loc.common_cancel),
                     ),
                     FilledButton(
                       style: ButtonStyle(
@@ -71,7 +74,7 @@ class PresetItem extends StatelessWidget {
                         Navigator.pop(context);
                         onDelete(preset);
                       },
-                      child: const Text('삭제'),
+                      child: Text(loc.common_delete),
                     ),
                   ],
                 );

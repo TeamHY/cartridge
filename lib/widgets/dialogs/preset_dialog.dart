@@ -4,6 +4,7 @@ import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/option_preset_button.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class PresetDialog extends ConsumerStatefulWidget {
   const PresetDialog({
@@ -83,6 +84,7 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final store = ref.read(storeProvider);
     final mods = _newPreset.mods.where(
       (mod) => mod.name.toLowerCase().replaceAll(RegExp('\\s'), "").contains(
@@ -164,7 +166,7 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
           ),
           TextBox(
             controller: _searchController,
-            placeholder: '검색',
+            placeholder: loc.common_search_placeholder,
             suffix: IgnorePointer(
               child: IconButton(
                 onPressed: () {},
@@ -179,7 +181,7 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("취소"),
+          child: Text(loc.common_cancel),
         ),
         FilledButton(
           onPressed: _isChanged
@@ -188,7 +190,7 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
                   Navigator.pop(context);
                 }
               : null,
-          child: const Text("적용"),
+          child: Text(loc.common_apply),
         ),
       ],
     );

@@ -1,0 +1,203 @@
+{
+  "@@locale": "ko",
+
+  "@home": {
+    "description": "홈 화면 UI 전반"
+  },
+  "home_preset_placeholder": "새 프리셋",
+  "home_button_record": "기록 모드",
+  "home_button_slot_machine": "슬롯 머신",
+  "home_button_daily_run": "데일리 런",
+  "home_dialog_delete_title": "프리셋 삭제",
+  "home_dialog_delete_description": "프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
+  "home_dialog_update_title": "업데이트",
+  "home_dialog_update_required": "이 버전은 사용할 수 없습니다. 새로운 버전을 사용해 주세요.",
+  "home_dialog_update_optional": "새로운 버전을 다운로드 받으시겠습니까?",
+  "home_checkbox_rerun": "자동 재시작",
+
+  "@quick": {
+    "description": "상단 퀵바 버튼 텍스트"
+  },
+  "quick_live": "생방송",
+  "quick_chat": "오픈채팅",
+  "quick_mods": "모드",
+  "quick_donation": "후원",
+
+  "@preset": {
+    "description": "프리셋 항목 관련 텍스트"
+  },
+  "preset_delete_title": "프리셋 삭제",
+  "preset_delete_message": "프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
+
+  "@setting": {
+    "description": "설정 다이얼로그"
+  },
+  "setting_dialog_title": "설정",
+  "setting_isaac_path_label": "아이작 설치 경로",
+  "setting_rerun_delay_label": "재시작 지연시간 (1000 = 1초)",
+  "setting_language_label": "언어",
+  "setting_language_ko": "한국어",
+  "setting_language_en": "English",
+  "setting_license_button": "라이센스",
+
+  "@option": {
+    "description": "옵션 프리셋 다이얼로그"
+  },
+  "option_preset_fallback_name": "새 프리셋",
+  "option_dialog_title": "옵션 프리셋",
+  "option_name_label": "이름",
+  "option_window_size_title": "창 크기",
+  "option_window_width_label": "너비",
+  "option_window_height_label": "높이",
+  "option_window_position_title": "창 위치",
+  "option_window_pos_x_label": "X",
+  "option_window_pos_y_label": "Y",
+
+  "@nickname": {
+    "description": "닉네임 변경 다이얼로그"
+  },
+  "nickname_dialog_title": "닉네임 변경",
+  "nickname_label": "닉네임",
+  "nickname_hint": "닉네임을 입력해주세요.",
+
+  "@signin": {
+    "description": "로그인 다이얼로그"
+  },
+  "signin_dialog_title": "로그인",
+  "signin_email_label": "이메일",
+  "signin_password_label": "비밀번호",
+  "signin_email_hint": "이메일을 입력해주세요.",
+  "signin_password_hint": "비밀번호를 입력해주세요.",
+  "signin_submit": "로그인",
+
+  "@signup": {
+    "description": "회원가입 다이얼로그"
+  },
+  "signup_dialog_title": "회원가입",
+  "signup_email_label": "이메일",
+  "signup_password_label": "비밀번호",
+  "signup_password_confirm_label": "비밀번호 확인",
+  "signup_email_hint": "이메일을 입력해주세요.",
+  "signup_password_hint": "비밀번호를 입력해주세요.",
+  "signup_password_min_length": "비밀번호는 6자 이상이어야 합니다.",
+  "signup_password_mismatch": "비밀번호가 일치하지 않습니다.",
+  "signup_submit": "회원가입",
+
+  "@record": {
+    "description": "기록 모드 페이지 UI 및 다이얼로그"
+  },
+  "record_login_required": "로그인이 필요합니다",
+  "record_signin": "로그인",
+  "record_signup": "회원가입",
+  "record_nickname_edit": "닉네임 변경",
+  "record_signout": "로그아웃",
+  "record_check_rules": "규칙 확인",
+  "record_daily_target": "일간 목표",
+  "record_weekly_target": "주간 목표",
+  "record_record_complete_title": "기록 완료",
+  "record_invalid_mod_warning": "허가되지 않은 모드가 감지되었습니다. 게임을 종료합니다.",
+  "record_no_challenge": "오늘의 챌린지가 없습니다.",
+  "record_daily_ranking": "일간 랭킹",
+  "record_weekly_ranking": "주간 랭킹",
+
+  "@ranking": {
+    "description": "일간 및 주간 챌린지 랭킹 페이지"
+  },
+  "ranking_loading": "불러오는 중...",
+  "ranking_no_data": "데이터 없음",
+  "ranking_daily": "일간 랭킹",
+  "ranking_weekly": "주간 랭킹",
+  "ranking_boss_label": "보스",
+  "ranking_seed_label": "시드",
+  "ranking_rank": "{rank}위",
+  "ranking_date_format": "{year}년 {week}주차",
+
+  "@slot": {
+    "description": "슬롯 머신 구성"
+  },
+  "slot_edit_title": "슬롯 수정",
+  "slot_delete_title": "슬롯 삭제",
+  "slot_delete_message": "슬롯을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
+  "slot_add_item": "항목 추가",
+  "slot_remove_item": "항목 제거",
+  "slot_default": "기본",
+
+  "@roulette": {
+    "description": "돌림판 다이얼로그"
+  },
+  "roulette_dialog_title": "돌림판",
+  "roulette_result_confirm": "이 프리셋을 적용하시겠습니까?",
+  "roulette_start_button": "추첨",
+
+  "@battle": {
+    "description": "유튜브 - 아이작 오헌영 대결 컨텐츠"
+  },
+  "battle_title": "Astrobirth",
+  "battle_current_version": "현재 버전",
+  "battle_latest_version": "최신 버전",
+  "battle_manual_update": "수동 업데이트",
+  "battle_patch_notes": "패치노트",
+  "battle_warning_title": "경고",
+  "battle_warning_message": "원활한 업데이트를 위해 스팀이 강제 종료됩니다.",
+  "battle_not_installed": "설치되지 않음",
+  "battle_unknown_version": "확인되지 않음",
+
+  "@common": {
+    "description": "공용 문구"
+  },
+  "common_cancel": "취소",
+  "common_save": "저장",
+  "common_search_placeholder": "검색",
+  "common_apply": "적용",
+  "common_confirm": "확인",
+  "common_delete": "삭제",
+  "common_error": "오류",
+  "common_close": "닫기",
+  "common_update": "변경",
+  "common_edit": "수정",
+
+
+  "@character": { "description": "캐릭터 이름들" },
+  "character_isaac": "아이작",
+  "character_magdalene": "막달레나",
+  "character_cain": "카인",
+  "character_judas": "유다",
+  "character_question_mark": "???",
+  "character_eve": "이브",
+  "character_samson": "삼손",
+  "character_azazel": "아자젤",
+  "character_lazarus": "나사로",
+  "character_eden": "에덴",
+  "character_the_lost": "더 로스트",
+  "character_lazarus2": "나사로2",
+  "character_black_judas": "블랙 유다",
+  "character_lilith": "릴리트",
+  "character_keeper": "키퍼",
+  "character_apollyon": "아폴리온",
+  "character_the_forgotten": "더 포가튼",
+  "character_the_soul": "더 소울",
+  "character_bethany": "베다니",
+  "character_jacob": "야곱",
+  "character_esau": "에사우",
+  "character_tainted_isaac": "더럽혀진 아이작",
+  "character_tainted_magdalene": "더럽혀진 막달레나",
+  "character_tainted_cain": "더럽혀진 카인",
+  "character_tainted_judas": "더럽혀진 유다",
+  "character_tainted_question_mark": "더럽혀진 ???",
+  "character_tainted_eve": "더럽혀진 이브",
+  "character_tainted_samson": "더럽혀진 삼손",
+  "character_tainted_azazel": "더럽혀진 아자젤",
+  "character_tainted_lazarus": "더럽혀진 나사로",
+  "character_tainted_eden": "더럽혀진 에덴",
+  "character_tainted_the_lost": "더럽혀진 더 로스트",
+  "character_tainted_lilith": "더럽혀진 릴리트",
+  "character_tainted_keeper": "더럽혀진 키퍼",
+  "character_tainted_apollyon": "더럽혀진 아폴리온",
+  "character_tainted_the_forgotten": "더럽혀진 더 포가튼",
+  "character_tainted_bethany": "더럽혀진 베다니",
+  "character_tainted_jacob_and_esau": "더럽혀진 야곱",
+  "character_tainted_lazarus2": "더럽혀진 나사로2",
+  "character_tainted_jacob2": "더럽혀진 야곱2",
+  "character_tainted_the_soul": "더럽혀진 더 소울",
+  "character_unknown": "알 수 없음"
+}

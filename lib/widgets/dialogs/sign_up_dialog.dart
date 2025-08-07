@@ -2,6 +2,7 @@ import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class SignUpDialog extends ConsumerStatefulWidget {
   const SignUpDialog({super.key});
@@ -66,8 +67,10 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return ContentDialog(
-      title: const Text('회원가입'),
+      title: Text(loc.signup_dialog_title),
       content: Form(
         key: _formKey,
         child: Column(
@@ -75,11 +78,11 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InfoLabel(
-              label: '이메일',
+              label: loc.signup_email_label,
               child: TextFormBox(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '이메일을 입력해주세요.';
+                    return loc.signup_email_hint;
                   }
 
                   return null;
@@ -89,15 +92,15 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
             ),
             const SizedBox(height: 16.0),
             InfoLabel(
-              label: '비밀번호',
+              label: loc.signup_password_label,
               child: PasswordFormBox(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '비밀번호를 입력해주세요.';
+                    return loc.signup_password_hint;
                   }
 
                   if (value.length < 6) {
-                    return '비밀번호는 6자 이상이어야 합니다.';
+                    return loc.signup_password_min_length;
                   }
 
                   return null;
@@ -107,15 +110,15 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
             ),
             const SizedBox(height: 16.0),
             InfoLabel(
-              label: '비밀번호 확인',
+              label: loc.signup_password_confirm_label,
               child: PasswordFormBox(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '비밀번호를 입력해주세요.';
+                    return loc.signup_password_hint;
                   }
 
                   if (value != _passwordController.text) {
-                    return '비밀번호가 일치하지 않습니다.';
+                    return loc.signup_password_mismatch;
                   }
 
                   return null;
@@ -131,11 +134,11 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('취소'),
+          child: Text(loc.common_cancel),
         ),
         FilledButton(
           onPressed: () => onSubmit(context),
-          child: const Text('회원가입'),
+          child: Text(loc.signup_submit),
         ),
       ],
     );

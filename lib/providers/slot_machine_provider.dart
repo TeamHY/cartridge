@@ -44,8 +44,8 @@ class SlotMachineNotifier extends ChangeNotifier {
     file.writeAsString(jsonEncode({'slots': slots}));
   }
 
-  void addSlot() {
-    slots.add(['기본']);
+  void addSlot(String defaultText) {
+    _slots.add([defaultText]);
 
     saveSlot();
     notifyListeners();

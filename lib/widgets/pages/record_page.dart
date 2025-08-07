@@ -27,6 +27,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:week_of_year/week_of_year.dart';
 import 'package:http/http.dart' as http;
+import 'package:cartridge/l10n/app_localizations.dart';
 
 enum ChallengeType { daily, weekly }
 
@@ -133,13 +134,14 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       'character': _recorder!.character,
       'data': _recorder!.data
     });
+    final loc = AppLocalizations.of(context);
 
     if (context.mounted) {
       showDialog(
         context: context,
         builder: (context) {
           return ContentDialog(
-            title: const Text('기록 완료'),
+            title: Text(loc.record_record_complete_title),
             content: Text(
               FormatUtil.getTimeString(Duration(milliseconds: time)),
             ),
@@ -148,7 +150,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text('닫기'),
+                child: Text(loc.common_close),
               ),
             ],
           );
@@ -168,13 +170,14 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       'character': _recorder!.character,
       'data': _recorder!.data
     });
+    final loc = AppLocalizations.of(context);
 
     if (context.mounted) {
       showDialog(
         context: context,
         builder: (context) {
           return ContentDialog(
-            title: const Text('기록 완료'),
+            title: Text(loc.record_record_complete_title),
             content: Text(
               FormatUtil.getTimeString(Duration(milliseconds: time)),
             ),
@@ -183,7 +186,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text('닫기'),
+                child: Text(loc.common_close),
               ),
             ],
           );
@@ -211,7 +214,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       ProcessUtil.killIsaac();
 
       if (context.mounted) {
-        showErrorDialog(context, '허가되지 않은 모드가 감지되었습니다. 게임을 종료합니다.');
+        showErrorDialog(context, AppLocalizations.of(context).record_invalid_mod_warning);
       }
     }
 
@@ -359,7 +362,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       await refreshChallenge();
 
       if (_dailyChallenge == null || _weeklyChallenge == null) {
-        throw Exception("오늘의 챌린지가 없습니다.");
+        throw Exception(AppLocalizations.of(context).record_no_challenge);
       }
 
       final setting = ref.read(settingProvider);
@@ -432,14 +435,15 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
     final time = _stopwatch.elapsed;
     final session = _supabase.auth.currentSession;
+    final loc = AppLocalizations.of(context);
 
     final stopwatchView = (session == null || session.isExpired)
         ? Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                '로그인이 필요합니다',
-                style: TextStyle(
+              Text(
+                loc.record_login_required,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 40,
                   fontWeight: FontWeight.w900,
@@ -448,9 +452,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
               ),
               const SizedBox(height: 40),
               HyperlinkButton(
-                child: const Text(
-                  '로그인',
-                  style: TextStyle(
+                child: Text(
+                  loc.record_signin,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w200,
@@ -464,9 +468,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
               ),
               const SizedBox(height: 16),
               HyperlinkButton(
-                child: const Text(
-                  '회원가입',
-                  style: TextStyle(
+                child: Text(
+                  loc.record_signup,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.w200,
@@ -484,9 +488,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FilledButton(
-                child: const Text(
-                  '규칙 확인',
-                  style: TextStyle(
+                child: Text(
+                  loc.record_check_rules,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -503,9 +507,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   HyperlinkButton(
-                    child: const Text(
-                      '닉네임 변경',
-                      style: TextStyle(
+                    child: Text(
+                      loc.record_nickname_edit,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w200,
@@ -520,9 +524,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                     },
                   ),
                   HyperlinkButton(
-                    child: const Text(
-                      '로그아웃',
-                      style: TextStyle(
+                    child: Text(
+                      loc.record_signout,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontWeight: FontWeight.w200,
@@ -544,9 +548,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                     children: [
                       Column(
                         children: [
-                          const Text(
-                            '일간 목표',
-                            style: TextStyle(
+                          Text(
+                            loc.record_daily_target,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -579,9 +583,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                       const SizedBox(width: 32),
                       Column(
                         children: [
-                          const Text(
-                            '주간 목표',
-                            style: TextStyle(
+                          Text(
+                            loc.record_weekly_target,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -678,7 +682,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                                 : Colors.grey[30],
                           ),
                         ),
-                        child: const Text('일간 랭킹'),
+                        child: Text(loc.record_daily_ranking),
                         onPressed: () {
                           setState(() {
                             _rankingTabIndex = 0;
@@ -693,7 +697,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                                 : Colors.grey[30],
                           ),
                         ),
-                        child: const Text('주간 랭킹'),
+                        child: Text(loc.record_weekly_ranking),
                         onPressed: () {
                           setState(() {
                             _rankingTabIndex = 1;

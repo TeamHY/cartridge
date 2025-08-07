@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
+
 class FormatUtil {
   static String formatNumberWithZero(int number, int length) {
     final numberString = number.toString();
@@ -24,92 +27,51 @@ class FormatUtil {
     return date.toIso8601String().split('T')[0];
   }
 
-  static String getCharacterName(int character) {
-    switch (character) {
-      case 0:
-        return '아이작';
-      case 1:
-        return '막달레나';
-      case 2:
-        return '카인';
-      case 3:
-        return '유다';
-      case 4:
-        return '???';
-      case 5:
-        return '이브';
-      case 6:
-        return '삼손';
-      case 7:
-        return '아자젤';
-      case 8:
-        return '나사로';
-      case 9:
-        return '에덴';
-      case 10:
-        return '더 로스트';
-      case 11:
-        return '나사로2';
-      case 12:
-        return '블랙 유다';
-      case 13:
-        return '릴리트';
-      case 14:
-        return '키퍼';
-      case 15:
-        return '아폴리온';
-      case 16:
-        return '더 포가튼';
-      case 17:
-        return '더 소울';
-      case 18:
-        return '베다니';
-      case 19:
-        return '야곱';
-      case 20:
-        return '에사우';
-      case 21:
-        return '더럽혀진 아이작';
-      case 22:
-        return '더럽혀진 막달레나';
-      case 23:
-        return '더럽혀진 카인';
-      case 24:
-        return '더럽혀진 유다';
-      case 25:
-        return '더럽혀진 ???';
-      case 26:
-        return '더럽혀진 이브';
-      case 27:
-        return '더럽혀진 삼손';
-      case 28:
-        return '더럽혀진 아자젤';
-      case 29:
-        return '더럽혀진 나사로';
-      case 30:
-        return '더럽혀진 에덴';
-      case 31:
-        return '더럽혀진 더 로스트';
-      case 32:
-        return '더럽혀진 릴리트';
-      case 33:
-        return '더럽혀진 키퍼';
-      case 34:
-        return '더럽혀진 아폴리온';
-      case 35:
-        return '더럽혀진 더 포가튼';
-      case 36:
-        return '더럽혀진 베다니';
-      case 37:
-        return '더럽혀진 야곱';
-      case 38:
-        return '더럽혀진 나사로2';
-      case 39:
-        return '더럽혀진 야곱2';
-      case 40:
-        return '더럽혀진 더 소울';
-      default:
-        return '알 수 없음';
-    }
+  static String getCharacterName(BuildContext context, int character) {
+    final loc = AppLocalizations.of(context);
+    final names = <int, String>{
+      0: loc.character_isaac,
+      1: loc.character_magdalene,
+      2: loc.character_cain,
+      3: loc.character_judas,
+      4: loc.character_question_mark,
+      5: loc.character_eve,
+      6: loc.character_samson,
+      7: loc.character_azazel,
+      8: loc.character_lazarus,
+      9: loc.character_eden,
+      10: loc.character_the_lost,
+      11: loc.character_lazarus2,
+      12: loc.character_black_judas,
+      13: loc.character_lilith,
+      14: loc.character_keeper,
+      15: loc.character_apollyon,
+      16: loc.character_the_forgotten,
+      17: loc.character_the_soul,
+      18: loc.character_bethany,
+      19: loc.character_jacob,
+      20: loc.character_esau,
+      21: loc.character_tainted_isaac,
+      22: loc.character_tainted_magdalene,
+      23: loc.character_tainted_cain,
+      24: loc.character_tainted_judas,
+      25: loc.character_tainted_question_mark,
+      26: loc.character_tainted_eve,
+      27: loc.character_tainted_samson,
+      28: loc.character_tainted_azazel,
+      29: loc.character_tainted_lazarus,
+      30: loc.character_tainted_eden,
+      31: loc.character_tainted_the_lost,
+      32: loc.character_tainted_lilith,
+      33: loc.character_tainted_keeper,
+      34: loc.character_tainted_apollyon,
+      35: loc.character_tainted_the_forgotten,
+      36: loc.character_tainted_bethany,
+      37: loc.character_tainted_jacob_and_esau,
+      38: loc.character_tainted_lazarus2,
+      39: loc.character_tainted_jacob2,
+      40: loc.character_tainted_the_soul,
+    };
+    return names[character] ?? loc.character_unknown;
   }
 }

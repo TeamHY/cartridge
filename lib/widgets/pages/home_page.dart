@@ -18,6 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -38,6 +39,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     if (response.statusCode != 200) {
       return;
     }
+    final loc = AppLocalizations.of(context);
 
     final latestVersion = Version.parse(jsonDecode(response.body)['tag_name']);
 
@@ -46,8 +48,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         context: context,
         builder: (context) {
           return ContentDialog(
-            title: const Text('업데이트'),
-            content: const Text('이 버전은 사용할 수 없습니다. 새로운 버전을 사용해 주세요.'),
+            title: Text(loc.home_dialog_update_title),
+            content: Text(loc.home_dialog_update_required),
             actions: [
               FilledButton(
                 onPressed: () async {
@@ -55,7 +57,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       'https://github.com/TeamHY/cartridge/releases/latest'));
                   exit(0);
                 },
-                child: const Text('확인'),
+                child: Text(loc.common_confirm),
               )
             ],
           );
@@ -66,12 +68,12 @@ class _HomePageState extends ConsumerState<HomePage> {
         context: context,
         builder: (context) {
           return ContentDialog(
-            title: const Text('업데이트'),
-            content: const Text('새로운 버전을 다운로드 받으시겠습니까?'),
+            title: Text(loc.home_dialog_update_title),
+            content: Text(loc.home_dialog_update_optional),
             actions: [
               Button(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('취소'),
+                child: Text(loc.common_cancel),
               ),
               FilledButton(
                 onPressed: () {
@@ -79,7 +81,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                       'https://github.com/TeamHY/cartridge/releases/latest'));
                   Navigator.pop(context);
                 },
-                child: const Text('확인'),
+                child: Text(loc.common_confirm),
               )
             ],
           );
@@ -134,6 +136,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         return a.name.compareTo(b.name);
       }
     });
+    final loc = AppLocalizations.of(context);
 
     return Layout(
       child: Row(
@@ -152,7 +155,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           Flexible(
                             child: TextBox(
                               controller: _presetNameController,
-                              placeholder: '새 프리셋',
+                              placeholder: loc.home_preset_placeholder,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -164,7 +167,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   Preset(
                                     name: _presetNameController.value.text != ''
                                         ? _presetNameController.value.text
-                                        : '새 프리셋',
+                                        : loc.home_preset_placeholder,
                                     mods: store.currentMods
                                         .map(
                                             (mod) => Mod.fromJson(mod.toJson()))
@@ -244,7 +247,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   builder: (context) => const RecordPage(),
                                 ),
                               ),
-                              child: const Text('기록 모드'),
+                              child: Text(loc.home_button_record),
                             ),
                             const SizedBox(width: 4),
                             Button(
@@ -254,7 +257,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   builder: (context) => const SlotMachinePage(),
                                 ),
                               ),
-                              child: const Text('슬롯 머신'),
+                              child: Text(loc.home_button_slot_machine),
                             ),
                             const SizedBox(width: 4),
                             Button(
@@ -263,7 +266,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 isEnableMods: false,
                                 isDebugConsole: false,
                               ),
-                              child: const Text('데일리 런'),
+                              child: Text(loc.home_button_daily_run),
                             ),
                           ],
                         ),
@@ -317,16 +320,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                                   context: context,
                                   builder: (context) {
                                     return ContentDialog(
-                                      title: const Text("프리셋 삭제"),
-                                      content: const Text(
-                                        "프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
-                                      ),
+                                      title: Text(loc.home_dialog_delete_title),
+                                      content: Text(loc.home_dialog_delete_description),
                                       actions: [
                                         Button(
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: const Text("취소"),
+                                          child: Text(loc.common_cancel),
                                         ),
                                         FilledButton(
                                           style: ButtonStyle(
@@ -338,7 +339,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                             Navigator.pop(context);
                                             store.removeOptionPreset(id);
                                           },
-                                          child: const Text('삭제'),
+                                          child: Text(loc.common_delete),
                                         ),
                                       ],
                                     );
@@ -459,7 +460,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                     padding: const EdgeInsets.all(16.0),
                     child: TextBox(
                       controller: _searchController,
-                      placeholder: '검색',
+                      placeholder: loc.common_search_placeholder,
                       suffix: IgnorePointer(
                         child: IconButton(
                           onPressed: () {},
@@ -485,7 +486,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Checkbox(
-                            content: const Text('자동 재시작'),
+                            content: Text(loc.home_checkbox_rerun),
                             checked: store.isRerun,
                             onChanged: (value) => setState(() {
                               store.isRerun = value!;
@@ -502,7 +503,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                       mods: store.currentMods,
                                     ));
                                   },
-                            child: const Text("적용"),
+                            child: Text(loc.common_apply),
                           ),
                         ],
                       ),

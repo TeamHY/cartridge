@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:cartridge/widgets/slot_item.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class SlotViewController {
   SlotViewController({this.start});
@@ -54,6 +55,8 @@ class _SlotViewState extends State<SlotView> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return SizedBox(
       width: 180,
       height: 320,
@@ -119,15 +122,14 @@ class _SlotViewState extends State<SlotView> {
                                       context: context,
                                       builder: (context) {
                                         return ContentDialog(
-                                          title: const Text("슬롯 삭제"),
-                                          content: const Text(
-                                              '슬롯을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?'),
+                                          title: Text(loc.slot_delete_title),
+                                          content: Text(loc.slot_delete_message),
                                           actions: [
                                             Button(
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text('취소'),
+                                              child: Text(loc.common_cancel),
                                             ),
                                             FilledButton(
                                               style: ButtonStyle(
@@ -139,7 +141,7 @@ class _SlotViewState extends State<SlotView> {
                                                 Navigator.pop(context);
                                                 widget.onDeleted();
                                               },
-                                              child: const Text('삭제'),
+                                              child: Text(loc.common_delete),
                                             ),
                                           ],
                                         );
@@ -188,8 +190,10 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return ContentDialog(
-      title: const Text("슬롯 수정"),
+      title: Text(loc.slot_edit_title),
       constraints: const BoxConstraints(maxWidth: 368, maxHeight: 600),
       content: SingleChildScrollView(
         child: Column(
@@ -237,14 +241,14 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("취소"),
+          child: Text(loc.common_cancel),
         ),
         FilledButton(
           onPressed: () {
             widget.onEdit(newItems);
             Navigator.pop(context);
           },
-          child: const Text("적용"),
+          child: Text(loc.common_apply),
         ),
       ],
     );
