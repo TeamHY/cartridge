@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cartridge/constants/urls.dart';
 import 'package:cartridge/models/daily_challenge.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
@@ -495,7 +496,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                 ),
                 onPressed: () async {
                   await launchUrl(
-                      Uri.parse('https://cafe.naver.com/iwt2hw/4478'));
+                      Uri.parse(AppUrls.rulesPost));
                 },
               ),
               const SizedBox(height: 32),
