@@ -8,6 +8,14 @@ jobs:
         - uses: subosito/flutter-action@v2
           with:
             channel: 'stable'
+        - name: Create .env file from secrets
+          run: |
+            cat <<EOF > .env
+            RECORD_PRESET_URL="${{ secrets.RECORD_PRESET_URL }}"
+            RECORDER_MOD_URL="${{ secrets.RECORDER_MOD_URL }}"
+            SUPABASE_URL="${{ secrets.SUPABASE_URL }}"
+            SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
+            EOF
         - run: flutter build windows
         - name: Upload Build Artifact
           uses: actions/upload-artifact@v4
