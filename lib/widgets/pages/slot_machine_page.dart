@@ -4,6 +4,7 @@ import 'package:cartridge/widgets/slot_view.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class SlotMachinePage extends ConsumerStatefulWidget {
   const SlotMachinePage({super.key});
@@ -65,7 +66,10 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
       height: 40,
       child: IconButton(
         icon: const Icon(FluentIcons.add),
-        onPressed: () => slotMachine.addSlot(),
+        onPressed: () {
+          final loc = AppLocalizations.of(context);
+          ref.read(slotMachineProvider).addSlot(loc.slot_default);
+        },
       ),
     ));
 

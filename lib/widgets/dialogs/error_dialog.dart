@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 void showErrorDialog(BuildContext context, String text) {
   showDialog(
@@ -16,15 +17,17 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return ContentDialog(
-      title: const Text('오류'),
+      title: Text(loc.common_error),
       content: Text(text),
       actions: [
         FilledButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('닫기'),
+          child: Text(loc.common_close),
         ),
       ],
     );

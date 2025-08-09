@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cartridge/models/preset.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:roulette/roulette.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class Arrow extends StatelessWidget {
   const Arrow({Key? key}) : super(key: key);
@@ -82,8 +83,10 @@ class _RouletteDialogState extends State<RouletteDialog>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return ContentDialog(
-      title: const Text("돌림판"),
+      title: Text(loc.roulette_dialog_title),
       content: Stack(alignment: Alignment.topCenter, children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -101,7 +104,7 @@ class _RouletteDialogState extends State<RouletteDialog>
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text("취소"),
+          child: Text(loc.common_cancel),
         ),
         FilledButton(
           onPressed: () {
@@ -114,13 +117,13 @@ class _RouletteDialogState extends State<RouletteDialog>
                     context: context,
                     builder: (context) => ContentDialog(
                       title: Text(widget.presets[index].name),
-                      content: const Text("이 프리셋을 적용하시겠습니까?"),
+                      content: Text(loc.roulette_result_confirm),
                       actions: [
                         Button(
                           onPressed: () {
                             Navigator.pop(context);
                           },
-                          child: const Text("취소"),
+                          child: Text(loc.common_cancel),
                         ),
                         FilledButton(
                           onPressed: () {
@@ -128,14 +131,14 @@ class _RouletteDialogState extends State<RouletteDialog>
                             Navigator.pop(context);
                             Navigator.pop(context);
                           },
-                          child: const Text("적용"),
+                          child: Text(loc.common_apply),
                         ),
                       ],
                     ),
                   ),
                 );
           },
-          child: const Text("추첨"),
+          child: Text(loc.roulette_start_button),
         )
       ],
     );

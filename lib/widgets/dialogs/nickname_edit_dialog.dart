@@ -2,6 +2,7 @@ import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class NicknameEditDialog extends ConsumerStatefulWidget {
   const NicknameEditDialog({super.key});
@@ -62,8 +63,10 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return ContentDialog(
-      title: const Text('닉네임 변경'),
+      title: Text(loc.nickname_dialog_title),
       content: Form(
         key: _formKey,
         child: Column(
@@ -71,11 +74,11 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InfoLabel(
-              label: '닉네임',
+              label: loc.nickname_label,
               child: TextFormBox(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '닉네임임을 입력해주세요.';
+                    return loc.nickname_hint;
                   }
 
                   return null;
@@ -91,11 +94,11 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('취소'),
+          child: Text(loc.common_cancel),
         ),
         FilledButton(
           onPressed: () => onSubmit(context),
-          child: const Text('변경'),
+          child: Text(loc.common_update),
         ),
       ],
     );

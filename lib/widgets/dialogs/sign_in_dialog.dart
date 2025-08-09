@@ -2,6 +2,7 @@ import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class SignInDialog extends ConsumerStatefulWidget {
   const SignInDialog({super.key});
@@ -61,8 +62,10 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return ContentDialog(
-      title: const Text('로그인'),
+      title: Text(loc.signin_dialog_title),
       content: Form(
         key: _formKey,
         child: Column(
@@ -70,11 +73,11 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             InfoLabel(
-              label: '이메일',
+              label: loc.signin_email_label,
               child: TextFormBox(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '이메일을 입력해주세요.';
+                    return loc.signin_email_hint;
                   }
 
                   return null;
@@ -84,11 +87,11 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
             ),
             const SizedBox(height: 16.0),
             InfoLabel(
-              label: '비밀번호',
+              label: loc.signin_password_label,
               child: PasswordFormBox(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return '비밀번호를 입력해주세요.';
+                    return loc.signin_password_hint;
                   }
 
                   return null;
@@ -105,11 +108,11 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('취소'),
+          child: Text(loc.common_cancel),
         ),
         FilledButton(
           onPressed: () => onSubmit(context),
-          child: const Text('로그인'),
+          child: Text(loc.signin_submit),
         ),
       ],
     );

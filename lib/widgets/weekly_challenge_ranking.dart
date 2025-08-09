@@ -7,6 +7,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:week_of_year/week_of_year.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class WeeklyChallengeRanking extends ConsumerStatefulWidget {
   const WeeklyChallengeRanking({super.key, this.isAdmin = false});
@@ -90,6 +91,8 @@ class _WeeklyChallengeRankingState
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,7 +111,7 @@ class _WeeklyChallengeRankingState
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    '$_year년 $_week주차',
+                    loc.ranking_date_format(_year, _week),
                     style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -132,7 +135,7 @@ class _WeeklyChallengeRankingState
         if (_challenge == null)
           Center(
             child: Text(
-              _isLoading ? '불러오는 중...' : '데이터 없음',
+              _isLoading ? loc.ranking_loading : loc.ranking_no_data,
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -164,7 +167,7 @@ class _WeeklyChallengeRankingState
               ),
               const SizedBox(width: 8),
               Text(
-                FormatUtil.getCharacterName(_challenge!.character),
+                FormatUtil.getCharacterName(context, _challenge!.character),
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -216,6 +219,8 @@ class WeeklyChallengeRankingItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -225,7 +230,7 @@ class WeeklyChallengeRankingItem extends StatelessWidget {
           Expanded(
             flex: 1,
             child: Text(
-              '${rank.toString()}위',
+              loc.ranking_rank(rank.toString()),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: rank <= 3 ? FontWeight.bold : FontWeight.normal,

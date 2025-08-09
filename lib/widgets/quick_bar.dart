@@ -1,6 +1,7 @@
 import 'package:cartridge/constants/urls.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class QuickBar extends StatelessWidget {
   const QuickBar({
@@ -9,6 +10,8 @@ class QuickBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -19,21 +22,21 @@ class QuickBar extends StatelessWidget {
               await launchUrl(Uri.parse(AppUrls.afreeca));
               await launchUrl(Uri.parse(AppUrls.chzzk));
             },
-            child: const Text('생방송')),
+            child: Text(loc.quick_live)),
         const SizedBox(width: 4),
         Button(
             onPressed: () =>
                 launchUrl(Uri.parse(AppUrls.openChat)),
-            child: const Text('오픈채팅')),
+            child: Text(loc.quick_chat)),
         const SizedBox(width: 4),
         Button(
             onPressed: () =>
                 launchUrl(Uri.parse(AppUrls.modsPost)),
-            child: const Text('모드')),
+            child: Text(loc.quick_mods)),
         const SizedBox(width: 4),
         Button(
             onPressed: () => launchUrl(Uri.parse(AppUrls.donation)),
-            child: const Text('후원')),
+            child: Text(loc.quick_donation)),
       ],
     );
   }

@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:http/http.dart' as http;
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/constants/urls.dart';
 
 class BattlePage extends ConsumerStatefulWidget {
@@ -39,6 +40,7 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final store = ref.watch(storeProvider);
     final baseColor =
         store.isAstroOutdated ? Colors.red.light : Colors.blue.lightest;
@@ -55,20 +57,20 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Astrobirth',
-                            style: TextStyle(
+                            loc.battle_title,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 40,
                               fontWeight: FontWeight.w900,
                               fontFamily: 'Pretendard',
                             ),
                           ),
-                          QuickAction(),
+                          const QuickAction(),
                         ],
                       ),
                       const SizedBox(height: 40),
@@ -85,9 +87,9 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    const Text(
-                                      '현재 버전',
-                                      style: TextStyle(
+                                    Text(
+                                      loc.battle_current_version,
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -97,7 +99,7 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      store.astroLocalVersion ?? '설치되지 않음',
+                                      store.astroLocalVersion ?? loc.battle_not_installed,
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 20,
@@ -113,9 +115,9 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    const Text(
-                                      '최신 버전',
-                                      style: TextStyle(
+                                    Text(
+                                      loc.battle_latest_version,
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
                                         fontWeight: FontWeight.normal,
@@ -125,7 +127,7 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      store.astroRemoteVersion ?? '확인되지 않음',
+                                      store.astroRemoteVersion ?? loc.battle_unknown_version,
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 20,
@@ -169,14 +171,14 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                       context: context,
                                       builder: (context) {
                                         return ContentDialog(
-                                          title: const Text('오류'),
+                                          title: Text(loc.common_error),
                                           content: Text(response.body),
                                           actions: [
                                             FilledButton(
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
-                                              child: const Text('닫기'),
+                                              child: Text(loc.common_close),
                                             ),
                                           ],
                                         );
@@ -197,15 +199,14 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                     context: context,
                                     builder: (context) {
                                       return ContentDialog(
-                                        title: const Text('경고'),
-                                        content: const Text(
-                                            '원활한 업데이트를 위해 스팀이 강제 종료됩니다.'),
+                                        title: Text(loc.battle_warning_title),
+                                        content: Text(loc.battle_warning_message),
                                         actions: [
                                           Button(
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: const Text('취소'),
+                                            child: Text(loc.common_cancel),
                                           ),
                                           FilledButton(
                                             onPressed: () {
@@ -216,7 +217,7 @@ class _BattlePageState extends ConsumerState<BattlePage> with WindowListener {
                                               );
                                               Navigator.pop(context);
                                             },
-                                            child: const Text('확인'),
+                                            child: Text(loc.common_confirm),
                                           ),
                                         ],
                                       );
@@ -276,13 +277,15 @@ class QuickAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         HyperlinkButton(
-          child: const Text(
-            '수동 업데이트',
-            style: TextStyle(
+          child: Text(
+            loc.battle_manual_update,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.w200,
@@ -294,9 +297,9 @@ class QuickAction extends StatelessWidget {
           ),
         ),
         HyperlinkButton(
-          child: const Text(
-            '패치노트',
-            style: TextStyle(
+          child: Text(
+            loc.battle_patch_notes,
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.w200,

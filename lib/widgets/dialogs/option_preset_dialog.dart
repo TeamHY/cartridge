@@ -2,6 +2,7 @@ import 'package:cartridge/models/option_preset.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class OptionPresetDialog extends ConsumerStatefulWidget {
   const OptionPresetDialog({
@@ -30,7 +31,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
 
     _newPreset = ref.read(storeProvider).optionPresets.firstWhere(
           (preset) => preset.id == widget.id,
-          orElse: () => OptionPreset(id: widget.id, name: '새 프리셋'),
+          orElse: () => OptionPreset(id: widget.id, name: AppLocalizations.of(context).option_preset_fallback_name),
         );
 
     _nameController = TextEditingController(text: _newPreset.name);
@@ -53,8 +54,10 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return ContentDialog(
-      title: const Text('옵션 프리셋'),
+      title: Text(loc.option_dialog_title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +65,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
           SizedBox(
             width: 328,
             child: InfoLabel(
-              label: '이름',
+              label: loc.option_name_label,
               child: TextBox(
                 controller: _nameController,
               ),
@@ -70,7 +73,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
           ),
           const SizedBox(height: 16.0),
           Text(
-            '창 크기',
+            loc.option_window_size_title,
             style: FluentTheme.of(context).typography.subtitle,
           ),
           const SizedBox(height: 8.0),
@@ -79,7 +82,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
               SizedBox(
                 width: 160,
                 child: InfoLabel(
-                  label: '너비',
+                  label: loc.option_window_width_label,
                   child: TextBox(
                     controller: _windowWidthController,
                   ),
@@ -91,7 +94,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
               SizedBox(
                 width: 160,
                 child: InfoLabel(
-                  label: '높이',
+                  label: loc.option_window_height_label,
                   child: TextBox(
                     controller: _windowHeightController,
                   ),
@@ -101,7 +104,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
           ),
           const SizedBox(height: 16.0),
           Text(
-            '창 위치',
+            loc.option_window_position_title,
             style: FluentTheme.of(context).typography.subtitle,
           ),
           const SizedBox(height: 8.0),
@@ -110,7 +113,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
               SizedBox(
                 width: 160,
                 child: InfoLabel(
-                  label: 'X',
+                  label: loc.option_window_pos_x_label,
                   child: TextBox(
                     controller: _windowPosXController,
                   ),
@@ -122,7 +125,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
               SizedBox(
                 width: 160,
                 child: InfoLabel(
-                  label: 'Y',
+                  label: loc.option_window_pos_y_label,
                   child: TextBox(
                     controller: _windowPosYController,
                   ),
@@ -137,7 +140,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
           onPressed: () {
             Navigator.pop(context);
           },
-          child: const Text('취소'),
+          child: Text(loc.common_cancel),
         ),
         FilledButton(
           onPressed: () {
@@ -154,7 +157,7 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
 
             Navigator.pop(context);
           },
-          child: const Text('저장'),
+          child: Text(loc.common_save),
         ),
       ],
     );

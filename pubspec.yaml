@@ -51,6 +51,9 @@ dependencies:
   flutter_dotenv: ^5.2.1
   tailf: ^1.1.0
   week_of_year: ^2.2.0
+  flutter_localizations:
+      sdk: flutter
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +74,7 @@ dependency_overrides:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
