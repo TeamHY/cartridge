@@ -8,6 +8,12 @@ jobs:
         - uses: subosito/flutter-action@v2
           with:
             channel: 'stable'
+        - name: Generate .env file
+          run: |
+            Set-Content .env "RECORD_PRESET_URL=`"${{ secrets.RECORD_PRESET_URL }}`""
+            Add-Content .env "RECORDER_MOD_URL=`"${{ secrets.RECORDER_MOD_URL }}`""
+            Add-Content .env "SUPABASE_URL=`"${{ secrets.SUPABASE_URL }}`""
+            Add-Content .env "SUPABASE_ANON_KEY=`"${{ secrets.SUPABASE_ANON_KEY }}`""
         - run: flutter build windows
         - name: Upload Build Artifact
           uses: actions/upload-artifact@v4
