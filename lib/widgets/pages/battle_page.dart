@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:cartridge/constants/urls.dart';
 
 class BattlePage extends ConsumerStatefulWidget {
   const BattlePage({super.key});
@@ -292,9 +293,7 @@ class QuickAction extends StatelessWidget {
             ),
           ),
           onPressed: () => launchUrl(
-            Uri.parse(
-              'https://cafe.naver.com/iwt2hw/128',
-            ),
+            Uri.parse(AppUrls.manualUpdatePost),
           ),
         ),
         HyperlinkButton(
@@ -308,9 +307,7 @@ class QuickAction extends StatelessWidget {
             ),
           ),
           onPressed: () => launchUrl(
-            Uri.parse(
-              'https://steamcommunity.com/sharedfiles/filedetails/changelog/2492350811',
-            ),
+            Uri.parse(AppUrls.steamAstrobirthPatchNotes),
           ),
         ),
       ],
