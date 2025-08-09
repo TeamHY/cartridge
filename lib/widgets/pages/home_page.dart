@@ -18,6 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'package:cartridge/constants/urls.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -31,9 +32,7 @@ class _HomePageState extends ConsumerState<HomePage> {
   late TextEditingController _searchController;
 
   void checkAppVersion() async {
-    final response = await http.get(Uri.parse(
-      'https://api.github.com/repos/TeamHY/cartridge/releases/latest',
-    ));
+    final response = await http.get(Uri.parse(AppUrls.githubApiLatestRelease));
 
     if (response.statusCode != 200) {
       return;
@@ -51,8 +50,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             actions: [
               FilledButton(
                 onPressed: () async {
-                  await launchUrl(Uri.parse(
-                      'https://github.com/TeamHY/cartridge/releases/latest'));
+                  await launchUrl(Uri.parse(AppUrls.githubLatestRelease));
                   exit(0);
                 },
                 child: const Text('확인'),
@@ -75,8 +73,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
               FilledButton(
                 onPressed: () {
-                  launchUrl(Uri.parse(
-                      'https://github.com/TeamHY/cartridge/releases/latest'));
+                  launchUrl(Uri.parse(AppUrls.githubLatestRelease));
                   Navigator.pop(context);
                 },
                 child: const Text('확인'),
