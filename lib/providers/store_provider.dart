@@ -376,6 +376,35 @@ class StoreNotifier extends ChangeNotifier {
       'favorites': favorites,
     }));
   }
+
+  Future<void> saveMods(List<Mod> mods) async {
+    final currentMods = await loadMods();
+
+    for (var mod in currentMods) {
+      final targetMod = mods.firstWhere(
+        (element) => element.name == mod.name,
+        orElse: () => Mod(
+          name: "Null",
+          path: "Null",
+          isDisable: true,
+        ),
+      );
+
+      try {
+        if (targetMod.isDisable) {
+          final disableFile = File('${mod.path}/disable.it');
+          disableFile.createSync();
+        } else {
+          final disableFile = File('${mod.path}/disable.it');
+          disableFile.deleteSync();
+        }
+      } catch (e) {
+        //
+      }
+    }
+
+    reloadMods();
+  }
 }
 
 final storeProvider = ChangeNotifierProvider<StoreNotifier>((ref) {

@@ -24,25 +24,35 @@ class _OptionPresetDialogState extends ConsumerState<OptionPresetDialog> {
   late TextEditingController _windowHeightController;
   late TextEditingController _windowPosXController;
   late TextEditingController _windowPosYController;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
+  }
 
-    _newPreset = ref.read(storeProvider).optionPresets.firstWhere(
-          (preset) => preset.id == widget.id,
-          orElse: () => OptionPreset(id: widget.id, name: AppLocalizations.of(context).option_preset_fallback_name),
-        );
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    if (!_initialized) {
+      _newPreset = ref.read(storeProvider).optionPresets.firstWhere(
+            (preset) => preset.id == widget.id,
+            orElse: () => OptionPreset(id: widget.id, name: AppLocalizations.of(context).option_preset_fallback_name),
+          );
 
-    _nameController = TextEditingController(text: _newPreset.name);
-    _windowWidthController =
-        TextEditingController(text: _newPreset.windowWidth.toString());
-    _windowHeightController =
-        TextEditingController(text: _newPreset.windowHeight.toString());
-    _windowPosXController =
-        TextEditingController(text: _newPreset.windowPosX.toString());
-    _windowPosYController =
-        TextEditingController(text: _newPreset.windowPosY.toString());
+      _nameController = TextEditingController(text: _newPreset.name);
+      _windowWidthController =
+          TextEditingController(text: _newPreset.windowWidth.toString());
+      _windowHeightController =
+          TextEditingController(text: _newPreset.windowHeight.toString());
+      _windowPosXController =
+          TextEditingController(text: _newPreset.windowPosX.toString());
+      _windowPosYController =
+          TextEditingController(text: _newPreset.windowPosY.toString());
+      
+      _initialized = true;
+    }
   }
 
   @override
