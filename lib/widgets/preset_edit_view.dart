@@ -3,6 +3,7 @@ import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/dialogs/game_config_dialog.dart';
+import 'package:cartridge/widgets/dialogs/mod_group_dialog.dart';
 import 'package:cartridge/widgets/mod_item.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
@@ -31,6 +32,7 @@ class PresetEditView extends ConsumerStatefulWidget {
 class _PresetEditViewState extends ConsumerState<PresetEditView> {
   List<Mod> editedMods = [];
   bool _isEditingPresetName = false;
+  final Map<String, FlyoutController> _menuControllers = {};
 
   @override
   void initState() {
@@ -79,6 +81,28 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     }).toList();
   }
 
+  Map<String?, List<Mod>> _getModsByGroup() {
+    final store = ref.read(storeProvider);
+    final filteredMods = _getFilteredMods();
+    final Map<String?, List<Mod>> groupedMods = {};
+
+    // 기존 그룹들을 모두 추가 (빈 그룹도 포함)
+    for (final groupName in store.groups.keys) {
+      groupedMods[groupName] = [];
+    }
+
+    // 미분류 그룹도 추가 (null로 표현)
+    groupedMods[null] = [];
+
+    // 모드를 해당 그룹에 할당
+    for (final mod in filteredMods) {
+      final groupName = store.getModGroup(mod.name);
+      groupedMods[groupName]!.add(mod);
+    }
+
+    return groupedMods;
+  }
+
   @override
   Widget build(BuildContext context) {
     final store = ref.watch(storeProvider);
@@ -93,7 +117,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
       children: [
         _buildPresetNameInput(context),
         _buildControlsRow(context, store, loc),
-        _buildModsList(_getFilteredMods()),
+        _buildModsList(),
         _buildActionButtons(context, loc),
       ],
     );
@@ -123,17 +147,24 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                       onTap: () => setState(() => _isEditingPresetName = true),
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.only(bottom: 3),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.transparent),
                           borderRadius: BorderRadius.circular(4.0),
                         ),
                         child: Text(
-                          widget.selectedPreset.name.isEmpty ? '프리셋 이름' : widget.selectedPreset.name,
+                          widget.selectedPreset.name.isEmpty
+                              ? '프리셋 이름'
+                              : widget.selectedPreset.name,
                           style: widget.selectedPreset.name.isEmpty
-                              ? FluentTheme.of(context).typography.subtitle?.copyWith(
-                                  color: FluentTheme.of(context).resources.textFillColorSecondary,
-                                )
+                              ? FluentTheme.of(context)
+                                  .typography
+                                  .subtitle
+                                  ?.copyWith(
+                                    color: FluentTheme.of(context)
+                                        .resources
+                                        .textFillColorSecondary,
+                                  )
                               : FluentTheme.of(context).typography.subtitle,
                         ),
                       ),
@@ -142,12 +173,16 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
           ),
           const SizedBox(width: 8),
           IconButton(
-            icon: Icon(_isEditingPresetName ? FluentIcons.check_mark : FluentIcons.edit),
+            icon: Icon(_isEditingPresetName
+                ? FluentIcons.check_mark
+                : FluentIcons.edit),
             onPressed: () {
               if (_isEditingPresetName) {
-                widget.selectedPreset.name = widget.editPresetNameController.text;
+                widget.selectedPreset.name =
+                    widget.editPresetNameController.text;
               } else {
-                widget.editPresetNameController.text = widget.selectedPreset.name;
+                widget.editPresetNameController.text =
+                    widget.selectedPreset.name;
               }
               setState(() => _isEditingPresetName = !_isEditingPresetName);
             },
@@ -160,11 +195,15 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
   Widget _buildControlsRow(BuildContext context, store, AppLocalizations loc) {
     return Padding(
       padding: const EdgeInsets.all(16.0).copyWith(top: 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          _GameConfigSelector(store: store),
-          _buildSearchBox(loc),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _GameConfigSelector(store: store),
+              _buildSearchBox(loc),
+            ],
+          ),
         ],
       ),
     );
@@ -186,42 +225,273 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     );
   }
 
-  Widget _buildModsList(List<Mod> filteredMods) {
-    return Expanded(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          const double minTileWidth = 200;
-          const double gap = 16;
-          final double width = constraints.maxWidth - gap * 2;
-          int columns = (width / (minTileWidth + gap)).floor();
-          if (columns < 1) columns = 1;
-          final double tileWidth = (width - gap * (columns - 1)) / columns;
+  Widget _buildModsList() {
+    return _buildGroupedModsList();
+  }
 
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: gap),
-              child: material.Material(
-                color: Colors.transparent,
-                child: Wrap(
-                  spacing: gap,
-                  runSpacing: gap,
-                  children: filteredMods
-                      .map((mod) => SizedBox(
-                            width: tileWidth,
-                            child: ModItem(
-                              mod: mod,
-                              onChanged: (value) => setState(() {
-                                mod.isDisable = !value;
-                              }),
-                            ),
-                          ))
-                      .toList(),
+  Widget _buildGroupedModsList() {
+    final groupedMods = _getModsByGroup();
+    final store = ref.read(storeProvider);
+
+    return Expanded(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: groupedMods.entries.map((entry) {
+              final groupName = entry.key;
+              final mods = entry.value;
+
+              return _buildGroupSection(groupName, mods, store);
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupSection(String? groupName, List<Mod> mods, store) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildGroupHeader(groupName, store),
+          const SizedBox(height: 12),
+          _buildGroupContent(groupName, mods),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupHeader(String? groupName, store) {
+    final groupedMods = _getModsByGroup();
+    final modsInGroup = groupedMods[groupName] ?? [];
+
+    return Row(
+      children: [
+        Expanded(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.ideographic,
+            spacing: 4,
+            children: [
+              Text(
+                groupName ?? '미분류',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-            ),
-          );
-        },
+              Text(
+                  '(${modsInGroup.where((e) => !e.isDisable).length} / ${modsInGroup.length})',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.grey,
+                  ))
+            ],
+          ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (groupName != null) ...[
+              // 그룹 전체 활성화/비활성화 버튼
+              IconButton(
+                icon: Icon(
+                  _isGroupAllEnabled(groupName, groupedMods) 
+                    ? FluentIcons.toggle_left 
+                    : FluentIcons.toggle_right,
+                  size: 16,
+                  color: _isGroupAllEnabled(groupName, groupedMods) 
+                    ? Colors.green 
+                    : Colors.grey,
+                ),
+                onPressed: () => _toggleGroupEnabled(groupName, groupedMods),
+              ),
+              // 더보기 메뉴 버튼
+              FlyoutTarget(
+                controller: _getMenuController(groupName),
+                child: IconButton(
+                  icon: const Icon(FluentIcons.more_vertical, size: 16),
+                  onPressed: () => _showGroupMenu(context, store, groupName),
+                ),
+              ),
+            ] else
+              IconButton(
+                icon: const Icon(FluentIcons.add),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => const ModGroupDialog(),
+                ),
+              ),
+          ],
+        )
+      ],
+    );
+  }
+
+  FlyoutController _getMenuController(String groupName) {
+    if (!_menuControllers.containsKey(groupName)) {
+      _menuControllers[groupName] = FlyoutController();
+    }
+    return _menuControllers[groupName]!;
+  }
+
+  void _showGroupMenu(BuildContext context, store, String groupName) {
+    _getMenuController(groupName).showFlyout(
+      barrierDismissible: true,
+      dismissWithEsc: true,
+      builder: (context) => MenuFlyout(
+        items: [
+          MenuFlyoutItem(
+            leading: const Icon(FluentIcons.edit),
+            text: const Text('이름 변경'),
+            onPressed: () {
+              Flyout.of(context).close();
+              showDialog(
+                context: context,
+                builder: (context) => ModGroupDialog(
+                  initialGroupName: groupName,
+                  isEdit: true,
+                ),
+              );
+            },
+          ),
+          MenuFlyoutItem(
+            leading: Icon(FluentIcons.delete, color: Colors.red),
+            text: Text('그룹 삭제', style: TextStyle(color: Colors.red)),
+            onPressed: () {
+              Flyout.of(context).close();
+              _showDeleteGroupConfirmDialog(context, store, groupName);
+            },
+          ),
+        ],
       ),
+    );
+  }
+
+  bool _isGroupAllEnabled(String? groupName, Map<String?, List<Mod>> groupedMods) {
+    final mods = groupedMods[groupName] ?? [];
+    if (mods.isEmpty) return false;
+    return mods.every((mod) => !mod.isDisable);
+  }
+
+  void _toggleGroupEnabled(String? groupName, Map<String?, List<Mod>> groupedMods) {
+    final mods = groupedMods[groupName] ?? [];
+    if (mods.isEmpty) return;
+    
+    final shouldEnable = !_isGroupAllEnabled(groupName, groupedMods);
+    
+    setState(() {
+      for (final mod in mods) {
+        mod.isDisable = !shouldEnable;
+      }
+    });
+  }
+
+  void _showDeleteGroupConfirmDialog(
+      BuildContext context, store, String groupName) {
+    showDialog(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: const Text('그룹 삭제'),
+        content: Text('$groupName 그룹을 삭제하시겠습니까?'),
+        actions: [
+          Button(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            onPressed: () {
+              store.removeGroup(groupName);
+              Navigator.of(context).pop();
+            },
+            child: const Text('삭제'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupContent(String? groupName, List<Mod> mods) {
+    return DragTarget<String>(
+      onAcceptWithDetails: (details) {
+        final modName = details.data;
+        final store = ref.read(storeProvider);
+        final currentGroup = store.getModGroup(modName);
+
+        if (currentGroup == groupName) return;
+
+        if (groupName == null) {
+          if (currentGroup != null) {
+            store.removeModFromGroup(currentGroup, modName);
+          }
+        } else {
+          store.moveModToGroup(modName, currentGroup, groupName);
+        }
+      },
+      builder: (context, candidateData, rejectedData) {
+        final isHovering = candidateData.isNotEmpty;
+
+        return Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(minHeight: 60),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isHovering
+                  ? Colors.blue.withValues(alpha: 0.5)
+                  : Colors.transparent,
+              width: isHovering ? 1 : 1,
+            ),
+          ),
+          child: mods.isEmpty
+              ? Center(
+                  child: Text(
+                    '모드를 여기로 드래그하세요',
+                    style: TextStyle(
+                      color: Colors.grey.withValues(alpha: 0.6),
+                    ),
+                  ),
+                )
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    const double minTileWidth = 200;
+                    const double gap = 16;
+                    final double width = constraints.maxWidth;
+                    int columns = (width / (minTileWidth + gap)).floor();
+                    if (columns < 1) columns = 1;
+                    final double tileWidth =
+                        (width - gap * (columns - 1)) / columns;
+
+                    return Wrap(
+                      spacing: gap,
+                      runSpacing: gap,
+                      children: mods
+                          .map((mod) => SizedBox(
+                                width: tileWidth,
+                                child: ModItem(
+                                  mod: mod,
+                                  isDraggable: true,
+                                  onChanged: (value) => setState(() {
+                                    mod.isDisable = !value;
+                                  }),
+                                  onMoveToGroup: (targetGroup) {
+                                    final store = ref.read(storeProvider);
+                                    final currentGroup = store.getModGroup(mod.name);
+                                    store.moveModToGroup(mod.name, currentGroup, targetGroup);
+                                  },
+                                ),
+                              ))
+                          .toList(),
+                    );
+                  },
+                ),
+        );
+      },
     );
   }
 
@@ -335,5 +605,4 @@ class _GameConfigSelector extends ConsumerWidget {
     store.isSync = false;
     store.selectGameConfig(value);
   }
-
 }

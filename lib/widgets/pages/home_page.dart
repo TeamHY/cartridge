@@ -122,184 +122,183 @@ class _HomePageState extends ConsumerState<HomePage> {
         children: [
           SizedBox(
             width: 300,
-            child: material.Material(
-                color: Colors.transparent,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: store.presets.isEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(32.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      FluentIcons.playlist_music,
-                                      size: 48,
-                                      color: Colors.grey.withValues(alpha: 0.5),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      '저장된 프리셋이 없어요',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color:
-                                            Colors.grey.withValues(alpha: 0.7),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      '아래에서 새로운 프리셋을\n생성할 수 있어요',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color:
-                                            Colors.grey.withValues(alpha: 0.6),
-                                      ),
-                                    ),
-                                  ],
+            child: Column(
+              children: [
+                Expanded(
+                  child: store.presets.isEmpty
+                      ? Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  FluentIcons.playlist_music,
+                                  size: 48,
+                                  color: Colors.grey.withValues(alpha: 0.5),
                                 ),
-                              ),
-                            )
-                          : ReorderableListView.builder(
-                              buildDefaultDragHandles: false,
-                              itemCount: store.presets.length,
-                              itemBuilder: (context, index) =>
-                                  ReorderableDragStartListener(
-                                key: ValueKey(store.presets[index]),
-                                index: index,
-                                child: PresetItem(
-                                  preset: store.presets[index],
-                                  isSelected:
-                                      _selectedPreset == store.presets[index],
-                                  onTap: () => setState(() {
-                                    _selectedPreset = store.presets[index];
-                                    _editPresetNameController.text =
-                                        store.presets[index].name;
-                                    _isPresetEditing = true;
-                                  }),
-                                  onApply: (Preset preset) async {
-                                    store.selectGameConfig(
-                                        preset.gameConfigId);
-                                    store.applyPreset(preset);
-
-                                    _presetNameController.text = preset.name;
-                                  },
-                                  onDelete: (Preset preset) {
-                                    setState(() {
-                                      store.presets.remove(preset);
-                                      store.savePresets();
-                                      if (_selectedPreset?.name ==
-                                          preset.name) {
-                                        _selectedPreset = null;
-                                        _isPresetEditing = false;
-                                      }
-                                    });
-                                  },
-                                  onEdit: (preset) => setState(() {
-                                    _selectedPreset = preset;
-                                    _editPresetNameController.text =
-                                        preset.name;
-                                    _isPresetEditing = true;
-                                  }),
+                                const SizedBox(height: 16),
+                                Text(
+                                  '저장된 프리셋이 없어요',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color:
+                                        Colors.grey.withValues(alpha: 0.7),
+                                  ),
                                 ),
-                              ),
-                              onReorder: ((oldIndex, newIndex) {
+                                const SizedBox(height: 8),
+                                Text(
+                                  '아래에서 새로운 프리셋을\n생성할 수 있어요',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color:
+                                        Colors.grey.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : ReorderableListView.builder(
+                          buildDefaultDragHandles: false,
+                          padding: const EdgeInsets.all(8),
+                          itemCount: store.presets.length,
+                          itemBuilder: (context, index) =>
+                              ReorderableDragStartListener(
+                            key: ValueKey(store.presets[index]),
+                            index: index,
+                            child: PresetItem(
+                              preset: store.presets[index],
+                              isSelected:
+                                  _selectedPreset == store.presets[index],
+                              onTap: () => setState(() {
+                                _selectedPreset = store.presets[index];
+                                _editPresetNameController.text =
+                                    store.presets[index].name;
+                                _isPresetEditing = true;
+                              }),
+                              onApply: (Preset preset) async {
+                                store.selectGameConfig(
+                                    preset.gameConfigId);
+                                store.applyPreset(preset);
+            
+                                _presetNameController.text = preset.name;
+                              },
+                              onDelete: (Preset preset) {
                                 setState(() {
-                                  if (oldIndex < newIndex) {
-                                    newIndex -= 1;
+                                  store.presets.remove(preset);
+                                  store.savePresets();
+                                  if (_selectedPreset?.name ==
+                                      preset.name) {
+                                    _selectedPreset = null;
+                                    _isPresetEditing = false;
                                   }
-
-                                  final item = store.presets.removeAt(oldIndex);
-                                  store.presets.insert(newIndex, item);
                                 });
+                              },
+                              onEdit: (preset) => setState(() {
+                                _selectedPreset = preset;
+                                _editPresetNameController.text =
+                                    preset.name;
+                                _isPresetEditing = true;
                               }),
                             ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Flexible(
-                            child: TextBox(
-                              controller: _presetNameController,
-                              placeholder: loc.home_preset_placeholder,
-                            ),
                           ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            icon: const Icon(FluentIcons.add),
-                            onPressed: () {
-                              setState(() {
-                                store.presets.add(
-                                  Preset(
-                                    name: _presetNameController.value.text != ''
-                                        ? _presetNameController.value.text
-                                        : loc.home_preset_placeholder,
-                                    mods: store.currentMods
-                                        .map(
-                                            (mod) => Mod.fromJson(mod.toJson()))
-                                        .toList(),
-                                  ),
-                                );
-                                store.savePresets();
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 245, 248, 252),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
-                            blurRadius: 2,
-                            offset: const Offset(0, -2),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          children: [
-                            Button(
-                              onPressed: () => Navigator.push(
-                                context,
-                                FluentPageRoute(
-                                  builder: (context) => const RecordPage(),
-                                ),
-                              ),
-                              child: Text(loc.home_button_record),
-                            ),
-                            const SizedBox(width: 4),
-                            Button(
-                              onPressed: () => Navigator.push(
-                                context,
-                                FluentPageRoute(
-                                  builder: (context) => const SlotMachinePage(),
-                                ),
-                              ),
-                              child: Text(loc.home_button_slot_machine),
-                            ),
-                            const SizedBox(width: 4),
-                            Button(
-                              onPressed: () => store.applyPreset(
-                                null,
-                                isEnableMods: false,
-                                isDebugConsole: false,
-                              ),
-                              child: Text(loc.home_button_daily_run),
-                            ),
-                          ],
+                          onReorder: ((oldIndex, newIndex) {
+                            setState(() {
+                              if (oldIndex < newIndex) {
+                                newIndex -= 1;
+                              }
+            
+                              final item = store.presets.removeAt(oldIndex);
+                              store.presets.insert(newIndex, item);
+                            });
+                          }),
+                        ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: TextBox(
+                          controller: _presetNameController,
+                          placeholder: loc.home_preset_placeholder,
                         ),
                       ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(FluentIcons.add),
+                        onPressed: () {
+                          setState(() {
+                            store.presets.add(
+                              Preset(
+                                name: _presetNameController.value.text != ''
+                                    ? _presetNameController.value.text
+                                    : loc.home_preset_placeholder,
+                                mods: store.currentMods
+                                    .map(
+                                        (mod) => Mod.fromJson(mod.toJson()))
+                                    .toList(),
+                              ),
+                            );
+                            store.savePresets();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 245, 248, 252),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 2,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Button(
+                          onPressed: () => Navigator.push(
+                            context,
+                            FluentPageRoute(
+                              builder: (context) => const RecordPage(),
+                            ),
+                          ),
+                          child: Text(loc.home_button_record),
+                        ),
+                        const SizedBox(width: 4),
+                        Button(
+                          onPressed: () => Navigator.push(
+                            context,
+                            FluentPageRoute(
+                              builder: (context) => const SlotMachinePage(),
+                            ),
+                          ),
+                          child: Text(loc.home_button_slot_machine),
+                        ),
+                        const SizedBox(width: 4),
+                        Button(
+                          onPressed: () => store.applyPreset(
+                            null,
+                            isEnableMods: false,
+                            isDebugConsole: false,
+                          ),
+                          child: Text(loc.home_button_daily_run),
+                        ),
+                      ],
                     ),
-                  ],
-                )),
+                  ),
+                ),
+              ],
+            ),
           ),
           Expanded(
             child: Container(

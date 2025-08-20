@@ -337,6 +337,84 @@ class StoreNotifier extends ChangeNotifier {
     file.writeAsString(jsonEncode(_presetsData?.toJson()));
   }
 
+  void addGroup(String groupName) {
+    if (_presetsData == null) {
+      _presetsData = PresetsDataV3(
+        presets: [],
+        gameConfigs: [],
+        groups: {},
+      );
+    }
+    
+    if (!_presetsData!.groups.containsKey(groupName)) {
+      _presetsData!.groups[groupName] = <String>{};
+      savePresets();
+      notifyListeners();
+    }
+  }
+
+  void removeGroup(String groupName) {
+    if (_presetsData != null && _presetsData!.groups.containsKey(groupName)) {
+      _presetsData!.groups.remove(groupName);
+      savePresets();
+      notifyListeners();
+    }
+  }
+
+  void renameGroup(String oldName, String newName) {
+    if (_presetsData != null && 
+        _presetsData!.groups.containsKey(oldName) && 
+        !_presetsData!.groups.containsKey(newName)) {
+      final modNames = _presetsData!.groups[oldName]!;
+      _presetsData!.groups.remove(oldName);
+      _presetsData!.groups[newName] = modNames;
+      savePresets();
+      notifyListeners();
+    }
+  }
+
+  void addModToGroup(String groupName, String modName) {
+    if (_presetsData != null && _presetsData!.groups.containsKey(groupName)) {
+      _presetsData!.groups[groupName]!.add(modName);
+      savePresets();
+      notifyListeners();
+    }
+  }
+
+  void removeModFromGroup(String groupName, String modName) {
+    if (_presetsData != null && _presetsData!.groups.containsKey(groupName)) {
+      _presetsData!.groups[groupName]!.remove(modName);
+      savePresets();
+      notifyListeners();
+    }
+  }
+
+  void moveModToGroup(String modName, String? fromGroup, String? toGroup) {
+    if (_presetsData == null) return;
+
+    if (fromGroup != null && _presetsData!.groups.containsKey(fromGroup)) {
+      _presetsData!.groups[fromGroup]!.remove(modName);
+    }
+
+    if (toGroup != null && _presetsData!.groups.containsKey(toGroup)) {
+      _presetsData!.groups[toGroup]!.add(modName);
+    }
+
+    savePresets();
+    notifyListeners();
+  }
+
+  String? getModGroup(String modName) {
+    if (_presetsData == null) return null;
+    
+    for (var entry in _presetsData!.groups.entries) {
+      if (entry.value.contains(modName)) {
+        return entry.key;
+      }
+    }
+    return null;
+  }
+
   Future<void> saveMods(List<Mod> mods) async {
     final currentMods = await loadMods();
 
