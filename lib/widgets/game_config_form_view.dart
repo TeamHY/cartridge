@@ -139,29 +139,28 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
   }
 
   void _validateForm() {
-    final loc = AppLocalizations.of(context);
     final errors = <String, String?>{};
 
     if (_nameController.text.trim().isEmpty) {
-      errors['name'] = '이름은 필수입니다';
+      errors['name'] = AppLocalizations.of(context).validation_name_required;
     }
 
     final width = int.tryParse(_windowWidthController.text);
     if (width == null || width < 320) {
-      errors['windowWidth'] = '너비는 320 이상이어야 합니다';
+      errors['windowWidth'] = AppLocalizations.of(context).validation_width_minimum;
     }
 
     final height = int.tryParse(_windowHeightController.text);
     if (height == null || height < 240) {
-      errors['windowHeight'] = '높이는 240 이상이어야 합니다';
+      errors['windowHeight'] = AppLocalizations.of(context).validation_height_minimum;
     }
 
     if (int.tryParse(_windowPosXController.text) == null) {
-      errors['windowPosX'] = '유효한 숫자를 입력해주세요';
+      errors['windowPosX'] = AppLocalizations.of(context).validation_number_required;
     }
 
     if (int.tryParse(_windowPosYController.text) == null) {
-      errors['windowPosY'] = '유효한 숫자를 입력해주세요';
+      errors['windowPosY'] = AppLocalizations.of(context).validation_number_required;
     }
 
     setState(() {
@@ -201,7 +200,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
         padding: const EdgeInsets.all(32),
         child: Center(
           child: Text(
-            '설정을 선택하거나 새로 만들어주세요',
+            AppLocalizations.of(context).game_config_select_or_create,
             style: FluentTheme.of(context).typography.body,
           ),
         ),

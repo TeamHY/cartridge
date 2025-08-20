@@ -1,6 +1,7 @@
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class ModGroupDialog extends ConsumerStatefulWidget {
   final String? initialGroupName;
@@ -23,7 +24,8 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
   @override
   void initState() {
     super.initState();
-    _groupNameController = TextEditingController(text: widget.initialGroupName ?? '');
+    _groupNameController =
+        TextEditingController(text: widget.initialGroupName ?? '');
   }
 
   @override
@@ -34,19 +36,19 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
 
   void _handleCreate() {
     final groupName = _groupNameController.text.trim();
-    
+
     if (groupName.isEmpty) {
       setState(() {
-        _errorMessage = '그룹 이름을 입력해주세요';
+        _errorMessage = AppLocalizations.of(context).group_name_required;
       });
       return;
     }
 
     final store = ref.read(storeProvider);
-    
+
     if (store.groups.containsKey(groupName)) {
       setState(() {
-        _errorMessage = '이미 존재하는 그룹 이름입니다';
+        _errorMessage = AppLocalizations.of(context).group_name_exists;
       });
       return;
     }
@@ -63,14 +65,16 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
   @override
   Widget build(BuildContext context) {
     return ContentDialog(
-      title: Text(widget.isEdit ? '그룹 이름 변경' : '새 그룹 생성'),
+      title: Text(widget.isEdit
+          ? AppLocalizations.of(context).group_rename_title
+          : AppLocalizations.of(context).group_create_title),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextBox(
             controller: _groupNameController,
-            placeholder: '그룹 이름을 입력하세요',
+            placeholder: AppLocalizations.of(context).group_name_placeholder,
             autofocus: true,
             onSubmitted: (_) => _handleCreate(),
           ),
@@ -89,11 +93,13 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
       actions: [
         Button(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('취소'),
+          child: Text(AppLocalizations.of(context).common_cancel),
         ),
         FilledButton(
           onPressed: _handleCreate,
-          child: Text(widget.isEdit ? '변경' : '생성'),
+          child: Text(widget.isEdit
+              ? AppLocalizations.of(context).common_update
+              : AppLocalizations.of(context).common_save),
         ),
       ],
     );

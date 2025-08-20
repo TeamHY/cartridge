@@ -52,7 +52,6 @@ class Layout extends ConsumerWidget {
                   width: 138,
                   height: 50,
                   child: WindowCaption(
-                    // brightness: theme.brightness,
                     backgroundColor: Colors.transparent,
                   ),
                 ),

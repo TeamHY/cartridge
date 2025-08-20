@@ -60,18 +60,6 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
   }
 
   void _onConfigSelected(GameConfig? config) {
-    // if (_selectedConfig != null && _hasUnsavedChanges(_selectedConfig!)) {
-    //   _showUnsavedChangesDialog(() {
-    //     setState(() {
-    //       _selectedConfig = config;
-    //     });
-    //   });
-    // } else {
-    //   setState(() {
-    //     _selectedConfig = config;
-    //   });
-    // }
-
     setState(() {
       _selectedConfig = config;
     });
@@ -151,12 +139,12 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
     showDialog(
       context: context,
       builder: (context) => ContentDialog(
-        title: Text('저장되지 않은 변경사항'),
-        content: Text('현재 설정에 저장되지 않은 변경사항이 있습니다. 저장하시겠습니까?'),
+        title: Text(AppLocalizations.of(context).game_config_unsaved_changes_title),
+        content: Text(AppLocalizations.of(context).game_config_unsaved_changes_message),
         actions: [
           Button(
             onPressed: () => Navigator.pop(context),
-            child: Text('돌아가기'),
+            child: Text(AppLocalizations.of(context).game_config_back),
           ),
           Button(
             onPressed: () {
@@ -164,7 +152,7 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
               _onResetConfig();
               onContinue();
             },
-            child: Text('취소'),
+            child: Text(AppLocalizations.of(context).game_config_discard),
           ),
           FilledButton(
             onPressed: () {
@@ -172,7 +160,7 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
               _onSaveConfig();
               onContinue();
             },
-            child: Text('저장'),
+            child: Text(AppLocalizations.of(context).game_config_save),
           ),
         ],
       ),
@@ -222,7 +210,7 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
         maxWidth: 800,
         maxHeight: 600,
       ),
-      title: Text('게임 설정 관리'),
+      title: Text(AppLocalizations.of(context).game_config_management_title),
       content: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

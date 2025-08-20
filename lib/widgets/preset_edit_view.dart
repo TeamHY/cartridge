@@ -6,7 +6,6 @@ import 'package:cartridge/widgets/dialogs/game_config_dialog.dart';
 import 'package:cartridge/widgets/dialogs/mod_group_dialog.dart';
 import 'package:cartridge/widgets/mod_item.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PresetEditView extends ConsumerStatefulWidget {
@@ -86,15 +85,12 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     final filteredMods = _getFilteredMods();
     final Map<String?, List<Mod>> groupedMods = {};
 
-    // 기존 그룹들을 모두 추가 (빈 그룹도 포함)
     for (final groupName in store.groups.keys) {
       groupedMods[groupName] = [];
     }
 
-    // 미분류 그룹도 추가 (null로 표현)
     groupedMods[null] = [];
 
-    // 모드를 해당 그룹에 할당
     for (final mod in filteredMods) {
       final groupName = store.getModGroup(mod.name);
       groupedMods[groupName]!.add(mod);
@@ -124,6 +120,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
   }
 
   Widget _buildPresetNameInput(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
@@ -135,7 +132,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                   ? TextBox(
                       controller: widget.editPresetNameController,
                       style: FluentTheme.of(context).typography.subtitle,
-                      placeholder: '프리셋 이름',
+                      placeholder: loc.preset_edit_name_placeholder,
                       onChanged: (value) => widget.selectedPreset.name = value,
                       onSubmitted: (value) {
                         widget.selectedPreset.name = value;
@@ -154,7 +151,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                         ),
                         child: Text(
                           widget.selectedPreset.name.isEmpty
-                              ? '프리셋 이름'
+                              ? loc.preset_edit_name_placeholder
                               : widget.selectedPreset.name,
                           style: widget.selectedPreset.name.isEmpty
                               ? FluentTheme.of(context)
@@ -266,6 +263,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
   }
 
   Widget _buildGroupHeader(String? groupName, store) {
+    final loc = AppLocalizations.of(context);
     final groupedMods = _getModsByGroup();
     final modsInGroup = groupedMods[groupName] ?? [];
 
@@ -278,7 +276,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
             spacing: 4,
             children: [
               Text(
-                groupName ?? '미분류',
+                groupName ?? loc.group_uncategorized,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
@@ -298,7 +296,6 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (groupName != null) ...[
-              // 그룹 전체 활성화/비활성화 버튼
               IconButton(
                 icon: Icon(
                   _isGroupAllEnabled(groupName, groupedMods) 
@@ -311,7 +308,6 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                 ),
                 onPressed: () => _toggleGroupEnabled(groupName, groupedMods),
               ),
-              // 더보기 메뉴 버튼
               FlyoutTarget(
                 controller: _getMenuController(groupName),
                 child: IconButton(
@@ -348,7 +344,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
         items: [
           MenuFlyoutItem(
             leading: const Icon(FluentIcons.edit),
-            text: const Text('이름 변경'),
+            text: Text(AppLocalizations.of(context).group_rename),
             onPressed: () {
               Flyout.of(context).close();
               showDialog(
@@ -362,7 +358,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
           ),
           MenuFlyoutItem(
             leading: Icon(FluentIcons.delete, color: Colors.red),
-            text: Text('그룹 삭제', style: TextStyle(color: Colors.red)),
+            text: Text(AppLocalizations.of(context).group_delete, style: TextStyle(color: Colors.red)),
             onPressed: () {
               Flyout.of(context).close();
               _showDeleteGroupConfirmDialog(context, store, groupName);
@@ -397,19 +393,19 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     showDialog(
       context: context,
       builder: (context) => ContentDialog(
-        title: const Text('그룹 삭제'),
-        content: Text('$groupName 그룹을 삭제하시겠습니까?'),
+        title: Text(AppLocalizations.of(context).group_delete),
+        content: Text(AppLocalizations.of(context).group_delete_confirm(groupName)),
         actions: [
           Button(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('취소'),
+            child: Text(AppLocalizations.of(context).common_cancel),
           ),
           FilledButton(
             onPressed: () {
               store.removeGroup(groupName);
               Navigator.of(context).pop();
             },
-            child: const Text('삭제'),
+            child: Text(AppLocalizations.of(context).common_delete),
           ),
         ],
       ),
@@ -451,7 +447,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
           child: mods.isEmpty
               ? Center(
                   child: Text(
-                    '모드를 여기로 드래그하세요',
+                    AppLocalizations.of(context).mod_drag_here,
                     style: TextStyle(
                       color: Colors.grey.withValues(alpha: 0.6),
                     ),
@@ -541,7 +537,7 @@ class _GameConfigSelector extends ConsumerWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 300),
         child: ComboBox<String?>(
-          placeholder: const Text('게임 설정'),
+          placeholder: Text(AppLocalizations.of(context).game_config_dialog_title),
           value: store.selectedGameConfigId,
           items: _buildComboBoxItems(loc),
           onChanged: (value) => _handleComboBoxChange(context, value),
@@ -562,18 +558,18 @@ class _GameConfigSelector extends ConsumerWidget {
           children: [
             const Icon(FluentIcons.edit, size: 14),
             const SizedBox(width: 8),
-            Text('편집하기'),
+            Text(loc.game_config_edit),
           ],
         ),
       ),
       if (store.selectedGameConfigId != null)
-        const ComboBoxItem<String?>(
+        ComboBoxItem<String?>(
           value: null,
           child: Row(
             children: [
               const Icon(FluentIcons.clear, size: 14),
               const SizedBox(width: 8),
-              Text('선택 해제'),
+              Text(loc.game_config_clear_selection),
             ],
           ),
         ),

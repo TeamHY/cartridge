@@ -49,7 +49,6 @@ class _PresetItemState extends State<PresetItem> with SingleTickerProviderStateM
       curve: Curves.easeInOut,
     ));
     
-    // 선택된 상태면 처음부터 애니메이션 완료 상태로
     if (widget.isSelected) {
       _animationController.value = 1.0;
     }
@@ -58,7 +57,6 @@ class _PresetItemState extends State<PresetItem> with SingleTickerProviderStateM
   @override
   void didUpdateWidget(PresetItem oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 선택 상태가 변경되면 애니메이션 조정
     if (widget.isSelected != oldWidget.isSelected) {
       if (widget.isSelected) {
         _animationController.forward();

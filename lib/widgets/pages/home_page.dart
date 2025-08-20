@@ -11,7 +11,7 @@ import 'package:cartridge/widgets/preset_edit_view.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
-import 'package:flutter/material.dart' as material;
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -139,7 +139,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  '저장된 프리셋이 없어요',
+                                  loc.preset_edit_no_presets,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -149,7 +149,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  '아래에서 새로운 프리셋을\n생성할 수 있어요',
+                                  loc.preset_edit_create_new,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 14,
@@ -343,7 +343,7 @@ class _HomePageState extends ConsumerState<HomePage> {
         Expanded(
           child: Center(
             child: Text(
-              '프리셋을 선택해주세요',
+              loc.preset_edit_select_message,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -368,47 +368,6 @@ class _HomePageState extends ConsumerState<HomePage> {
             width: double.infinity,
             height: 60,
           ),
-          // child: Padding(
-          //   padding: const EdgeInsets.all(16.0),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       Checkbox(
-          //         content: Text(loc.home_checkbox_rerun),
-          //         checked: store.isRerun,
-          //         onChanged: (value) => setState(() {
-          //           store.isRerun = value!;
-          //         }),
-          //       ),
-          //       Row(
-          //         spacing: 8,
-          //         children: [
-          //           FilledButton(
-          //             onPressed: store.isSync
-          //                 ? null
-          //                 : () async {
-          //                     await store.saveMods(store.currentMods);
-          //                     setState(() {
-          //                       store.isSync = true;
-          //                     });
-          //                   },
-          //             child: Text(loc.common_save),
-          //           ),
-          //           FilledButton(
-          //             onPressed: () async {
-          //               store.applyPreset(Preset(
-          //                 name: '',
-          //                 gameConfigId: store.selectedGameConfigId,
-          //                 mods: store.currentMods,
-          //               ));
-          //             },
-          //             child: const Text("시작"),
-          //           ),
-          //         ],
-          //       )
-          //     ],
-          //   ),
-          // ),
         )
       ],
     );

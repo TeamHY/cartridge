@@ -37,7 +37,6 @@ Future<void> setEnableMods(bool value) async {
 
     await optionFile.writeAsString(newContent);
   } catch (e) {
-    //
   }
 }
 

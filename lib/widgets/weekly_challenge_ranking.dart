@@ -1,4 +1,3 @@
-import 'package:cartridge/models/daily_challenge.dart';
 import 'package:cartridge/models/daily_record.dart';
 import 'package:cartridge/models/weekly_challenge.dart';
 import 'package:cartridge/utils/format_util.dart';

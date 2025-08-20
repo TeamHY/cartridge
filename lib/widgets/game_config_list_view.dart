@@ -63,7 +63,7 @@ class _GameConfigListViewState extends State<GameConfigListView> {
           children: [
             const Icon(FluentIcons.add, size: 16),
             const SizedBox(width: 8),
-            Text('새 설정 추가'),
+            Text(AppLocalizations.of(context).game_config_add_new),
           ],
         ),
       ),
@@ -101,7 +101,9 @@ class _GameConfigListViewState extends State<GameConfigListView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              config.name.isEmpty ? 'Untitled' : config.name,
+                              config.name.isEmpty
+                                  ? AppLocalizations.of(context).common_untitled
+                                  : config.name,
                               style: TextStyle(
                                 fontWeight: isSelected
                                     ? FontWeight.w600
@@ -133,7 +135,7 @@ class _GameConfigListViewState extends State<GameConfigListView> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '수정됨',
+                            AppLocalizations.of(context).common_modified,
                             style: TextStyle(
                               fontSize: 10,
                               color: Colors.orange.dark,
@@ -169,7 +171,7 @@ class _GameConfigListViewState extends State<GameConfigListView> {
           children: [
             const Icon(FluentIcons.delete, size: 16),
             const SizedBox(width: 8),
-            Text('선택된 항목 삭제'),
+            Text(AppLocalizations.of(context).game_config_delete_selected),
           ],
         ),
       ),
@@ -185,9 +187,9 @@ class _GameConfigListViewState extends State<GameConfigListView> {
     showDialog(
       context: context,
       builder: (context) => ContentDialog(
-        title: Text('설정 삭제'),
+        title: Text(AppLocalizations.of(context).game_config_delete_title),
         content: Text(
-          '\'$configName\' 설정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+          loc.game_config_delete_message(configName),
         ),
         actions: [
           Button(

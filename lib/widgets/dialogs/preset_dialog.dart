@@ -55,17 +55,7 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
                   )
                   .toList();
 
-              // _newPreset.mods.sort((a, b) {
-              //   if (store.favorites.contains(a.name) &&
-              //       !store.favorites.contains(b.name)) {
-              //     return -1;
-              //   } else if (!store.favorites.contains(a.name) &&
-              //       store.favorites.contains(b.name)) {
-              //     return 1;
-              //   } else {
-              //     return a.name.compareTo(b.name);
-              //   }
-              // });
+
             },
           ),
         );
@@ -147,11 +137,6 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
                             },
                             content: Text(
                               mod.name,
-                              // style: TextStyle(
-                              //   color: store.favorites.contains(mod.name)
-                              //       ? Colors.blue
-                              //       : Colors.black,
-                              // ),
                             ),
                           ),
                         ),

@@ -155,6 +155,71 @@
   "common_close": "닫기",
   "common_update": "변경",
   "common_edit": "수정",
+  "common_start": "시작",
+  "common_untitled": "제목 없음",
+  "common_unknown": "알 수 없음",
+  "common_modified": "수정됨",
+
+  "@mod": {
+    "description": "모드 관련 문자열"
+  },
+  "mod_open_folder": "모드 폴더 열기",
+  "mod_move_to_group": "그룹으로 이동",
+  "mod_remove_from_group": "그룹에서 제거",
+  "mod_drag_here": "모드를 여기로 드래그하세요",
+  "mod_version_unknown": "알 수 없음",
+
+  "@group": {
+    "description": "그룹 관리"
+  },
+  "group_uncategorized": "미분류",
+  "group_create_new": "새 그룹 생성",
+  "group_rename": "이름 변경",
+  "group_delete": "그룹 삭제",
+  "group_delete_confirm": "{groupName} 그룹을 삭제하시겠습니까?",
+  "group_name_placeholder": "그룹 이름을 입력하세요",
+  "group_name_required": "그룹 이름을 입력해주세요",
+  "group_name_exists": "이미 존재하는 그룹 이름입니다",
+  "group_create_title": "새 그룹 생성",
+  "group_rename_title": "그룹 이름 변경",
+
+  "@preset_edit": {
+    "description": "프리셋 편집 인터페이스"
+  },
+  "preset_edit_name_placeholder": "프리셋 이름",
+  "preset_edit_select_message": "프리셋을 선택해주세요",
+  "preset_edit_no_presets": "저장된 프리셋이 없어요",
+  "preset_edit_create_new": "아래에서 새로운 프리셋을\n생성할 수 있어요",
+
+  "@game_config_management": {
+    "description": "게임 설정 관리"
+  },
+  "game_config_management_title": "게임 설정 관리",
+  "game_config_add_new": "새 설정 추가",
+  "game_config_delete_selected": "선택된 항목 삭제",
+  "game_config_delete_title": "설정 삭제",
+  "game_config_delete_message": "'{configName}' 설정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+  "game_config_unsaved_changes_title": "저장되지 않은 변경사항",
+  "game_config_unsaved_changes_message": "현재 설정에 저장되지 않은 변경사항이 있습니다. 저장하시겠습니까?",
+  "game_config_back": "돌아가기",
+  "game_config_discard": "취소",
+  "game_config_save": "저장",
+  "game_config_select_or_create": "설정을 선택하거나 새로 만들어주세요",
+  "game_config_edit": "편집하기",
+  "game_config_clear_selection": "선택 해제",
+
+  "@validation": {
+    "description": "폼 검증 메시지"
+  },
+  "validation_name_required": "이름은 필수입니다",
+  "validation_width_minimum": "너비는 320 이상이어야 합니다",
+  "validation_height_minimum": "높이는 240 이상이어야 합니다",
+  "validation_number_required": "유효한 숫자를 입력해주세요",
+
+  "@record": {
+    "description": "기록 페이지 관련 문자열"
+  },
+  "record_stage_entry": "스테이지 {stage}.{substage} 입장",
 
 
   "@character": { "description": "캐릭터 이름들" },

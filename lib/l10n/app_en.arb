@@ -155,6 +155,71 @@
   "common_close": "Close",
   "common_update": "Update",
   "common_edit": "Edit",
+  "common_start": "Start",
+  "common_untitled": "Untitled",
+  "common_unknown": "Unknown",
+  "common_modified": "Modified",
+
+  "@mod": {
+    "description": "Mod related strings"
+  },
+  "mod_open_folder": "Open Mod Folder",
+  "mod_move_to_group": "Move to Group",
+  "mod_remove_from_group": "Remove from Group",
+  "mod_drag_here": "Drag mods here",
+  "mod_version_unknown": "Unknown",
+
+  "@group": {
+    "description": "Group management"
+  },
+  "group_uncategorized": "Uncategorized",
+  "group_create_new": "Create New Group",
+  "group_rename": "Rename",
+  "group_delete": "Delete Group",
+  "group_delete_confirm": "Are you sure you want to delete the {groupName} group?",
+  "group_name_placeholder": "Enter group name",
+  "group_name_required": "Please enter a group name",
+  "group_name_exists": "Group name already exists",
+  "group_create_title": "Create New Group",
+  "group_rename_title": "Rename Group",
+
+  "@preset_edit": {
+    "description": "Preset editing interface"
+  },
+  "preset_edit_name_placeholder": "Preset name",
+  "preset_edit_select_message": "Please select a preset",
+  "preset_edit_no_presets": "No saved presets",
+  "preset_edit_create_new": "You can create a new preset below",
+
+  "@game_config_management": {
+    "description": "Game configuration management"
+  },
+  "game_config_management_title": "Game Configuration Management",
+  "game_config_add_new": "Add New Configuration",
+  "game_config_delete_selected": "Delete Selected Item",
+  "game_config_delete_title": "Delete Configuration",
+  "game_config_delete_message": "Are you sure you want to delete '{configName}' configuration? This action cannot be undone.",
+  "game_config_unsaved_changes_title": "Unsaved Changes",
+  "game_config_unsaved_changes_message": "There are unsaved changes in the current configuration. Would you like to save them?",
+  "game_config_back": "Go Back",
+  "game_config_discard": "Discard",
+  "game_config_save": "Save",
+  "game_config_select_or_create": "Please select a configuration or create a new one",
+  "game_config_edit": "Edit",
+  "game_config_clear_selection": "Clear Selection",
+
+  "@validation": {
+    "description": "Form validation messages"
+  },
+  "validation_name_required": "Name is required",
+  "validation_width_minimum": "Width must be at least 320",
+  "validation_height_minimum": "Height must be at least 240",
+  "validation_number_required": "Please enter a valid number",
+
+  "@record": {
+    "description": "Record page specific strings"
+  },
+  "record_stage_entry": "Entered Stage {stage}.{substage}",
 
 
   "@character": { "description": "Character names" },

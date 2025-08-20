@@ -4,6 +4,7 @@ import 'package:cartridge/providers/store_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
 class ModItem extends ConsumerStatefulWidget {
   const ModItem({
@@ -36,7 +37,7 @@ class _ModItemState extends ConsumerState<ModItem> {
         await Process.run('xdg-open', [widget.mod.path]);
       }
     } catch (e) {
-      // 에러 처리
+      // Error handling
     }
   }
 
@@ -51,7 +52,7 @@ class _ModItemState extends ConsumerState<ModItem> {
         items: [
           fluent.MenuFlyoutItem(
             leading: const Icon(fluent.FluentIcons.folder_open),
-            text: const Text('모드 폴더 열기'),
+            text: Text(AppLocalizations.of(context).mod_open_folder),
             onPressed: () {
               fluent.Flyout.of(context).close();
               _openModFolder();
@@ -61,7 +62,7 @@ class _ModItemState extends ConsumerState<ModItem> {
             const fluent.MenuFlyoutSeparator(),
             fluent.MenuFlyoutSubItem(
               leading: const Icon(fluent.FluentIcons.move),
-              text: const Text('그룹으로 이동'),
+              text: Text(AppLocalizations.of(context).mod_move_to_group),
               items: (context) => [
                 ...store.groups.keys
                     .where((group) => group != currentGroup)
@@ -77,7 +78,7 @@ class _ModItemState extends ConsumerState<ModItem> {
                 if (currentGroup != null)
                   fluent.MenuFlyoutItem(
                     text: Text(
-                      '그룹에서 제거',
+                      AppLocalizations.of(context).mod_remove_from_group,
                       style: TextStyle(color: fluent.Colors.red),
                     ),
                     onPressed: () {
@@ -96,8 +97,6 @@ class _ModItemState extends ConsumerState<ModItem> {
   @override
   Widget build(BuildContext context) {
     final bool enabled = !widget.mod.isDisable;
-    final store = ref.watch(storeProvider);
-    final groupName = store.getModGroup(widget.mod.name);
 
     Widget child = fluent.FlyoutTarget(
       controller: _flyoutController,
@@ -154,7 +153,7 @@ class _ModItemState extends ConsumerState<ModItem> {
                             widget.mod.version != null &&
                                     widget.mod.version!.trim().isNotEmpty
                                 ? 'v${widget.mod.version}'
-                                : '알 수 없음',
+                                : AppLocalizations.of(context).mod_version_unknown,
                             style: TextStyle(
                               fontSize: 12,
                               color: enabled

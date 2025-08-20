@@ -18,6 +18,7 @@ import 'package:cartridge/widgets/daily_challenge_ranking.dart';
 import 'package:cartridge/widgets/dialogs/error_dialog.dart';
 import 'package:cartridge/widgets/dialogs/nickname_edit_dialog.dart';
 import 'package:cartridge/widgets/dialogs/sign_in_dialog.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/widgets/dialogs/sign_up_dialog.dart';
 import 'package:cartridge/widgets/weekly_challenge_ranking.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -28,7 +29,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:week_of_year/week_of_year.dart';
 import 'package:http/http.dart' as http;
-import 'package:cartridge/l10n/app_localizations.dart';
 
 enum ChallengeType { daily, weekly }
 
@@ -321,7 +321,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       _recorder?.data.addAll(
         {
           _stopwatch.elapsedMilliseconds.toString():
-              "스테이지 ${data[0]}.${data[1]} 입장"
+              AppLocalizations.of(context).record_stage_entry(data[0], data[1])
         },
       );
     }
