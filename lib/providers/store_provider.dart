@@ -99,7 +99,10 @@ class StoreNotifier extends ChangeNotifier {
   }
 
   Future<List<Mod>> loadMods() async {
-    final path = ref.read(settingProvider).isaacPath;
+    final setting = ref.read(settingProvider);
+    await setting.loadSetting();
+
+    final path = setting.isaacPath;
     final directory = Directory('$path/mods');
 
     final mods = <Mod>[];

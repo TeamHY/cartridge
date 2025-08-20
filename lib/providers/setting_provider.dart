@@ -18,7 +18,7 @@ class SettingNotifier extends ChangeNotifier {
   int rerunDelay = 1000;
   String? languageCode;
 
-  void loadSetting() async {
+  Future<void> loadSetting() async {
     final appSupportDir = await getApplicationSupportDirectory();
     final file = File('${appSupportDir.path}\\setting.json');
 
