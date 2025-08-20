@@ -354,19 +354,6 @@ class _HomePageState extends ConsumerState<HomePage> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: TextBox(
-            controller: _searchController,
-            placeholder: loc.common_search_placeholder,
-            suffix: IgnorePointer(
-              child: IconButton(
-                onPressed: () {},
-                icon: const Icon(FluentIcons.search),
-              ),
-            ),
-          ),
-        ),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,

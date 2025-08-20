@@ -40,7 +40,7 @@
   "setting_language_en": "English",
   "setting_license_button": "License",
 
-  "@option": {
+  "@game_config": {
     "description": "Game Config Dialog"
   },
   "game_config_fallback_name": "New Game Config",

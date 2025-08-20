@@ -52,7 +52,7 @@
   "game_config_window_position_title": "창 위치",
   "game_config_window_pos_x_label": "X",
   "game_config_window_pos_y_label": "Y",
-
+  
   "@nickname": {
     "description": "닉네임 변경 다이얼로그"
   },

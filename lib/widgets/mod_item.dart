@@ -60,18 +60,18 @@ class ModItem extends ConsumerWidget {
                         color: enabled ? Colors.green[700] : Colors.grey[600],
                       ),
                     ),
-                    if (mod.version != null && mod.version!.trim().isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          'v${mod.version}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color:
-                                enabled ? Colors.green[600] : Colors.grey[500],
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        mod.version != null && mod.version!.trim().isNotEmpty
+                            ? 'v${mod.version}'
+                            : '알 수 없음',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: enabled ? Colors.green[600] : Colors.grey[500],
                         ),
                       ),
+                    ),
                   ],
                 ),
               ),

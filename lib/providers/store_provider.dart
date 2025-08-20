@@ -5,6 +5,7 @@ import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/game_config.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
+import 'package:cartridge/utils/presets_parser.dart';
 import 'package:cartridge/utils/process_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -72,11 +73,13 @@ class StoreNotifier extends ChangeNotifier {
 
   final Ref ref;
 
-  List<Preset> presets = [];
+  PresetsDataV3? _presetsData;
 
-  List<GameConfig> gameConfigs = [];
+  List<Preset> get presets => _presetsData?.presets ?? [];
 
-  List<String> favorites = [];
+  List<GameConfig> get gameConfigs =>  _presetsData?.gameConfigs ?? [];
+
+  Map<String, Set<String>> get groups =>  _presetsData?.groups ?? {};
 
   List<Mod> currentMods = [];
 
@@ -312,58 +315,17 @@ class StoreNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addFavorite(String name) {
-    favorites.add(name);
-
-    savePresets();
-    notifyListeners();
-  }
-
-  void removeFavorite(String name) {
-    favorites.remove(name);
-
-    savePresets();
-    notifyListeners();
-  }
-
-  void loadOldPreset() async {
-    final appDocumentsDir = await getApplicationDocumentsDirectory();
-    final file = File('${appDocumentsDir.path}/presets.json');
-
-    if (!(await file.exists())) {
-      return;
-    }
-
-    final json = jsonDecode(await file.readAsString()) as List<dynamic>;
-
-    presets = json.map((e) => Preset.fromJson(e)).toList();
-
-    notifyListeners();
-  }
-
   void loadPresets() async {
     final appSupportDir = await getApplicationSupportDirectory();
     final file = File('${appSupportDir.path}/presets.json');
 
+    print(appSupportDir);
+
     if (!(await file.exists())) {
-      return loadOldPreset();
-    }
-
-    final json = jsonDecode(await file.readAsString());
-
-    if (json['version'] == 2) {
-      presets = (json['presets'] as List<dynamic>)
-          .map((e) => Preset.fromJson(e))
-          .toList();
-
-      gameConfigs = (json['optionPresets'] as List<dynamic>)
-          .map((e) => GameConfig.fromJson(e))
-          .toList();
-
-      favorites = ((json['favorites'] as List<dynamic>?) ?? []).cast<String>();
-    } else {
       return;
     }
+
+    _presetsData = await PresetsParser.parseFromFile(file);
 
     notifyListeners();
   }
@@ -372,12 +334,7 @@ class StoreNotifier extends ChangeNotifier {
     final appSupportDir = await getApplicationSupportDirectory();
     final file = File('${appSupportDir.path}/presets.json');
 
-    file.writeAsString(jsonEncode({
-      'version': 2,
-      'presets': presets,
-      'gameConfigs': gameConfigs,
-      'favorites': favorites,
-    }));
+    file.writeAsString(jsonEncode(_presetsData?.toJson()));
   }
 
   Future<void> saveMods(List<Mod> mods) async {
