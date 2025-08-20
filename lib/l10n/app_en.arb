@@ -41,17 +41,17 @@
   "setting_license_button": "License",
 
   "@option": {
-    "description": "Option Preset Dialog"
+    "description": "Game Config Dialog"
   },
-  "option_preset_fallback_name": "New Preset",
-  "option_dialog_title": "Option Preset",
-  "option_name_label": "Name",
-  "option_window_size_title": "Window Size",
-  "option_window_width_label": "Width",
-  "option_window_height_label": "Height",
-  "option_window_position_title": "Window Position",
-  "option_window_pos_x_label": "X",
-  "option_window_pos_y_label": "Y",
+  "game_config_fallback_name": "New Game Config",
+  "game_config_dialog_title": "Game Config",
+  "game_config_name_label": "Name",
+  "game_config_window_size_title": "Window Size",
+  "game_config_window_width_label": "Width",
+  "game_config_window_height_label": "Height",
+  "game_config_window_position_title": "Window Position",
+  "game_config_window_pos_x_label": "X",
+  "game_config_window_pos_y_label": "Y",
 
   "@nickname": {
     "description": "Nickname edit dialog"

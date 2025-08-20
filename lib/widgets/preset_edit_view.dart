@@ -2,9 +2,9 @@ import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/widgets/dialogs/option_preset_dialog.dart';
+import 'package:cartridge/widgets/dialogs/game_config_dialog.dart';
 import 'package:cartridge/widgets/mod_item.dart';
-import 'package:cartridge/widgets/option_preset_button.dart';
+import 'package:cartridge/widgets/game_config_button.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -107,28 +107,28 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ...store.optionPresets.map(
+                ...store.gameConfigs.map(
                   (option) => Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: OptionPresetButton(
+                    child: GameConfigButton(
                       id: option.id,
-                      checked: option.id == store.selectOptionPresetId,
+                      checked: option.id == store.selectedGameConfigId,
                       onChanged: (value) {
                         if (!value) {
-                          store.selectOptionPreset(
+                          store.selectGameConfig(
                             null,
                           );
                           return;
                         }
 
                         store.isSync = false;
-                        store.selectOptionPreset(
+                        store.selectGameConfig(
                           option.id,
                         );
                       },
                       onEdited: (id) => showDialog(
                         context: context,
-                        builder: (context) => OptionPresetDialog(
+                        builder: (context) => GameConfigDialog(
                           id: id,
                         ),
                       ),
@@ -153,7 +153,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                                 ),
                                 onPressed: () {
                                   Navigator.pop(context);
-                                  store.removeOptionPreset(id);
+                                  store.removeGameConfig(id);
                                 },
                                 child: Text(loc.common_delete),
                               ),
@@ -169,7 +169,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                   icon: const Icon(FluentIcons.add),
                   onPressed: () => showDialog(
                     context: context,
-                    builder: (context) => const OptionPresetDialog(),
+                    builder: (context) => const GameConfigDialog(),
                   ),
                 ),
               ],

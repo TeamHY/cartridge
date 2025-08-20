@@ -40,18 +40,18 @@
   "setting_language_en": "English",
   "setting_license_button": "라이센스",
 
-  "@option": {
-    "description": "옵션 프리셋 다이얼로그"
+  "@game_config": {
+    "description": "게임 설정 다이얼로그"
   },
-  "option_preset_fallback_name": "새 프리셋",
-  "option_dialog_title": "옵션 프리셋",
-  "option_name_label": "이름",
-  "option_window_size_title": "창 크기",
-  "option_window_width_label": "너비",
-  "option_window_height_label": "높이",
-  "option_window_position_title": "창 위치",
-  "option_window_pos_x_label": "X",
-  "option_window_pos_y_label": "Y",
+  "game_config_fallback_name": "새 게임 설정",
+  "game_config_dialog_title": "게임 설정",
+  "game_config_name_label": "이름",
+  "game_config_window_size_title": "창 크기",
+  "game_config_window_width_label": "너비",
+  "game_config_window_height_label": "높이",
+  "game_config_window_position_title": "창 위치",
+  "game_config_window_pos_x_label": "X",
+  "game_config_window_pos_y_label": "Y",
 
   "@nickname": {
     "description": "닉네임 변경 다이얼로그"

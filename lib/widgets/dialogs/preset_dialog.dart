@@ -1,7 +1,7 @@
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/widgets/option_preset_button.dart';
+import 'package:cartridge/widgets/game_config_button.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -33,7 +33,7 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
 
     _newPreset = Preset(
       name: widget.preset.name,
-      optionPresetId: widget.preset.optionPresetId,
+      gameConfigId: widget.preset.gameConfigId,
       mods: [],
     );
 
@@ -103,19 +103,19 @@ class _PresetDialogState extends ConsumerState<PresetDialog> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  ...store.optionPresets.map(
+                  ...store.gameConfigs.map(
                     (option) => Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: OptionPresetButton(
+                      child: GameConfigButton(
                         id: option.id,
-                        checked: option.id == _newPreset.optionPresetId,
+                        checked: option.id == _newPreset.gameConfigId,
                         onChanged: (value) => setState(() {
                           if (!value) {
-                            _newPreset.optionPresetId = null;
+                            _newPreset.gameConfigId = null;
                             return;
                           }
 
-                          _newPreset.optionPresetId = option.id;
+                          _newPreset.gameConfigId = option.id;
                           _isChanged = true;
                         }),
                         content: option.name,

@@ -2,8 +2,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:cartridge/l10n/app_localizations.dart';
 
-class OptionPresetButton extends StatefulWidget {
-  const OptionPresetButton({
+class GameConfigButton extends StatefulWidget {
+  const GameConfigButton({
     super.key,
     this.id,
     required this.checked,
@@ -21,10 +21,10 @@ class OptionPresetButton extends StatefulWidget {
   final String content;
 
   @override
-  State<OptionPresetButton> createState() => OptionPresetButtonState();
+  State<GameConfigButton> createState() => GameConfigButtonState();
 }
 
-class OptionPresetButtonState extends State<OptionPresetButton> {
+class GameConfigButtonState extends State<GameConfigButton> {
   final _menuController = FlyoutController();
 
   @override

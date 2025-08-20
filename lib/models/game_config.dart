@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart';
 
-class OptionPreset {
+class GameConfig {
   final String id;
   final String name;
   final int windowWidth;
@@ -8,7 +8,7 @@ class OptionPreset {
   final int windowPosX;
   final int windowPosY;
 
-  OptionPreset({
+  GameConfig({
     String? id,
     required this.name,
     this.windowWidth = 960,
@@ -17,8 +17,8 @@ class OptionPreset {
     this.windowPosY = 100,
   }) : id = id ?? const Uuid().v4();
 
-  factory OptionPreset.fromJson(Map<String, dynamic> json) {
-    return OptionPreset(
+  factory GameConfig.fromJson(Map<String, dynamic> json) {
+    return GameConfig(
       id: json['id'],
       name: json['name'],
       windowWidth: json['windowWidth'],

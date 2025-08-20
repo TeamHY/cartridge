@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cartridge/models/mod.dart';
-import 'package:cartridge/models/option_preset.dart';
+import 'package:cartridge/models/game_config.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/utils/process_util.dart';
@@ -74,7 +74,7 @@ class StoreNotifier extends ChangeNotifier {
 
   List<Preset> presets = [];
 
-  List<OptionPreset> optionPresets = [];
+  List<GameConfig> gameConfigs = [];
 
   List<String> favorites = [];
 
@@ -86,7 +86,7 @@ class StoreNotifier extends ChangeNotifier {
   String? astroLocalVersion;
   String? astroRemoteVersion;
 
-  String? selectOptionPresetId;
+  String? selectedGameConfigId;
 
   get isAstroOutdated =>
       astroLocalVersion != astroRemoteVersion ||
@@ -180,10 +180,10 @@ class StoreNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> applyOptionPreset(String id) async {
+  Future<void> applyGameConfig(String id) async {
     try {
-      final optionPreset =
-          optionPresets.firstWhere((element) => element.id == id);
+      final gameConfig =
+          gameConfigs.firstWhere((element) => element.id == id);
 
       final optionFile = File('$isaacDocumentPath\\options.ini');
 
@@ -195,13 +195,13 @@ class StoreNotifier extends ChangeNotifier {
 
       final newContent = content.split('\n').map((line) {
         if (line.startsWith('WindowWidth=')) {
-          return 'WindowWidth=${optionPreset.windowWidth}';
+          return 'WindowWidth=${gameConfig.windowWidth}';
         } else if (line.startsWith('WindowHeight=')) {
-          return 'WindowHeight=${optionPreset.windowHeight}';
+          return 'WindowHeight=${gameConfig.windowHeight}';
         } else if (line.startsWith('WindowPosX=')) {
-          return 'WindowPosX=${optionPreset.windowPosX}';
+          return 'WindowPosX=${gameConfig.windowPosX}';
         } else if (line.startsWith('WindowPosY=')) {
-          return 'WindowPosY=${optionPreset.windowPosY}';
+          return 'WindowPosY=${gameConfig.windowPosY}';
         } else {
           return line;
         }
@@ -268,8 +268,8 @@ class StoreNotifier extends ChangeNotifier {
       }
     }
 
-    if (preset?.optionPresetId != null) {
-      await applyOptionPreset(preset!.optionPresetId!);
+    if (preset?.gameConfigId != null) {
+      await applyGameConfig(preset!.gameConfigId!);
     }
 
     await setEnableMods(isEnableMods);
@@ -281,33 +281,33 @@ class StoreNotifier extends ChangeNotifier {
     }
   }
 
-  void updateOptionPreset(OptionPreset optionPreset) {
+  void updateGameConfig(GameConfig gameConfig) {
     final index =
-        optionPresets.indexWhere((element) => element.id == optionPreset.id);
+        gameConfigs.indexWhere((element) => element.id == gameConfig.id);
 
     if (index == -1) {
-      optionPresets.add(optionPreset);
+      gameConfigs.add(gameConfig);
     } else {
-      optionPresets[index] = optionPreset;
+      gameConfigs[index] = gameConfig;
     }
 
     savePresets();
     notifyListeners();
   }
 
-  void removeOptionPreset(String id) {
-    optionPresets.removeWhere((element) => element.id == id);
+  void removeGameConfig(String id) {
+    gameConfigs.removeWhere((element) => element.id == id);
 
-    if (selectOptionPresetId == id) {
-      selectOptionPresetId = null;
+    if (selectedGameConfigId == id) {
+      selectedGameConfigId = null;
     }
 
     savePresets();
     notifyListeners();
   }
 
-  void selectOptionPreset(String? id) {
-    selectOptionPresetId = id;
+  void selectGameConfig(String? id) {
+    selectedGameConfigId = id;
 
     notifyListeners();
   }
@@ -356,8 +356,8 @@ class StoreNotifier extends ChangeNotifier {
           .map((e) => Preset.fromJson(e))
           .toList();
 
-      optionPresets = (json['optionPresets'] as List<dynamic>)
-          .map((e) => OptionPreset.fromJson(e))
+      gameConfigs = (json['optionPresets'] as List<dynamic>)
+          .map((e) => GameConfig.fromJson(e))
           .toList();
 
       favorites = ((json['favorites'] as List<dynamic>?) ?? []).cast<String>();
@@ -375,7 +375,7 @@ class StoreNotifier extends ChangeNotifier {
     file.writeAsString(jsonEncode({
       'version': 2,
       'presets': presets,
-      'optionPresets': optionPresets,
+      'gameConfigs': gameConfigs,
       'favorites': favorites,
     }));
   }

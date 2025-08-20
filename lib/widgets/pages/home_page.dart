@@ -181,8 +181,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                                     _isPresetEditing = true;
                                   }),
                                   onApply: (Preset preset) async {
-                                    store.selectOptionPreset(
-                                        preset.optionPresetId);
+                                    store.selectGameConfig(
+                                        preset.gameConfigId);
                                     store.applyPreset(preset);
 
                                     _presetNameController.text = preset.name;
@@ -412,7 +412,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           //             onPressed: () async {
           //               store.applyPreset(Preset(
           //                 name: '',
-          //                 optionPresetId: store.selectOptionPresetId,
+          //                 gameConfigId: store.selectedGameConfigId,
           //                 mods: store.currentMods,
           //               ));
           //             },
