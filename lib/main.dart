@@ -9,7 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 import 'l10n/app_localizations.dart';
 
-final currentVersion = Version.parse('4.13.3');
+final currentVersion = Version.parse('4.14.0');
 
 void main() async {
   await dotenv.load(fileName: '.env');
