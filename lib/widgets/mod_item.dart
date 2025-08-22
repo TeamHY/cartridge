@@ -30,7 +30,8 @@ class _ModItemState extends ConsumerState<ModItem> {
   void _openModFolder() async {
     try {
       if (Platform.isWindows) {
-        await Process.run('explorer', [widget.mod.path]);
+        await Process.run(
+            'explorer', [widget.mod.path.replaceAll(RegExp('/'), "\\")]);
       } else if (Platform.isMacOS) {
         await Process.run('open', [widget.mod.path]);
       } else if (Platform.isLinux) {
