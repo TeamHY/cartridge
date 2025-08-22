@@ -187,7 +187,7 @@
     "description": "프리셋 편집 인터페이스"
   },
   "preset_edit_name_placeholder": "프리셋 이름",
-  "preset_edit_select_message": "프리셋을 선택해주세요",
+  "preset_edit_select_message": "원하는 프리셋을 선택해주세요",
   "preset_edit_no_presets": "저장된 프리셋이 없어요",
   "preset_edit_create_new": "아래에서 새로운 프리셋을\n생성할 수 있어요",
 

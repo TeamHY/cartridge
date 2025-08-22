@@ -58,18 +58,6 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     }
   }
 
-  void _syncModsWithStore(List<Mod> currentMods) {
-    for (var mod in currentMods) {
-      mod.isDisable = editedMods
-          .firstWhere(
-            (element) => element.name == mod.name,
-            orElse: () => Mod(name: "Null", path: "Null", isDisable: true),
-          )
-          .isDisable;
-    }
-    editedMods = currentMods;
-  }
-
   List<Mod> _getFilteredMods() {
     return editedMods.where((mod) {
       final searchText = widget.searchController.text
@@ -103,10 +91,6 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
   Widget build(BuildContext context) {
     final store = ref.watch(storeProvider);
     final loc = AppLocalizations.of(context);
-
-    ref.listen(storeProvider, (previous, next) {
-      _syncModsWithStore(next.currentMods.toList());
-    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -298,13 +282,13 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
             if (groupName != null) ...[
               IconButton(
                 icon: Icon(
-                  _isGroupAllEnabled(groupName, groupedMods) 
-                    ? FluentIcons.toggle_left 
-                    : FluentIcons.toggle_right,
+                  _isGroupAllEnabled(groupName, groupedMods)
+                      ? FluentIcons.toggle_left
+                      : FluentIcons.toggle_right,
                   size: 16,
-                  color: _isGroupAllEnabled(groupName, groupedMods) 
-                    ? Colors.green 
-                    : Colors.grey,
+                  color: _isGroupAllEnabled(groupName, groupedMods)
+                      ? Colors.green
+                      : Colors.grey,
                 ),
                 onPressed: () => _toggleGroupEnabled(groupName, groupedMods),
               ),
@@ -358,7 +342,8 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
           ),
           MenuFlyoutItem(
             leading: Icon(FluentIcons.delete, color: Colors.red),
-            text: Text(AppLocalizations.of(context).group_delete, style: TextStyle(color: Colors.red)),
+            text: Text(AppLocalizations.of(context).group_delete,
+                style: TextStyle(color: Colors.red)),
             onPressed: () {
               Flyout.of(context).close();
               _showDeleteGroupConfirmDialog(context, store, groupName);
@@ -369,18 +354,20 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     );
   }
 
-  bool _isGroupAllEnabled(String? groupName, Map<String?, List<Mod>> groupedMods) {
+  bool _isGroupAllEnabled(
+      String? groupName, Map<String?, List<Mod>> groupedMods) {
     final mods = groupedMods[groupName] ?? [];
     if (mods.isEmpty) return false;
     return mods.every((mod) => !mod.isDisable);
   }
 
-  void _toggleGroupEnabled(String? groupName, Map<String?, List<Mod>> groupedMods) {
+  void _toggleGroupEnabled(
+      String? groupName, Map<String?, List<Mod>> groupedMods) {
     final mods = groupedMods[groupName] ?? [];
     if (mods.isEmpty) return;
-    
+
     final shouldEnable = !_isGroupAllEnabled(groupName, groupedMods);
-    
+
     setState(() {
       for (final mod in mods) {
         mod.isDisable = !shouldEnable;
@@ -394,7 +381,8 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
       context: context,
       builder: (context) => ContentDialog(
         title: Text(AppLocalizations.of(context).group_delete),
-        content: Text(AppLocalizations.of(context).group_delete_confirm(groupName)),
+        content:
+            Text(AppLocalizations.of(context).group_delete_confirm(groupName)),
         actions: [
           Button(
             onPressed: () => Navigator.of(context).pop(),
@@ -477,8 +465,10 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                                   }),
                                   onMoveToGroup: (targetGroup) {
                                     final store = ref.read(storeProvider);
-                                    final currentGroup = store.getModGroup(mod.name);
-                                    store.moveModToGroup(mod.name, currentGroup, targetGroup);
+                                    final currentGroup =
+                                        store.getModGroup(mod.name);
+                                    store.moveModToGroup(
+                                        mod.name, currentGroup, targetGroup);
                                   },
                                 ),
                               ))
@@ -514,7 +504,17 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
               child: Text(loc.common_cancel),
             ),
             FilledButton(
-              onPressed: () => widget.onSave(editedMods),
+              onPressed: () {
+                final mods = <Mod>[];
+
+                for (var mod in editedMods) {
+                  if (!mod.isDisable) {
+                    mods.add(Mod.fromJson(mod.toJson()));
+                  }
+                }
+
+                widget.onSave(mods);
+              },
               child: Text(loc.common_save),
             ),
           ],
@@ -537,7 +537,8 @@ class _GameConfigSelector extends ConsumerWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 300),
         child: ComboBox<String?>(
-          placeholder: Text(AppLocalizations.of(context).game_config_dialog_title),
+          placeholder:
+              Text(AppLocalizations.of(context).game_config_dialog_title),
           value: store.selectedGameConfigId,
           items: _buildComboBoxItems(loc),
           onChanged: (value) => _handleComboBoxChange(context, value),

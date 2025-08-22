@@ -29,7 +29,8 @@ class PresetItem extends StatefulWidget {
   State<PresetItem> createState() => _PresetItemState();
 }
 
-class _PresetItemState extends State<PresetItem> with SingleTickerProviderStateMixin {
+class _PresetItemState extends State<PresetItem>
+    with SingleTickerProviderStateMixin {
   bool _isHovering = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -48,7 +49,7 @@ class _PresetItemState extends State<PresetItem> with SingleTickerProviderStateM
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    
+
     if (widget.isSelected) {
       _animationController.value = 1.0;
     }
@@ -103,8 +104,9 @@ class _PresetItemState extends State<PresetItem> with SingleTickerProviderStateM
                   child: Text(
                     widget.preset.name,
                     style: TextStyle(
-                      fontWeight:
-                          widget.isSelected ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: widget.isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                       fontSize: 14,
                       color: widget.isSelected ? theme.accentColor : null,
                     ),
@@ -113,25 +115,39 @@ class _PresetItemState extends State<PresetItem> with SingleTickerProviderStateM
                 AnimatedBuilder(
                   animation: _fadeAnimation,
                   builder: (context, child) {
-                    final shouldShow = widget.isSelected || _isHovering;
-                    final opacity = shouldShow ? _fadeAnimation.value : 0.0;
-                    
+                    final shouldShow = true; //widget.isSelected || _isHovering;
+                    final opacity =
+                        1.0; //shouldShow ? _fadeAnimation.value : 0.0;
+
                     return Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Opacity(
                           opacity: opacity,
                           child: IconButton(
-                            onPressed: shouldShow ? () => widget.onApply(widget.preset) : null,
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(
-                                theme.accentColor.withValues(alpha: 0.1),
-                              ),
-                            ),
+                            onPressed: shouldShow
+                                ? () => widget.onApply(widget.preset)
+                                : null,
                             icon: Icon(
                               FluentIcons.play,
-                              color: theme.accentColor,
                               size: 18,
+                            ),
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStateProperty.resolveWith((states) {
+                                if (states.contains(WidgetState.hovered)) {
+                                  return theme.accentColor
+                                      .withValues(alpha: 0.1);
+                                }
+                                return Colors.transparent;
+                              }),
+                              foregroundColor:
+                                  WidgetStateProperty.resolveWith((states) {
+                                if (states.contains(WidgetState.hovered)) {
+                                  return theme.accentColor;
+                                }
+                                return Colors.black;
+                              }),
                             ),
                           ),
                         ),
@@ -139,43 +155,54 @@ class _PresetItemState extends State<PresetItem> with SingleTickerProviderStateM
                         Opacity(
                           opacity: opacity,
                           child: IconButton(
-                            onPressed: shouldShow ? () => showDialog(
-                              context: context,
-                              builder: (context) {
-                                return ContentDialog(
-                                  title: Text(loc.preset_delete_title),
-                                  content: Text(loc.preset_delete_message),
-                                  actions: [
-                                    Button(
-                                      onPressed: () {
-                                        Navigator.pop(context);
+                            onPressed: shouldShow
+                                ? () => showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ContentDialog(
+                                          title: Text(loc.preset_delete_title),
+                                          content:
+                                              Text(loc.preset_delete_message),
+                                          actions: [
+                                            Button(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(loc.common_cancel),
+                                            ),
+                                            FilledButton(
+                                              style: ButtonStyle(
+                                                backgroundColor:
+                                                    WidgetStatePropertyAll<
+                                                        Color>(Colors.red.dark),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                widget.onDelete(widget.preset);
+                                              },
+                                              child: Text(loc.common_delete),
+                                            ),
+                                          ],
+                                        );
                                       },
-                                      child: Text(loc.common_cancel),
-                                    ),
-                                    FilledButton(
-                                      style: ButtonStyle(
-                                        backgroundColor: WidgetStatePropertyAll<Color>(
-                                            Colors.red.dark),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        widget.onDelete(widget.preset);
-                                      },
-                                      child: Text(loc.common_delete),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ) : null,
-                            style: ButtonStyle(
-                              backgroundColor: WidgetStatePropertyAll(
-                                Colors.red.withValues(alpha: 0.1),
-                              ),
-                            ),
-                            icon: Icon(
+                                    )
+                                : null,
+                            icon: const Icon(
                               FluentIcons.delete,
-                              color: Colors.red.dark,
                               size: 18,
+                            ),
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStateProperty.resolveWith((states) {
+                                if (states.contains(WidgetState.hovered)) {
+                                  return Colors.red.withValues(alpha: 0.1);
+                                }
+                                return Colors.transparent;
+                              }),
+                              foregroundColor:
+                                  WidgetStateProperty.resolveWith((states) {
+                                return Colors.red.dark;
+                              }),
                             ),
                           ),
                         ),
