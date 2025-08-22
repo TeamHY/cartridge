@@ -12,12 +12,14 @@ class ModItem extends ConsumerStatefulWidget {
     required this.mod,
     required this.onChanged,
     this.isDraggable = false,
+    this.isGridItem = false,
     this.onMoveToGroup,
   });
 
   final Mod mod;
   final Function(bool value) onChanged;
   final bool isDraggable;
+  final bool isGridItem;
   final Function(String? groupName)? onMoveToGroup;
 
   @override
@@ -42,11 +44,12 @@ class _ModItemState extends ConsumerState<ModItem> {
     }
   }
 
-  void _showContextMenu() {
+  void _showContextMenu(Offset position) {
     final store = ref.read(storeProvider);
     final currentGroup = store.getModGroup(widget.mod.name);
 
     _flyoutController.showFlyout(
+      position: position,
       barrierDismissible: true,
       dismissWithEsc: true,
       builder: (context) => fluent.MenuFlyout(
@@ -103,9 +106,10 @@ class _ModItemState extends ConsumerState<ModItem> {
       controller: _flyoutController,
       child: fluent.Tooltip(
         message: widget.mod.name,
-        useMousePosition: false,
+        useMousePosition: true,
         child: GestureDetector(
-          onSecondaryTap: () => _showContextMenu(),
+          onSecondaryTapUp: (details) =>
+              _showContextMenu(details.globalPosition),
           child: InkWell(
             onTap: () => widget.onChanged(widget.mod.isDisable),
             borderRadius: BorderRadius.circular(12),
@@ -116,7 +120,7 @@ class _ModItemState extends ConsumerState<ModItem> {
                 ? Colors.green.withValues(alpha: 0.1)
                 : Colors.grey.withValues(alpha: 0.05),
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: enabled
                     ? Colors.green.withValues(alpha: 0.08)
@@ -130,12 +134,19 @@ class _ModItemState extends ConsumerState<ModItem> {
                 ),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 spacing: 12,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Flex(
+                      direction:
+                          widget.isGridItem ? Axis.vertical : Axis.horizontal,
+                      crossAxisAlignment: widget.isGridItem
+                          ? CrossAxisAlignment.start
+                          : CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
                       mainAxisSize: MainAxisSize.min,
+                      spacing: widget.isGridItem ? 0 : 4,
                       children: [
                         Text(
                           widget.mod.name,
@@ -154,7 +165,8 @@ class _ModItemState extends ConsumerState<ModItem> {
                             widget.mod.version != null &&
                                     widget.mod.version!.trim().isNotEmpty
                                 ? 'v${widget.mod.version}'
-                                : AppLocalizations.of(context).mod_version_unknown,
+                                : AppLocalizations.of(context)
+                                    .mod_version_unknown,
                             style: TextStyle(
                               fontSize: 12,
                               color: enabled
@@ -180,43 +192,45 @@ class _ModItemState extends ConsumerState<ModItem> {
     );
 
     if (widget.isDraggable) {
-      return Draggable<String>(
-        data: widget.mod.name,
-        feedback: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: 180,
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: enabled
-                  ? Colors.green.withValues(alpha: 0.2)
-                  : Colors.grey.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Text(
-              widget.mod.name,
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-                color: enabled ? Colors.green[700] : Colors.grey[600],
+      return LayoutBuilder(
+        builder: (context, constraints) => Draggable<String>(
+          data: widget.mod.name,
+          feedback: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: enabled
+                    ? Colors.green.withValues(alpha: 0.2)
+                    : Colors.grey.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              constraints: constraints,
+              child: Text(
+                widget.mod.name,
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  color: enabled ? Colors.green[700] : Colors.grey[600],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
-        ),
-        childWhenDragging: Opacity(
-          opacity: 0.5,
+          childWhenDragging: Opacity(
+            opacity: 0.5,
+            child: child,
+          ),
           child: child,
         ),
-        child: child,
       );
     }
 

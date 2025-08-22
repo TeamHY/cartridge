@@ -16,7 +16,10 @@ class SettingNotifier extends ChangeNotifier {
   String get isaacPath => _isaacPath;
 
   int rerunDelay = 1000;
+
   String? languageCode;
+
+  bool isGridView = false;
 
   Future<void> loadSetting() async {
     final appSupportDir = await getApplicationSupportDirectory();
@@ -31,6 +34,7 @@ class SettingNotifier extends ChangeNotifier {
     _isaacPath = json['isaacPath'] as String? ?? _isaacPath;
     rerunDelay = json['rerunDelay'] as int? ?? 1000;
     languageCode = json['languageCode'] as String?;
+    isGridView = json['isGridView'] as bool? ?? false;
 
     notifyListeners();
   }
@@ -43,6 +47,7 @@ class SettingNotifier extends ChangeNotifier {
       'isaacPath': _isaacPath,
       'rerunDelay': rerunDelay,
       'languageCode': languageCode,
+      'isGridView': isGridView,
     }));
   }
 
@@ -60,6 +65,12 @@ class SettingNotifier extends ChangeNotifier {
 
   void setLanguageCode(String code) {
     languageCode = code;
+
+    notifyListeners();
+  }
+
+  void setIsGridView(bool value) {
+    isGridView = value;
 
     notifyListeners();
   }

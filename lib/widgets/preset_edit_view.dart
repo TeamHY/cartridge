@@ -1,6 +1,7 @@
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
+import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/dialogs/game_config_dialog.dart';
 import 'package:cartridge/widgets/dialogs/mod_group_dialog.dart';
@@ -95,104 +96,125 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildPresetNameInput(context),
-        _buildControlsRow(context, store, loc),
+        _buildTopRow(context, store, loc),
         _buildModsList(),
         _buildActionButtons(context, loc),
       ],
     );
   }
 
-  Widget _buildPresetNameInput(BuildContext context) {
-    final loc = AppLocalizations.of(context);
+  Widget _buildTopRow(BuildContext context, store, AppLocalizations loc) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Row(
         children: [
-          IntrinsicWidth(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: 10),
-              child: _isEditingPresetName
-                  ? TextBox(
-                      controller: widget.editPresetNameController,
-                      style: FluentTheme.of(context).typography.subtitle,
-                      placeholder: loc.preset_edit_name_placeholder,
-                      onChanged: (value) => widget.selectedPreset.name = value,
-                      onSubmitted: (value) {
-                        widget.selectedPreset.name = value;
-                        setState(() => _isEditingPresetName = false);
-                      },
-                      autofocus: true,
-                    )
-                  : GestureDetector(
-                      onTap: () => setState(() => _isEditingPresetName = true),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.only(bottom: 3),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.transparent),
-                          borderRadius: BorderRadius.circular(4.0),
+          Row(
+            children: [
+              IntrinsicWidth(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 10),
+                  child: _isEditingPresetName
+                      ? TextBox(
+                          controller: widget.editPresetNameController,
+                          style: FluentTheme.of(context).typography.subtitle,
+                          placeholder: loc.preset_edit_name_placeholder,
+                          onChanged: (value) =>
+                              widget.selectedPreset.name = value,
+                          onSubmitted: (value) {
+                            widget.selectedPreset.name = value;
+                            setState(() => _isEditingPresetName = false);
+                          },
+                          autofocus: true,
+                        )
+                      : GestureDetector(
+                          onTap: () =>
+                              setState(() => _isEditingPresetName = true),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.only(bottom: 3),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.transparent),
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            child: Text(
+                              widget.selectedPreset.name.isEmpty
+                                  ? loc.preset_edit_name_placeholder
+                                  : widget.selectedPreset.name,
+                              style: widget.selectedPreset.name.isEmpty
+                                  ? FluentTheme.of(context)
+                                      .typography
+                                      .subtitle
+                                      ?.copyWith(
+                                        color: FluentTheme.of(context)
+                                            .resources
+                                            .textFillColorSecondary,
+                                      )
+                                  : FluentTheme.of(context).typography.subtitle,
+                            ),
+                          ),
                         ),
-                        child: Text(
-                          widget.selectedPreset.name.isEmpty
-                              ? loc.preset_edit_name_placeholder
-                              : widget.selectedPreset.name,
-                          style: widget.selectedPreset.name.isEmpty
-                              ? FluentTheme.of(context)
-                                  .typography
-                                  .subtitle
-                                  ?.copyWith(
-                                    color: FluentTheme.of(context)
-                                        .resources
-                                        .textFillColorSecondary,
-                                  )
-                              : FluentTheme.of(context).typography.subtitle,
-                        ),
-                      ),
-                    ),
-            ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(_isEditingPresetName
+                    ? FluentIcons.check_mark
+                    : FluentIcons.edit),
+                onPressed: () {
+                  if (_isEditingPresetName) {
+                    widget.selectedPreset.name =
+                        widget.editPresetNameController.text;
+                  } else {
+                    widget.editPresetNameController.text =
+                        widget.selectedPreset.name;
+                  }
+                  setState(() => _isEditingPresetName = !_isEditingPresetName);
+                },
+              ),
+            ],
           ),
+          const SizedBox(width: 16),
+          _GameConfigSelector(store: store),
+          const Expanded(child: SizedBox()),
+          _buildViewToggle(),
           const SizedBox(width: 8),
-          IconButton(
-            icon: Icon(_isEditingPresetName
-                ? FluentIcons.check_mark
-                : FluentIcons.edit),
-            onPressed: () {
-              if (_isEditingPresetName) {
-                widget.selectedPreset.name =
-                    widget.editPresetNameController.text;
-              } else {
-                widget.editPresetNameController.text =
-                    widget.selectedPreset.name;
-              }
-              setState(() => _isEditingPresetName = !_isEditingPresetName);
-            },
-          ),
+          _buildSearchBox(loc),
         ],
       ),
     );
   }
 
-  Widget _buildControlsRow(BuildContext context, store, AppLocalizations loc) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0).copyWith(top: 0),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _GameConfigSelector(store: store),
-              _buildSearchBox(loc),
-            ],
+  Widget _buildViewToggle() {
+    final setting = ref.watch(settingProvider);
+
+    return Row(
+      children: [
+        IconButton(
+          icon: Icon(
+            FluentIcons.list,
+            color: !setting.isGridView ? Colors.blue : Colors.grey,
           ),
-        ],
-      ),
+          onPressed: () {
+            setting.setIsGridView(false);
+            setting.saveSetting();
+          },
+        ),
+        IconButton(
+          icon: Icon(
+            FluentIcons.grid_view_medium,
+            color: setting.isGridView ? Colors.blue : Colors.grey,
+          ),
+          onPressed: () {
+            setting.setIsGridView(true);
+            setting.saveSetting();
+          },
+        ),
+      ],
     );
   }
 
   Widget _buildSearchBox(AppLocalizations loc) {
     return SizedBox(
-      width: 250,
+      width: 300,
       child: TextBox(
         controller: widget.searchController,
         placeholder: loc.common_search_placeholder,
@@ -401,6 +423,8 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
   }
 
   Widget _buildGroupContent(String? groupName, List<Mod> mods) {
+    final setting = ref.watch(settingProvider);
+
     return DragTarget<String>(
       onAcceptWithDetails: (details) {
         final modName = details.data;
@@ -441,22 +465,48 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                     ),
                   ),
                 )
-              : LayoutBuilder(
-                  builder: (context, constraints) {
-                    const double minTileWidth = 200;
-                    const double gap = 16;
-                    final double width = constraints.maxWidth;
-                    int columns = (width / (minTileWidth + gap)).floor();
-                    if (columns < 1) columns = 1;
-                    final double tileWidth =
-                        (width - gap * (columns - 1)) / columns;
+              : setting.isGridView
+                  ? LayoutBuilder(
+                      builder: (context, constraints) {
+                        const double minTileWidth = 200;
+                        const double gap = 8;
+                        final double width = constraints.maxWidth;
+                        int columns = (width / (minTileWidth + gap)).floor();
+                        if (columns < 1) columns = 1;
+                        final double tileWidth =
+                            (width - gap * (columns - 1)) / columns;
 
-                    return Wrap(
-                      spacing: gap,
-                      runSpacing: gap,
+                        return Wrap(
+                          spacing: gap,
+                          runSpacing: gap,
+                          children: mods
+                              .map((mod) => SizedBox(
+                                    width: tileWidth,
+                                    child: ModItem(
+                                      mod: mod,
+                                      isDraggable: true,
+                                      isGridItem: true,
+                                      onChanged: (value) => setState(() {
+                                        mod.isDisable = !value;
+                                      }),
+                                      onMoveToGroup: (targetGroup) {
+                                        final store = ref.read(storeProvider);
+                                        final currentGroup =
+                                            store.getModGroup(mod.name);
+                                        store.moveModToGroup(mod.name,
+                                            currentGroup, targetGroup);
+                                      },
+                                    ),
+                                  ))
+                              .toList(),
+                        );
+                      },
+                    )
+                  : Column(
+                      spacing: 8,
                       children: mods
-                          .map((mod) => SizedBox(
-                                width: tileWidth,
+                          .map((mod) => Container(
+                                width: double.infinity,
                                 child: ModItem(
                                   mod: mod,
                                   isDraggable: true,
@@ -473,9 +523,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                                 ),
                               ))
                           .toList(),
-                    );
-                  },
-                ),
+                    ),
         );
       },
     );
