@@ -36,8 +36,7 @@ Future<void> setEnableMods(bool value) async {
     }).join('\n');
 
     await optionFile.writeAsString(newContent);
-  } catch (e) {
-  }
+  } catch (e) {}
 }
 
 Future<void> setDebugConsole(bool value) async {
@@ -76,9 +75,9 @@ class StoreNotifier extends ChangeNotifier {
 
   List<Preset> get presets => _presetsData?.presets ?? [];
 
-  List<GameConfig> get gameConfigs =>  _presetsData?.gameConfigs ?? [];
+  List<GameConfig> get gameConfigs => _presetsData?.gameConfigs ?? [];
 
-  Map<String, Set<String>> get groups =>  _presetsData?.groups ?? {};
+  Map<String, Set<String>> get groups => _presetsData?.groups ?? {};
 
   List<Mod> currentMods = [];
 
@@ -126,6 +125,7 @@ class StoreNotifier extends ChangeNotifier {
         final mod = Mod(
           name: metadata.name ?? '',
           path: modDirectory.path,
+          id: metadata.id,
           version: metadata.version,
           isDisable: isDisable,
         );
@@ -184,8 +184,7 @@ class StoreNotifier extends ChangeNotifier {
 
   Future<void> applyGameConfig(String id) async {
     try {
-      final gameConfig =
-          gameConfigs.firstWhere((element) => element.id == id);
+      final gameConfig = gameConfigs.firstWhere((element) => element.id == id);
 
       final optionFile = File('$isaacDocumentPath\\options.ini');
 
@@ -344,7 +343,7 @@ class StoreNotifier extends ChangeNotifier {
         groups: {},
       );
     }
-    
+
     if (!_presetsData!.groups.containsKey(groupName)) {
       _presetsData!.groups[groupName] = <String>{};
       savePresets();
@@ -361,8 +360,8 @@ class StoreNotifier extends ChangeNotifier {
   }
 
   void renameGroup(String oldName, String newName) {
-    if (_presetsData != null && 
-        _presetsData!.groups.containsKey(oldName) && 
+    if (_presetsData != null &&
+        _presetsData!.groups.containsKey(oldName) &&
         !_presetsData!.groups.containsKey(newName)) {
       final modNames = _presetsData!.groups[oldName]!;
       _presetsData!.groups.remove(oldName);
@@ -405,7 +404,7 @@ class StoreNotifier extends ChangeNotifier {
 
   String? getModGroup(String modName) {
     if (_presetsData == null) return null;
-    
+
     for (var entry in _presetsData!.groups.entries) {
       if (entry.value.contains(modName)) {
         return entry.key;

@@ -164,6 +164,7 @@
     "description": "Mod related strings"
   },
   "mod_open_folder": "Open Mod Folder",
+  "mod_open_workshop": "Open Workshop",
   "mod_move_to_group": "Move to Group",
   "mod_remove_from_group": "Remove from Group",
   "mod_drag_here": "Drag mods here",

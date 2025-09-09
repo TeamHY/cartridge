@@ -1,6 +1,7 @@
 class Mod {
   final String name;
   final String path;
+  final String? id;
   final String? version;
 
   bool isDisable;
@@ -8,6 +9,7 @@ class Mod {
   Mod({
     required this.name,
     required this.path,
+    this.id,
     this.version,
     this.isDisable = false,
   });

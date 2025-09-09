@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:cartridge/constants/urls.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ModItem extends ConsumerStatefulWidget {
   const ModItem({
@@ -44,6 +46,11 @@ class _ModItemState extends ConsumerState<ModItem> {
     }
   }
 
+  void _openModWorkshop() async {
+    await launchUrl(
+        Uri.parse('${AppUrls.steamWorkshopDetail}/?id=${widget.mod.id}'));
+  }
+
   void _showContextMenu(Offset position) {
     final store = ref.read(storeProvider);
     final currentGroup = store.getModGroup(widget.mod.name);
@@ -62,6 +69,16 @@ class _ModItemState extends ConsumerState<ModItem> {
               _openModFolder();
             },
           ),
+          if (widget.mod.id != null) ...[
+            fluent.MenuFlyoutItem(
+              leading: const Icon(fluent.FluentIcons.link),
+              text: Text(AppLocalizations.of(context).mod_open_workshop),
+              onPressed: () {
+                fluent.Flyout.of(context).close();
+                _openModWorkshop();
+              },
+            ),
+          ],
           if (widget.onMoveToGroup != null) ...[
             const fluent.MenuFlyoutSeparator(),
             fluent.MenuFlyoutSubItem(

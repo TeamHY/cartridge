@@ -6,10 +6,12 @@ class AppUrls {
       'https://api.github.com/repos/TeamHY/cartridge/releases/latest';
 
   // 오헌영 방송 채널
-  static const youtube = 'https://www.youtube.com/@아이작오헌영'; // 변경되면 README.md도 수정하기
+  static const youtube =
+      'https://www.youtube.com/@아이작오헌영'; // 변경되면 README.md도 수정하기
   static const twitch = 'https://www.twitch.tv/iwt2hw'; // 변경되면 README.md도 수정하기
   static const afreeca = 'https://bj.afreecatv.com/iwt2hw';
-  static const chzzk = 'https://chzzk.naver.com/f409bd9619bb9d384159a82d8892f73a';
+  static const chzzk =
+      'https://chzzk.naver.com/f409bd9619bb9d384159a82d8892f73a';
 
   // 커뮤니티
   static const openChat = 'https://open.kakao.com/o/gXkuZvze';
@@ -28,4 +30,6 @@ class AppUrls {
   // 스팀
   static const steamAstrobirthPatchNotes =
       'https://steamcommunity.com/sharedfiles/filedetails/changelog/2492350811';
+  static const steamWorkshopDetail =
+      'https://steamcommunity.com/sharedfiles/filedetails';
 }
