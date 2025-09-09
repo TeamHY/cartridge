@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/app/presentation/app_scaffold.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/providers/store_provider.dart';
+import 'package:cartridge/theme/theme.dart';
 import 'package:cartridge/widgets/dialogs/setting_dialog.dart';
 import 'package:cartridge/widgets/pages/home_page.dart';
 import 'package:cartridge/widgets/pages/record_page.dart';
@@ -20,6 +21,7 @@ class AppNavigation extends ConsumerWidget {
     final index = ref.watch(appNavigationIndexProvider);
     final loc = AppLocalizations.of(context);
     final store = ref.watch(storeProvider);
+    final fTheme = FluentTheme.of(context);
 
     Future<void> openRecordPage() async {
       await Navigator.of(context).push(
@@ -33,49 +35,49 @@ class AppNavigation extends ConsumerWidget {
       ); // ⬅ 전체 화면 전환
     }
 
-    List<NavigationPaneItem> items = [
+    final items = <NavigationPaneItem>[
       // 홈 화면
-      themedPaneItem(
+      _paneItem(
+        context: context,
         icon: FluentIcons.home,
         title: loc.home_button_preset,
         body: const material.Material(
           color: Colors.transparent,
           child: HomePage(),
         ),
-        context: context,
       ),
       PaneItemSeparator(),
       // 컨텐츠(기록모드, 대결모드 등등 추가 컨텐츠)
-      themedPaneAction(
+      _paneAction(
+        context: context,
         icon: FluentIcons.game,
         title: loc.home_button_record,
-        context: context,
         onTap: openRecordPage,
       ),
       // 슬롯 머신(미니 게임)
-      themedPaneAction(
+      _paneAction(
+        context: context,
         icon: FluentIcons.game,
         title: loc.home_button_slot_machine,
-        context: context,
         onTap: openSlotMachine,
       ),
       // 데일리런 실행 버튼
-      themedPaneAction(
+      _paneAction(
+        context: context,
         icon: FluentIcons.game,
         title: loc.home_button_daily_run,
-        context: context,
         onTap: () => store.applyPreset(
           null,
           isEnableMods: false,
           isDebugConsole: false,
         ),
       ),
-      // 세팅 화면
       PaneItemSeparator(),
-      themedPaneAction(
+      // 세팅 화면
+      _paneAction(
+        context: context,
         icon: FluentIcons.settings,
         title: loc.home_button_setting,
-        context: context,
         onTap: () {
           showDialog(context: context, builder: (_) => const SettingDialog());
         },
@@ -89,9 +91,8 @@ class AppNavigation extends ConsumerWidget {
         borderRadius: BorderRadius.only(topLeft: Radius.circular(12)),
       ),
       paneBodyBuilder: (item, body) {
-        final theme = FluentTheme.of(context);
         return Container(
-          color: theme.cardColor,
+          color: fTheme.cardColor,
           padding: EdgeInsets.zero,
           child: body ?? const SizedBox.shrink(),
         );
@@ -100,45 +101,54 @@ class AppNavigation extends ConsumerWidget {
         selected: index,
         onChanged: (i) => ref.read(appNavigationIndexProvider.notifier).state = i,
         displayMode: PaneDisplayMode.auto,
-        size: const NavigationPaneSize(openWidth: 200),
+        size: const NavigationPaneSize(openWidth: AppSpacing.navigationPaneSize),
         indicator: null,
         items: items,
       ),
     );
   }
 
-  PaneItem themedPaneItem({
+  static Icon _icon(BuildContext context, IconData data) {
+    final t = FluentTheme.of(context);
+    return Icon(data, size: 18.0, color: t.accentColor.normal);
+  }
+
+  static WidgetStateProperty<Color> _selectedTile(BuildContext context) {
+    final t = FluentTheme.of(context);
+    final alpha = t.brightness == Brightness.light ? 36 : 52;
+    return WidgetStatePropertyAll(t.accentColor.normal.withAlpha(alpha));
+  }
+
+
+  static PaneItem _paneItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required Widget body,
-    required BuildContext context,
   }) {
-    final fTheme = FluentTheme.of(context);
-
     return PaneItem(
-      icon: Icon(
-        icon,
-        size: 18.0,
-        color: fTheme.accentColor.normal,
-      ),
-      title: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      icon: _icon(context, icon),
+      title: Text(title, style: AppTypography.navigationPane),
       body: body,
-      selectedTileColor: WidgetStateProperty.resolveWith((states) {
-        final isLight = fTheme.brightness == Brightness.light;
-        final base = fTheme.accentColor.normal;
-        final alpha = isLight ? 36 : 52;
-        return base.withAlpha(alpha);
-      }),
+      selectedTileColor: _selectedTile(context),
     );
   }
 
-  PaneItem themedPaneItemExpander({
+  static PaneItemAction _paneAction({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
+    return PaneItemAction(
+      icon: _icon(context, icon),
+      title: Text(title, style: AppTypography.navigationPane),
+      onTap: onTap,
+    );
+  }
+
+  // ignore: unused_element TODO 추후 확장용
+  PaneItem _paneItemExpander({
     required IconData icon,
     required String title,
     required BuildContext context,
@@ -170,21 +180,4 @@ class AppNavigation extends ConsumerWidget {
       items: items,
     );
   }
-}
-
-PaneItemAction themedPaneAction({
-  required IconData icon,
-  required String title,
-  required BuildContext context,
-  required VoidCallback onTap,
-}) {
-  final fTheme = FluentTheme.of(context);
-  return PaneItemAction(
-    icon: Icon(icon, size: 18.0, color: fTheme.accentColor.normal),
-    title: Text(
-      title,
-      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-    ),
-    onTap: onTap,
-  );
 }

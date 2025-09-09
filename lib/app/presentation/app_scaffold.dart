@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
 import 'package:cartridge/providers/store_provider.dart';
+import 'package:cartridge/theme/theme.dart';
 import 'package:cartridge/widgets/quick_bar.dart';
 
 /// 상단 헤더를 생성한다.
@@ -24,36 +25,33 @@ NavigationAppBar buildNavigationAppBar(BuildContext context, WidgetRef ref) {
         children: [
           Image.asset(
             'assets/images/Cartridge_icon_32x32.png',
-            width: 50,
-            height: 50,
+            width: AppSpacing.appBarHeight,
+            height: AppSpacing.appBarHeight,
             fit: BoxFit.contain,
           ),
-          const SizedBox(width: 8),
-          const Text('Cartridge', style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          )),
+          Gaps.w8,
+          const Text('Cartridge', style: AppTypography.appBarTitle),
         ],
       ),
     ),
     actions: Row(
       children: [
-        if (MediaQuery.of(context).size.width > 800) ...[
+        if (context.isLgUp) ...[
           const Spacer(),
           const QuickBar(),
         ],
         const Spacer(),
         IconButton(
-          icon: const Icon(FluentIcons.refresh, size: 20),
+          icon: const Icon(FluentIcons.refresh, size: 16),
           onPressed: () {
             final store = ref.read(storeProvider);
             store.reloadMods();
           },
         ),
-        const SizedBox(width: 4),
+        Gaps.w4,
         const SizedBox(
           width: 138,
-          height: 50,
+          height: AppSpacing.appBarHeight,
           child: WindowCaption(
             backgroundColor: Colors.transparent,
           ),
