@@ -6,7 +6,7 @@ import 'package:roulette/roulette.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
 class Arrow extends StatelessWidget {
-  const Arrow({Key? key}) : super(key: key);
+  const Arrow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -52,26 +52,25 @@ class _RouletteDialogState extends State<RouletteDialog>
     with TickerProviderStateMixin {
   final Random random = Random();
 
-  late RouletteController controller;
+  late final RouletteGroup group;
+  late final RouletteController controller;
   int index = 0;
 
   @override
   void initState() {
     super.initState();
 
-    controller = RouletteController(
-      group: RouletteGroup.uniform(
-        widget.presets.length,
-        colorBuilder: (index) => Colors.blue.lightest,
-        textBuilder: (index) => widget.presets[index].name,
-        textStyleBuilder: (index) => const TextStyle(
-          color: Colors.black,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Pretendard',
-        ),
+    controller = RouletteController();
+    group = RouletteGroup.uniform(
+      widget.presets.length,
+      colorBuilder: (index) => Colors.blue.lightest,
+      textBuilder: (index) => widget.presets[index].name,
+      textStyleBuilder: (index) => const TextStyle(
+        color: Colors.black,
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        fontFamily: 'Pretendard',
       ),
-      vsync: this,
     );
   }
 
@@ -91,6 +90,7 @@ class _RouletteDialogState extends State<RouletteDialog>
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Roulette(
+            group: group,
             controller: controller,
             style: const RouletteStyle(
               centerStickSizePercent: 0,
