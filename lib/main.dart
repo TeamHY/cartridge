@@ -1,5 +1,5 @@
+import 'package:cartridge/app/presentation/app_navigation.dart';
 import 'package:cartridge/providers/setting_provider.dart';
-import 'package:cartridge/widgets/pages/home_page.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -71,7 +71,7 @@ class MyApp extends ConsumerWidget {
           ),
         );
       },
-      home: const HomePage(),
+      home: const AppNavigation(),
     );
   }
 }

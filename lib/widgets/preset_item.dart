@@ -76,13 +76,13 @@ class _PresetItemState extends State<PresetItem>
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
 
     return Card(
       backgroundColor: widget.isSelected
-          ? theme.accentColor.withValues(alpha: 0.1)
+          ? fTheme.accentColor.withValues(alpha: 0.1)
           : Colors.transparent,
-      borderColor: widget.isSelected ? theme.accentColor : Colors.transparent,
+      borderColor: widget.isSelected ? fTheme.accentColor : Colors.transparent,
       padding: EdgeInsetsGeometry.zero,
       child: MouseRegion(
         onEnter: (_) {
@@ -108,7 +108,7 @@ class _PresetItemState extends State<PresetItem>
                           ? FontWeight.w600
                           : FontWeight.normal,
                       fontSize: 14,
-                      color: widget.isSelected ? theme.accentColor : null,
+                      color: widget.isSelected ? fTheme.accentColor : null,
                     ),
                   ),
                 ),
@@ -136,7 +136,7 @@ class _PresetItemState extends State<PresetItem>
                               backgroundColor:
                                   WidgetStateProperty.resolveWith((states) {
                                 if (states.contains(WidgetState.hovered)) {
-                                  return theme.accentColor
+                                  return fTheme.accentColor
                                       .withValues(alpha: 0.1);
                                 }
                                 return Colors.transparent;
@@ -144,7 +144,7 @@ class _PresetItemState extends State<PresetItem>
                               foregroundColor:
                                   WidgetStateProperty.resolveWith((states) {
                                 if (states.contains(WidgetState.hovered)) {
-                                  return theme.accentColor;
+                                  return fTheme.accentColor;
                                 }
                                 return Colors.black;
                               }),

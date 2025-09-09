@@ -5,9 +5,11 @@
     "description": "Home screen UI"
   },
   "home_preset_placeholder": "New preset",
+  "home_button_preset": "Preset",
   "home_button_record": "Record\nMode",
   "home_button_slot_machine": "Slot\nMachine",
   "home_button_daily_run": "Daily\nRun",
+  "home_button_setting": "Setting",
   "home_dialog_delete_title": "Delete Preset",
   "home_dialog_delete_description": "Once deleted, the preset cannot be recovered. Do you really want to delete it?",
   "home_dialog_update_title": "Update",

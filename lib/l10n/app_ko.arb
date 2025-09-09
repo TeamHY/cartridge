@@ -5,8 +5,10 @@
     "description": "홈 화면 UI 전반"
   },
   "home_preset_placeholder": "새 프리셋",
+  "home_button_preset": "프리셋",
   "home_button_record": "기록 모드",
   "home_button_slot_machine": "슬롯 머신",
+  "home_button_setting": "설정",
   "home_button_daily_run": "데일리 런",
   "home_dialog_delete_title": "프리셋 삭제",
   "home_dialog_delete_description": "프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
