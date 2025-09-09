@@ -221,6 +221,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.4"
+  golden_toolkit:
+    dependency: "direct dev"
+    description:
+      name: golden_toolkit
+      sha256: "8f74adab33154fe7b731395782797021f97d2edc52f7bfb85ff4f1b5c4a215f0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.15.0"
   gotrue:
     dependency: transitive
     description:
@@ -365,6 +373,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  mocktail:
+    dependency: "direct dev"
+    description:
+      name: mocktail
+      sha256: "890df3f9688106f25755f26b1c60589a92b3ab91a22b8b224947ad041bf172d8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   path:
     dependency: "direct main"
     description:

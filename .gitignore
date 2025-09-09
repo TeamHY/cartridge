@@ -47,3 +47,5 @@ app.*.map.json
 
 *.env
 coverage/*
+
+**/failures/*.png
