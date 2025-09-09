@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/TeamHY/cartridge"><img src="assets/images/Cartridge_icon_200_200.png" alt="cartridge" width="200"></a>
+  <a href="https://github.com/TeamHY/cartridge"><img src="/assets/images/Cartridge_icon_200_200.png" alt="cartridge" width="200"></a>
   <br>
   Cartridge — Developer Setup
   <br>
