@@ -63,6 +63,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter            # [i18n] 플러터 기본 현지화 지원
   intl: ^0.20.2             # [i18n] 날짜·숫자 포맷
+  win32_registry: ^2.1.0
+  path: ^1.9.1
+  meta: ^1.16.0
 
 dev_dependencies:
   flutter_test:

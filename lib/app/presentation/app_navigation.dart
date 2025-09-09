@@ -26,13 +26,13 @@ class AppNavigation extends ConsumerWidget {
     Future<void> openRecordPage() async {
       await Navigator.of(context).push(
         FluentPageRoute(builder: (_) => const RecordPage()),
-      ); // ⬅ 전체 화면 전환
+      );
     }
 
     Future<void> openSlotMachine() async {
       await Navigator.of(context).push(
         FluentPageRoute(builder: (_) => const SlotMachinePage()),
-      ); // ⬅ 전체 화면 전환
+      );
     }
 
     final items = <NavigationPaneItem>[
