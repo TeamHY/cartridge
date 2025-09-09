@@ -1,5 +1,6 @@
 import 'package:cartridge/main.dart';
 import 'package:cartridge/providers/setting_provider.dart';
+import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart' as material;
@@ -18,6 +19,7 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
   late TextEditingController _pathController;
   late TextEditingController _rerunDelayController;
   late String _selectedLanguageCode;
+  late AppThemeKey _selectedThemeKey;
 
   @override
   void initState() {
@@ -28,6 +30,7 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
     _rerunDelayController =
         TextEditingController(text: settings.rerunDelay.toString());
     _selectedLanguageCode = settings.languageCode ?? 'ko';
+    _selectedThemeKey = settings.themeKey;
   }
 
   @override
@@ -40,6 +43,7 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    String themeLabel(AppThemeKey k) => localizedThemeName(loc, k);
 
     return ContentDialog(
       title: Text(loc.setting_dialog_title),
@@ -81,6 +85,21 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
               },
             ),
           ),
+          const SizedBox(height: 16.0),InfoLabel(
+            label: loc.setting_theme_label,
+            child: ComboBox<AppThemeKey>(
+              value: _selectedThemeKey,
+              items: AppThemeKey.values.map((k) =>
+                  ComboBoxItem(value: k, child: Text(themeLabel(k)))).toList(),
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  _selectedThemeKey = value;
+                  _isChanged = true;
+                });
+              },
+            ),
+          ),
           const SizedBox(height: 16.0),
           Row(
             children: [
@@ -111,6 +130,7 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
                     int.parse(_rerunDelayController.text),
                   );
                   setting.setLanguageCode(_selectedLanguageCode);
+                  setting.setThemeKey(_selectedThemeKey);
                   setting.saveSetting();
 
                   Navigator.pop(context);

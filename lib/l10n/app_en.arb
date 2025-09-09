@@ -41,6 +41,13 @@
   "setting_language_ko": "Korean",
   "setting_language_en": "English",
   "setting_license_button": "License",
+  "setting_theme_label": "Theme",
+  "setting_theme_light": "Light",
+  "setting_theme_dark": "Dark",
+  "setting_theme_oled": "OLED",
+  "setting_theme_system": "Sync with system",
+  "setting_theme_tangerine": "Tangerine",
+  "setting_theme_claude": "Claude",
 
   "@game_config": {
     "description": "Game Config Dialog"
@@ -101,6 +108,7 @@
   "record_no_challenge": "No challenge available today.",
   "record_daily_ranking": "Daily Ranking",
   "record_weekly_ranking": "Weekly Ranking",
+  "record_stage_entry": "Entered Stage {stage}.{substage}",
 
   "@ranking": {
     "description": "Daily and weekly challenge ranking page"
@@ -217,12 +225,6 @@
   "validation_width_minimum": "Width must be at least 320",
   "validation_height_minimum": "Height must be at least 240",
   "validation_number_required": "Please enter a valid number",
-
-  "@record": {
-    "description": "Record page specific strings"
-  },
-  "record_stage_entry": "Entered Stage {stage}.{substage}",
-
 
   "@character": { "description": "Character names" },
   "character_isaac": "Isaac",

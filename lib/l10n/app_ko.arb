@@ -41,6 +41,14 @@
   "setting_language_ko": "한국어",
   "setting_language_en": "English",
   "setting_license_button": "라이센스",
+  "setting_theme_label": "테마",
+  "setting_theme_light": "라이트",
+  "setting_theme_dark": "다크",
+  "setting_theme_oled": "OLED",
+  "setting_theme_system": "컴퓨터와 동기화",
+  "setting_theme_tangerine": "Tangerine",
+  "setting_theme_claude": "Claude",
+
 
   "@game_config": {
     "description": "게임 설정 다이얼로그"
@@ -101,6 +109,7 @@
   "record_no_challenge": "오늘의 챌린지가 없습니다.",
   "record_daily_ranking": "일간 랭킹",
   "record_weekly_ranking": "주간 랭킹",
+  "record_stage_entry": "스테이지 {stage}.{substage} 입장",
 
   "@ranking": {
     "description": "일간 및 주간 챌린지 랭킹 페이지"
@@ -217,12 +226,6 @@
   "validation_width_minimum": "너비는 320 이상이어야 합니다",
   "validation_height_minimum": "높이는 240 이상이어야 합니다",
   "validation_number_required": "유효한 숫자를 입력해주세요",
-
-  "@record": {
-    "description": "기록 페이지 관련 문자열"
-  },
-  "record_stage_entry": "스테이지 {stage}.{substage} 입장",
-
 
   "@character": { "description": "캐릭터 이름들" },
   "character_isaac": "아이작",

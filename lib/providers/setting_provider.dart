@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cartridge/theme/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,14 +13,19 @@ class SettingNotifier extends ChangeNotifier {
 
   String _isaacPath =
       'C:\\Program Files (x86)\\Steam\\steamapps\\common\\The Binding of Isaac Rebirth';
-
   String get isaacPath => _isaacPath;
-
   int rerunDelay = 1000;
-
   String? languageCode;
-
   bool isGridView = false;
+  String themeId = AppThemeKey.system.name;
+
+  AppThemeKey get themeKey {
+    try {
+      return AppThemeKey.values.byName(themeId);
+    } catch (_) {
+      return AppThemeKey.system;
+    }
+  }
 
   Future<void> loadSetting() async {
     final appSupportDir = await getApplicationSupportDirectory();
@@ -35,6 +41,7 @@ class SettingNotifier extends ChangeNotifier {
     rerunDelay = json['rerunDelay'] as int? ?? 1000;
     languageCode = json['languageCode'] as String?;
     isGridView = json['isGridView'] as bool? ?? false;
+    themeId = json['themeId'] as String? ?? AppThemeKey.system.name;
 
     notifyListeners();
   }
@@ -48,6 +55,7 @@ class SettingNotifier extends ChangeNotifier {
       'rerunDelay': rerunDelay,
       'languageCode': languageCode,
       'isGridView': isGridView,
+      'themeKey': themeId,
     }));
   }
 
@@ -73,6 +81,11 @@ class SettingNotifier extends ChangeNotifier {
     isGridView = value;
 
     notifyListeners();
+  }
+
+  void setThemeKey(AppThemeKey key) {
+    themeId = key.name;         // 'system' 등 유효한 문자열을 사용
+    notifyListeners();    // UI 반영
   }
 }
 
