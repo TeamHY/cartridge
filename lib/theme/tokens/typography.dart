@@ -65,4 +65,12 @@ class AppTypography {
     fontWeight: FontWeight.w400,
     height: 1.35,
   );
+
+  /// 슬롯머신
+  static const TextStyle slotItem = TextStyle(
+    fontFamily: fontSans,
+    fontSize: 26,
+    fontWeight: FontWeight.w600,
+    height: 1.20,
+  );
 }

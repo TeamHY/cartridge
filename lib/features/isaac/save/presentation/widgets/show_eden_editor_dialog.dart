@@ -80,11 +80,8 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final t = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     final asyncState = ref.watch(edenEditorControllerProvider(widget.args));
-
-    Color divider(FluentThemeData th) =>
-        th.dividerColor ?? (th.resources.textFillColorSecondary).withAlpha(64);
 
     return asyncState.when(
       loading: () => const ContentDialog(content: Center(child: ProgressRing())),
@@ -103,7 +100,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
         return ContentDialog(
           title: Row(
             children: [
-              Icon(FluentIcons.pro_hockey, size: 18, color: t.accentColor.normal),
+              Icon(FluentIcons.pro_hockey, size: 18, color: fTheme.accentColor.normal),
               SizedBox(width: AppSpacing.xs),
               const Text('에덴 토큰'),
             ],
@@ -120,7 +117,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                   child: Text(
                     '${IsaacEditionInfo.folderName[s.edition]}',
                     style: TextStyle(
-                      color: t.resources.textFillColorSecondary,
+                      color: fTheme.resources.textFillColorSecondary,
                       fontSize: 16,
                     ),
                   ),
@@ -141,7 +138,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                 // 슬롯 선택
                 Padding(
                   padding: EdgeInsets.only(bottom: AppSpacing.xs),
-                  child: Text('게임의 저장 칸(슬롯)을 선택하세요.', style: t.typography.caption),
+                  child: Text('게임의 저장 칸(슬롯)을 선택하세요.', style: fTheme.typography.caption),
                 ),
                 Row(
                   children: List.generate(3, (i) {
@@ -168,8 +165,8 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                               ),
                             ),
                             backgroundColor: WidgetStateProperty.resolveWith((_) {
-                              if (!exists) return t.inactiveColor.withAlpha(16);
-                              if (selected) return t.accentColor.normal.withAlpha(36);
+                              if (!exists) return fTheme.inactiveColor.withAlpha(16);
+                              if (selected) return fTheme.accentColor.normal.withAlpha(36);
                               return null;
                             }),
                           ),
@@ -204,9 +201,9 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                 if (!s.loading && s.selectedSlot != 0) ...[
                   Container(
                     decoration: BoxDecoration(
-                      color: t.cardColor,
+                      color: fTheme.cardColor,
                       borderRadius: BorderRadius.circular(_r),
-                      border: Border.all(color: divider(t)),
+                      border: Border.all(color: fTheme.dividerColor),
                     ),
                     padding: EdgeInsets.all(AppSpacing.md),
                     child: Column(
@@ -223,8 +220,8 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: t.accentColor.withAlpha(
-                                  t.brightness == Brightness.dark ? 128 : 80,
+                                color: fTheme.accentColor.withAlpha(
+                                  fTheme.brightness == Brightness.dark ? 128 : 80,
                                 ),
                                 borderRadius: BorderRadius.circular(999),
                               ),

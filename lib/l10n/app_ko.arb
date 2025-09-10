@@ -132,6 +132,7 @@
   "slot_add_item": "항목 추가",
   "slot_remove_item": "항목 제거",
   "slot_default": "기본",
+  "slot_empty_message": "슬롯이 하나도 없어요.",
 
   "@roulette": {
     "description": "돌림판 다이얼로그"

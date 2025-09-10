@@ -9,13 +9,9 @@ Future<SteamAccountProfile?> showChooseSteamAccountDialog(
     BuildContext context,
     List<SteamAccountProfile> items,
     ) {
-  final theme = FluentTheme.of(context);
-  final accent = theme.accentColor.normal;
+  final fTheme = FluentTheme.of(context);
+  final accent = fTheme.accentColor.normal;
   final scrollCtrl = ScrollController();
-
-  // theme.md: divider fallback은 시스템 텍스트 보조색을 살짝 희미하게
-  Color divider(FluentThemeData t) =>
-      t.dividerColor ?? (t.resources.textFillColorSecondary).withAlpha(64);
 
   return showDialog<SteamAccountProfile?>(
     context: context,
@@ -42,7 +38,7 @@ Future<SteamAccountProfile?> showChooseSteamAccountDialog(
             separatorBuilder: (_, __) => SizedBox(height: AppSpacing.sm),
             itemBuilder: (ctx, i) => _AccountTile(
               profile: items[i],
-              borderColor: divider(theme),
+              borderColor: fTheme.dividerColor,
               onTap: () => Navigator.of(ctx).pop(items[i]),
             ),
           ),

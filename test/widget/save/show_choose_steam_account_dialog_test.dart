@@ -1,3 +1,4 @@
+import 'package:cartridge/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -73,7 +74,7 @@ class _HarnessState extends State<_Harness> {
                       });
                     },
                   ),
-                  const SizedBox(height: 8),
+                  Gaps.h8,
                   Text('selected: $_selectedLabel', key: const Key('selected_label')),
                 ],
               ),

@@ -131,6 +131,7 @@
   "slot_add_item": "Add Item",
   "slot_remove_item": "Remove Item",
   "slot_default": "Default",
+  "slot_empty_message": "No Slot items found.",
 
   "@roulette": {
     "description": "Roulette dialog messages"

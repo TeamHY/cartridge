@@ -1,3 +1,8 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sqflite/sqlite_api.dart';
+
+import 'package:cartridge/core/infra/app_database.dart';
+import 'package:cartridge/features/cartridge/slot_machine/slot_machine.dart';
 import 'package:cartridge/features/isaac/runtime/domain/isaac_versions.dart';
 import 'package:cartridge/features/isaac/save/application/isaac_save_service.dart';
 import 'package:cartridge/features/isaac/save/domain/ports/eden_tokens_port.dart';
@@ -15,7 +20,13 @@ import 'package:cartridge/features/steam/infra/links/steam_url_launcher_adapter.
 import 'package:cartridge/features/steam/infra/steam_users_vdf_repository.dart';
 import 'package:cartridge/features/steam/infra/windows/steam_app_library.dart';
 import 'package:cartridge/features/steam/infra/windows/steam_install_locator.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 0) App-wide Database (SQLite)
+// ─────────────────────────────────────────────────────────────────────────────
+final appDatabaseProvider =
+Provider<Future<Database> Function()>((ref) => appDatabase);
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -96,3 +107,20 @@ final editionAndSlotsProvider = FutureProvider.family<EditionSlots, EditionSlots
   final slots  = await probe.listExistingSlots(args.acc, target);
   return (edition: target, slots: List<int>.from(slots)..sort());
 });
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 4) Feature: Slot Machine (SQLite)
+// ─────────────────────────────────────────────────────────────────────────────
+final slotMachineRepositoryProvider = Provider<ISlotMachineRepository>(
+      (ref) => SqliteSlotMachineRepository(
+    dbOpener: ref.read(appDatabaseProvider),
+  ),
+);
+
+final slotMachineServiceProvider = Provider<SlotMachineService>(
+      (ref) => SlotMachineService(
+    repo: ref.read(slotMachineRepositoryProvider),
+  ),
+);

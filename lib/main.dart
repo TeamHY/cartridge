@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pub_semver/pub_semver.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -15,6 +16,9 @@ final currentVersion = Version.parse('4.14.1');
 
 void main() async {
   await dotenv.load(fileName: '.env');
+
+  sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
 
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();

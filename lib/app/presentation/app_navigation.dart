@@ -1,3 +1,4 @@
+import 'package:cartridge/features/cartridge/slot_machine/presentation/pages/slot_machine_page.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +10,6 @@ import 'package:cartridge/theme/theme.dart';
 import 'package:cartridge/widgets/dialogs/setting_dialog.dart';
 import 'package:cartridge/widgets/pages/home_page.dart';
 import 'package:cartridge/widgets/pages/record_page.dart';
-import 'package:cartridge/widgets/pages/slot_machine_page.dart';
 
 final appNavigationIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -26,12 +26,6 @@ class AppNavigation extends ConsumerWidget {
     Future<void> openRecordPage() async {
       await Navigator.of(context).push(
         FluentPageRoute(builder: (_) => const RecordPage()),
-      );
-    }
-
-    Future<void> openSlotMachine() async {
-      await Navigator.of(context).push(
-        FluentPageRoute(builder: (_) => const SlotMachinePage()),
       );
     }
 
@@ -55,11 +49,11 @@ class AppNavigation extends ConsumerWidget {
         onTap: openRecordPage,
       ),
       // 슬롯 머신(미니 게임)
-      _paneAction(
+      _paneItem(
         context: context,
         icon: FluentIcons.game,
         title: loc.home_button_slot_machine,
-        onTap: openSlotMachine,
+        body: const SlotMachinePage(),
       ),
       // 데일리런 실행 버튼
       _paneAction(
@@ -109,14 +103,14 @@ class AppNavigation extends ConsumerWidget {
   }
 
   static Icon _icon(BuildContext context, IconData data) {
-    final t = FluentTheme.of(context);
-    return Icon(data, size: 18.0, color: t.accentColor.normal);
+    final fTheme = FluentTheme.of(context);
+    return Icon(data, size: 18.0, color: fTheme.accentColor.normal);
   }
 
   static WidgetStateProperty<Color> _selectedTile(BuildContext context) {
-    final t = FluentTheme.of(context);
-    final alpha = t.brightness == Brightness.light ? 36 : 52;
-    return WidgetStatePropertyAll(t.accentColor.normal.withAlpha(alpha));
+    final fTheme = FluentTheme.of(context);
+    final alpha = fTheme.brightness == Brightness.light ? 36 : 52;
+    return WidgetStatePropertyAll(fTheme.accentColor.normal.withAlpha(alpha));
   }
 
 

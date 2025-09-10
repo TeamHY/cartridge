@@ -1,3 +1,4 @@
+import 'package:cartridge/theme/tokens/radius.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
 import 'tokens/colors.dart';
@@ -32,11 +33,11 @@ class AppTheme {
       unselectedIconColor: WidgetStateProperty.all(AppColors.lightAccent.normal),
     ),
     dialogTheme: ContentDialogThemeData(
-      decoration: BoxDecoration(color: AppColors.lightBackground, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: AppColors.lightBackground, borderRadius: BorderRadius.circular(AppRadius.md)),
       actionsDecoration: BoxDecoration(
         color: AppColors.lightSurface,
         border: const Border(top: BorderSide(color: AppColors.lightDivider)),
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(AppRadius.md)),
       ),
       actionsPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
     ),
@@ -58,11 +59,11 @@ class AppTheme {
       unselectedIconColor: WidgetStateProperty.all(AppColors.darkAccent.normal),
     ),
     dialogTheme: ContentDialogThemeData(
-      decoration: BoxDecoration(color: AppColors.darkBackground, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: AppColors.darkBackground, borderRadius: BorderRadius.circular(AppRadius.md)),
       actionsDecoration: BoxDecoration(
         color: AppColors.darkSurface,
         border: const Border(top: BorderSide(color: AppColors.darkDivider)),
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(AppRadius.md)),
       ),
       actionsPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
     ),
@@ -84,11 +85,11 @@ class AppTheme {
       unselectedIconColor: WidgetStateProperty.all(Colors.white),
     ),
     dialogTheme: ContentDialogThemeData(
-      decoration: BoxDecoration(color: AppColors.oledBackground, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: AppColors.oledBackground, borderRadius: BorderRadius.circular(AppRadius.md)),
       actionsDecoration: BoxDecoration(
         color: AppColors.oledSurface,
         border: const Border(top: BorderSide(color: AppColors.oledDivider)),
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(AppRadius.md)),
       ),
       actionsPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
     ),
@@ -110,11 +111,11 @@ class AppTheme {
       unselectedIconColor: WidgetStateProperty.all(AppColors.tangerineAccent.normal),
     ),
     dialogTheme: ContentDialogThemeData(
-      decoration: BoxDecoration(color: AppColors.tangerineBg, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: AppColors.tangerineBg, borderRadius: BorderRadius.circular(AppRadius.md)),
       actionsDecoration: BoxDecoration(
         color: AppColors.tangerineCard,
         border: const Border(top: BorderSide(color: AppColors.tangerineDivider)),
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(AppRadius.md), bottomRight: Radius.circular(AppRadius.md)),
       ),
       actionsPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
     ),
@@ -136,11 +137,11 @@ class AppTheme {
       unselectedIconColor: WidgetStateProperty.all(AppColors.claudeAccent.normal),
     ),
     dialogTheme: ContentDialogThemeData(
-      decoration: BoxDecoration(color: AppColors.claudeBg, borderRadius: BorderRadius.circular(8)),
+      decoration: BoxDecoration(color: AppColors.claudeBg, borderRadius: BorderRadius.circular(AppRadius.md)),
       actionsDecoration: BoxDecoration(
         color: AppColors.claudeCard,
         border: const Border(top: BorderSide(color: AppColors.claudeDivider)),
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(AppRadius.md), bottomRight: Radius.circular(AppRadius.md)),
       ),
       actionsPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
     ),
@@ -195,5 +196,5 @@ class AppTheme {
 
 /// Divider 색상 접근 보조
 extension FluentThemeX on FluentThemeData {
-  Color? get dividerColor => (dividerTheme.decoration as BoxDecoration?)?.color;
+  Color get dividerColor => (dividerTheme.decoration as BoxDecoration?)?.color ?? (resources.textFillColorSecondary).withAlpha(64);
 }

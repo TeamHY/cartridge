@@ -49,3 +49,7 @@ app.*.map.json
 coverage/*
 
 **/failures/*.png
+
+# freezed
+*.g.dart
+*.freezed.dart

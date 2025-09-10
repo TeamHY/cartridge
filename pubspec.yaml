@@ -32,56 +32,60 @@ dependencies:
     sdk: flutter
 
   # ── UI / Desktop ────────────────────────────────────────────────────────────
-  fluent_ui: ^4.7.7         # [UI] 데스크톱 Fluent 컴포넌트(예: NavigationView, Pane, InfoBar)
-  window_manager: ^0.5.1    # [Desktop] 창 컨트롤/캡션/드래그 영역 등 윈도우 관리
-  url_launcher: ^6.1.12     # [Platform] 외부 링크/앱 열기(워크샵, 문서 등)
+  fluent_ui: ^4.7.7           # [UI] 데스크톱 Fluent 컴포넌트(예: NavigationView, Pane, InfoBar)
+  window_manager: ^0.5.1      # [Desktop] 창 컨트롤/캡션/드래그 영역 등 윈도우 관리
+  url_launcher: ^6.1.12       # [Platform] 외부 링크/앱 열기(워크샵, 문서 등)
 
   # ── State / Config ──────────────────────────────────────────────────────────
-  flutter_riverpod: ^2.3.6  # [State] 전역 상태/DI(예: storeProvider)
-  flutter_dotenv: ^6.0.0    # [Config] .env 로드(키/엔드포인트 분리)
+  flutter_riverpod: ^2.3.6    # [State] 전역 상태/DI(예: storeProvider)
+  flutter_dotenv: ^6.0.0      # [Config] .env 로드(키/엔드포인트 분리)
 
   # ── Filesystem / IO ─────────────────────────────────────────────────────────
-  path_provider: ^2.0.15    # [FS] 앱/문서 디렉터리 경로 획득(모드 스캔, 프리셋 저장)
-  file_picker: ^10.3.2       # [FS/UI] 파일·폴더 선택(예: 아이작 설치 경로 지정)
-  tailf: ^1.1.0             # [Logs] 파일 실시간 tail(기록 모드 로그 리딩)
-  path: ^1.9.1              # [FS/Path] 경로 조작(join, basename 등). 런타임에서 저장 경로/파일명 계산에 사용.
+  path_provider: ^2.0.15      # [FS] 앱/문서 디렉터리 경로 획득(모드 스캔, 프리셋 저장)
+  file_picker: ^10.3.2        # [FS/UI] 파일·폴더 선택(예: 아이작 설치 경로 지정)
+  tailf: ^1.1.0               # [Logs] 파일 실시간 tail(기록 모드 로그 리딩)
+  path: ^1.9.1                # [FS/Path] 경로 조작(join, basename 등). 런타임에서 저장 경로/파일명 계산에 사용.
 
   # ── Networking / Backend ────────────────────────────────────────────────────
-  http: ^1.1.0              # [Net] REST 호출(업데이트 체크, 서버 연동 등)
-  supabase_flutter: ^2.8.1  # [Backend] Supabase 인증/스토리지/DB 연동
+  http: ^1.1.0                # [Net] REST 호출(업데이트 체크, 서버 연동 등)
+  supabase_flutter: ^2.8.1    # [Backend] Supabase 인증/스토리지/DB 연동
 
   # ── Parsing / Data Utils ────────────────────────────────────────────────────
-  xml: ^6.3.0               # [Parsing] 모드 metadata.xml 파싱
-  html: ^0.15.4             # [Parsing] HTML 파싱/스크래핑(필요 시)
-  pub_semver: ^2.1.4        # [Util] 버전 비교/범위 처리(앱/모드 버전 판단)
-  uuid: ^4.2.2              # [Util] 고유 ID 생성(프리셋/엔트리 키 등)
-  meta: ^1.16.0             # [Lang] @immutable/@sealed 등 애노테이션. 컴파일 타임 힌트(런타임 오버헤드 없음)
+  xml: ^6.3.0                 # [Parsing] 모드 metadata.xml 파싱
+  html: ^0.15.4               # [Parsing] HTML 파싱/스크래핑(필요 시)
+  pub_semver: ^2.1.4          # [Util] 버전 비교/범위 처리(앱/모드 버전 판단)
+  uuid: ^4.2.2                # [Util] 고유 ID 생성(프리셋/엔트리 키 등)
+  meta: ^1.16.0               # [Lang] @immutable/@sealed 등 애노테이션. 컴파일 타임 힌트(런타임 오버헤드 없음)
+  json_annotation: ^4.9.0     # [SerDe] JsonSerializable와 함께 쓰는 런타임 애노테이션(@JsonSerializable 등)
+  freezed_annotation: ^3.1.0  # [Codegen] Freezed 모델이 import하는 애노테이션(@freezed 등). 런타임 의존.
 
   # ── Features / Misc ─────────────────────────────────────────────────────────
-  roulette: ^0.2.0          # [Feature] 슬롯머신 룰렛(랜덤 회전)
-  week_of_year: ^2.2.0      # [Date] 주차 계산(데일리런/통계 등)
+  roulette: ^0.2.0            # [Feature] 슬롯머신 룰렛(랜덤 회전)
+  week_of_year: ^2.2.0        # [Date] 주차 계산(데일리런/통계 등)
 
   # ── i18n ────────────────────────────────────────────────────────────────────
   flutter_localizations:
-    sdk: flutter            # [i18n] 플러터 기본 현지화 지원
-  intl: ^0.20.2             # [i18n] 날짜·숫자 포맷
+    sdk: flutter              # [i18n] 플러터 기본 현지화 지원
+  intl: ^0.20.2               # [i18n] 날짜·숫자 포맷
 
   # ── Platform / Windows ──────────────────────────────────────────────────────
-  win32_registry: ^2.1.0    # [Windows] 레지스트리 조회(예: Steam 설치 경로 탐색). 런타임 의존.
+  win32_registry: ^2.1.0      # [Windows] 레지스트리 조회(예: Steam 설치 경로 탐색). 런타임 의존.
+  sqflite: ^2.4.2             # [DB] 로컬 SQLite 액세스(설정/캐시/슬롯 데이터 등)
+  sqflite_common_ffi: ^2.3.6
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mocktail: ^1.0.4          # [Test] 단위/위젯 테스트용 mocking 프레임워크
-  golden_toolkit: ^0.15.0   # [Test/Golden] 골든 이미지 테스트 도구( --update-goldens 로 베이스라인 갱신 )
+  mocktail: ^1.0.4            # [Test] 단위/위젯 테스트용 mocking 프레임워크
+  golden_toolkit: ^0.15.0     # [Test/Golden] 골든 이미지 테스트 도구( --update-goldens 로 베이스라인 갱신 )
+  flutter_lints: ^6.0.0       # [Lint] 권장 린트 세트(analysis_options.yaml에서 활성화)
 
+  # ── Codegen / Model ─────────────────────────────────────────────────────────
+  build_runner: ^2.8.0        # [Codegen] 코드 생성 실행기(Freezed/JsonSerializable 빌드 진입점)
+  freezed: ^3.2.2             # [Codegen] 불변 데이터 클래스/union/sealed 생성기( *.freezed.dart )
+  json_serializable: ^6.11.1  # [Codegen] JSON (de)serialize 생성기( *.g.dart )
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
-  flutter_lints: ^6.0.0
 
 dependency_overrides:
   # [Compat] fluent_ui의 NumberBox가 사용하는 수식 파서 심볼(ShuntingYardParser)을 제공하기 위해
@@ -111,6 +115,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/
+    - assets/images/404/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
