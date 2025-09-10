@@ -15,12 +15,13 @@ alwaysApply: false
 - `tokens/typography.dart` — **AppTypography**: 텍스트 스타일 토큰(타이틀/본문/캡션/내비).
 - `tokens/breakpoints.dart` — **AppBreakpoints/SizeClass**: 반응형 구간(xs~xl)과 분류 함수.
 - `tokens/colors.dart` — **AppThemeKey/AppColors**: 테마 키(enum)와 라이트/다크/OLED/커스텀 팔레트.
+- `tokens/radius.dart` — **AppRadius/AppShapes**: 반지름 스케일과 의미 기반 모양 프리셋(card/panel/dialog/chip).
+- `responsive/context_breakpoints.dart` — **BuildContext 확장**: `screenWidth`, `isLgUp` 등.
+- `responsive/adaptive_visibility.dart` — **AdaptiveVisibility**: `minWidth/maxWidth`로 표시/숨김.
 - `app_theme.dart` — **AppTheme**: `FluentThemeData` 생성·보관(light/dark/oled/tangerine/claude) + `resolve(key)`.
 - `theme_state.dart` — **Providers**: 설정(themeId)→`selectedThemeKeyProvider`→`resolvedThemeProvider`.
 - `semantic_colors.dart` — **의미색**: info/success/warning/danger/neutral 팔레트 매핑 함수.
 - `theme_previews.dart` — **미리보기/라벨**: `kThemePreviews`, `localizedThemeName`.
-- `responsive/context_breakpoints.dart` — **BuildContext 확장**: `screenWidth`, `isLgUp` 등.
-- `responsive/adaptive_visibility.dart` — **AdaptiveVisibility**: `minWidth/maxWidth`로 표시/숨김.
 - `tokens.dart` — **토큰 배럴**: spacing/typography/breakpoints/colors export.
 - `theme.dart` — **통합 배럴**: 토큰 + 테마 + 프리뷰 + 의미색 + 반응형 헬퍼 일괄 export.
 
@@ -42,6 +43,9 @@ FluentApp(themeMode, theme, darkTheme)
 - **반응형은 의미로 표현**: `context.isLgUp` / `AdaptiveVisibility(minWidth: AppBreakpoints.lg)`.
 - **글꼴/타이포는 토큰으로**: `Text('...', style: AppTypography.sectionTitle)`.
 - **테마 변경은 설정만 수정**: `settingProvider.setThemeId(key.name)` → 앱 전역 자동 반영.
+- **라운드 규칙**:
+    - 기본 반지름은 `AppRadius`(xs/sm/md/lg/xl) 스텝을 따른다.
+    - 컴포넌트별 의미 프리셋은 `AppShapes` 사용(예: 카드= `AppShapes.card`, 다이얼로그= `AppShapes.dialog`).
 
 ## 4) 짧은 예시
 ```dart
@@ -53,6 +57,24 @@ return FluentApp(
   darkTheme: ref.watch(resolvedThemeProvider).dark,
 );
 ````
+
+## 4.1 반지름/모양 예시
+```dart
+Container(
+  decoration: BoxDecoration(
+    color: FluentTheme.of(context).cardColor,
+    borderRadius: AppShapes.card,
+    border: Border.all(color: FluentTheme.of(context).dividerColor),
+  ),
+);
+
+ContentDialogThemeData(
+  decoration: BoxDecoration(
+    color: AppTheme.light.scaffoldBackgroundColor,
+    borderRadius: AppShapes.dialog,
+  ),
+);
+```
 
 ## 5) 새 테마 추가 절차
 
@@ -68,6 +90,8 @@ return FluentApp(
 * [ ] 새 컴포넌트의 여백/폭/높이는 **AppSpacing**을 사용했는가?
 * [ ] 반응형 분기는 **의미 메서드**(`isMdUp` 등)로 표현했는가?
 * [ ] 반복되는 숫자는 **토큰화**했는가?
+* [ ] 라운드는 AppRadius/AppShapes로만 지정했는가? 
+* [ ] 투명도는 withAlpha만 사용했는가?
 * [ ] 테마 라벨은 `localizedThemeName`으로 다국어 표기했는가?
 * [ ] `FluentApp`는 `resolvedThemeProvider`를 통해 연결했는가?
 
@@ -75,4 +99,5 @@ return FluentApp(
 
 * **직렬화**: `themeId → themeKey` 매핑, enum 설정 시 JSON `themeId` 문자열 저장.
 * **Provider**: `settingProvider` 오버라이드로 테마 키를 주입했을 때 `resolvedThemeProvider` 결과 검증.
-* **라벨**: 로케일별 `localizedThemeName`이 기대 문자열인지(Widget 테스트).
+* **라벨**: 로케일별 `localizedThemeName`이 기대 문자열인지(Widget 테스트). 
+* **시각 스냅샷**: Golden에서 폰트 로드 + FluentApp로 감싸고, 라운드/여백은 토큰 값 기준
