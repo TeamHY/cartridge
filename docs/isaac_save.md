@@ -31,7 +31,7 @@ save/
 
 ````
 
-## 2) 서비스 계약 (파사드)
+## 2) 서비스 Interface (파사드)
 ```dart
 class IsaacSaveService {
   IsaacSaveService({required SteamUsersPort users});
@@ -43,7 +43,7 @@ class IsaacSaveService {
 * 에러: 포트 예외는 **rethrow**.
 * 로깅 키: `IsaacSaveService`, `op=findCandidates fn=findSaveCandidates msg=start|done|failed count=<n>`.
 
-## 3) 포트 계약
+## 3) 포트 Interface
 
 ### 3.1 EdenTokensPort
 

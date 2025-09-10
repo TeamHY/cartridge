@@ -25,7 +25,7 @@ alwaysApply: false
 - `infra/users/steam_users_vdf_repository.dart` — **유저 구현**: `%Steam%\config\loginusers.vdf` 파싱 + `%Steam%\userdata\<accountId>\250900\remote` 존재 계정만 반환.
 - `domain/steam_app_urls.dart` — **URL/URI 상수**: 스토어/워크샵/steam 프로토콜.
 - `domain/steam_link_builder.dart` — **링크 빌더**: 스팀 도메인이면 `steam://openurl/<web>`로 감싸기.
-- `domain/steam_links_port.dart` — **링크 포트**: 링크/프로토콜 실행 계약.
+- `domain/steam_links_port.dart` — **링크 포트**: 링크/프로토콜 실행 Interface.
 - `infra/links/steam_url_launcher_adapter.dart` — **런처 어댑터**: `url_launcher`로 `steam://` 또는 `http/https`를 **외부 앱**으로 실행.
 - `application/steam_links_service.dart` — **서비스**: 빌더+런처 오케스트레이션(정상 흐름 로그 없음, 실패만 로그).
 
@@ -67,7 +67,7 @@ alwaysApply: false
 
 ---
 
-## 4) 포트 계약
+## 4) 포트 Interface
 
 ### 4.1 `SteamInstallPort`
 ```dart
