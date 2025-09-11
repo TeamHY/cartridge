@@ -7,7 +7,8 @@ Future<void> pumpGolden(
     WidgetTester tester,
     Widget widget, {
       Size surfaceSize = const Size(800, 600),
+      Duration pump = const Duration(milliseconds: 1),
     }) async {
   await tester.pumpWidgetBuilder(widget, surfaceSize: surfaceSize);
-  await tester.pumpAndSettle();
+  await tester.pump(pump);
 }

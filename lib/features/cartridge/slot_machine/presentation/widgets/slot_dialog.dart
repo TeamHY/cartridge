@@ -203,7 +203,7 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     final sem = ref.watch(themeSemanticsProvider);
 
     return ContentDialog(
@@ -221,7 +221,7 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
           height: 560,
           child: Container(
             decoration: BoxDecoration(
-              color: theme.cardColor,
+              color: fTheme.cardColor,
               borderRadius: AppShapes.dialog,
               border: Border.all(color: sem.neutral.border),
             ),
@@ -326,10 +326,12 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
       ),
       actions: [
         Button(
+          key: const Key('slotdialog-close'),
           onPressed: () => Navigator.pop(context),
           child: Text(loc.common_cancel),
         ),
         FilledButton(
+          key: const Key('slotdialog-apply'),
           onPressed: () {
             final trimmed = _items
                 .map((e) => e.trim())

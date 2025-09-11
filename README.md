@@ -36,7 +36,7 @@
     <a href="https://ohy.kr/toon"><b>Toonation</b></a>
 </p>
 
-![screenshot](assets/images/cartridge-screenshot.png)
+![screenshot](assets/images/screenshots/홈화면.png)
 
 <a id="주요-기능"></a>
 
@@ -47,11 +47,11 @@
 * **프리셋 관리** — 여러 Isaac 모드 조합을 저장/불러오기
 
 <p align="center">
-  <img src = "assets/images/기록모드.png" width=700 alt="기록모드 화면">
+  <img src = "assets/images/screenshots/인스턴스%20화면.png" width=700 alt="기록모드 화면">
 </p>
 
 <p align="center">
-  <img src = "assets/images/슬롯머신.png" width=700 alt="슬롯머신">
+  <img src = "assets/images/screenshots/슬롯머신%20화면.png" width=700 alt="슬롯머신">
 </p>
 
 ---

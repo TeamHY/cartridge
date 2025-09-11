@@ -1,6 +1,21 @@
 {
   "@@locale": "ko",
 
+  "app_name": "Cartridge",
+  "brand_tagline": "아이작 프리셋 매니저 (Windows)",
+
+  "@navigation": {"description": "네비게이션 바"},
+  "navigation_home": "홈",
+  "navigation_instance": "인스턴스",
+  "navigation_content": "컨텐츠",
+  "navigation_slot_machine": "슬롯 머신",
+  "navigation_mod_preset": "모드 프리셋",
+  "navigation_option_preset": "옵션 프리셋",
+  "navigation_settings": "설정",
+
+  "@error": { "description": "앱 시작 단계 오류 화면" },
+  "error_startup_message": "시작 중 문제가 발생했습니다. 다시 시도하거나 창을 닫아 주세요.",
+
   "@home": {
     "description": "홈 화면 UI 전반"
   },
@@ -28,15 +43,19 @@
   "@preset": {
     "description": "프리셋 항목 관련 텍스트"
   },
+  "preset_tab_mod": "모드 프리셋",
+  "preset_tab_window": "옵션 프리셋",
+
   "preset_delete_title": "프리셋 삭제",
   "preset_delete_message": "프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
 
   "@setting": {
     "description": "설정 다이얼로그"
   },
+  "setting_page_title": "설정",
+  "setting_section_basic_title": "기본",
+  "setting_section_basic_desc": "언어와 테마를 선택하세요.",
   "setting_dialog_title": "설정",
-  "setting_isaac_path_label": "아이작 설치 경로",
-  "setting_rerun_delay_label": "재시작 지연시간 (1000 = 1초)",
   "setting_language_label": "언어",
   "setting_language_ko": "한국어",
   "setting_language_en": "English",
@@ -49,6 +68,132 @@
   "setting_theme_tangerine": "Tangerine",
   "setting_theme_claude": "Claude",
 
+  "setting_section_game_title": "게임 설정",
+  "setting_section_detect_and_path_title": "설치/경로",
+  "setting_section_detect_and_path_desc": "설치된 버전을 확인하고 필요한 경로를 설정합니다.",
+  "setting_detect_edition_title": "게임 에디션",
+  "setting_detect_edition_desc": "감지된 에디션 미리보기예요.",
+  "setting_section_game_desc": "아이작 설치 경로와 재실행 지연 시간을 설정합니다.",
+  "setting_isaac_path_label": "아이작 설치 폴더",
+  "setting_path_label": "경로",
+  "setting_tools_title": "도구",
+  "setting_options_ini_path_label": "아이작 options.ini 파일 경로",
+  "setting_rerun_delay_label": "재시작 지연시간 (1000 = 1초)",
+
+  "setting_isaac_path_desc": "실행 파일과 모드가 있는 위치예요.",
+  "setting_use_auto_detect": "자동 검색 사용",
+  "setting_pick_folder": "폴더 선택",
+  "setting_detect_auto": "자동 검색 실행",
+  "setting_isaac_path_help": "직접 폴더를 선택하거나, 앱이 일반적인 Steam 위치에서 찾아 채우도록 할 수 있어요.",
+
+  "setting_steam_tools_label": "스팀 관련 기능",
+  "setting_open_properties": "게임 속성 열기",
+  "setting_verify_integrity": "무결성 검사",
+
+  "setting_detect_path_failed": "탐지 중 오류가 발생했습니다: {error}",
+  "@setting_detect_path_failed": {
+    "description": "탐지 중 에러 stack trace",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "setting_section_detect_preview_title": "자동 감지 미리보기",
+  "setting_section_detect_preview_desc": "탐지된 아이작 게임",
+  "setting_detect_preview_edition": "현재 아이작 에디션",
+  "setting_detect_not_found": "감지되지 않았습니다",
+
+  "setting_saved_desc": "설정이 저장되었습니다.",
+
+  "setting_options_ini_desc": "에디션마다 options.ini 위치가 달라요. 이 파일을 수정합니다.",
+  "setting_pick_file": "파일 선택",
+  "setting_options_ini_help": "options.ini를 직접 지정하거나, 알려진 사용자 폴더에서 자동으로 찾을 수 있어요.",
+
+  "setting_repentogon_section_title": "Repentogon",
+  "setting_repentogon_desc": "아이작 확장 런처/기능 모드입니다. 필요할 때만 설치하세요.",
+  "setting_repentogon_status_title": "설치 상태",
+  "setting_repentogon_open_install_folder": "설치 폴더 열기",
+  "setting_repentogon_open_guide": "설치 방법 보기",
+
+  "steam_tools_section_title": "Steam 도구",
+  "steam_tools_section_desc": "Steam 속성 창을 열거나 무결성 검사를 실행합니다.",
+  "steam_open_properties_title": "속성 열기",
+  "steam_open_properties_desc": "Steam 게임 속성 창을 엽니다. 실행 인자 등을 확인할 수 있어요.",
+  "steam_open_properties_button": "속성 열기",
+  "steam_integrity_check_title": "무결성 검사",
+  "steam_integrity_check_desc": "설치 파일 손상 여부를 확인하고 필요하면 자동으로 복구합니다.",
+  "steam_integrity_check_button": "검사 시작",
+
+  "restart_section_title": "자동 재시작",
+  "restart_section_desc": "모드 적용 후 게임을 다시 시작합니다. 지연이 너무 짧으면 반영이 누락될 수 있어요.",
+  "restart_delay_title": "지연 시간",
+  "restart_delay_desc": "권장 500–3000 ms",
+
+  "setting_section_about_title": "정보",
+  "setting_section_about_desc": "라이선스와 앱 버전을 확인하세요.",
+
+  "setting_validate_required": "필수 항목입니다.",
+  "setting_validate_number_required": "숫자를 입력하세요.",
+  "setting_validate_min_zero": "0ms 이상이어야 합니다.",
+  "setting_validate_max_60s": "최대 60000ms 입니다.",
+
+  "setting_detect_path_fail_title": "설치 폴더를 찾지 못했어요",
+  "setting_detect_path_fail_desc": "설치 경로를 감지하지 못했습니다. 직접 설정해 주세요.",
+  "setting_detect_path_success_title": "설치 폴더를 찾았습니다",
+
+  "setting_detect_options_ini_fail_title": "options.ini를 찾지 못했어요",
+  "setting_detect_options_ini_fail_desc": "options.ini 경로를 감지하지 못했습니다. 파일을 직접 선택해 주세요.",
+
+  "@instance": {
+    "description": "인스턴스 항목 관련 텍스트"
+  },
+  "instance_create_title": "인스턴스 생성",
+  "instance_create_name_label": "인스턴스 이름",
+  "instance_create_name_placeholder": "인스턴스 이름",
+  "instance_create_initial_mode_label": "초기 모드 구성",
+  "instance_create_all_off": "모든 모드를 꺼진 상태로 추가",
+  "instance_create_current_enabled": "현재 켜진 모드만 추가",
+  "instance_create_hint": "모드 프리셋을 불러와서 빠르게 세팅할 수 있어요.",
+  "instance_create_validate_required": "이름을 입력하세요.",
+  "instance_enabled_mods": "프리셋 {preset} │ 모드 {mod}",
+  "instance_search_placeholder": "인스턴스 검색...",
+  "instance_create_button": "인스턴스 생성",
+  "instance_option_preset_label": "옵션 프리셋",
+  "instance_empty_message": "인스턴스를 추가해주세요.",
+  "instance_delete_title": "인스턴스 삭제",
+  "instance_delete_message": "인스턴스를 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
+  "instance_image_change": "이미지 변경",
+  "instance_option_preset_add_label": "옵션 프리셋 추가",
+
+  "@mod_preset": {
+    "description": "모드 프리셋 항목 관련 텍스트"
+  },
+  "mod_preset_search_placeholder": "프리셋 검색...",
+  "mod_preset_create_button": "프리셋 생성",
+  "mod_preset_enabled_mods": "모드 {count}",
+
+  "mod_preset_create_title": "모드 프리셋 생성",
+  "mod_preset_create_name_label": "모드 프리셋 이름",
+  "mod_preset_create_name_placeholder": "모드 프리셋 이름",
+  "mod_preset_create_initial_mode_label": "초기 모드 구성",
+  "mod_preset_create_all_off": "모든 모드를 꺼진 상태로 추가",
+  "mod_preset_create_current_enabled": "현재 켜진 모드만 추가",
+
+  "mod_preset_create_validate_required": "이름을 입력하세요.",
+  "mod_preset_create_hint": "프리셋은 모드 조합을 저장해 빠르게 전환할 수 있어요.",
+
+  "mod_preset_delete_title": "모드 프리셋 삭제",
+  "mod_preset_delete_message": "모드 프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
+
+  "mod_search_placeholder": "모드 검색...",
+  "mod_table_header_favorite": "즐겨찾기",
+  "mod_table_header_name": "이름",
+  "mod_table_header_version": "버전",
+  "mod_table_header_enabled": "활성화",
+  "mod_action_open_folder": "로컬 폴더 열기",
+  "mod_missing_short": "미설치",
+  "mod_local_short": "로컬",
 
   "@game_config": {
     "description": "게임 설정 다이얼로그"
@@ -62,7 +207,42 @@
   "game_config_window_position_title": "창 위치",
   "game_config_window_pos_x_label": "X",
   "game_config_window_pos_y_label": "Y",
-  
+
+  "@option": {
+    "description": "옵션 프리셋 다이얼로그"
+  },
+  "option_preset_fallback_name": "새 프리셋",
+  "option_window_create_title": "옵션 프리셋 생성",
+  "option_window_edit_title": "옵션 프리셋 수정",
+  "option_name_label": "이름",
+  "option_window_fullscreen": "전체화면",
+  "option_window_resolution_recommend": "추천 해상도",
+  "option_window_size_title": "창 크기",
+  "option_window_width_label": "너비",
+  "option_window_height_label": "높이",
+  "option_window_position_title": "창 위치",
+  "option_window_pos_x_label": "X",
+  "option_window_pos_y_label": "Y",
+  "option_advanced_title":  "고급 옵션",
+  "option_gamma_label": "감마",
+  "option_gameplay_title": "게임 플레이",
+  "option_debug_console_label": "디버그 콘솔",
+  "option_pause_on_focus_lost_label": "화면 전환 시 포커스",
+  "option_mouse_control_label": "마우스",
+  "option_use_repentogon_label": "Repentogon",
+
+  "option_window_error_name_required": "프리셋 이름을 입력해 주세요.",
+  "option_window_error_width_range": "가로(px)는 100~4096 사이여야 합니다.",
+  "option_window_error_height_range": "세로(px)는 100~4096 사이여야 합니다.",
+  "option_window_error_posx_range": "X 좌표는 -10000~10000 사이여야 합니다.",
+  "option_window_error_posy_range": "Y 좌표는 -10000~10000 사이여야 합니다.",
+  "option_fullscreen_label": "전체화면",
+  "option_window_label": "창 모드",
+  "option_position_label": "위치",
+  "option_repentogon_label": "Repentogon",
+  "option_search_placeholder": "프리셋 검색...",
+  "option_create_button": "프리셋 생성",
+
   "@nickname": {
     "description": "닉네임 변경 다이얼로그"
   },
@@ -159,6 +339,7 @@
   },
   "common_cancel": "취소",
   "common_save": "저장",
+  "common_saved": "저장 완료",
   "common_search_placeholder": "검색",
   "common_apply": "적용",
   "common_confirm": "확인",
@@ -167,10 +348,26 @@
   "common_close": "닫기",
   "common_update": "변경",
   "common_edit": "수정",
-  "common_start": "시작",
+  "common_reset": "되돌리기",
+  "common_select": "선택",
+  "common_create": "생성",
+  "common_refresh": "새로 고침",
+  "common_duplicate": "복제",
+  "common_duplicate_suffix": "(사본)",
+  "common_none_label": "(없음)",
+  "common_clipboard": "공유(클립보드)",
+  "common_add_favorite": "즐겨찾기",
+  "common_remove_favorite": "즐겨찾기 취소",
+  "common_enable_mod": "모드 활성화",
+  "common_disable_mod": "모드 비활성화",
+  "common_copied": "복사 완료",
+  "common_items_copied": " 개 항목을 복사했습니다.",
+  "common_nothing_selected": "선택된 항목이 없습니다.",
+  "common_copy_failed": "복사에 실패했습니다.",
+  "common_play": "플레이",
   "common_untitled": "제목 없음",
   "common_unknown": "알 수 없음",
-  "common_modified": "수정됨",
+  "common_retry": "다시 시도",
 
   "@mod": {
     "description": "모드 관련 문자열"
@@ -233,7 +430,7 @@
   "character_magdalene": "막달레나",
   "character_cain": "카인",
   "character_judas": "유다",
-  "character_question_mark": "???",
+  "character_blue_baby": "???",
   "character_eve": "이브",
   "character_samson": "삼손",
   "character_azazel": "아자젤",
@@ -254,7 +451,7 @@
   "character_tainted_magdalene": "더럽혀진 막달레나",
   "character_tainted_cain": "더럽혀진 카인",
   "character_tainted_judas": "더럽혀진 유다",
-  "character_tainted_question_mark": "더럽혀진 ???",
+  "character_tainted_blue_baby": "더럽혀진 ???",
   "character_tainted_eve": "더럽혀진 이브",
   "character_tainted_samson": "더럽혀진 삼손",
   "character_tainted_azazel": "더럽혀진 아자젤",
@@ -270,5 +467,15 @@
   "character_tainted_lazarus2": "더럽혀진 나사로2",
   "character_tainted_jacob2": "더럽혀진 야곱2",
   "character_tainted_the_soul": "더럽혀진 더 소울",
-  "character_unknown": "알 수 없음"
+  "character_unknown": "알 수 없음",
+
+  "@record_goal": { "description": "기록 모드 목표" },
+  "record_goal_perfection": "A+",
+  "record_goal_mom": "엄마 발",
+  "record_goal_blue_baby": "???",
+  "record_goal_mother": "마더",
+  "record_goal_mega_satan": "메가 사탄",
+  "record_goal_the_lamb": "어린양(The Lamb)",
+  "record_goal_the_beast": "비스트",
+  "record_goal_delirium": "델리리움"
 }

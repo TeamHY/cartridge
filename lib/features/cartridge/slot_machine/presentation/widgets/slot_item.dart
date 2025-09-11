@@ -17,15 +17,15 @@ class SlotItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = FluentTheme.of(context);
-    final sem = ref.watch(themeSemanticsProvider); // AppSemanticColors
+    final fTheme = FluentTheme.of(context);
+    final sem = ref.watch(themeSemanticsProvider);
 
     return Container(
       width: width,
       height: height,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: fTheme.cardColor,
         borderRadius: AppShapes.card,
         border: Border.all(
           color: sem.neutral.border,

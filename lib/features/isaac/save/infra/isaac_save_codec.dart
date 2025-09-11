@@ -40,7 +40,7 @@ class IsaacSaveCodec {
   int readEdenTokens(Uint8List data, {int? section1Offset}) {
     final s1 = section1Offset ?? _getSectionOffsets(data)[1];
     final ofs = s1 + 0x4 + 0x50;
-    return _getUint32LE(data, ofs); // ← 32비트 읽기로 복원
+    return _getUint32LE(data, ofs);
   }
   /// Writes **Eden Tokens** (`UInt32 LE`) at:
   /// `absolute = section[1] + 0x04 + 0x50`.
@@ -51,7 +51,7 @@ class IsaacSaveCodec {
     final out = Uint8List.fromList(data);
     final s1 = section1Offset ?? _getSectionOffsets(out)[1];
     final ofs = s1 + 0x4 + 0x50;
-    _setUint32LE(out, ofs, eden & 0xFFFFFFFF); // ← 32비트 쓰기 복원
+    _setUint32LE(out, ofs, eden & 0xFFFFFFFF);
     return out;
   }
 

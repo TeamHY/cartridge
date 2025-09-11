@@ -1,0 +1,1 @@
+enum ChallengeType { daily, weekly }

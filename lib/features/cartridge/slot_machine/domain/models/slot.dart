@@ -1,6 +1,3 @@
-/// lib/features/cartridge/slot_machine/domain/models/slot.dart
-library;
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'slot.freezed.dart';

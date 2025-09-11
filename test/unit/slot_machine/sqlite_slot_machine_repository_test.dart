@@ -5,11 +5,9 @@ import 'package:cartridge/features/cartridge/slot_machine/data/sqlite_slot_machi
 import 'package:cartridge/features/cartridge/slot_machine/domain/models/slot.dart';
 
 Future<Database> _openInMemory() async {
-  // FFI 초기화
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
+  final factory = databaseFactoryFfi;
 
-  final db = await databaseFactory.openDatabase(inMemoryDatabasePath,
+  final db = await factory.openDatabase(inMemoryDatabasePath,
       options: OpenDatabaseOptions(
         version: 1,
         onCreate: (db, v) async {
@@ -32,6 +30,9 @@ Future<Database> _openInMemory() async {
 }
 
 void main() {
+  setUpAll(() {
+    sqfliteFfiInit();
+  });
   group('SqliteSlotMachineRepository — 인메모리 DB', () {
     late Database db;
     late SqliteSlotMachineRepository repo;

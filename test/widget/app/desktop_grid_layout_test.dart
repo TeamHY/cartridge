@@ -1,4 +1,4 @@
-import 'package:cartridge/app/presentation/widgets/desktop_grid.dart';
+import 'package:cartridge/app/presentation/desktop_grid.dart';
 import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_test/flutter_test.dart';

@@ -2,9 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/theme/theme.dart';
-import 'package:cartridge/widgets/quick_bar.dart';
 
 /// 상단 헤더를 생성한다.
 ///
@@ -36,24 +34,13 @@ NavigationAppBar buildNavigationAppBar(BuildContext context, WidgetRef ref) {
     ),
     actions: Row(
       children: [
-        if (context.isLgUp) ...[
-          const Spacer(),
-          const QuickBar(),
-        ],
         const Spacer(),
-        IconButton(
-          icon: const Icon(FluentIcons.refresh, size: 16),
-          onPressed: () {
-            final store = ref.read(storeProvider);
-            store.reloadMods();
-          },
-        ),
-        Gaps.w4,
-        const SizedBox(
+        SizedBox(
           width: 138,
           height: AppSpacing.appBarHeight,
           child: WindowCaption(
             backgroundColor: Colors.transparent,
+            brightness: fTheme.brightness,
           ),
         ),
       ],

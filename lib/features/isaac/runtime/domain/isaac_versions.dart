@@ -1,6 +1,3 @@
-/// lib/core/constants/isaac_versions.dart
-library;
-
 import 'package:cartridge/features/isaac/runtime/domain/isaac_steam_ids.dart';
 
 /// Isaac 에디션(본편/각 DLC) 식별자.

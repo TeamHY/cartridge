@@ -106,7 +106,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
 
     final sem = ref.watch(themeSemanticsProvider);
 
@@ -124,7 +124,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
     final double contentWidth = panelWidth - unit * 2; // 좌우 여백 고려
     final double viewportHeight = itemExtent * 2.8;
 
-    final dividerColor = theme.dividerColor;
+    final dividerColor = fTheme.dividerColor;
 
     // 글로벌 스핀 트리거
     final tick = ref.watch(spinAllTickProvider);
@@ -192,7 +192,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
                             opacity: _hover ? 1 : 0,
                             child: Container(
                               decoration: BoxDecoration(
-                                color: theme.cardColor.withAlpha(220),
+                                color: fTheme.cardColor.withAlpha(220),
                                 border: Border.all(color: dividerColor),
                               ),
                             ),

@@ -1,5 +1,20 @@
 {
   "@@locale": "en",
+  "@app": {"description": "Root-level strings & metadata. Keep domain strings in split ARBs."},
+  "app_name": "Cartridge",
+  "brand_tagline": "Isaac preset manager for Windows",
+
+  "@navigation": {"description": "Navigation bar labels"},
+  "navigation_home": "Home",
+  "navigation_instance": "Instance",
+  "navigation_content": "Content",
+  "navigation_slot_machine": "Slot Machine",
+  "navigation_mod_preset": "Mod Preset",
+  "navigation_option_preset": "Option Preset",
+  "navigation_settings": "Settings",
+
+  "@error": { "description": "Error screen shown during app startup" },
+  "error_startup_message": "Something went wrong during startup. Try again or close the app.",
 
   "@home": {
     "description": "Home screen UI"
@@ -28,15 +43,19 @@
   "@preset": {
     "description": "Preset item related texts"
   },
+  "preset_tab_mod": "Mod Presets",
+  "preset_tab_window": "Option Presets",
+
   "preset_delete_title": "Delete Preset",
   "preset_delete_message": "Deleting a preset cannot be undone. Are you sure you want to continue?",
 
   "@setting": {
     "description": "Settings Dialog"
   },
+  "setting_page_title": "Settings",
+  "setting_section_basic_title": "Basic",
+  "setting_section_basic_desc": "Choose language and theme.",
   "setting_dialog_title": "Settings",
-  "setting_isaac_path_label": "Isaac installation path",
-  "setting_rerun_delay_label": "Restart delay (1000 = 1 second)",
   "setting_language_label": "Language",
   "setting_language_ko": "Korean",
   "setting_language_en": "English",
@@ -48,6 +67,134 @@
   "setting_theme_system": "Sync with system",
   "setting_theme_tangerine": "Tangerine",
   "setting_theme_claude": "Claude",
+
+  "setting_section_game_title": "Game",
+  "setting_section_detect_and_path_title": "Install & Paths",
+  "setting_section_detect_and_path_desc": "Check your installed edition and set required paths.",
+  "setting_detect_edition_title": "Game Edition",
+  "setting_detect_edition_desc": "Detected edition preview.",
+  "setting_section_game_desc": "Set Isaac install path and relaunch delay.",
+  "setting_isaac_path_label": "Isaac Install Folder",
+  "setting_path_label": "Path",
+  "setting_tools_title": "tools",
+  "setting_options_ini_path_label": "Isaac Options.ini path",
+  "setting_rerun_delay_label": "Restart delay (1000 = 1 second)",
+
+  "setting_isaac_path_desc": "Where the executable and mods are located.",
+  "setting_use_auto_detect": "Use auto detect",
+  "setting_pick_folder": "Choose folder",
+  "setting_detect_auto": "Auto detect",
+  "setting_isaac_path_help": "Pick the folder manually or let the app search common Steam locations.",
+
+  "setting_steam_tools_label": "Steam tools",
+  "setting_open_properties": "Open Game Properties",
+  "setting_verify_integrity": "Verify Integrity",
+
+  "setting_detect_path_failed": "An error occurred during detection: {error}",
+  "@setting_detect_path_failed": {
+    "description": "error message when detecting path failed",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "setting_section_detect_preview_title": "Auto-detection preview",
+  "setting_section_detect_preview_desc": "Detected Isaac",
+  "setting_detect_preview_edition": "Current edition",
+  "setting_detect_not_found": "Not found",
+
+  "setting_saved_desc": "Settings have been saved.",
+
+  "setting_options_ini_desc": "The options.ini path differs by edition. This file will be edited.",
+  "setting_pick_file": "Choose file",
+  "setting_options_ini_help": "Select options.ini manually or search known user folders automatically.",
+
+  "setting_repentogon_section_title": "Repentogon",
+  "setting_repentogon_desc": "An extended launcher/features mod. Install only if needed.",
+  "setting_repentogon_status_title": "Status",
+  "setting_repentogon_open_install_folder": "Open install folder",
+  "setting_repentogon_open_guide": "View install guide",
+
+  "steam_tools_section_title": "Steam Tools",
+  "steam_tools_section_desc": "Open Steam properties or run integrity check.",
+  "steam_open_properties_title": "Open Properties",
+  "steam_open_properties_desc": "Opens the Steam game properties window. You can review launch options.",
+  "steam_open_properties_button": "Open Properties",
+  "steam_integrity_check_title": "Verify Integrity",
+  "steam_integrity_check_desc": "Checks for corrupted files and restores them if needed.",
+  "steam_integrity_check_button": "Start Check",
+
+  "restart_section_title": "Auto Restart",
+  "restart_section_desc": "Restarts the game after applying mods. Too short delay may skip changes.",
+  "restart_delay_title": "Delay",
+  "restart_delay_desc": "Recommended 500–3000 ms",
+
+  "setting_section_about_title": "About",
+  "setting_section_about_desc": "Check licenses and app version.",
+
+  "setting_validate_required": "This field is required.",
+  "setting_validate_number_required": "Enter a number.",
+  "setting_validate_min_zero": "Must be 0 or greater.",
+  "setting_validate_max_60s": "Maximum is 60000 ms.",
+
+  "setting_detect_path_fail_title": "Install folder not found",
+  "setting_detect_path_fail_desc": "Couldn’t detect the install path. Please set it manually.",
+  "setting_detect_path_success_title": "Install folder detected",
+
+  "setting_detect_options_ini_fail_title": "options.ini not found",
+  "setting_detect_options_ini_fail_desc": "Couldn’t detect options.ini. Please select the file manually.",
+
+
+  "@instance": {
+    "description": "Instance item related texts"
+  },
+  "instance_create_title": "Create instance",
+  "instance_create_name_label": "Instance name",
+  "instance_create_name_placeholder": "Instance name",
+  "instance_create_initial_mode_label": "Initial mod setup",
+  "instance_create_all_off": "Add all mods as off",
+  "instance_create_current_enabled": "Add only currently enabled mods",
+  "instance_create_hint": "모드 프리셋을 불러와서 빠르게 세팅할 수 있어요.",
+  "instance_create_validate_required": "Please enter a name.",
+  "instance_enabled_mods": "{preset} PRESET｜{mod} MOD",
+  "instance_search_placeholder": "Search instances...",
+  "instance_create_button": "Create instance",
+  "instance_option_preset_label": "Option preset",
+  "instance_empty_message": "No instances found.",
+  "instance_delete_title": "Delete Instance",
+  "instance_delete_message": "Deleting a instance cannot be undone. Are you sure you want to continue?",
+  "instance_image_change": "Change image",
+  "instance_option_preset_add_label": "Add Option preset",
+
+  "@mod_preset": {
+    "description": "Mod Preset item related texts"
+  },
+  "mod_preset_search_placeholder": "Search presets...",
+  "mod_preset_create_button": "Create preset",
+  "mod_preset_enabled_mods": "{count} MODS",
+
+  "mod_preset_create_title": "Create Mod Preset",
+  "mod_preset_create_name_label": "Mod Preset name",
+  "mod_preset_create_name_placeholder": "Mod Preset name",
+  "mod_preset_create_initial_mode_label": "Initial mod setup",
+  "mod_preset_create_all_off": "Add all mods as off",
+  "mod_preset_create_current_enabled": "Add only currently enabled mods",
+
+  "mod_preset_create_validate_required": "Please enter a name.",
+  "mod_preset_create_hint": "Presets save a set of mods so you can switch quickly.",
+
+  "mod_preset_delete_title": "Delete Mod Preset",
+  "mod_preset_delete_message": "Deleting a mod preset cannot be undone. Are you sure you want to continue?",
+
+  "mod_search_placeholder": "Search mods...",
+  "mod_table_header_favorite": "Favorites",
+  "mod_table_header_name": "Name",
+  "mod_table_header_version": "Version",
+  "mod_table_header_enabled": "Enabled",
+  "mod_action_open_folder": "Open local folder",
+  "mod_missing_short": "MISSING",
+  "mod_local_short": "LOCAL",
 
   "@game_config": {
     "description": "Game Config Dialog"
@@ -61,6 +208,41 @@
   "game_config_window_position_title": "Window Position",
   "game_config_window_pos_x_label": "X",
   "game_config_window_pos_y_label": "Y",
+
+  "@option": {
+    "description": "Option Preset Dialog"
+  },
+  "option_preset_fallback_name": "New Preset",
+  "option_window_create_title": "Create Option Preset",
+  "option_window_edit_title": "Edit Option Preset",
+  "option_name_label": "Name",
+  "option_window_fullscreen": "Fullscreen",
+  "option_window_resolution_recommend": "Recommended Monitor display resolution",
+  "option_window_size_title": "Window Size",
+  "option_window_width_label": "Width",
+  "option_window_height_label": "Height",
+  "option_window_position_title": "Window Position",
+  "option_window_pos_x_label": "X",
+  "option_window_pos_y_label": "Y",
+  "option_advanced_title":  "Advanced options",
+  "option_gamma_label": "Gamma",
+  "option_gameplay_title": "Gameplay",
+  "option_debug_console_label": "Debug Console",
+  "option_pause_on_focus_lost_label": "Pause on focus lost",
+  "option_mouse_control_label": "Mouse Control",
+  "option_use_repentogon_label": "Repentogon",
+
+  "option_window_error_name_required": "Please enter a preset name.",
+  "option_window_error_width_range": "Width (px) must be between 100 and 4096.",
+  "option_window_error_height_range": "Height (px) must be between 100 and 4096.",
+  "option_window_error_posx_range": "X must be between -10000 and 10000.",
+  "option_window_error_posy_range": "Y must be between -10000 and 10000.",
+  "option_fullscreen_label": "Fullscreen",
+  "option_window_label": "Window",
+  "option_position_label": "Position",
+  "option_repentogon_label": "Repentogon",
+  "option_search_placeholder": "Search presets...",
+  "option_create_button": "Create preset",
 
   "@nickname": {
     "description": "Nickname edit dialog"
@@ -158,6 +340,7 @@
   },
   "common_cancel": "Cancel",
   "common_save": "Save",
+  "common_saved": "Saved",
   "common_search_placeholder": "Search",
   "common_apply": "Apply",
   "common_confirm": "Confirm",
@@ -166,10 +349,26 @@
   "common_close": "Close",
   "common_update": "Update",
   "common_edit": "Edit",
-  "common_start": "Start",
+  "common_reset": "Reset",
+  "common_select": "Select",
+  "common_create": "Create",
+  "common_refresh": "Refresh",
+  "common_duplicate": "Duplicate",
+  "common_duplicate_suffix": "(copy)",
+  "common_none_label": "(NONE)",
+  "common_clipboard": "Share to Clipboard",
+  "common_add_favorite": "Favorites",
+  "common_remove_favorite": "Not Favorites",
+  "common_enable_mod": "Enable",
+  "common_disable_mod": "Disable",
+  "common_copied": "Copied",
+  "common_items_copied": " items copied.",
+  "common_nothing_selected": "No items selected.",
+  "common_copy_failed": "Copy failed.",
+  "common_play": "Play",
   "common_untitled": "Untitled",
   "common_unknown": "Unknown",
-  "common_modified": "Modified",
+  "common_retry": "Retry",
 
   "@mod": {
     "description": "Mod related strings"
@@ -232,7 +431,7 @@
   "character_magdalene": "Magdalene",
   "character_cain": "Cain",
   "character_judas": "Judas",
-  "character_question_mark": "???",
+  "character_blue_baby": "???",
   "character_eve": "Eve",
   "character_samson": "Samson",
   "character_azazel": "Azazel",
@@ -253,7 +452,7 @@
   "character_tainted_magdalene": "Tainted Magdalene",
   "character_tainted_cain": "Tainted Cain",
   "character_tainted_judas": "Tainted Judas",
-  "character_tainted_question_mark": "Tainted ???",
+  "character_tainted_blue_baby": "Tainted ???",
   "character_tainted_eve": "Tainted Eve",
   "character_tainted_samson": "Tainted Samson",
   "character_tainted_azazel": "Tainted Azazel",
@@ -269,5 +468,15 @@
   "character_tainted_lazarus2": "Tainted Lazarus Risen",
   "character_tainted_jacob2": "Tainted Jacob 2",
   "character_tainted_the_soul": "Tainted Soul",
-  "character_unknown": "Unknown"
+  "character_unknown": "Unknown",
+
+  "@record_goal": { "description": "Record mode goal" },
+  "record_goal_perfection": "Perfection",
+  "record_goal_mom": "Mom",
+  "record_goal_blue_baby": "???",
+  "record_goal_mother": "Mother",
+  "record_goal_mega_satan": "Mega Satan",
+  "record_goal_the_lamb": "The Lamb",
+  "record_goal_the_beast": "The beast",
+  "record_goal_delirium": "Delirium"
 }

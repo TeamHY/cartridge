@@ -1,4 +1,3 @@
-// lib/theme/tokens/radius.dart
 import 'package:flutter/widgets.dart';
 
 /// 반지름 토큰 (디자인 시스템 공통)

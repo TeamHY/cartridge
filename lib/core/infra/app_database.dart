@@ -1,6 +1,3 @@
-// lib/core/infra/app_database.dart
-library;
-
 import 'dart:io' as io;
 
 import 'package:sqflite/sqlite_api.dart';
@@ -189,7 +186,7 @@ Future<Database> appDatabase() {
 
 
 
-String _systemLanguageCode() {                 // ← 추가
+String _systemLanguageCode() {                 
   final raw = (io.Platform.localeName).toLowerCase();
   final code = raw.split(RegExp(r'[_\-.]')).first;
   const supported = {'ko', 'en'};

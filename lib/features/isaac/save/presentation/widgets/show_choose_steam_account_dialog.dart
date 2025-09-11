@@ -78,8 +78,8 @@ class _AccountTileState extends State<_AccountTile> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
-    final accent = theme.accentColor;
+    final fTheme = FluentTheme.of(context);
+    final accent = fTheme.accentColor;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -101,14 +101,14 @@ class _AccountTileState extends State<_AccountTile> {
                 borderRadius: BorderRadius.circular(_r),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.shadowColor.withAlpha(shadowOpacity),
+                    color: fTheme.shadowColor.withAlpha(shadowOpacity),
                     blurRadius: 10 + 8 * t,
                     offset: Offset(0, 4 + 2 * t),
                   ),
                 ],
               ),
               child: Acrylic(
-                tint: theme.micaBackgroundColor,
+                tint: fTheme.micaBackgroundColor,
                 luminosityAlpha: 0.0,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(_r)),
@@ -136,7 +136,7 @@ class _AccountTileState extends State<_AccountTile> {
                           )
                               : Container(
                             width: 40, height: 40,
-                            color: theme.resources.systemFillColorSolidNeutralBackground,
+                            color: fTheme.resources.systemFillColorSolidNeutralBackground,
                             alignment: Alignment.center,
                             child: const Icon(FluentIcons.contact, size: 20),
                           ),
@@ -152,7 +152,7 @@ class _AccountTileState extends State<_AccountTile> {
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color: Color.lerp(
-                                theme.resources.textFillColorPrimary,
+                                fTheme.resources.textFillColorPrimary,
                                 accent,
                                 0.15 * t,
                               ),
@@ -168,7 +168,7 @@ class _AccountTileState extends State<_AccountTile> {
                             child: Icon(
                               FluentIcons.chevron_right,
                               size: 10,
-                              color: theme.resources.textFillColorPrimary,
+                              color: fTheme.resources.textFillColorPrimary,
                             ),
                           ),
                         ),

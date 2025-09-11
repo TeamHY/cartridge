@@ -1,7 +1,10 @@
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart' show rootBundle;
+
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
-import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Fluent + Localizations + ProviderScope를 한번에 세팅하는 테스트 호스트.
 /// needButton을 켜면 중앙에 Button('Open')을 렌더링하고, onOpen을 눌렀을 때 호출한다.
@@ -74,5 +77,67 @@ class FluentTestHost extends ConsumerWidget {
         home: home,
       ),
     );
+  }
+}
+
+
+/// 골든/위젯 테스트용: Navigator/Route 없이 최소 환경만 제공
+class FluentBareHost extends StatelessWidget {
+  const FluentBareHost({
+    super.key,
+    required this.child,
+    this.themeKey = AppThemeKey.light,
+    this.locale = const Locale('en'),
+    this.disableAnimations = true,
+    this.assetBundle,
+  });
+
+  final Widget child;
+  final AppThemeKey themeKey;
+  final Locale locale;
+  final bool disableAnimations;
+  final AssetBundle? assetBundle;
+
+  @override
+  Widget build(BuildContext context) {
+    final resolved = AppTheme.resolve(themeKey);
+    final theme = resolved.mode == ThemeMode.dark ? resolved.dark : resolved.light;
+
+    Widget core = Directionality(
+      textDirection: TextDirection.ltr,
+      child: FluentTheme(
+        data: theme,
+        child: DefaultTextStyle(
+          style: theme.typography.body ?? const TextStyle(),
+          child: child,
+        ),
+      ),
+    );
+
+    core = DefaultAssetBundle(
+      bundle: assetBundle ?? rootBundle,
+      child: core,
+    );
+
+    Widget tree = MediaQuery(
+      data: const MediaQueryData(size: Size(900, 600), devicePixelRatio: 1.0),
+      child: Localizations(
+        locale: locale,
+        delegates: const [
+          AppLocalizations.delegate,
+          FluentLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          DefaultWidgetsLocalizations.delegate,
+        ],
+        child: core,
+      ),
+    );
+
+    if (disableAnimations) {
+      tree = TickerMode(enabled: false, child: tree);
+    }
+    return tree;
   }
 }

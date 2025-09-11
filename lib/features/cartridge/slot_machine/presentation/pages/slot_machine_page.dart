@@ -2,8 +2,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'package:cartridge/app/presentation/widgets/content_scaffold.dart';
-import 'package:cartridge/app/presentation/widgets/empty_state.dart';
+import 'package:cartridge/app/presentation/content_scaffold.dart';
+import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:cartridge/features/cartridge/slot_machine/slot_machine.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
@@ -64,7 +64,7 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
   }
 
   Widget _addSlotButton(BuildContext context, {bool large = false, required bool left}) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     final sem = ref.watch(themeSemanticsProvider);
     final loc = AppLocalizations.of(context);
 
@@ -82,7 +82,7 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
           onPressed: () => _onAddSlot(left: left),
           style: ButtonStyle(
             padding: WidgetStateProperty.all(EdgeInsets.zero),
-            backgroundColor: WidgetStateProperty.all(theme.cardColor),
+            backgroundColor: WidgetStateProperty.all(fTheme.cardColor),
             shape: WidgetStateProperty.all(RoundedRectangleBorder(
               borderRadius: AppShapes.chip,
             )),

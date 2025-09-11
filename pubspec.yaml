@@ -32,46 +32,55 @@ dependencies:
     sdk: flutter
 
   # ── UI / Desktop ────────────────────────────────────────────────────────────
-  fluent_ui: ^4.7.7           # [UI] 데스크톱 Fluent 컴포넌트(예: NavigationView, Pane, InfoBar)
-  window_manager: ^0.5.1      # [Desktop] 창 컨트롤/캡션/드래그 영역 등 윈도우 관리
-  url_launcher: ^6.1.12       # [Platform] 외부 링크/앱 열기(워크샵, 문서 등)
+  fluent_ui: ^4.7.7                 # [UI] 데스크톱 Fluent 컴포넌트(예: NavigationView, Pane, InfoBar)
+  flutter_reorderable_grid_view: ^5.5.1  # [UI] 그리드 재정렬 위젯(프리셋/모드 카드 재배치)
+  window_manager: ^0.5.1            # [Desktop] 창 컨트롤/캡션/드래그 영역 등 윈도우 관리
+  url_launcher: ^6.1.12             # [Platform] 외부 링크/앱 열기(워크샵, 문서 등)
+  gpt_markdown: ^1.1.4              # [UI] 마크다운 렌더러(도움말/릴리즈노트 등)
 
   # ── State / Config ──────────────────────────────────────────────────────────
-  flutter_riverpod: ^2.3.6    # [State] 전역 상태/DI(예: storeProvider)
-  flutter_dotenv: ^6.0.0      # [Config] .env 로드(키/엔드포인트 분리)
+  flutter_riverpod: ^2.3.6          # [State] 전역 상태/DI(예: storeProvider)
+  flutter_dotenv: ^6.0.0            # [Config] .env 로드(키/엔드포인트 분리)
 
   # ── Filesystem / IO ─────────────────────────────────────────────────────────
-  path_provider: ^2.0.15      # [FS] 앱/문서 디렉터리 경로 획득(모드 스캔, 프리셋 저장)
-  file_picker: ^10.3.2        # [FS/UI] 파일·폴더 선택(예: 아이작 설치 경로 지정)
-  tailf: ^1.1.0               # [Logs] 파일 실시간 tail(기록 모드 로그 리딩)
-  path: ^1.9.1                # [FS/Path] 경로 조작(join, basename 등). 런타임에서 저장 경로/파일명 계산에 사용.
+  path_provider: ^2.0.15            # [FS] 앱/문서 디렉터리 경로 획득(모드 스캔, 프리셋 저장)
+  file_selector: ^1.0.3             # [FS/UI] 플랫폼 파일/폴더 선택(네이티브 다이얼로그)
+  tailf: ^1.1.0                     # [Logs] 파일 실시간 tail(기록 모드 로그 리딩)
+  path: ^1.9.1                      # [FS/Path] 경로 조작(join, basename 등). 런타임에서 저장 경로/파일명 계산에 사용.
 
   # ── Networking / Backend ────────────────────────────────────────────────────
-  http: ^1.1.0                # [Net] REST 호출(업데이트 체크, 서버 연동 등)
-  supabase_flutter: ^2.8.1    # [Backend] Supabase 인증/스토리지/DB 연동
+  http: ^1.1.0                      # [Net] REST 호출(업데이트 체크, 서버 연동 등)
+  supabase_flutter: ^2.10.0         # [Backend] Supabase 인증/스토리지/DB 연동
 
   # ── Parsing / Data Utils ────────────────────────────────────────────────────
-  xml: ^6.3.0                 # [Parsing] 모드 metadata.xml 파싱
-  html: ^0.15.4               # [Parsing] HTML 파싱/스크래핑(필요 시)
-  pub_semver: ^2.1.4          # [Util] 버전 비교/범위 처리(앱/모드 버전 판단)
-  uuid: ^4.2.2                # [Util] 고유 ID 생성(프리셋/엔트리 키 등)
-  meta: ^1.16.0               # [Lang] @immutable/@sealed 등 애노테이션. 컴파일 타임 힌트(런타임 오버헤드 없음)
-  json_annotation: ^4.9.0     # [SerDe] JsonSerializable와 함께 쓰는 런타임 애노테이션(@JsonSerializable 등)
-  freezed_annotation: ^3.1.0  # [Codegen] Freezed 모델이 import하는 애노테이션(@freezed 등). 런타임 의존.
+  xml: ^6.3.0                       # [Parsing] 모드 metadata.xml 파싱
+  html: ^0.15.4                     # [Parsing] HTML 파싱/스크래핑(필요 시)
+  pub_semver: ^2.1.4                # [Util] 버전 비교/범위 처리(앱/모드 버전 판단)
+  uuid: ^4.2.2                      # [Util] 고유 ID 생성(프리셋/엔트리 키 등)
+  meta: ^1.16.0                     # [Lang] @immutable/@sealed 등 애노테이션. 컴파일 타임 힌트(런타임 오버헤드 없음)
+  json_annotation: ^4.9.0           # [SerDe] JsonSerializable와 함께 쓰는 런타임 애노테이션(@JsonSerializable 등)
+  freezed_annotation: ^3.1.0        # [Codegen] Freezed 모델이 import하는 애노테이션(@freezed 등). 런타임 의존.타임 의존.
+  collection: ^1.19.1               # [Lang/Util] 확장 컬렉션 유틸(equality, groupBy 등)
 
   # ── Features / Misc ─────────────────────────────────────────────────────────
-  roulette: ^0.2.0            # [Feature] 슬롯머신 룰렛(랜덤 회전)
-  week_of_year: ^2.2.0        # [Date] 주차 계산(데일리런/통계 등)
+  roulette: ^0.2.0                  # [Feature] 슬롯머신 룰렛(랜덤 회전)
+  week_of_year: ^2.2.0              # [Date] 주차 계산(데일리런/통계 등)
 
   # ── i18n ────────────────────────────────────────────────────────────────────
   flutter_localizations:
-    sdk: flutter              # [i18n] 플러터 기본 현지화 지원
-  intl: ^0.20.2               # [i18n] 날짜·숫자 포맷
+    sdk: flutter                    # [i18n] 플러터 기본 현지화 지원
+  intl: ^0.20.2                     # [i18n] 날짜·숫자 포맷
+  characters: ^1.4.0                # [i18n] 유니코드 문자 경계 처리(다국어 타이틀 파싱 안정성)
 
   # ── Platform / Windows ──────────────────────────────────────────────────────
-  win32_registry: ^2.1.0      # [Windows] 레지스트리 조회(예: Steam 설치 경로 탐색). 런타임 의존.
-  sqflite: ^2.4.2             # [DB] 로컬 SQLite 액세스(설정/캐시/슬롯 데이터 등)
-  sqflite_common_ffi: ^2.3.6
+  win32_registry: ^2.1.0            # [Windows] 레지스트리 조회(예: Steam 설치 경로 탐색). 런타임 의존.
+  sqflite: ^2.4.2                   # [DB] 로컬 SQLite 액세스(설정/캐시/슬롯 데이터 등)
+  sqflite_common_ffi: ^2.3.6        # [DB/Desktop] SQLite FFI(Windows/macOS/Linux) — 데스크톱에서 sqflite 대체 백엔드
+  super_clipboard: ^0.9.1           # [Clipboard] 선택한 모드 목록을 클립보드로 공유
+
+  # ── Media / Cache ───────────────────────────────────────────────────────────
+  crypto: ^3.0.6                    # 이미지 캐싱 할때 해싱으로 사용
+  image: ^4.5.4                     # 이미지 캐싱할때 용량 최적화를 위해 이미지 축소하는 기능에 사용하는 패키지
 
 
 dev_dependencies:
@@ -95,7 +104,6 @@ dependency_overrides:
   # - 배경: fluent_ui >= 4.12.0 경로(예: NumberBox.allowExpressions)에서 해당 심볼 필요
   # - 메모: 상위 패키지들이 의존성 정리 후에는 이 override를 제거할 수 있습니다.
   math_expressions: ^3.1.0
-  #collection: ^1.19.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -109,14 +117,17 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
   assets:
+    - .env
+    - assets/content/
     - assets/images/
     - assets/images/404/
-    - .env
+    - assets/images/characters/
+    - assets/images/contents/
+    - assets/images/editions/
+    - assets/images/promo/
+    - assets/images/record_goal/
+    - assets/images/screenshots/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

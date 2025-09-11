@@ -21,7 +21,7 @@ Future<void> _openDialog(WidgetTester tester, Widget dialog) async {
   ));
   await tester.pump(); // 첫 프레임
   await tester.tap(find.text('Open'));
-  await tester.pump(const Duration(milliseconds: 250)); // 오픈 애니메이션 소화
+  await tester.pump(const Duration(milliseconds: 350)); // 오픈 애니메이션 소화
 }
 
 void main() {
@@ -91,9 +91,15 @@ void main() {
     // 핵심은 위젯이 살아 있고 상호작용 가능한지 스모크 검증으로 대체.
     expect(find.byType(SlotDialog), findsOneWidget);
 
-    // 닫기
-    await tester.tap(find.byType(Button).first);
-    await tester.pump(const Duration(milliseconds: 200));
+    final closeBtn = find.descendant(
+      of: find.byType(SlotDialog),
+      matching: find.byType(Button),
+    ).first;
+
+    await tester.ensureVisible(closeBtn);
+
+    await tester.tap(closeBtn, warnIfMissed: false);
+    await tester.pump(const Duration(milliseconds: 250));
   });
 
   testWidgets('SlotDialog — 여러 줄 붙여넣기 시 각 줄이 새 행으로 분배된다 (로직 경로 스모크)', (tester) async {
@@ -117,8 +123,10 @@ void main() {
     expect(find.byType(TextBox), findsNWidgets(4));
 
     // 닫기
-    await tester.tap(find.byType(Button).first);
-    await tester.pump(const Duration(milliseconds: 200));
+    final closeBtn = find.byKey(const Key('slotdialog-close'));
+    await tester.ensureVisible(closeBtn);
+    await tester.tap(closeBtn);
+    await tester.pump(const Duration(milliseconds: 250));
   });
 
 }

@@ -2,24 +2,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 import 'package:cartridge/core/infra/app_database.dart';
+import 'package:cartridge/features/cartridge/instances/instances.dart';
+import 'package:cartridge/features/cartridge/mod_presets/mod_presets.dart';
+import 'package:cartridge/features/cartridge/option_presets/option_presets.dart';
+import 'package:cartridge/features/cartridge/record_mode/domain/models/auth_user.dart' as cartridge;
+import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
+import 'package:cartridge/features/cartridge/runtime/application/isaac_launcher_service.dart';
+import 'package:cartridge/features/cartridge/setting/setting.dart';
 import 'package:cartridge/features/cartridge/slot_machine/slot_machine.dart';
-import 'package:cartridge/features/isaac/runtime/domain/isaac_versions.dart';
-import 'package:cartridge/features/isaac/save/application/isaac_save_service.dart';
-import 'package:cartridge/features/isaac/save/domain/ports/eden_tokens_port.dart';
-import 'package:cartridge/features/isaac/save/domain/ports/save_files_probe_port.dart';
-import 'package:cartridge/features/isaac/save/infra/isaac_eden_file_adapter.dart';
-import 'package:cartridge/features/isaac/save/infra/isaac_save_codec.dart';
-import 'package:cartridge/features/isaac/save/infra/save_files_probe_fs_adapter.dart';
-import 'package:cartridge/features/steam/application/steam_links_service.dart';
-import 'package:cartridge/features/steam/domain/models/steam_account_profile.dart';
-import 'package:cartridge/features/steam/domain/steam_install_port.dart';
-import 'package:cartridge/features/steam/domain/steam_library_port.dart';
-import 'package:cartridge/features/steam/domain/steam_links_port.dart';
-import 'package:cartridge/features/steam/domain/steam_users_port.dart';
-import 'package:cartridge/features/steam/infra/links/steam_url_launcher_adapter.dart';
-import 'package:cartridge/features/steam/infra/steam_users_vdf_repository.dart';
-import 'package:cartridge/features/steam/infra/windows/steam_app_library.dart';
-import 'package:cartridge/features/steam/infra/windows/steam_install_locator.dart';
+import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
+import 'package:cartridge/features/isaac/options/isaac_options.dart';
+import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
+import 'package:cartridge/features/isaac/save/isaac_save.dart';
+import 'package:cartridge/features/steam/steam.dart';
+import 'package:cartridge/features/steam_news/steam_news.dart';
+import 'package:cartridge/features/web_preview/web_preview.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -59,9 +57,43 @@ final steamUsersPortProvider = Provider<SteamUsersPort>((ref) {
 });
 
 
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 2) Isaac Runtime & Environment
 // ─────────────────────────────────────────────────────────────────────────────
+final isaacRuntimeServiceProvider = Provider<IsaacRuntimeService>((ref) {
+  final links = ref.read(steamLinksPortProvider);
+  final library = ref.read(steamLibraryPortProvider);
+  return IsaacRuntimeService(links: links, library: library);
+});
+
+final isaacPathResolverProvider = Provider<IsaacPathResolver>((ref) {
+// 테스트에서는 environment/documentsProvider를 주입하세요.
+  return IsaacPathResolver(
+// environment: {'USERPROFILE': '...'},
+// documentsProvider: () => Directory('test_docs'),
+  );
+});
+
+final modsServiceProvider = Provider<ModsService>((ref) => ModsService());
+final isaacOptionsIniService =
+Provider<IsaacOptionsIniService>((ref) => IsaacOptionsIniService());
+
+final isaacEnvironmentServiceProvider = Provider<IsaacEnvironmentService>((ref) {
+  return IsaacEnvironmentService(
+    settings: ref.read(settingServiceProvider),
+    isaac: ref.read(isaacRuntimeServiceProvider),
+    pathResolver: ref.read(isaacPathResolverProvider),
+    mods: ref.read(modsServiceProvider),
+  );
+});
+
+final isaacSteamLinksProvider = Provider<IsaacSteamLinks>((ref) {
+  final port = ref.read(steamLinksPortProvider);
+  final sls = SteamLinksService(port: port);
+  return IsaacSteamLinks(steam: sls);
+});
+
 final isaacSaveServiceProvider = Provider<IsaacSaveService>((ref) {
   final users = ref.read(steamUsersPortProvider);
   return IsaacSaveService(users: users);
@@ -108,7 +140,59 @@ final editionAndSlotsProvider = FutureProvider.family<EditionSlots, EditionSlots
   return (edition: target, slots: List<int>.from(slots)..sort());
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 3) Core Domain Services (App-wide)
+// ─────────────────────────────────────────────────────────────────────────────
+// Settings (SQLite)
+final settingRepositoryProvider = Provider<ISettingRepository>(
+      (ref) => SqliteSettingRepository(dbOpener: ref.read(appDatabaseProvider)),
+);
+final settingServiceProvider = Provider<SettingService>(
+      (ref) => SettingService(repo: ref.read(settingRepositoryProvider)),
+);
 
+// Option Presets (SQLite)
+final optionPresetsRepositoryProvider = Provider<IOptionPresetsRepository>(
+      (ref) => SqliteOptionPresetsRepository(
+    dbOpener: ref.read(appDatabaseProvider),
+  ),
+);
+final optionPresetsServiceProvider = Provider<OptionPresetsService>(
+      (ref) => OptionPresetsService(
+    repo: ref.read(optionPresetsRepositoryProvider),
+  ),
+);
+
+// Mod Presets (SQLite)
+final modPresetsRepositoryProvider = Provider<IModPresetsRepository>(
+      (ref) => SqliteModPresetsRepository(
+    dbOpener: ref.read(appDatabaseProvider),
+  ),
+);
+final modPresetsServiceProvider = Provider<ModPresetsService>((ref) {
+  return ModPresetsService(
+    repository: ref.read(modPresetsRepositoryProvider),
+    modsService: ref.read(modsServiceProvider),
+    envService: ref.read(isaacEnvironmentServiceProvider),
+    projector: null, // 기존 구조 유지
+  );
+});
+
+// Instances (SQLite)
+final instancesRepositoryProvider = Provider<IInstancesRepository>(
+      (ref) => SqliteInstancesRepository(
+    dbOpener: ref.read(appDatabaseProvider),
+  ),
+);
+final instancesServiceProvider = Provider<InstancesService>((ref) {
+  return InstancesService(
+    repo: ref.read(instancesRepositoryProvider),
+    optionPresetsService: ref.read(optionPresetsServiceProvider),
+    modPresetsService: ref.read(modPresetsServiceProvider),
+    modsService: ref.read(modsServiceProvider),
+    envService: ref.read(isaacEnvironmentServiceProvider),
+  );
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 4) Feature: Slot Machine (SQLite)
@@ -124,3 +208,120 @@ final slotMachineServiceProvider = Provider<SlotMachineService>(
     repo: ref.read(slotMachineRepositoryProvider),
   ),
 );
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5) Application Services (Launch/Play)
+// ─────────────────────────────────────────────────────────────────────────────
+final isaacLauncherServiceProvider = Provider<IsaacLauncherService>((ref) {
+  return IsaacLauncherService(
+    runtime: ref.read(isaacRuntimeServiceProvider),
+    modsService: ref.read(modsServiceProvider),
+    optionsIniService: ref.read(isaacOptionsIniService),
+    isaacEnvironmentService: ref.read(isaacEnvironmentServiceProvider),
+  );
+});
+
+final instancePlayServiceProvider = Provider<InstancePlayService>((ref) {
+  return InstancePlayService(
+    instances: ref.read(instancesServiceProvider),
+    optionPresets: ref.read(optionPresetsServiceProvider),
+    launcher: ref.read(isaacLauncherServiceProvider),
+  );
+});
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6) UI Controllers / ViewModel-ish Providers
+// ─────────────────────────────────────────────────────────────────────────────
+final optionPresetsControllerProvider =
+AsyncNotifierProvider<OptionPresetsController, List<OptionPresetView>>(
+  OptionPresetsController.new,
+);
+
+final repentogonInstalledProvider = FutureProvider<bool>((ref) async {
+  final env = ref.read(isaacEnvironmentServiceProvider);
+  final path = await env.resolveInstallPath();
+  return path != null && await Repentogon.isInstalled(path);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 7) Record Mode (Supabase-backed)
+// ─────────────────────────────────────────────────────────────────────────────
+final recordModeGoalReadServiceProvider = Provider<GoalReadService>((ref) {
+  final sp = Supabase.instance.client;
+  return SupabaseGoalReadService(sp);
+});
+
+final recordModeLeaderboardServiceProvider =
+Provider<LeaderboardService>((ref) {
+  final sp = Supabase.instance.client;
+  return LeaderboardServiceImpl(sp);
+});
+
+final recordModeGameIndexServiceProvider =
+Provider<GameIndexService>((ref) => DefaultGameIndexService());
+
+final recordModeSessionServiceProvider = Provider<GameSessionService>((ref) {
+  final svc = GameSessionServiceImpl(
+    Supabase.instance.client,
+    ref.read(isaacEnvironmentServiceProvider),
+    ref.read(isaacLauncherServiceProvider),
+    presetService: ref.read(recordModePresetServiceProvider),
+    allowedPrefs: ref.read(recordModeAllowedPrefsServiceProvider),
+  );
+
+  ref.onDispose(svc.dispose);
+
+  return svc;
+});
+
+final recordModeAuthUserProvider =
+StreamProvider.autoDispose<cartridge.AuthUser?>((ref) {
+  final auth = ref.read(recordModeAuthProvider);
+  return auth.authStateChanges();
+});
+
+final recordModeAuthRepositoryProvider = Provider<AuthRepository>((ref) {
+  final sp = Supabase.instance.client;
+  return SupabaseAuthRepository(sp);
+});
+
+final recordModeAuthServiceProvider = Provider<AuthService>((ref) {
+  final sp = Supabase.instance.client;
+  final repo = ref.read(recordModeAuthRepositoryProvider);
+  return SupabaseAuthService(sp, repo);
+});
+
+final recordModeAuthProvider =
+Provider<AuthService>((ref) => ref.read(recordModeAuthServiceProvider));
+
+final recordModeAllowedPrefsRepositoryProvider =
+Provider<RecordModeAllowedPrefsRepository>(
+      (ref) => FileRecordModeAllowedPrefsRepository(),
+);
+
+final recordModeAllowedPrefsServiceProvider =
+Provider<RecordModeAllowedPrefsService>(
+      (ref) => RecordModeAllowedPrefsServiceImpl(
+    ref.read(recordModeAllowedPrefsRepositoryProvider),
+  ),
+);
+
+final recordModePresetServiceProvider = Provider<RecordModePresetService>((ref) {
+  final env = ref.read(isaacEnvironmentServiceProvider);
+  final prefs = ref.read(recordModeAllowedPrefsServiceProvider);
+  return RecordModePresetServiceImpl(env, prefs);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 8) Steam News
+// ─────────────────────────────────────────────────────────────────────────────
+final steamNewsServiceProvider = Provider<SteamNewsService>((ref) {
+  return SteamNewsService(
+    repo: SteamNewsRepository(),
+    api: SteamNewsApi(),
+    preview: ref.read(webPreviewCacheProvider),
+  );
+});
