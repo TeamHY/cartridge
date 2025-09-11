@@ -239,6 +239,29 @@
       "mod": { "type": "int", "example": "5" }
     }
   },
+  "mod_presets_none": "선택 안 함",
+  "mod_presets_selected": "{count}개 선택됨",
+  "@mod_presets_selected": {
+    "placeholders": { "count": { "type": "int", "example": "3" } }
+  },
+
+  "mod_preset_create_title": "프리셋 만들기",
+  "mod_preset_create_name_label": "이름",
+  "mod_preset_create_name_placeholder": "모드 프리셋 이름",
+  "mod_preset_create_initial_mode_label": "처음에 어떻게 시작할까요?",
+  "mod_preset_create_all_off": "모드 모두 끄기",
+  "@mod_preset_create_all_off": {
+    "description": "프리셋 초기값으로 모든 모드를 비활성화 상태로 설정해놓고 생성하는 옵션"
+  },
+  "mod_preset_create_current_enabled": "지금 켠 모드로 시작",
+  "@mod_preset_create_current_enabled": {
+    "description": "프리셋 초기값으로 로컬 컴퓨터에 세팅되어 있는 모드 활성화 기준대로 프리셋에 반영하여 생성하는 옵션"
+  },
+  "mod_preset_create_validate_required": "이름을 입력해 주세요.",
+
+  "mod_preset_edit_title": "이름 수정",
+  "mod_preset_edit_name_label": "프리셋 이름",
+  "mod_preset_edit_name_placeholder": "새 이름을 입력해 주세요",
 
   "option_error_title": "옵션 프리셋을 불러오지 못했어요.",
   "option_empty_title": "옵션 프리셋이 없어요",
@@ -259,6 +282,26 @@
 
   "option_reorder_unavailable_title": "순서 바꾸기 불가",
   "option_reorder_unavailable_desc": "검색 중에는 순서를 바꿀 수 없어요. 검색을 먼저 끝내주세요.",
+
+  "instance_create_title": "인스턴스 만들기",
+  "instance_edit_title": "인스턴스 편집",
+  "instance_create_name_label": "이름",
+  "instance_create_name_placeholder": "인스턴스 이름",
+  "instance_create_initial_mode_label": "처음에 어떻게 시작할까요?",
+  "instance_create_all_off": "모드 모두 끄기",
+  "@instance_create_all_off": {
+    "description": "인스턴스 초기값으로 모든 모드를 비활성화 상태로 설정해놓고 생성하는 옵션"
+  },
+  "instance_create_current_enabled": "지금 켠 모드로 시작",
+  "@instance_create_current_enabled": {
+    "description": "인스턴스 초기값으로 로컬 컴퓨터에 세팅되어 있는 모드 활성화 기준대로 프리셋에 반영하여 생성하는 옵션"
+  },
+  "preset_tab_mod": "모드 프리셋",
+  "instance_option_preset_label": "옵션 프리셋",
+  "instance_option_none": "선택 안 함",
+  "instance_option_loading": "불러오는 중이에요",
+  "instance_option_error": "목록을 불러오지 못했어요",
+  "instance_create_validate_required": "이름을 입력해 주세요.",
 
   "home_preset_placeholder": "새 프리셋",
   "home_button_preset": "프리셋",
@@ -284,7 +327,6 @@
   "@preset": {
     "description": "프리셋 항목 관련 텍스트"
   },
-  "preset_tab_mod": "모드 프리셋",
   "preset_tab_window": "옵션 프리셋",
 
   "preset_delete_title": "프리셋 삭제",
@@ -389,14 +431,6 @@
   "@instance": {
     "description": "인스턴스 항목 관련 텍스트"
   },
-  "instance_create_title": "인스턴스 생성",
-  "instance_create_name_label": "인스턴스 이름",
-  "instance_create_name_placeholder": "인스턴스 이름",
-  "instance_create_initial_mode_label": "초기 모드 구성",
-  "instance_create_all_off": "모든 모드를 꺼진 상태로 추가",
-  "instance_create_current_enabled": "현재 켜진 모드만 추가",
-  "instance_create_hint": "모드 프리셋을 불러와서 빠르게 세팅할 수 있어요.",
-  "instance_create_validate_required": "이름을 입력하세요.",
   "instance_enabled_mods": "프리셋 {preset} │ 모드 {mod}",
   "@instance_enabled_mods": {
     "description": "인스턴스 리스트에서 추가 정보 라벨",
@@ -407,7 +441,6 @@
   },
   "instance_search_placeholder": "인스턴스 검색하기",
   "instance_create_button": "인스턴스 만들기",
-  "instance_option_preset_label": "옵션 프리셋",
   "instance_empty_message": "인스턴스를 추가해주세요.",
   "instance_delete_title": "인스턴스 삭제",
   "instance_delete_message": "인스턴스를 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
@@ -417,21 +450,10 @@
   "@mod_preset": {
     "description": "모드 프리셋 항목 관련 텍스트"
   },
-
-  "mod_preset_create_title": "모드 프리셋 생성",
-  "mod_preset_create_name_label": "모드 프리셋 이름",
-  "mod_preset_create_name_placeholder": "모드 프리셋 이름",
-  "mod_preset_create_initial_mode_label": "초기 모드 구성",
-  "mod_preset_create_all_off": "모든 모드를 꺼진 상태로 추가",
-  "mod_preset_create_current_enabled": "현재 켜진 모드만 추가",
-
-  "mod_preset_create_validate_required": "이름을 입력하세요.",
-  "mod_preset_create_hint": "프리셋은 모드 조합을 저장해 빠르게 전환할 수 있어요.",
-
   "mod_preset_delete_title": "모드 프리셋 삭제",
   "mod_preset_delete_message": "모드 프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
 
-  "mod_search_placeholder": "모드 검색...",
+  "mod_search_placeholder": "모드 검색",
   "mod_table_header_favorite": "즐겨찾기",
   "mod_table_header_name": "이름",
   "mod_table_header_version": "버전",
@@ -485,7 +507,7 @@
   "option_window_label": "창 모드",
   "option_position_label": "위치",
   "option_repentogon_label": "Repentogon",
-  "option_search_placeholder": "프리셋 검색...",
+  "option_search_placeholder": "프리셋 검색",
 
   "@nickname": {
     "description": "닉네임 변경 다이얼로그"

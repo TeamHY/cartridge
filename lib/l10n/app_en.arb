@@ -239,6 +239,23 @@
       "mod": { "type": "int", "example": "5" }
     }
   },
+  "mod_presets_none": "None selected",
+  "mod_presets_selected": "{count} selected",
+  "@mod_presets_selected": {
+    "placeholders": { "count": { "type": "int", "example": "3" } }
+  },
+
+  "mod_preset_create_title": "Create preset",
+  "mod_preset_create_name_label": "Name",
+  "mod_preset_create_name_placeholder": "Mod preset name",
+  "mod_preset_create_initial_mode_label": "How should we start?",
+  "mod_preset_create_all_off": "Turn all mods off",
+  "mod_preset_create_current_enabled": "Use currently enabled mods",
+  "mod_preset_create_validate_required": "Please enter a name.",
+
+  "mod_preset_edit_title": "Edit name",
+  "mod_preset_edit_name_label": "Preset name",
+  "mod_preset_edit_name_placeholder": "Enter a new name",
 
   "option_error_title": "Failed to load option presets.",
   "option_empty_title": "No option presets yet",
@@ -259,6 +276,20 @@
 
   "option_reorder_unavailable_title": "Cannot edit order",
   "option_reorder_unavailable_desc": "You can’t start editing while searching.",
+
+  "instance_create_title": "Create instance",
+  "instance_edit_title": "Edit instance",
+  "instance_create_name_label": "Name",
+  "instance_create_name_placeholder": "Instance name",
+  "instance_create_initial_mode_label": "How should we start?",
+  "instance_create_all_off": "Turn all mods off",
+  "instance_create_current_enabled": "Use currently enabled mods",
+  "preset_tab_mod": "Mod presets",
+  "instance_option_preset_label": "Option preset",
+  "instance_option_none": "None",
+  "instance_option_loading": "Loading",
+  "instance_option_error": "Couldn't load the list",
+  "instance_create_validate_required": "Please enter a name.",
 
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
@@ -284,7 +315,6 @@
   "@preset": {
     "description": "Preset item related texts"
   },
-  "preset_tab_mod": "Mod Presets",
   "preset_tab_window": "Option Presets",
 
   "preset_delete_title": "Delete Preset",
@@ -390,14 +420,6 @@
   "@instance": {
     "description": "Instance item related texts"
   },
-  "instance_create_title": "Create instance",
-  "instance_create_name_label": "Instance name",
-  "instance_create_name_placeholder": "Instance name",
-  "instance_create_initial_mode_label": "Initial mod setup",
-  "instance_create_all_off": "Add all mods as off",
-  "instance_create_current_enabled": "Add only currently enabled mods",
-  "instance_create_hint": "모드 프리셋을 불러와서 빠르게 세팅할 수 있어요.",
-  "instance_create_validate_required": "Please enter a name.",
   "instance_enabled_mods": "{preset, plural, =0 {0 PRESET} one {1 PRESET} other {{preset} PRESETS}}｜{mod, plural, =0 {0 MOD} one {1 MOD} other {{mod} MODS}}",
   "@instance_enabled_mods": {
     "description": "Counts of applied presets and enabled mods (shown as 'X PRESET｜Y MOD')",
@@ -406,9 +428,8 @@
       "mod":    { "type": "int", "example": "5" }
     }
   },
-  "instance_search_placeholder": "Search instances...",
+  "instance_search_placeholder": "Search instances",
   "instance_create_button": "Create instance",
-  "instance_option_preset_label": "Option preset",
   "instance_empty_message": "No instances found.",
   "instance_delete_title": "Delete Instance",
   "instance_delete_message": "Deleting a instance cannot be undone. Are you sure you want to continue?",
@@ -418,21 +439,10 @@
   "@mod_preset": {
     "description": "Mod Preset item related texts"
   },
-
-  "mod_preset_create_title": "Create Mod Preset",
-  "mod_preset_create_name_label": "Mod Preset name",
-  "mod_preset_create_name_placeholder": "Mod Preset name",
-  "mod_preset_create_initial_mode_label": "Initial mod setup",
-  "mod_preset_create_all_off": "Add all mods as off",
-  "mod_preset_create_current_enabled": "Add only currently enabled mods",
-
-  "mod_preset_create_validate_required": "Please enter a name.",
-  "mod_preset_create_hint": "Presets save a set of mods so you can switch quickly.",
-
   "mod_preset_delete_title": "Delete Mod Preset",
   "mod_preset_delete_message": "Deleting a mod preset cannot be undone. Are you sure you want to continue?",
 
-  "mod_search_placeholder": "Search mods...",
+  "mod_search_placeholder": "Search mods",
   "mod_table_header_favorite": "Favorites",
   "mod_table_header_name": "Name",
   "mod_table_header_version": "Version",
@@ -486,7 +496,7 @@
   "option_window_label": "Window",
   "option_position_label": "Position",
   "option_repentogon_label": "Repentogon",
-  "option_search_placeholder": "Search presets...",
+  "option_search_placeholder": "Search presets",
 
   "@nickname": {
     "description": "Nickname edit dialog"

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/app/presentation/content_scaffold.dart';
 import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
+import 'package:cartridge/app/presentation/widgets/list_page/list_page.dart';
 import 'package:cartridge/app/presentation/widgets/search_toolbar.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/core/result.dart';
@@ -213,32 +214,13 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
       content: ContentShell(
         scrollable: false,
         child: listAsync.when(
-          // ——— LOADING: 툴바/레이아웃 유지 ———
-          loading: () => Column(
-            children: [
-              toolbar(const []),
-              Gaps.h12,
-              Expanded(
-                child: Center(child: ProgressRing(activeColor: fTheme.accentColor)),
-              ),
-            ],
-          ),
-
-          // ——— ERROR: 사용자 친화 메시지 + 새로고침, 레이아웃 유지 ———
-          error: (_, __) => Column(
-            children: [
-              toolbar(const []),
-              Gaps.h12,
-              Expanded(
-                child: Center(
-                  child: EmptyState.withDefault404(
-                    title: loc.instance_error_title,
-                    primaryLabel: loc.common_refresh,
-                    onPrimary: () => ref.invalidate(orderedInstancesForUiProvider),
-                  ),
-                ),
-              ),
-            ],
+          loading: () => ListPageLoadingShell(topBar: toolbar(const [])),
+          error: (_, __) => ListPageErrorShell(
+            topBar: toolbar(const []),
+            title: loc.instance_error_title,
+            description: loc.error_startup_message,
+            primaryLabel: loc.common_retry,
+            onPrimary: () => ref.invalidate(orderedInstancesForUiProvider),
           ),
 
           // ——— DATA ———

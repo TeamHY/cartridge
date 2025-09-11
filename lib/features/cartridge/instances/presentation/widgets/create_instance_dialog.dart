@@ -3,35 +3,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/core/service_providers.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/show_mod_preset_picker_dialog.dart';
-import 'package:cartridge/features/isaac/mod/domain/models/seed_mode.dart';
+import 'package:cartridge/features/cartridge/instances/instances.dart';
+import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
-/// 다이얼로그 결과 DTO.
-/// - name: 인스턴스 이름
-/// - seedMode: 초기 시드(SeedMode)
-/// - presetIds: 선택된 모드 프리셋 ID 집합(0–N)
-/// - optionPresetId: 선택된 옵션 프리셋 ID(0–1; 없으면 null)
 class CreateInstanceResult {
   final String name;
   final SeedMode mode;
   final List<String> presetIds;
   final String? optionPresetId;
-
-  CreateInstanceResult(
-      this.name,
-      this.mode,
-      this.presetIds,
-      this.optionPresetId,
-      );
-
+  CreateInstanceResult(this.name, this.mode, this.presetIds, this.optionPresetId);
   SeedMode get seedMode => mode;
 }
 
 const String _kNoneOptionId = '__NONE__';
+const double _kFieldWidth = 360;
+const double _kFieldHeight = 36;
 
-/// 편집 결과 DTO (seedMode 없음)
 class EditInstanceResult {
   final String name;
   final List<String> presetIds;
@@ -39,18 +28,13 @@ class EditInstanceResult {
   EditInstanceResult(this.name, this.presetIds, this.optionPresetId);
 }
 
-/// 인스턴스 생성 다이얼로그.
-/// - 이름 입력
-/// - SeedMode 선택(allOff / currentEnabled)
-/// - 모드 프리셋 멀티 선택(0–N)
-/// - 옵션 프리셋 단일 선택(0–1)
+/// 인스턴스 생성
 Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
   final nameController = TextEditingController();
   final scrollCtrl = ScrollController();
   var mode = SeedMode.allOff;
   final loc = AppLocalizations.of(context);
 
-  // 선택 상태(다이얼로그 생명주기 동안 유지)
   final selectedPresetIds = <String>{};
   String? selectedOptionId;
 
@@ -80,31 +64,25 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
               child: Container(
                 decoration: BoxDecoration(
                   color: fTheme.cardColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(color: dividerColor),
                 ),
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 이름 섹션
-                    Text(
-                      loc.instance_create_name_label,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    // 이름
+                    Text(loc.instance_create_name_label, style: const TextStyle(fontWeight: FontWeight.w600)),
                     Gaps.h4,
                     TextBox(
                       controller: nameController,
                       placeholder: loc.instance_create_name_placeholder,
                     ),
                     Gaps.h12,
-                    // 초기 모드 구성 섹션
-                    Text(
-                      loc.instance_create_initial_mode_label,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Gaps.h4,
 
+                    // 초기 모드
+                    Text(loc.instance_create_initial_mode_label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Gaps.h4,
                     _RadioRow(
                       label: loc.instance_create_all_off,
                       selected: mode == SeedMode.allOff,
@@ -121,100 +99,34 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
                         (ctx as Element).markNeedsBuild();
                       },
                     ),
-
                     Gaps.h12,
 
-                    // ── 모드 프리셋(0–N 멀티 선택)
-                    Text(
-                      loc.preset_tab_mod,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    // 옵션 프리셋(단일)
+                    Text(loc.instance_option_preset_label, style: const TextStyle(fontWeight: FontWeight.w600)),
                     Gaps.h4,
-                    Row(
-                      children: [
-                        Button(
-                          onPressed: () async {
-                            final picked = await showModPresetPickerDialog(
-                              ctx,
-                              initialSelected: selectedPresetIds,
-                            );
-                            if (picked != null) {
-                              selectedPresetIds
-                                ..clear()
-                                ..addAll(picked);
-                              (ctx as Element).markNeedsBuild();
-                            }
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(FluentIcons.check_list),
-                              Gaps.w4,
-                              Text(
-                                '${loc.preset_tab_mod} (${selectedPresetIds.length})',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    Gaps.h12,
-
-                    // ── 옵션 프리셋(0–1 단일 선택)
-                    Text(
-                      loc.instance_option_preset_label,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Gaps.h4,
-                    Consumer(
-                      builder: (context, ref, _) {
-                        final asyncOptions = ref.watch(optionPresetsControllerProvider);
-                        return SizedBox(
-                          width: 360,
-                          child: asyncOptions.when(
-                            loading: () => const Center(child: ProgressRing()),
-                            error  : (e, st) => Text('Error: $e'),
-                            data   : (options) {
-                              // 현재 선택된 id가 목록에 없으면 "(None)" sentinel로 폴백
-                              final currentValue = options.any((o) => o.id == selectedOptionId)
-                                  ? (selectedOptionId ?? _kNoneOptionId)
-                                  : _kNoneOptionId;
-
-                              return ComboBox<String>(
-                                isExpanded: true,
-                                value: currentValue,
-                                items: [
-                                  const ComboBoxItem<String>(
-                                    value: _kNoneOptionId,
-                                    child: Text('(None)'),
-                                  ),
-                                  ...options.map((o) => ComboBoxItem<String>(
-                                    value: o.id,            // OptionPresetView.id 사용
-                                    child: Text(o.name),
-                                  )),
-                                ],
-                                onChanged: (v) {
-                                  selectedOptionId = (v == _kNoneOptionId) ? null : v;
-                                  (ctx as Element).markNeedsBuild();
-                                },
-                              );
-                            },
-                          ),
-                        );
+                    _OptionPresetComboField(
+                      selectedOptionId: selectedOptionId,
+                      onChanged: (v) {
+                        selectedOptionId = v;
+                        (ctx as Element).markNeedsBuild();
                       },
                     ),
+                    Gaps.h12,
 
-                    Gaps.h8,
-
-                    // ── 힌트
-                    Text(
-                      loc.instance_create_hint,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: fTheme.inactiveColor,
-                      ),
+                    // 모드 프리셋(멀티)
+                    Text(loc.preset_tab_mod, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    Gaps.h4,
+                    _ModPresetPickerField(
+                      selectedCount: selectedPresetIds.length,
+                      onPressed: () async {
+                        final picked = await showModPresetPickerDialog(ctx, initialSelected: selectedPresetIds);
+                        if (picked != null) {
+                          selectedPresetIds..clear()..addAll(picked);
+                          (ctx as Element).markNeedsBuild();
+                        }
+                      },
                     ),
+                    Gaps.h8,
                   ],
                 ),
               ),
@@ -222,20 +134,13 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
           ),
         ),
         actions: [
-          Button(
-            child: Text(loc.common_cancel),
-            onPressed: () => Navigator.of(ctx).pop(null),
-          ),
+          Button(child: Text(loc.common_cancel), onPressed: () => Navigator.of(ctx).pop(null)),
           FilledButton(
             child: Text(loc.common_create),
             onPressed: () {
               final name = nameController.text.trim();
               if (name.isEmpty) {
-                UiFeedback.error(
-                  ctx,
-                  loc.common_error,
-                  loc.instance_create_validate_required,
-                );
+                UiFeedback.error(ctx, loc.common_error, loc.instance_create_validate_required);
                 return;
               }
               Navigator.of(ctx).pop(
@@ -254,18 +159,17 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
   );
 }
 
-/// 인스턴스 편집 다이얼로그 (이름 + 프리셋 + 옵션 프리셋)
+/// 인스턴스 편집
 Future<EditInstanceResult?> showEditInstanceDialog(
-  BuildContext context, {
-  required String initialName,
-  required Set<String> initialPresetIds,
-  required String? initialOptionPresetId,
-}) {
+    BuildContext context, {
+      required String initialName,
+      required Set<String> initialPresetIds,
+      required String? initialOptionPresetId,
+    }) {
   final nameController = TextEditingController(text: initialName);
   final scrollCtrl = ScrollController();
   final loc = AppLocalizations.of(context);
 
-  // 선택 상태(다이얼로그 생명주기 동안 유지)
   final selectedPresetIds = <String>{...initialPresetIds};
   String? selectedOptionId = initialOptionPresetId;
 
@@ -281,7 +185,7 @@ Future<EditInstanceResult?> showEditInstanceDialog(
           children: [
             Icon(FluentIcons.edit, size: 18, color: accent),
             Gaps.w4,
-            const Text('인스턴스 편집'),
+            Text(loc.instance_edit_title),
           ],
         ),
         constraints: const BoxConstraints(maxWidth: 560, maxHeight: 560),
@@ -295,18 +199,15 @@ Future<EditInstanceResult?> showEditInstanceDialog(
               child: Container(
                 decoration: BoxDecoration(
                   color: fTheme.cardColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(color: dividerColor),
                 ),
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 이름 섹션
-                    Text(
-                      loc.instance_create_name_label,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    // 이름
+                    Text(loc.instance_create_name_label, style: const TextStyle(fontWeight: FontWeight.w600)),
                     Gaps.h4,
                     TextBox(
                       controller: nameController,
@@ -314,84 +215,29 @@ Future<EditInstanceResult?> showEditInstanceDialog(
                     ),
                     Gaps.h12,
 
-                    // ── 모드 프리셋(0–N 멀티 선택)
-                    Text(
-                      loc.preset_tab_mod,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    // 옵션 프리셋(단일)
+                    Text(loc.instance_option_preset_label, style: const TextStyle(fontWeight: FontWeight.w600)),
                     Gaps.h4,
-                    Row(
-                      children: [
-                        Button(
-                          onPressed: () async {
-                            final picked = await showModPresetPickerDialog(
-                              ctx,
-                              initialSelected: selectedPresetIds,
-                            );
-                            if (picked != null) {
-                              selectedPresetIds
-                                ..clear()
-                                ..addAll(picked);
-                              (ctx as Element).markNeedsBuild();
-                            }
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(FluentIcons.check_list),
-                              Gaps.w4,
-                              Text(
-                                '${loc.preset_tab_mod} (${selectedPresetIds.length})',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    _OptionPresetComboField(
+                      selectedOptionId: selectedOptionId,
+                      onChanged: (v) {
+                        selectedOptionId = v;
+                        (ctx as Element).markNeedsBuild();
+                      },
                     ),
-
                     Gaps.h12,
 
-                    // ── 옵션 프리셋(0–1 단일 선택)
-                    Text(
-                      loc.instance_option_preset_label,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    // 모드 프리셋(멀티)
+                    Text(loc.preset_tab_mod, style: const TextStyle(fontWeight: FontWeight.w600)),
                     Gaps.h4,
-                    Consumer(
-                      builder: (context, ref, _) {
-                        final asyncOptions = ref.watch(optionPresetsControllerProvider);
-                        return SizedBox(
-                          width: 360,
-                          child: asyncOptions.when(
-                            loading: () => const Center(child: ProgressRing()),
-                            error  : (e, st) => Text('Error: $e'),
-                            data   : (options) {
-                              // 현재 선택된 id가 목록에 없으면 "(None)" sentinel로 폴백
-                              final currentValue = options.any((o) => o.id == selectedOptionId)
-                                  ? (selectedOptionId ?? _kNoneOptionId)
-                                  : _kNoneOptionId;
-
-                              return ComboBox<String>(
-                                isExpanded: true,
-                                value: currentValue,
-                                items: [
-                                  const ComboBoxItem<String>(
-                                    value: _kNoneOptionId,
-                                    child: Text('(None)'),
-                                  ),
-                                  ...options.map((o) => ComboBoxItem<String>(
-                                    value: o.id,
-                                    child: Text(o.name),
-                                  )),
-                                ],
-                                onChanged: (v) {
-                                  selectedOptionId = (v == _kNoneOptionId) ? null : v;
-                                  (ctx as Element).markNeedsBuild();
-                                },
-                              );
-                            },
-                          ),
-                        );
+                    _ModPresetPickerField(
+                      selectedCount: selectedPresetIds.length,
+                      onPressed: () async {
+                        final picked = await showModPresetPickerDialog(ctx, initialSelected: selectedPresetIds);
+                        if (picked != null) {
+                          selectedPresetIds..clear()..addAll(picked);
+                          (ctx as Element).markNeedsBuild();
+                        }
                       },
                     ),
                   ],
@@ -401,20 +247,13 @@ Future<EditInstanceResult?> showEditInstanceDialog(
           ),
         ),
         actions: [
-          Button(
-            child: Text(loc.common_cancel),
-            onPressed: () => Navigator.of(ctx).pop(null),
-          ),
+          Button(child: Text(loc.common_cancel), onPressed: () => Navigator.of(ctx).pop(null)),
           FilledButton(
             child: Text(loc.common_save),
             onPressed: () {
               final name = nameController.text.trim();
               if (name.isEmpty) {
-                UiFeedback.error(
-                  ctx,
-                  loc.common_error,
-                  loc.instance_create_validate_required,
-                );
+                UiFeedback.error(ctx, loc.common_error, loc.instance_create_validate_required);
                 return;
               }
               Navigator.of(ctx).pop(
@@ -432,7 +271,151 @@ Future<EditInstanceResult?> showEditInstanceDialog(
   );
 }
 
-/// Fluent 라디오 + 라벨 한 줄
+/// 옵션 프리셋 콤보: 로딩/에러도 동일 레이아웃 유지
+class _OptionPresetComboField extends ConsumerWidget {
+  final String? selectedOptionId;
+  final ValueChanged<String?> onChanged;
+  const _OptionPresetComboField({
+    required this.selectedOptionId,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context);
+    final asyncOptions = ref.watch(optionPresetsControllerProvider);
+
+    // 항상 같은 너비/모양 유지
+    return SizedBox(
+      width: _kFieldWidth,
+      child: asyncOptions.when(
+        loading: () {
+          return ComboBox<String>(
+            isExpanded: true,
+            value: _kNoneOptionId,
+            items: [
+              ComboBoxItem<String>(
+                value: _kNoneOptionId,
+                child: Text(loc.instance_option_loading),
+              ),
+            ],
+            onChanged: null, // disabled
+          );
+        },
+        error: (_, __) {
+          return ComboBox<String>(
+            isExpanded: true,
+            value: _kNoneOptionId,
+            items: [
+              ComboBoxItem<String>(
+                value: _kNoneOptionId,
+                child: Text(loc.instance_option_error),
+              ),
+            ],
+            onChanged: null, // disabled
+          );
+        },
+        data: (options) {
+          final exists = options.any((o) => o.id == selectedOptionId);
+          final value = exists ? (selectedOptionId ?? _kNoneOptionId) : _kNoneOptionId;
+
+          return ComboBox<String>(
+            isExpanded: true,
+            value: value,
+            items: [
+              ComboBoxItem<String>(
+                value: _kNoneOptionId,
+                child: Text(loc.instance_option_none),
+              ),
+              ...options.map(
+                    (o) => ComboBoxItem<String>(value: o.id, child: Text(o.name)),
+              ),
+            ],
+            onChanged: (v) => onChanged(v == _kNoneOptionId ? null : v),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// 모드 프리셋: ComboBox처럼 보이는 '필드형 버튼'
+class _ModPresetPickerField extends StatelessWidget {
+  final int selectedCount;
+  final VoidCallback onPressed;
+  const _ModPresetPickerField({required this.selectedCount, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
+    final stroke = theme.resources.controlStrokeColorDefault;
+    final bg = theme.resources.controlFillColorDefault;
+    final textColor = theme.typography.body?.color;
+    final hintColor = theme.inactiveColor;
+
+    final hasSelection = selectedCount > 0;
+    final label = hasSelection
+        ? AppLocalizations.of(context).mod_presets_selected(selectedCount)
+        : AppLocalizations.of(context).mod_presets_none;
+
+    return SizedBox(
+      width: _kFieldWidth,
+      height: _kFieldHeight,
+      child: HoverButton(
+        onPressed: onPressed,
+        builder: (ctx, states) {
+          final hovered = states.isHovered;
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+              border: Border.all(color: stroke),
+              boxShadow: hovered
+                  ? [
+                BoxShadow(
+                  color: theme.shadowColor.withAlpha(theme.brightness == Brightness.dark ? 60 : 28),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: hasSelection ? textColor : hintColor,
+                      fontWeight: hasSelection ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(start: 8.0),
+                  child: IconTheme.merge(
+                    data: IconThemeData(
+                      color: theme.resources.textFillColorSecondary,
+                      size: 8,
+                    ),
+                    child: Icon(FluentIcons.chevron_down),
+                  ),
+                ),
+                Gaps.w4
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// 라디오 + 라벨
 class _RadioRow extends StatelessWidget {
   const _RadioRow({
     required this.label,
@@ -449,22 +432,14 @@ class _RadioRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSpacing.xs,
-          horizontal: AppSpacing.sm,
-        ),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs, horizontal: AppSpacing.sm),
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
         child: Row(
           children: [
-            RadioButton(
-              checked: selected,
-              onChanged: (_) => onChanged(),
-              content: Text(label),
-            ),
+            RadioButton(checked: selected, onChanged: (_) => onChanged(), content: Text(label)),
           ],
         ),
       ),
     );
   }
 }
-

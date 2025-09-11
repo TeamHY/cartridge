@@ -13,7 +13,6 @@ class CreatePresetResult {
   SeedMode get seedMode => mode;
 }
 
-
 Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
   final nameController = TextEditingController();
   final scrollCtrl = ScrollController();
@@ -35,9 +34,9 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
             Text(loc.mod_preset_create_title),
           ],
         ),
-        constraints: const BoxConstraints(maxWidth: AppBreakpoints.sm - 1, maxHeight: AppBreakpoints.md),
+        constraints: const BoxConstraints(maxWidth: 560, maxHeight: 460),
         content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: AppBreakpoints.sm - 1, maxHeight: AppBreakpoints.md),
+          constraints: const BoxConstraints(maxWidth: 560, maxHeight: 460),
           child: fluent.Scrollbar(
             controller: scrollCtrl,
             interactive: true,
@@ -46,14 +45,14 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
               child: Container(
                 decoration: BoxDecoration(
                   color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(color: dividerColor),
                 ),
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 이름 섹션
+                    // 이름
                     Text(
                       loc.mod_preset_create_name_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
@@ -64,13 +63,13 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
                       placeholder: loc.mod_preset_create_name_placeholder,
                     ),
                     Gaps.h12,
-                    // 초기 모드 구성 섹션
+
+                    // 초기 모드
                     Text(
                       loc.mod_preset_create_initial_mode_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     Gaps.h4,
-
                     _RadioRow(
                       label: loc.mod_preset_create_all_off,
                       selected: mode == SeedMode.allOff,
@@ -87,17 +86,7 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
                         (ctx as Element).markNeedsBuild();
                       },
                     ),
-
                     Gaps.h8,
-
-                    // Hint / 도움말
-                    Text(
-                      loc.mod_preset_create_hint,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.inactiveColor,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -114,7 +103,6 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
             onPressed: () {
               final name = nameController.text.trim();
               if (name.isEmpty) {
-                // 빈 이름 검증: 에러 토스트
                 UiFeedback.error(ctx, loc.common_error, loc.mod_preset_create_validate_required);
                 return;
               }
@@ -144,9 +132,12 @@ class _RadioRow extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs, horizontal: AppSpacing.sm),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSpacing.xs,
+          horizontal: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(AppRadius.sm),
         ),
         child: Row(
           children: [
@@ -162,7 +153,7 @@ class _RadioRow extends StatelessWidget {
   }
 }
 
-/// 이름만 수정하는 다이얼로그(생성 다이얼로그와 동일한 톤/레이아웃)
+/// 이름만 수정하는 다이얼로그 (동일 톤/레이아웃)
 Future<String?> showEditPresetNameDialog(
     BuildContext context, {
       required String initialName,
@@ -181,7 +172,7 @@ Future<String?> showEditPresetNameDialog(
         children: [
           fluent.Icon(fluent.FluentIcons.edit, size: 18, color: accent),
           Gaps.w4,
-          const Text('이름 수정'),
+          Text(loc.mod_preset_edit_title),
         ],
       ),
       constraints: const BoxConstraints(
@@ -201,18 +192,21 @@ Future<String?> showEditPresetNameDialog(
             child: Container(
               decoration: BoxDecoration(
                 color: theme.cardColor,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(color: dividerColor),
               ),
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('프리셋 이름', style: TextStyle(fontWeight: FontWeight.w600)),
+                  Text(
+                    loc.mod_preset_edit_name_label,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   Gaps.h4,
                   fluent.TextBox(
                     controller: nameController,
-                    placeholder: '새 이름을 입력하세요',
+                    placeholder: loc.mod_preset_edit_name_placeholder,
                     autofocus: true,
                     onSubmitted: (_) {
                       final name = nameController.text.trim();

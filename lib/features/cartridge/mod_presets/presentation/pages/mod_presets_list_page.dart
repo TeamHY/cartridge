@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/app/presentation/content_scaffold.dart';
 import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
+import 'package:cartridge/app/presentation/widgets/list_page/list_page.dart';
 import 'package:cartridge/app/presentation/widgets/list_tiles.dart';
 import 'package:cartridge/app/presentation/widgets/search_toolbar.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
@@ -212,32 +213,14 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
       content: ContentShell(
         scrollable: false,
         child: listAsync.when(
-          // 로딩: 툴바/레이아웃 유지
-          loading: () => Column(
-            children: [
-              toolbar0(const []),
-              Gaps.h12,
-              const Expanded(child: Center(child: ProgressRing())),
-            ],
+          loading: () => ListPageLoadingShell(topBar: toolbar0(const [])),
+          error: (_, __) => ListPageErrorShell(
+            topBar: toolbar0(const []),
+            title: loc.mod_preset_error_title,
+            description: loc.error_startup_message,
+            primaryLabel: loc.common_retry,
+            onPrimary: () => ref.invalidate(orderedModPresetsForUiProvider),
           ),
-
-          // 에러: 사용자 친화 메시지 + 새로고침, 레이아웃 유지
-          error: (_, __) => Column(
-            children: [
-              toolbar0(const []),
-              Gaps.h12,
-              Expanded(
-                child: Center(
-                  child: EmptyState.withDefault404(
-                    title: loc.mod_preset_error_title,
-                    primaryLabel: loc.common_refresh,
-                    onPrimary: () => ref.invalidate(orderedModPresetsForUiProvider),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
           data: (List<ModPresetView> list) {
             if (inReorder) {
               final working = ref.read(modPresetsWorkingOrderProvider);

@@ -4,14 +4,15 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/content_scaffold.dart';
 import 'package:cartridge/app/presentation/empty_state.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
+import 'package:cartridge/app/presentation/widgets/list_page/list_page.dart';
 import 'package:cartridge/app/presentation/widgets/list_tiles.dart';
 import 'package:cartridge/app/presentation/widgets/search_toolbar.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
-import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/core/result.dart';
+import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/core/utils/id.dart';
 import 'package:cartridge/core/utils/wiggle.dart';
 import 'package:cartridge/features/cartridge/option_presets/domain/models/option_preset_view.dart';
@@ -19,6 +20,7 @@ import 'package:cartridge/features/cartridge/option_presets/presentation/control
 import 'package:cartridge/features/cartridge/option_presets/presentation/widgets/option_presets_create_edit_dialog.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
+
 
 class OptionPresetsTab extends ConsumerStatefulWidget {
   const OptionPresetsTab({super.key});
@@ -218,32 +220,14 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
       content: ContentShell(
         scrollable: false,
         child: listAsync.when(
-          // 로딩: 툴바 + 본문 중앙 로더 (레이아웃 유지)
-          loading: () => Column(
-            children: [
-              toolbar0(const []),
-              Gaps.h12,
-              const Expanded(child: Center(child: ProgressRing())),
-            ],
+          loading: () => ListPageLoadingShell(topBar: toolbar0(const [])),
+          error: (_, __) => ListPageErrorShell(
+            topBar: toolbar0(const []),
+            title: loc.option_error_title,
+            description: loc.error_startup_message,
+            primaryLabel: loc.common_retry,
+            onPrimary: () => ref.invalidate(orderedOptionPresetsForUiProvider),
           ),
-
-          // 에러: 친화적 메시지 + 새로고침 (레이아웃 유지)
-          error: (_, __) => Column(
-            children: [
-              toolbar0(const []),
-              Gaps.h12,
-              Expanded(
-                child: Center(
-                  child: EmptyState.withDefault404(
-                    title: loc.option_error_title,
-                    primaryLabel: loc.common_refresh,
-                    onPrimary: () => ref.invalidate(orderedOptionPresetsForUiProvider),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
           data: (List<OptionPresetView> list) {
             if (inReorder) {
               final working = ref.read(optionPresetsWorkingOrderProvider);
