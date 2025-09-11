@@ -1,4 +1,5 @@
 import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_image/instance_image_thumb.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,7 +8,6 @@ import 'package:cartridge/app/presentation/controllers/home_controller.dart';
 import 'package:cartridge/app/presentation/widgets/home/ut_split_button.dart';
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/instances/domain/models/instance_view.dart';
-
 
 class GamePlaySplitButton extends ConsumerWidget {
   const GamePlaySplitButton({
@@ -19,9 +19,9 @@ class GamePlaySplitButton extends ConsumerWidget {
   final List<InstanceView> instances;
   final Color buttonColor;
 
-  // 메인 버튼 텍스트와 드롭다운 버튼을 분리하여 레이아웃을 구성
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context);
     final recentId = ref.watch(recentInstanceIdProvider);
 
     String? selectedId = recentId;
@@ -29,7 +29,10 @@ class GamePlaySplitButton extends ConsumerWidget {
     if (instances.isNotEmpty) {
       final found = recentId == null
           ? null
-          : instances.firstWhere((e) => e.id == recentId, orElse: () => InstanceView.empty);
+          : instances.firstWhere(
+            (e) => e.id == recentId,
+        orElse: () => InstanceView.empty,
+      );
       if (found != null && found.id.isNotEmpty) {
         selectedId = found.id;
         selectedName = found.name;
@@ -47,7 +50,7 @@ class GamePlaySplitButton extends ConsumerWidget {
     }
 
     return UtSplitButton(
-      mainButtonText: '인스턴스 플레이',
+      mainButtonText: loc.play_instance_button_title,
       secondaryText: selectedName,
       buttonColor: buttonColor,
       onMainButtonPressed: playSelected,
@@ -59,13 +62,12 @@ class GamePlaySplitButton extends ConsumerWidget {
           ref.read(recentInstanceIdProvider.notifier).state = id; // 선택만 갱신
         },
         onPlayNow: playSelected, // 패널의 "바로 실행" 버튼
-        width: 340,
-        maxHeight: 320,
+        width: 360,
+        maxHeight: 360,
       ),
     );
   }
 }
-
 
 class _InstancePickerPanel extends StatefulWidget {
   const _InstancePickerPanel({
@@ -73,8 +75,8 @@ class _InstancePickerPanel extends StatefulWidget {
     required this.selectedId,
     required this.onPick,         // 선택만 갱신
     required this.onPlayNow,      // 즉시 실행(선택 유지)
-    this.width = 340,
-    this.maxHeight = 320,
+    this.width = 360,
+    this.maxHeight = 360,
   });
 
   final List<InstanceView> instances;
@@ -109,8 +111,13 @@ class _InstancePickerPanelState extends State<_InstancePickerPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final fTheme = FluentTheme.of(context);
-    final divider = fTheme.dividerColor;
+    final theme = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
+
+    // 🎨 semantic tokens
+    final stroke = theme.resources.controlStrokeColorDefault;
+    final shadow = theme.shadowColor.withAlpha(28);
+    final panelBg = theme.cardColor;
 
     final list = (_q.trim().isEmpty)
         ? widget.instances
@@ -122,17 +129,17 @@ class _InstancePickerPanelState extends State<_InstancePickerPanel> {
     return Container(
       width: widget.width,
       constraints: BoxConstraints(maxHeight: widget.maxHeight),
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
-        color: fTheme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: divider),
-        boxShadow: [
-          BoxShadow(
-            color: fTheme.shadowColor.withAlpha(30),
-            blurRadius: 14, offset: const Offset(0, 8),
-          ),
-        ],
+        color: panelBg,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: stroke),
+        boxShadow: [BoxShadow(color: shadow, blurRadius: 14, offset: const Offset(0, 8))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,39 +148,53 @@ class _InstancePickerPanelState extends State<_InstancePickerPanel> {
           Row(
             children: [
               const Icon(FluentIcons.server, size: 14),
-              const SizedBox(width: 6),
-              const Text('인스턴스 선택', style: TextStyle(fontWeight: FontWeight.w600)),
+              Gaps.w6,
+              Text(
+                loc.instance_picker_title,
+                style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+              ),
             ],
           ),
           Gaps.h8,
+
           // 검색
           TextBox(
             controller: _searchCtrl,
             onChanged: (s) => setState(() => _q = s),
-            placeholder: '검색',
+            placeholder: loc.common_search_placeholder, // 기존 키 활용
           ),
           Gaps.h8,
 
           // 목록
           Expanded(
-            child: Scrollbar(
+            child: list.isEmpty
+                ? Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                child: Text(
+                  loc.instance_picker_empty,
+                  style: theme.typography.body,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+                : Scrollbar(
               controller: _scrollCtrl,
               interactive: true,
               child: ListView.separated(
                 controller: _scrollCtrl,
-                primary: false,               // ★ PrimaryScrollController 사용 금지
+                primary: false,
                 itemCount: list.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 6),
+                separatorBuilder: (_, __) => Gaps.h6,
                 itemBuilder: (ctx, i) {
                   final v = list[i];
                   final selected = v.id == widget.selectedId;
-
                   return _InstanceTile(
                     view: v,
                     selected: selected,
                     onTap: () {
                       widget.onPick(v.id);
-                      Flyout.of(context).close();   // ★ 닫기
+                      Flyout.of(context).close();
                     },
                   );
                 },
@@ -199,8 +220,11 @@ class _InstanceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fTheme = FluentTheme.of(context);
-    final selColor = fTheme.accentColor;
+    final theme = FluentTheme.of(context);
+
+    final selStroke = theme.resources.controlStrokeColorSecondary;
+    final hoverFill = theme.cardColor; // subtle hover
+    final checkColor = theme.accentColor;
 
     return HoverButton(
       onPressed: onTap,
@@ -208,35 +232,37 @@ class _InstanceTile extends StatelessWidget {
         final hovered = states.isHovered;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.sm,
+          ),
           decoration: BoxDecoration(
-            color: hovered ? fTheme.cardColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            color: hovered ? hoverFill : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
-              color: selected ? selColor : Colors.transparent,
+              color: selected ? selStroke : Colors.transparent,
               width: selected ? 1.2 : 1.0,
             ),
           ),
           child: Row(
             children: [
               InstanceImageThumb(
-                image: view.image,              // InstanceView.image
-                fallbackSeed: view.name,        // 이름 해시로 스프라이트 인덱스 산출
+                image: view.image,
+                fallbackSeed: view.name,
                 size: 32,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
-              const SizedBox(width: 10),
+              Gaps.w8,
               Expanded(
                 child: Text(
                   view.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
               Gaps.w8,
-              if (selected)
-                Icon(FluentIcons.check_mark, size: 14, color: selColor),
+              if (selected) Icon(FluentIcons.check_mark, size: 14, color: checkColor),
             ],
           ),
         );

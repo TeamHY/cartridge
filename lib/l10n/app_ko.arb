@@ -19,6 +19,25 @@
   "@home": {
     "description": "홈 화면 UI 전반"
   },
+  "play_instance_button_title": "인스턴스 플레이",
+  "@play_instance_button_title": {
+    "description": "메인 스플릿 버튼의 기본 타이틀"
+  },
+  "instance_picker_title": "인스턴스 선택",
+  "@instance_picker_title": {
+    "description": "드롭다운 패널 헤더"
+  },
+  "instance_picker_empty": "해당하는 인스턴스가 없습니다",
+  "vanilla_play_button_title": "바닐라 플레이",
+  "vanilla_play_checking": "확인 중...",
+  "@vanilla_play_checking": {
+    "description": "Repentogon 설치 여부 조회 중 보조 텍스트"
+  },
+  "vanilla_play_check_failed": "확인 실패",
+  "vanilla_play_no_preset": "프리셋 없음",
+  "option_preset_picker_title": "옵션 프리셋 선택",
+  "option_preset_picker_empty": "해당하는 프리셋이 없습니다",
+
   "home_preset_placeholder": "새 프리셋",
   "home_button_preset": "프리셋",
   "home_button_record": "기록 모드",

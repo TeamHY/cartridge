@@ -1,4 +1,4 @@
-import 'package:cartridge/theme/theme.dart';
+import 'package:cartridge/theme/theme.dart'; // AppSpacing, AppRadius, Gaps 등
 import 'package:fluent_ui/fluent_ui.dart';
 
 class UtSplitButton extends StatefulWidget {
@@ -72,19 +72,25 @@ class _UtSplitButtonState extends State<UtSplitButton> {
 
   final flyoutController = FlyoutController();
 
-  static const double buttonHeight = 60.0;
-  static const double buttonRadius = 12;
+  // 🎯 테마 토큰
+  static const double _buttonHeight = 60.0;
+  static const double _chevronWidth = 28.0;
 
   @override
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
-    final primaryColor = widget.buttonColor;
-    final Color dividerColor = theme.dividerColor;
 
-    final hoveredMain   = _isMainButtonHovered   && widget.enabled;
-    final pressedMain   = _isMainButtonPressed   && widget.enabled;
-    final hoveredRight  = _isDropdownButtonHovered && widget.enabled;
-    final pressedRight  = _isDropdownButtonPressed && widget.enabled;
+    // 📌 semantic tokens
+    final Color strokeColor = theme.resources.controlStrokeColorDefault;
+    final Color textOnAccent = theme.resources.textOnAccentFillColorSelectedText;
+    final Color textDisabled = theme.inactiveColor;
+
+    final primaryColor = widget.buttonColor;
+
+    final hoveredMain  = _isMainButtonHovered   && widget.enabled;
+    final pressedMain  = _isMainButtonPressed   && widget.enabled;
+    final hoveredRight = _isDropdownButtonHovered && widget.enabled;
+    final pressedRight = _isDropdownButtonPressed && widget.enabled;
 
     final mainBg = widget.enabled
         ? _resolveBg(
@@ -93,153 +99,132 @@ class _UtSplitButtonState extends State<UtSplitButton> {
       pressed: pressedMain,
       brightness: theme.brightness,
     )
-        : primaryColor.withAlpha(theme.brightness == Brightness.dark ? 50 : 28);
+        : _disabledFill(primaryColor, theme.brightness);
 
     final rightBg = widget.hasDropdown
         ? (widget.enabled
         ? _resolveBg(
-      base: primaryColor,                // 같은 베이스
-      // 살짝 약하게 보이길 원하면 overlay만 줄이지 말고 아래처럼 알파 한번 더 낮춰도 됨:
-      // base: primaryColor.withOpacity(0.95),
+      base: primaryColor,
       hovered: hoveredRight,
       pressed: pressedRight,
       brightness: theme.brightness,
     )
-        : primaryColor.withAlpha(theme.brightness == Brightness.dark ? 50 : 28))
+        : _disabledFill(primaryColor, theme.brightness))
         : mainBg;
 
-    final textColor = widget.enabled
-        ? theme.resources.textOnAccentFillColorSelectedText
-        : theme.inactiveColor;
+    final textColor = widget.enabled ? textOnAccent : textDisabled;
 
-    // 메인 버튼(좌측 또는 단일)
-    final mainButton = MouseRegion(
-      onEnter: (_) => setState(() => _isMainButtonHovered = true),
-      onExit: (_) => setState(() => _isMainButtonHovered = false),
-      child: GestureDetector(
-        onTapDown: (_) => setState(() => _isMainButtonPressed = true),
-        onTapUp: (_) => setState(() => _isMainButtonPressed = false),
-        onTapCancel: () => setState(() => _isMainButtonPressed = false),
-        onTap: widget.enabled ? widget.onMainButtonPressed : null,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 100),
-          height: buttonHeight,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            border: widget.hasDropdown
-                ? Border(
-              left: BorderSide(color: dividerColor),
-              top: BorderSide(color: dividerColor),
-              bottom: BorderSide(color: dividerColor),
-            )
-                : Border.all(color: dividerColor),
-            color: mainBg,
-            borderRadius: widget.hasDropdown
-                ? const BorderRadius.only(
-              topLeft: Radius.circular(buttonRadius),
-              bottomLeft: Radius.circular(buttonRadius),
-            )
-                : BorderRadius.circular(buttonRadius),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(FluentIcons.play_solid, color: textColor),
-                Gaps.w8,
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        widget.mainButtonText,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      if (widget.secondaryText != null) ...[
-                        const SizedBox(height: 2),
-                        Text(
-                          widget.secondaryText!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: widget.enabled ? textColor.withAlpha(220) : textColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ],
+    final BorderRadius leftRadius = widget.hasDropdown
+        ? const BorderRadius.only(
+      topLeft: Radius.circular(AppRadius.lg),
+      bottomLeft: Radius.circular(AppRadius.lg),
+    )
+        : BorderRadius.circular(AppRadius.lg);
+
+    final BorderRadius rightRadius = const BorderRadius.only(
+      topRight: Radius.circular(AppRadius.lg),
+      bottomRight: Radius.circular(AppRadius.lg),
+    );
+
+    // 메인(좌/단독)
+    final mainButton = FocusableActionDetector(
+      enabled: widget.enabled,
+      onShowFocusHighlight: (_) => setState(() {}),
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isMainButtonHovered = true),
+        onExit: (_) => setState(() => _isMainButtonHovered = false),
+        child: GestureDetector(
+          onTapDown: (_) => setState(() => _isMainButtonPressed = true),
+          onTapUp: (_) => setState(() => _isMainButtonPressed = false),
+          onTapCancel: () => setState(() => _isMainButtonPressed = false),
+          onTap: widget.enabled ? widget.onMainButtonPressed : null,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
+            height: _buttonHeight,
+            alignment: Alignment.center,
+            decoration: ShapeDecoration(
+              color: mainBg,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(color: strokeColor),
+                borderRadius: leftRadius,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: AppSpacing.xs,
+                horizontal: AppSpacing.md,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(FluentIcons.play_solid, color: textColor),
+                  Gaps.w8,
+                  Expanded(
+                    child: _TwoLineLabel(
+                      primary: widget.mainButtonText,
+                      secondary: widget.secondaryText,
+                      color: textColor,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
 
-    // 드롭다운 버튼(우측) — 필요 없으면 렌더링 생략
+    // 드롭다운(우)
     final dropdownButton = !widget.hasDropdown
         ? const SizedBox.shrink()
-        : FlyoutTarget( // ★ 버튼 자체를 앵커로
+        : FlyoutTarget(
       controller: flyoutController,
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isDropdownButtonHovered = true),
-        onExit: (_) => setState(() => _isDropdownButtonHovered = false),
-        child: GestureDetector(
-          onTapDown: (_) => setState(() => _isDropdownButtonPressed = true),
-          onTapUp: (_) => setState(() => _isDropdownButtonPressed = false),
-          onTapCancel: () => setState(() => _isDropdownButtonPressed = false),
-          onTap: (widget.enabled &&
-              (widget.dropdownBuilder != null ||
-                  widget.dropdownMenuItems.isNotEmpty))
-              ? () {
-            flyoutController.showFlyout(
-              barrierColor: Colors.transparent,
-              placementMode: FlyoutPlacementMode.bottomRight,
-              builder: (ctx) {
-                final custom = widget.dropdownBuilder?.call(ctx);
-                if (custom != null) return custom;
+      child: FocusableActionDetector(
+        enabled: widget.enabled,
+        onShowFocusHighlight: (_) => setState(() {}),
+        child: MouseRegion(
+          onEnter: (_) => setState(() => _isDropdownButtonHovered = true),
+          onExit: (_) => setState(() => _isDropdownButtonHovered = false),
+          child: GestureDetector(
+            onTapDown: (_) => setState(() => _isDropdownButtonPressed = true),
+            onTapUp: (_) => setState(() => _isDropdownButtonPressed = false),
+            onTapCancel: () => setState(() => _isDropdownButtonPressed = false),
+            onTap: (widget.enabled &&
+                (widget.dropdownBuilder != null ||
+                    widget.dropdownMenuItems.isNotEmpty))
+                ? () {
+              flyoutController.showFlyout(
+                barrierColor: Colors.transparent,
+                placementMode: FlyoutPlacementMode.bottomRight,
+                builder: (ctx) {
+                  final custom = widget.dropdownBuilder?.call(ctx);
+                  if (custom != null) return custom;
 
-                return MenuFlyout(
-                  constraints: const BoxConstraints(maxWidth: 280),
-                  color: primaryColor.withAlpha(100),
-                  items: widget.dropdownMenuItems,
-                );
-              },
-            );
-          }
-              : null,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 100),
-            height: buttonHeight,
-            width: 24,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: dividerColor),
-                right: BorderSide(color: dividerColor),
-                bottom: BorderSide(color: dividerColor),
+                  return MenuFlyout(
+                    constraints: const BoxConstraints(maxWidth: 260),
+                    items: widget.dropdownMenuItems,
+                  );
+                },
+              );
+            }
+                : null,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              height: _buttonHeight,
+              width: _chevronWidth,
+              alignment: Alignment.center,
+              decoration: ShapeDecoration(
+                color: rightBg,
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: strokeColor),
+                  borderRadius: rightRadius,
+                ),
               ),
-              color: rightBg,
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(buttonRadius),
-                bottomRight: Radius.circular(buttonRadius),
+              child: Icon(
+                FluentIcons.chevron_down,
+                size: 14,
+                color: textColor,
               ),
-            ),
-            child: Icon(
-              FluentIcons.chevron_down,
-              size: 14,
-              color: textColor,
             ),
           ),
         ),
@@ -256,13 +241,63 @@ class _UtSplitButtonState extends State<UtSplitButton> {
   }
 }
 
+class _TwoLineLabel extends StatelessWidget {
+  const _TwoLineLabel({
+    required this.primary,
+    required this.secondary,
+    required this.color,
+  });
+
+  final String primary;
+  final String? secondary;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final typo = FluentTheme.of(context).typography;
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          primary,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: typo.bodyStrong?.copyWith(
+            color: color,
+            fontSize: 14,
+          ),
+        ),
+        if (secondary != null) ...[
+          Gaps.h2,
+          Text(
+            secondary!,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: typo.caption?.copyWith(
+              color: color.withAlpha(220),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// === helpers ===
+
+Color _disabledFill(Color base, Brightness b) =>
+    base.withAlpha(b == Brightness.dark ? 50 : 28);
+
 Color _resolveBg({
   required Color base,
   required bool hovered,
   required bool pressed,
   required Brightness brightness,
 }) {
-  // Fluent 권장 톤: hover < pressed (light: 어둡게, dark: 밝게)
+  // 테마 문서: hover/pressed는 overlay로 계산 (밝기별 알파 차등)
   final hoverOverlay   = (brightness == Brightness.dark)
       ? Colors.white.withAlpha(20)
       : Colors.black.withAlpha(15);

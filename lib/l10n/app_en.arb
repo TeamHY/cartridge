@@ -19,6 +19,25 @@
   "@home": {
     "description": "Home screen UI"
   },
+  "play_instance_button_title": "Play instance",
+  "@play_instance_button_title": {
+    "description": "Main split button title"
+  },
+  "instance_picker_title": "Select instance",
+  "@instance_picker_title": {
+    "description": "Dropdown panel header"
+  },
+  "instance_picker_empty": "No instances found",
+  "vanilla_play_button_title": "Play vanilla",
+  "vanilla_play_checking": "Checking…",
+  "@vanilla_play_checking": {
+    "description": "Subtitle while detecting Repentogon installation"
+  },
+  "vanilla_play_check_failed": "Check failed",
+  "vanilla_play_no_preset": "No preset",
+  "option_preset_picker_title": "Select option preset",
+  "option_preset_picker_empty": "No presets found",
+
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
   "home_button_record": "Record\nMode",

@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,7 +22,8 @@ class VanillaPlaySplitButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fTheme = FluentTheme.of(context);
+    final theme = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
     final repAsync = ref.watch(repentogonInstalledProvider);
 
     // 최근/기본 프리셋 선택
@@ -67,27 +69,27 @@ class VanillaPlaySplitButton extends ConsumerWidget {
       }
     }
 
-    // 프리셋이 없는 경우: 스킨 유지한 채 disabled/간단 액션
+    // 프리셋 없음 → 스킨 유지하되 상태 텍스트만
     if (selected == null) {
       return repAsync.when(
         loading: () => UtSplitButton.single(
-          mainButtonText: '바닐라 플레이',
-          secondaryText: '확인 중...',
-          buttonColor: fTheme.accentColor,
+          mainButtonText: loc.vanilla_play_button_title,
+          secondaryText: loc.vanilla_play_checking,
+          buttonColor: theme.accentColor,
           onPressed: _noop,
           enabled: false,
         ),
         error: (_, __) => UtSplitButton.single(
-          mainButtonText: '바닐라 플레이',
-          secondaryText: '확인 실패',
-          buttonColor: fTheme.accentColor,
+          mainButtonText: loc.vanilla_play_button_title,
+          secondaryText: loc.vanilla_play_check_failed,
+          buttonColor: theme.accentColor,
           onPressed: _noop,
           enabled: false,
         ),
         data: (installed) => UtSplitButton.single(
-          mainButtonText: '바닐라 플레이',
-          secondaryText: '프리셋 없음',
-          buttonColor: fTheme.accentColor,
+          mainButtonText: loc.vanilla_play_button_title,
+          secondaryText: loc.vanilla_play_no_preset,
+          buttonColor: theme.accentColor,
           onPressed: () {
             // 프리셋 없이 바로 실행 (Repentogon 설치시 -repentogonoff)
             if (installed) {
@@ -102,24 +104,24 @@ class VanillaPlaySplitButton extends ConsumerWidget {
       );
     }
 
-    // 프리셋이 있을 때: 메인 버튼은 선택 프리셋으로 실행, 오른쪽 화살표는 패널 오픈
+    // 프리셋 있음 → 메인 실행 + 우측 패널
     return repAsync.when(
       loading: () => UtSplitButton.single(
-        mainButtonText: '바닐라 플레이',
-        secondaryText: '확인 중...',
-        buttonColor: fTheme.accentColor,
+        mainButtonText: loc.vanilla_play_button_title,
+        secondaryText: loc.vanilla_play_checking,
+        buttonColor: theme.accentColor,
         onPressed: _noop,
         enabled: false,
       ),
       error: (_, __) => UtSplitButton.single(
-        mainButtonText: '바닐라 플레이',
-        secondaryText: '확인 실패',
-        buttonColor: fTheme.accentColor,
+        mainButtonText: loc.vanilla_play_button_title,
+        secondaryText: loc.vanilla_play_check_failed,
+        buttonColor: theme.accentColor,
         onPressed: _noop,
         enabled: false,
       ),
       data: (installed) => UtSplitButton(
-        mainButtonText: '바닐라 플레이',
+        mainButtonText: loc.vanilla_play_button_title,
         secondaryText: selected.name,
         buttonColor: buttonColor,
         onMainButtonPressed: () => launch(selected),
@@ -130,11 +132,11 @@ class VanillaPlaySplitButton extends ConsumerWidget {
           selectedId: selected.id,
           repentogonInstalled: installed,
           onPick: (id) {
-            ref.read(vanillaPresetIdProvider.notifier).state = id; // 선택만 갱신
+            ref.read(vanillaPresetIdProvider.notifier).state = id;
             Flyout.of(ctx).close();
           },
-          width: 340,
-          maxHeight: 320,
+          width: 360,
+          maxHeight: 360,
         ),
       ),
     );
@@ -143,7 +145,7 @@ class VanillaPlaySplitButton extends ConsumerWidget {
 
 void _noop() {}
 
-// 같은 파일 하단에 같이 둬도 됩니다.
+// === 패널 ===
 
 class _PresetPickerPanel extends StatefulWidget {
   const _PresetPickerPanel({
@@ -151,16 +153,14 @@ class _PresetPickerPanel extends StatefulWidget {
     required this.selectedId,
     required this.repentogonInstalled,
     required this.onPick,
-    this.width = 340,
-    this.maxHeight = 320,
+    this.width = 360,
+    this.maxHeight = 360,
   });
 
   final List<OptionPresetView> presets;
   final String selectedId;
   final bool repentogonInstalled;
-
   final ValueChanged<String> onPick;
-
   final double width;
   final double maxHeight;
 
@@ -189,61 +189,81 @@ class _PresetPickerPanelState extends State<_PresetPickerPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final fTheme = FluentTheme.of(context);
-    final divider = fTheme.dividerColor;
+    final theme = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
+
+    final stroke = theme.resources.controlStrokeColorDefault;
+    final panelBg = theme.cardColor;
+    final shadow = theme.shadowColor.withAlpha(28);
 
     final list = (_q.trim().isEmpty)
         ? widget.presets
-        : widget.presets.where((v) {
-      final q = _q.toLowerCase();
-      return v.name.toLowerCase().contains(q);
-    }).toList(growable: false);
+        : widget.presets
+        .where((v) => v.name.toLowerCase().contains(_q.toLowerCase()))
+        .toList(growable: false);
 
     return Container(
       width: widget.width,
       constraints: BoxConstraints(maxHeight: widget.maxHeight),
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.sm,
+        AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
-        color: fTheme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: divider),
+        color: panelBg,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: stroke),
         boxShadow: [
-          BoxShadow(
-            color: fTheme.shadowColor.withAlpha(30),
-            blurRadius: 14,
-            offset: const Offset(0, 8),
-          ),
+          BoxShadow(color: shadow, blurRadius: 14, offset: const Offset(0, 8)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 헤더 + 퀵 액션
+          // 헤더
           Row(
             children: [
               const Icon(FluentIcons.toolbox, size: 14),
-              const SizedBox(width: 6),
-              const Text('옵션 프리셋 선택', style: TextStyle(fontWeight: FontWeight.w600)),
+              Gaps.w6,
+              Text(
+                loc.option_preset_picker_title,
+                style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+              ),
             ],
           ),
           Gaps.h8,
+
           // 검색
           TextBox(
             controller: _searchCtrl,
             onChanged: (s) => setState(() => _q = s),
-            placeholder: '검색',
+            placeholder: loc.common_search_placeholder,
           ),
           Gaps.h8,
+
           // 목록
           Expanded(
-            child: Scrollbar(
+            child: list.isEmpty
+                ? Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+                child: Text(
+                  loc.option_preset_picker_empty,
+                  style: theme.typography.body,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            )
+                : Scrollbar(
               controller: _scrollCtrl,
               interactive: true,
               child: ListView.separated(
                 controller: _scrollCtrl,
-                primary: false, // ★ PrimaryScrollController 사용 안 함 (스크롤바 에러 방지)
+                primary: false,
                 itemCount: list.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 6),
+                separatorBuilder: (_, __) => Gaps.h4,
                 itemBuilder: (ctx, i) {
                   final v = list[i];
                   final selected = v.id == widget.selectedId;
@@ -273,8 +293,8 @@ class _PresetTile extends ConsumerWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  String _dimLabel(OptionPresetView v) {
-    if (v.fullscreen == true) return 'Fullscreen';
+  String _dimLabel(AppLocalizations loc, OptionPresetView v) {
+    if (v.fullscreen == true) return loc.option_window_fullscreen;
     if (v.windowWidth != null && v.windowHeight != null) {
       return '${v.windowWidth}×${v.windowHeight}';
     }
@@ -283,9 +303,13 @@ class _PresetTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final fTheme = FluentTheme.of(context);
-    final selColor = fTheme.accentColor;
+    final theme = FluentTheme.of(context);
     final sem = ref.watch(themeSemanticsProvider);
+    final loc = AppLocalizations.of(context);
+
+    final selStroke = theme.resources.controlStrokeColorSecondary;
+    final hoverFill = theme.cardColor;
+    final checkColor = theme.accentColor;
 
     return HoverButton(
       onPressed: onTap,
@@ -293,12 +317,15 @@ class _PresetTile extends ConsumerWidget {
         final hovered = states.isHovered;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.sm,
+          ),
           decoration: BoxDecoration(
-            color: hovered ? fTheme.cardColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            color: hovered ? hoverFill : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
-              color: selected ? selColor : Colors.transparent,
+              color: selected ? selStroke : Colors.transparent,
               width: selected ? 1.2 : 1.0,
             ),
           ),
@@ -309,27 +336,40 @@ class _PresetTile extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(view.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 2),
+                    Text(
+                      view.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    Gaps.h2,
                     Row(
                       children: [
-                        Text(_dimLabel(view),
-                            style: TextStyle(
-                                fontSize: 11, color: fTheme.inactiveColor)),
+                        Text(
+                          _dimLabel(loc, view),
+                          style: theme.typography.caption?.copyWith(
+                            fontSize: 11,
+                            color: theme.inactiveColor,
+                          ),
+                        ),
                         Gaps.w8,
                         if (view.useRepentogon == true)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.xs,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: sem.danger.bg,
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(AppRadius.xs),
                             ),
-                            child: const Text(
-                              'Repentogon',
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+                            child: Text(
+                              loc.option_use_repentogon_label,
+                              style: theme.typography.caption?.copyWith(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: sem.danger.fg
+                              ),
                             ),
                           ),
                       ],
@@ -338,7 +378,7 @@ class _PresetTile extends ConsumerWidget {
                 ),
               ),
               Gaps.w8,
-              if (selected) Icon(FluentIcons.check_mark, size: 14, color: selColor),
+              if (selected) Icon(FluentIcons.check_mark, size: 14, color: checkColor),
             ],
           ),
         );
