@@ -67,9 +67,9 @@ Future<Set<String>?> showModPresetPickerDialog(
             title: Row(
               children: [
                 const Icon(FluentIcons.check_list, size: 18),
-                const SizedBox(width: AppSpacing.xs),
+                Gaps.w4,
                 Text(loc.preset_tab_mod),
-                const SizedBox(width: AppSpacing.sm),
+                Gaps.w8,
                 Text('(${selected.length})',
                     style: TextStyle(color: theme.inactiveColor)),
               ],
@@ -95,7 +95,7 @@ Future<Set<String>?> showModPresetPickerDialog(
                           child: Icon(FluentIcons.search),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      Gaps.h4,
 
                       // 목록
                       Expanded(
@@ -139,7 +139,7 @@ Future<Set<String>?> showModPresetPickerDialog(
                                       vertical: 4),
                                   itemCount: filtered.length,
                                   separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 6),
+                                  Gaps.h6,
                                   itemBuilder: (context, index) {
                                     final p = filtered[index];
                                     final id = p.key; // presetId

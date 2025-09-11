@@ -210,7 +210,7 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
       title: Row(
         children: [
           Icon(FluentIcons.edit, size: 18, color: sem.info.fg),
-          const SizedBox(width: AppSpacing.xs),
+          Gaps.w4,
           Text(loc.slot_edit_title),
         ],
       ),
@@ -248,7 +248,7 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.sm),
+                Gaps.h8,
                 Expanded(
                   child: Scrollbar(
                     controller: _scrollCtl,
@@ -258,7 +258,7 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
                       padding: EdgeInsets.zero,
                       itemCount: _items.length,
                       separatorBuilder: (_, __) =>
-                      const SizedBox(height: AppSpacing.xs),
+                      Gaps.h4,
                       itemBuilder: (context, i) {
                         return KeyedSubtree(
                           key: ValueKey(_ids[i]),
@@ -300,7 +300,7 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: AppSpacing.xs),
+                              Gaps.w4,
                               Tooltip(
                                 message: loc.slot_remove_item,
                                 style: const TooltipThemeData(

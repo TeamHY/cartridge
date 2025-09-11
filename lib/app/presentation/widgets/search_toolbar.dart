@@ -67,7 +67,7 @@ class SearchToolbar extends StatelessWidget {
             ),
           ),
           if (actions.isNotEmpty) ...[
-            const SizedBox(width: AppSpacing.sm),
+            Gaps.w8,
             Row(children: actions),
           ],
         ],

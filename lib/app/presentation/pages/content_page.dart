@@ -97,9 +97,9 @@ class ContentPage extends ConsumerWidget {
             children: [
               for (final cat in ContentCategory.values)
                 if ((groups[cat] ?? const []).isNotEmpty) ...[
-                  const SizedBox(height: AppSpacing.md),
+                  Gaps.h12,
                   _SectionHeader(title: _categoryLabel(cat)),
-                  const SizedBox(height: AppSpacing.sm),
+                  Gaps.h8,
                   _ResponsiveCards(
                     items: groups[cat]!,
                     onOpen: (it) async {
@@ -304,7 +304,7 @@ class _ContentCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(item.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 6),
+                          Gaps.h6,
                           Text(item.description, style: const TextStyle(fontSize: 12)),
                         ],
                       ),

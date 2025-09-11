@@ -216,7 +216,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
                                     onPressed: _spinning ? null : _start,
                                   ),
                                 ),
-                                const SizedBox(width: AppSpacing.md),
+                                Gaps.w12,
                                 Tooltip(
                                   message: loc.common_edit,
                                   style: const TooltipThemeData(waitDuration: Duration.zero),
@@ -231,7 +231,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: AppSpacing.md),
+                                Gaps.w12,
                                 Tooltip(
                                   message: loc.common_delete,
                                   style: const TooltipThemeData(waitDuration: Duration.zero),

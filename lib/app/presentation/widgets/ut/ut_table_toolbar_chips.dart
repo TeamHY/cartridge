@@ -178,7 +178,7 @@ class _UTTableToolbarChipsState<T> extends State<UTTableToolbarChips<T>> {
             sidebarOn: widget.sidebarOn,
             onToggleSidebar: widget.onToggleSidebar,
           ),
-          const SizedBox(width: 6),
+          Gaps.w6,
 
           // 2) Filter 그룹 버튼
           if (baseFilterIds.isNotEmpty) ...[
@@ -205,7 +205,7 @@ class _UTTableToolbarChipsState<T> extends State<UTTableToolbarChips<T>> {
                 setState(() {});
               },
             ),
-            const SizedBox(width: 6),
+            Gaps.w6,
           ],
 
           // 3) Preset 그룹 버튼
@@ -233,7 +233,7 @@ class _UTTableToolbarChipsState<T> extends State<UTTableToolbarChips<T>> {
                 setState(() {});
               },
             ),
-            const SizedBox(width: 6),
+            Gaps.w6,
           ],
 
           // 4) Search: 좁은 화면이면 아이콘 → 클릭 시 오른쪽으로 슬라이드하며 입력창 등장
@@ -566,7 +566,7 @@ class _AdaptiveSearchState extends State<_AdaptiveSearch>
       mainAxisSize: MainAxisSize.min,
       children: [
         iconBtn,
-        if (!widget.collapsed) const SizedBox(width: 6),
+        if (!widget.collapsed) Gaps.w6,
         if (!widget.collapsed) field,
       ],
     );
@@ -657,7 +657,7 @@ class _GroupFlyoutButtonState<T> extends State<_GroupFlyoutButton<T>> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(widget.icon, size: 14),
-            const SizedBox(width: 6),
+            Gaps.w6,
             Text(widget.label),
             badge,
             Gaps.w4,
@@ -699,7 +699,7 @@ class _GroupFlyoutBodyState extends State<_GroupFlyoutBody> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(it.icon, size: 12),
-          const SizedBox(width: 6),
+          Gaps.w6,
           Text(it.label),
         ],
       );
@@ -749,7 +749,7 @@ class _GroupFlyoutBodyState extends State<_GroupFlyoutBody> {
             alignment: Alignment.centerLeft,
             child: Wrap(children: [for (final it in widget.items) chip(it)]),
           ),
-          const SizedBox(height: 6),
+          Gaps.h6,
           Align(
             alignment: Alignment.centerLeft,
             child: Text(

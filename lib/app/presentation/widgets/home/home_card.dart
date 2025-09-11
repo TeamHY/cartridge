@@ -44,14 +44,14 @@ class HomeCard extends StatelessWidget {
                 if (trailing != null) trailing!,
               ],
             ),
-            const SizedBox(height: AppSpacing.sm),
+            Gaps.h8,
             Divider(
               style: DividerThemeData(
                 horizontalMargin: EdgeInsets.zero,
                 thickness: 1,
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
+            Gaps.h8,
           ],
           child,
         ],

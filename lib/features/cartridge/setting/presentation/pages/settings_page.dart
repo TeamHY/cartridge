@@ -202,10 +202,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     final actions = <Widget>[
       Button(onPressed: _isChanged ? _saveSettings : null,
-          child: Row(children: [const Icon(FluentIcons.save), const SizedBox(width: 6), Text(loc.common_save)])),
+          child: Row(children: [const Icon(FluentIcons.save), Gaps.w6, Text(loc.common_save)])),
       Gaps.w8,
       Button(onPressed: _isChanged ? _revert : null,
-          child: Row(children: [const Icon(FluentIcons.undo), const SizedBox(width: 6), Text(loc.common_reset)])),
+          child: Row(children: [const Icon(FluentIcons.undo), Gaps.w6, Text(loc.common_reset)])),
     ];
 
     return GestureDetector(
@@ -217,7 +217,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           actions: [
             if (_isChanged) ...[
               Icon(FluentIcons.circle_shape_solid, size: 10, color: fTheme.accentColor),
-              const SizedBox(width: 10),
+              Gaps.w8,
             ],
             ...actions,
           ],
@@ -255,7 +255,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.lg),
+                      Gaps.h16,
                       LabeledBlock(
                         label: loc.setting_theme_label,
                         child: ThemePaletteScroller(
@@ -268,7 +268,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                Gaps.h16,
 
                 // ── 게임: 감지 + 경로 + 도구 + 지연
                 SettingsSection(
@@ -284,13 +284,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         useAutoInstall: _autoInstall,
                         manualInstallPath: _pathController.text,
                       ),
-                      const SizedBox(height: AppSpacing.lg),
+                      Gaps.h16,
 
                       // 아이작 설치 폴더
                       Text(loc.setting_isaac_path_label, style: AppTypography.sectionTitle),
-                      const SizedBox(height: AppSpacing.xs),
+                      Gaps.h4,
                       Text('설치 위치를 자동으로 사용하거나, 직접 지정할 수 있어요.', style: AppTypography.caption),
-                      const SizedBox(height: AppSpacing.sm),
+                      Gaps.h8,
                       PathInputGroup(
                         isFile: false,
                         auto: _autoInstall,
@@ -302,14 +302,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         pickLabel: '폴더 선택',
                       ),
 
-                      const SizedBox(height: AppSpacing.lg),
-                      const Divider(), const SizedBox(height: AppSpacing.lg),
+                      Gaps.h16,
+                      const Divider(), Gaps.h16,
 
                       // options.ini 파일
                       Text(loc.setting_options_ini_path_label, style: AppTypography.sectionTitle),
-                      const SizedBox(height: AppSpacing.xs),
+                      Gaps.h4,
                       Text('자동으로 찾거나, 직접 파일을 선택할 수 있어요.', style: fTheme.typography.caption),
-                      const SizedBox(height: AppSpacing.sm),
+                      Gaps.h8,
                       PathInputGroup(
                         isFile: true,
                         auto: _autoOptionsIni,
@@ -321,32 +321,32 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         pickLabel: '파일 선택',
                       ),
 
-                      const SizedBox(height: AppSpacing.lg),
+                      Gaps.h16,
                       const Divider(style: DividerThemeData(horizontalMargin: EdgeInsets.zero)),
-                      const SizedBox(height: AppSpacing.lg),
+                      Gaps.h16,
 
                       // Steam 도구
                       Text('Steam 속성', style: AppTypography.sectionTitle),
-                      const SizedBox(height: AppSpacing.xs),
+                      Gaps.h4,
                       Text('Steam 게임 속성 창을 엽니다. 실행 인자 등을 설정할 수 있어요.', style: AppTypography.caption),
-                      const SizedBox(height: AppSpacing.sm),
+                      Gaps.h8,
                       Button(onPressed: _openGameProperties, child: Text(loc.setting_open_properties)),
 
-                      const SizedBox(height: AppSpacing.md),
+                      Gaps.h12,
                       Text('무결성 검사', style: AppTypography.sectionTitle),
-                      const SizedBox(height: AppSpacing.xs),
+                      Gaps.h4,
                       Text('설치 파일 손상 여부를 확인하고, 문제가 있으면 복구합니다.', style: AppTypography.caption),
-                      const SizedBox(height: AppSpacing.sm),
+                      Gaps.h8,
                       FilledButton(onPressed: _runIntegrityCheck, child: Text(loc.setting_verify_integrity)),
 
-                      const SizedBox(height: AppSpacing.lg),
-                      const Divider(), const SizedBox(height: AppSpacing.lg),
+                      Gaps.h16,
+                      const Divider(), Gaps.h16,
 
                       // 자동 재시작 지연
                       Text(loc.setting_rerun_delay_label, style: AppTypography.sectionTitle),
-                      const SizedBox(height: AppSpacing.xs),
+                      Gaps.h4,
                       Text('기본 1000ms, 권장 500–3000ms', style: AppTypography.caption),
-                      const SizedBox(height: AppSpacing.sm),
+                      Gaps.h8,
                       SizedBox(
                         width: 220,
                         child: TextFormBox(
@@ -372,7 +372,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   ),
                 ),
 
-                const SizedBox(height: AppSpacing.lg),
+                Gaps.h16,
 
                 // ── 정보
                 SettingsSection(
@@ -384,7 +384,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('v$currentVersion', style: AppTypography.body),
-                      const SizedBox(height: AppSpacing.sm),
+                      Gaps.h8,
                       Button(
                         onPressed: () {
                           Navigator.of(context).push(
@@ -407,7 +407,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                Gaps.h16,
               ],
             ),
           ),

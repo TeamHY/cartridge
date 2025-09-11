@@ -379,7 +379,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(FluentIcons.folder_open),
-                                  SizedBox(width: 6),
+                                  Gaps.w6,
                                   Text('이미지 파일 선택…'),
                                 ],
                               ),
@@ -449,7 +449,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 leftPanel(),
-                const SizedBox(width: AppSpacing.md),
+                Gaps.w12,
                 rightPanel(),
               ],
             ),
@@ -464,7 +464,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
           title: Row(
             children: [
               Icon(FluentIcons.image_search, size: 18, color: accent),
-              const SizedBox(width: AppSpacing.xs),
+              Gaps.w4,
               const Text('인스턴스 이미지 선택'),
             ],
           ),

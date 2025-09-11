@@ -46,7 +46,7 @@ class YoutubeBanner extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(width: AppSpacing.lg),
+              Gaps.w16,
               // 타이틀 + 보조 아이콘
               Expanded(
                 child: Column(

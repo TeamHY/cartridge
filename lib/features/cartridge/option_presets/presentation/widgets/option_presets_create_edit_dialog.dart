@@ -138,7 +138,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
             title: Row(
               children: [
                 Icon(FluentIcons.single_column_edit, size: 18, color: accent),
-                const SizedBox(width: AppSpacing.xs),
+                Gaps.w4,
                 Text(isEditing
                     ? loc.option_window_edit_title
                     : loc.option_window_create_title),
@@ -175,7 +175,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                               ),
                             ),
                             if (useRepentogon == true) ...[
-                              const SizedBox(width: AppSpacing.sm),
+                              Gaps.w8,
                               Container(
                                 margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -213,7 +213,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                               placeholder: loc.option_preset_fallback_name,
                               onChanged: (_) => bindPreview(),
                             ),
-                            const SizedBox(height: AppSpacing.md),
+                            Gaps.h12,
                             // 전체화면 토글
                             sectionLabel(loc.option_window_fullscreen),
                             ToggleSwitch(
@@ -221,7 +221,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                               onChanged: toggleFullscreen,
                               content: Text(isFullscreen ? 'ON' : 'OFF'),
                             ),
-                            const SizedBox(height: AppSpacing.md),
+                            Gaps.h12,
                             // 추천 해상도
                             sectionLabel(loc.option_window_resolution_recommend),
                             disableIfFullscreen(
@@ -236,7 +236,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                                     .toList(),
                               ),
                             ),
-                            const SizedBox(height: AppSpacing.md),
+                            Gaps.h12,
 
                             // 가로 × 세로
                             sectionLabel(loc.option_window_size_title),
@@ -265,7 +265,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                                 ],
                               ),
                             ),
-                            const SizedBox(height: AppSpacing.md),
+                            Gaps.h12,
 
                             // X, Y
                             sectionLabel(loc.option_window_position_title),
@@ -302,7 +302,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                         ),
                       ),
 
-                      const SizedBox(height: AppSpacing.md),
+                      Gaps.h12,
 
                       // ── 고급 옵션(접이식) ──────────────────────────────────
                       // KeyedSubtree로 앵커 키를 감싸서 ensureVisible 타겟을 안정화
@@ -352,7 +352,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: AppSpacing.md),
+                              Gaps.h12,
 
                               // Gameplay/System
                               sectionLabel(loc.option_gameplay_title),
@@ -377,7 +377,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: AppSpacing.md),
+                              Gaps.h12,
 
                               // Repentogon (설치된 사용자만 노출)
                               if (repentogonInstalled) ...[
@@ -439,7 +439,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                                         : FluentIcons.arrow_down_right8,
                                     size: 14,
                                   ),
-                                  const SizedBox(width: 6),
+                                  Gaps.w6,
                                   Flexible(
                                     child: Text(
                                       loc.option_advanced_title,
@@ -449,7 +449,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                                     ),
                                   ),
                                   if (advancedTouched()) ...[
-                                    const SizedBox(width: 6),
+                                    Gaps.w6,
                                     const Icon(FluentIcons.brightness, size: 8),
                                   ],
                                 ],

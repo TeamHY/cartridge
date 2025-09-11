@@ -313,7 +313,7 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
                         ),
                       ),
 
-                      const SizedBox(width: AppSpacing.sm),
+                      Gaps.w8,
 
                       // ===== 텍스트/메뉴/뱃지 =====
                       Expanded(
@@ -341,7 +341,7 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: AppSpacing.xxs),
+                                Gaps.w2,
                                 // 편집 모드에서는 … 메뉴 숨김 (드래그 충돌/중복 방지)
                                 if (!widget.inEditMode)
                                   FlyoutTarget(

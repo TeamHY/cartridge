@@ -39,15 +39,15 @@ class PathInputGroup extends StatelessWidget {
           children: [
             Row(mainAxisSize: MainAxisSize.min, children: [
               RadioButton(checked: auto, onChanged: (_) => onModeChanged(true)),
-              const SizedBox(width: 6), const Text('자동 탐지'),
+              Gaps.w6, const Text('자동 탐지'),
             ]),
             Row(mainAxisSize: MainAxisSize.min, children: [
               RadioButton(checked: !auto, onChanged: (_) => onModeChanged(false)),
-              const SizedBox(width: 6), const Text('직접 지정'),
+              Gaps.w6, const Text('직접 지정'),
             ]),
           ],
         ),
-        const SizedBox(height: AppSpacing.sm),
+        Gaps.h8,
 
         // 2) 입력 필드만 단독 행
         Row(
@@ -71,7 +71,7 @@ class PathInputGroup extends StatelessWidget {
 
         // 3) 직접 지정 모드일 때만 액션
         if (!auto) ...[
-          const SizedBox(height: AppSpacing.sm),
+          Gaps.h8,
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -80,7 +80,7 @@ class PathInputGroup extends StatelessWidget {
                 onPressed: onPick,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(isFile ? FluentIcons.open_file : FluentIcons.open_folder_horizontal),
-                  const SizedBox(width: 6), Text(pickLabel),
+                  Gaps.w6, Text(pickLabel),
                 ]),
               ),
               Tooltip(
@@ -88,7 +88,7 @@ class PathInputGroup extends StatelessWidget {
                 child: Button(
                   onPressed: onDetect,
                   child: Row(mainAxisSize: MainAxisSize.min, children: const [
-                    Icon(FluentIcons.search), SizedBox(width: 6), Text('자동으로 채우기'),
+                    Icon(FluentIcons.search), Gaps.w6, Text('자동으로 채우기'),
                   ]),
                 ),
               ),

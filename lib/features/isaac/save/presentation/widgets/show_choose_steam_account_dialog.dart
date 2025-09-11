@@ -20,7 +20,7 @@ Future<SteamAccountProfile?> showChooseSteamAccountDialog(
       title: Row(
         children: [
           Icon(FluentIcons.folder_open, size: 18, color: accent),
-          SizedBox(width: AppSpacing.xs),
+          Gaps.w4,
           const Text('세이브 폴더 선택'),
         ],
       ),
@@ -35,7 +35,7 @@ Future<SteamAccountProfile?> showChooseSteamAccountDialog(
             controller: scrollCtrl,
             padding: EdgeInsets.all(AppSpacing.md),
             itemCount: items.length,
-            separatorBuilder: (_, __) => SizedBox(height: AppSpacing.sm),
+            separatorBuilder: (_, __) => Gaps.h8,
             itemBuilder: (ctx, i) => _AccountTile(
               profile: items[i],
               borderColor: fTheme.dividerColor,
@@ -141,7 +141,7 @@ class _AccountTileState extends State<_AccountTile> {
                             child: const Icon(FluentIcons.contact, size: 20),
                           ),
                         ),
-                        SizedBox(width: AppSpacing.sm),
+                        Gaps.w8,
                         Expanded(
                           child: Text(
                             (widget.profile.personaName?.trim().isNotEmpty ?? false)
@@ -159,7 +159,7 @@ class _AccountTileState extends State<_AccountTile> {
                             ),
                           ),
                         ),
-                        SizedBox(width: AppSpacing.xs),
+                        Gaps.w4,
                         AnimatedOpacity(
                           duration: _fast,
                           opacity: 0.6 + 0.4 * t,

@@ -64,7 +64,7 @@ class RecordModeLeftPanel extends ConsumerWidget {
           }(),
         ),
 
-        const SizedBox(height: AppSpacing.md),
+        Gaps.h12,
 
         // ⬇ 타이머는 “현재 기간”이면서 “목표가 있을 때”만 노출
         if (temporal == ContestTemporal.current && ui.goal != null)

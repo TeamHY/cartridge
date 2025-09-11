@@ -249,7 +249,7 @@ class _PromoIntro extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          Gaps.w16,
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +259,7 @@ class _PromoIntro extends StatelessWidget {
                   '아이작 오헌영 • 커뮤니티 & 후원',
                   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
-                SizedBox(height: 6),
+                Gaps.h6,
                 Text('아이작 플레이어들과 함께 만드는 공간! 방송, 커뮤니티, 공략, 그리고 다양한 이벤트 소식들을 만나보세요.'),
               ],
             ),

@@ -102,7 +102,7 @@ class _EditableHeaderTitleState extends State<EditableHeaderTitle> {
                   style: AppTypography.appBarTitle,
                 ),
               ),
-              const SizedBox(width: AppSpacing.xs),
+              Gaps.w4,
               AnimatedOpacity(
                 opacity: _hover ? 0.7 : 0.0,
                 duration: const Duration(milliseconds: 120),
@@ -151,7 +151,7 @@ class _EditableHeaderTitleState extends State<EditableHeaderTitle> {
             ),
           ),
         ),
-        const SizedBox(width: AppSpacing.xs),
+        Gaps.w4,
         Tooltip(
           message: '저장 (Enter)',
           child: FilledButton(
@@ -159,7 +159,7 @@ class _EditableHeaderTitleState extends State<EditableHeaderTitle> {
             child: const Icon(FluentIcons.save, size: 16),
           ),
         ),
-        const SizedBox(width: AppSpacing.xs),
+        Gaps.w4,
         Tooltip(
           message: '취소 (Esc)',
           child: Button(

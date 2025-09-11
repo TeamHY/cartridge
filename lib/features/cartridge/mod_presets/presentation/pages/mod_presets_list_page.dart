@@ -168,7 +168,7 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
                   },
                   child: const Text('취소'),
                 ),
-                const SizedBox(width: AppSpacing.sm),
+                Gaps.w8,
                 FilledButton(
                   onPressed: dirty
                       ? () async {
@@ -206,7 +206,7 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 6),
+                Gaps.w6,
                 Button(
                   onPressed: () {
                     if (q.trim().isNotEmpty) {
@@ -225,7 +225,7 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
                         FluentIcons.edit,
                         size: 12,
                       ),
-                      SizedBox(width: 4),
+                      Gaps.w4,
                       Text('편집'),
                     ],
                   ),
@@ -237,7 +237,7 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
               return Column(
                 children: [
                   toolbar,
-                  SizedBox(height: AppSpacing.md),
+                  Gaps.h12,
                   Expanded(
                     child: Center(
                       child: EmptyState.withDefault404(
@@ -371,7 +371,7 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
             return Column(
               children: [
                 toolbar,
-                SizedBox(height: AppSpacing.md),
+                Gaps.h12,
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, constraints) {

@@ -47,14 +47,14 @@ class SettingsSection extends StatelessWidget {
             Text(description!, style: AppTypography.body),
           ],
           if (title != null || description != null) ...[
-            const SizedBox(height: AppSpacing.md),
+            Gaps.h12,
             Divider(
               style: DividerThemeData(
                 thickness: 1,
                 horizontalMargin: EdgeInsets.zero,
               ),
             ),
-            const SizedBox(height: AppSpacing.md),
+            Gaps.h12,
           ],
           content,
         ],

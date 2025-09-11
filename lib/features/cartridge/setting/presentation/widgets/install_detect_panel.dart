@@ -107,7 +107,7 @@ class InstallDetectPanel extends ConsumerWidget {
                       child: const Icon(FluentIcons.photo2, size: 28),
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.md),
+                  Gaps.w12,
 
                   // 타이틀/경로/Repentogon 상태
                   Expanded(
@@ -115,7 +115,7 @@ class InstallDetectPanel extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(editionLabel, style: AppTypography.sectionTitle),
-                        const SizedBox(height: 2),
+                        Gaps.h2,
                         Text(
                           (info.installPath == null || info.installPath!.isEmpty)
                               ? '설치 경로를 찾을 수 없어요.'
@@ -170,7 +170,7 @@ class InstallDetectPanel extends ConsumerWidget {
 
               // Repentogon 설치 안내: “필요 + 미설치” 조건에서만
               if (info.needsRepentogon && !info.repentogonInstalled) ...[
-                const SizedBox(height: AppSpacing.sm),
+                Gaps.h8,
                 Expander(
                   header: const Text('Repentogon 설치 안내'),
                   content: Column(
@@ -178,21 +178,21 @@ class InstallDetectPanel extends ConsumerWidget {
                     children: [
                       if (info.edition == IsaacEdition.repentance) ...[
                         const Text('· GitHub Releases에서 설치 EXE를 다운로드해 실행하세요.'),
-                        const SizedBox(height: 6),
+                        Gaps.h6,
                         HyperlinkButton(
                           child: const Text('Releases 열기'),
                           onPressed: () => launchUrl(Uri.parse('https://github.com/TeamREPENTOGON/REPENTOGON/releases')),
                         ),
                       ] else ...[
                         const Text('· GitHub Actions에서 최신 ZIP을 받아 게임 폴더에 압축 해제하세요.'),
-                        const SizedBox(height: 6),
+                        Gaps.h6,
                         HyperlinkButton(
                           child: const Text('GitHub Actions 열기'),
                           onPressed: () => launchUrl(Uri.parse(
                               'https://github.com/TeamREPENTOGON/REPENTOGON/actions?query=branch%3Amain+is%3Asuccess')),
                         ),
                       ],
-                      const SizedBox(height: 10),
+                      Gaps.h8,
                       const Text('※ 설치 후 "폴더 열기"로 DLL 배치 여부를 확인하세요.'),
                     ],
                   ),

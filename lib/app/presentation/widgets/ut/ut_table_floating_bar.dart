@@ -140,7 +140,7 @@ class UTFloatingSelectionBar<T> extends StatelessWidget {
           title: const Row(
             children: [
               Icon(FluentIcons.share),
-              SizedBox(width: 6),
+              Gaps.w6,
               Text('Share'),
             ],
           ),

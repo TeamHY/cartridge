@@ -52,7 +52,7 @@ class ContentDetailPage extends StatelessWidget {
               children: [
                 // Title already in header via Hero; keep description here
                 Text(description),
-                const SizedBox(height: AppSpacing.lg),
+                Gaps.h16,
 
                 // Reserved empty content area (placeholder for future detail content)
                 Container(
@@ -79,7 +79,7 @@ class ContentDetailPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   imageWidget,
-                  const SizedBox(height: AppSpacing.lg),
+                  Gaps.h16,
                   rightPanel,
                 ],
               );
@@ -93,7 +93,7 @@ class ContentDetailPage extends StatelessWidget {
                   constraints: const BoxConstraints(maxWidth: 520),
                   child: imageWidget,
                 ),
-                const SizedBox(width: AppSpacing.lg),
+                Gaps.w16,
 
                 // Right: info + reserved area expands
                 Expanded(child: rightPanel),

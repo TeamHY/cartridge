@@ -86,7 +86,7 @@ class ThemeOptionCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.sm),
+                      Gaps.w8,
                       // 텍스트 라인 2개(가로 바)
                       Expanded(
                         child: Column(
@@ -94,7 +94,7 @@ class ThemeOptionCard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _line(width: 96, height: 8, color: text1),
-                            const SizedBox(height: AppSpacing.xs),
+                            Gaps.h4,
                             _line(width: 64, height: 8, color: text2),
                           ],
                         ),
@@ -104,7 +104,7 @@ class ThemeOptionCard extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.md),
+              Gaps.h12,
 
               // 하단 라디오 + 라벨
               Row(
@@ -113,7 +113,7 @@ class ThemeOptionCard extends StatelessWidget {
                     checked: selected,
                     onChanged: (_) => onTap(),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
+                  Gaps.w8,
                   Expanded(
                     child: Text(
                       title,

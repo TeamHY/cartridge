@@ -75,7 +75,7 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
             child: const Row(
               children: [
                 Icon(FluentIcons.play_solid),
-                SizedBox(width: 6),
+                Gaps.w6,
                 Text('게임 실행'),
               ],
             ),
@@ -97,7 +97,7 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
                     GridItem(child: RecordModeRightPanel()),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                Gaps.h16,
               ],
             );
           },
@@ -150,10 +150,10 @@ class _AccountFlyoutSmallState extends State<_AccountFlyoutSmall> {
                 style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
           if (widget.isAdmin) ...[
-            const SizedBox(width: 6),
+            Gaps.w6,
             InfoBadge(color: Colors.green, source: const Text('운영자')),
           ],
-          const SizedBox(width: 6),
+          Gaps.w6,
           const Icon(FluentIcons.chevron_down, size: 12),
         ]),
       ),

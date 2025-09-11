@@ -5,9 +5,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/features/cartridge/instances/domain/models/instance_view.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/sidebar_tile.dart';
-import 'package:cartridge/features/cartridge/mod_presets/application/mod_presets_controller.dart';
+import 'package:cartridge/features/cartridge/instances/instances.dart';
+import 'package:cartridge/features/cartridge/mod_presets/mod_presets.dart';
+import 'package:cartridge/theme/theme.dart';
 
 class PresetTileList extends ConsumerStatefulWidget {
   const PresetTileList({
@@ -86,7 +86,7 @@ class _PresetTileListState extends ConsumerState<PresetTileList> {
       child: ListView.separated(
         controller: widget.controller,
         itemCount: widget.presets.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 6),
+        separatorBuilder: (_, __) => Gaps.h6,
         itemBuilder: (context, index) {
           final p = widget.presets[index];
           final id = p.presetId;

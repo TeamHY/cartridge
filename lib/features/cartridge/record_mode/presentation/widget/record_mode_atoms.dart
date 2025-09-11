@@ -140,7 +140,7 @@ class _InfoChips {
           mainAxisSize: MainAxisSize.min, // ← 칩이 내용 길이만큼만 차지 (가로 스크롤 친화적)
           children: [
             Icon(icon, size: 14),
-            const SizedBox(width: 6),
+            Gaps.w6,
             // 가로 스크롤 안에서 잘리지 않도록 한 줄 고정 (필요시 끝까지 스크롤)
             Text(text, softWrap: false),
           ],
@@ -377,7 +377,7 @@ class GoalEmpty extends StatelessWidget {
             ),
             child: const Center(child: Icon(FluentIcons.info)),
           ),
-          const SizedBox(width: 14),
+          Gaps.w12,
           Gaps.w4,
           Expanded(
             child: Column(
@@ -511,7 +511,7 @@ class RankingEmptyPanelPast extends StatelessWidget {
               ),
               child: const Center(child: Icon(FluentIcons.info)),
             ),
-            const SizedBox(width: 14),
+            Gaps.w12,
             const Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center, // ⟵ 세로 중앙 정렬
@@ -690,7 +690,7 @@ class PodiumTile extends StatelessWidget {
               crossAxisAlignment: centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
               children: [
                 name,
-                if (time != null) ...[const SizedBox(height: 2), time],
+                if (time != null) ...[Gaps.h2, time],
               ],
             ),
           ),

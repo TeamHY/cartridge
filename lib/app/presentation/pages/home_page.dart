@@ -38,7 +38,7 @@ class HomePage extends ConsumerWidget {
                 child: Column(
                   children: [
                     QuickLaunchInline(),
-                    SizedBox(height: AppSpacing.xs),
+                    Gaps.h8,
                     SteamNewsSection(),
                   ],
                 ),
@@ -55,7 +55,7 @@ class HomePage extends ConsumerWidget {
                   colsSm: 1,
                   items: isNarrow ? narrowItems : wideItems,
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                Gaps.h16,
               ],
             );
           },

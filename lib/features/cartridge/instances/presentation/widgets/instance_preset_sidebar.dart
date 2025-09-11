@@ -121,7 +121,7 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
               selected: isModeAll,
               onTap: () => _setModeAll(tableCtrl, allIds),
             ),
-            const SizedBox(height: 6),
+            Gaps.h6,
             SidebarTile(
               icon: FluentIcons.tag,
               label: '프리셋만 보기',
@@ -129,7 +129,7 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
               selected: isModeHas,
               onTap: () => _setModeHas(tableCtrl),
             ),
-            const SizedBox(height: 6),
+            Gaps.h6,
             SidebarTile(
               icon: FluentIcons.clear_filter,
               label: '프리셋이 없는 모드만 보기',

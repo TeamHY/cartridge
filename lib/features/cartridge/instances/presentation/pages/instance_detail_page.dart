@@ -333,13 +333,13 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                   child: Row(
                     children: [
                       const Icon(FluentIcons.play_solid, size: 14),
-                      const SizedBox(width: 6),
+                      Gaps.w6,
                       Text(loc.common_play),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
+              Gaps.w6,
               FlyoutTarget(
                 controller: _headerMoreFlyout,
                 child: IconButton(

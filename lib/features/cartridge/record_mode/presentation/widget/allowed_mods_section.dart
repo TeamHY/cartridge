@@ -68,7 +68,7 @@ class _AllowedModsSectionState extends ConsumerState<AllowedModsSection> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          Gaps.h8,
           LazySwitcher(
             loading: loading,
             skeleton: const _AllowedModsSkeleton(),
@@ -145,7 +145,7 @@ class _DashboardStats extends StatelessWidget {
             Icon(icon, size: 18, color: t.accentColor),
             Gaps.h12,
             Text('$value', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
-            const SizedBox(height: 6),
+            Gaps.h6,
             Text(label, style: const TextStyle(fontSize: 12, color: Color(0xFF7A7A7A))),
           ],
         ),
@@ -305,7 +305,7 @@ class _TitleCell extends ConsumerWidget {
               prewarmPreview: false,
             ),
           ),
-          const SizedBox(width: 6),
+          Gaps.w6,
           const Tooltip(
             message: '대회 필수 모드 — 항상 활성화',
             child: Icon(FluentIcons.lock_solid, size: 14),

@@ -65,7 +65,7 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
         title: Row(
           children: [
             Icon(FluentIcons.add_medium, size: 18, color: accent),
-            const SizedBox(width: AppSpacing.xs),
+            Gaps.w4,
             Text(loc.instance_create_title),
           ],
         ),
@@ -92,18 +92,18 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
                       loc.instance_create_name_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
                     TextBox(
                       controller: nameController,
                       placeholder: loc.instance_create_name_placeholder,
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    Gaps.h12,
                     // 초기 모드 구성 섹션
                     Text(
                       loc.instance_create_initial_mode_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
 
                     _RadioRow(
                       label: loc.instance_create_all_off,
@@ -122,14 +122,14 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
                       },
                     ),
 
-                    const SizedBox(height: AppSpacing.md),
+                    Gaps.h12,
 
                     // ── 모드 프리셋(0–N 멀티 선택)
                     Text(
                       loc.preset_tab_mod,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
                     Row(
                       children: [
                         Button(
@@ -149,7 +149,7 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(FluentIcons.check_list),
-                              const SizedBox(width: AppSpacing.xs),
+                              Gaps.w4,
                               Text(
                                 '${loc.preset_tab_mod} (${selectedPresetIds.length})',
                               ),
@@ -159,14 +159,14 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
                       ],
                     ),
 
-                    const SizedBox(height: AppSpacing.md),
+                    Gaps.h12,
 
                     // ── 옵션 프리셋(0–1 단일 선택)
                     Text(
                       loc.instance_option_preset_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
                     Consumer(
                       builder: (context, ref, _) {
                         final asyncOptions = ref.watch(optionPresetsControllerProvider);
@@ -205,7 +205,7 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
                       },
                     ),
 
-                    const SizedBox(height: AppSpacing.sm),
+                    Gaps.h8,
 
                     // ── 힌트
                     Text(
@@ -280,7 +280,7 @@ Future<EditInstanceResult?> showEditInstanceDialog(
         title: Row(
           children: [
             Icon(FluentIcons.edit, size: 18, color: accent),
-            const SizedBox(width: AppSpacing.xs),
+            Gaps.w4,
             const Text('인스턴스 편집'),
           ],
         ),
@@ -307,19 +307,19 @@ Future<EditInstanceResult?> showEditInstanceDialog(
                       loc.instance_create_name_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
                     TextBox(
                       controller: nameController,
                       placeholder: loc.instance_create_name_placeholder,
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    Gaps.h12,
 
                     // ── 모드 프리셋(0–N 멀티 선택)
                     Text(
                       loc.preset_tab_mod,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
                     Row(
                       children: [
                         Button(
@@ -339,7 +339,7 @@ Future<EditInstanceResult?> showEditInstanceDialog(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(FluentIcons.check_list),
-                              const SizedBox(width: AppSpacing.xs),
+                              Gaps.w4,
                               Text(
                                 '${loc.preset_tab_mod} (${selectedPresetIds.length})',
                               ),
@@ -349,14 +349,14 @@ Future<EditInstanceResult?> showEditInstanceDialog(
                       ],
                     ),
 
-                    const SizedBox(height: AppSpacing.md),
+                    Gaps.h12,
 
                     // ── 옵션 프리셋(0–1 단일 선택)
                     Text(
                       loc.instance_option_preset_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
                     Consumer(
                       builder: (context, ref, _) {
                         final asyncOptions = ref.watch(optionPresetsControllerProvider);

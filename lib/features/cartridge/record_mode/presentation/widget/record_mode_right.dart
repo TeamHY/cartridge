@@ -23,7 +23,7 @@ class RecordModeRightPanel extends ConsumerWidget {
       children: [
         IconButton(icon: const Icon(FluentIcons.chevron_left),
             onPressed: ui.neighbors?.prev == null ? null : uiCtrl.navPrev),
-        const SizedBox(width: 6),
+        Gaps.w6,
         IconButton(icon: const Icon(FluentIcons.chevron_right),
             onPressed: ui.neighbors?.next == null ? null : uiCtrl.navNext),
         Gaps.w12,
@@ -82,7 +82,7 @@ class RecordModeRightPanel extends ConsumerWidget {
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
           child: _RightNowBlock(),
         ),
-        SizedBox(height: AppSpacing.md),
+        Gaps.h12,
         AllowedModsSection(),
       ],
     );
@@ -117,7 +117,7 @@ class _RightNowBlock extends ConsumerWidget {
           children: [
             IconButton(icon: const Icon(FluentIcons.chevron_left),
                 onPressed: ui.neighbors?.prev == null ? null : uiCtrl.navPrev),
-            const SizedBox(width: 6),
+            Gaps.w6,
             IconButton(icon: const Icon(FluentIcons.chevron_right),
                 onPressed: ui.neighbors?.next == null ? null : uiCtrl.navNext),
             Gaps.w12,

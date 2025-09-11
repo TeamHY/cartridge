@@ -1,5 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
+import 'package:cartridge/theme/theme.dart';
+
 enum _ChipTone { neutral, info, success }
 
 class UTInfoChipsRow extends StatelessWidget {
@@ -97,7 +99,7 @@ class _InfoChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 12, color: fg),
-          const SizedBox(width: 6),
+          Gaps.w6,
           Text(
             '$label ',
             style: TextStyle(

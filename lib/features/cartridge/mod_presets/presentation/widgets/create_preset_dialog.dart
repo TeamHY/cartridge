@@ -31,7 +31,7 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
         title: Row(
           children: [
             fluent.Icon(fluent.FluentIcons.add_medium, size: 18, color: accent),
-            const SizedBox(width: AppSpacing.xs),
+            Gaps.w4,
             Text(loc.mod_preset_create_title),
           ],
         ),
@@ -58,18 +58,18 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
                       loc.mod_preset_create_name_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
                     fluent.TextBox(
                       controller: nameController,
                       placeholder: loc.mod_preset_create_name_placeholder,
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    Gaps.h12,
                     // 초기 모드 구성 섹션
                     Text(
                       loc.mod_preset_create_initial_mode_label,
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
+                    Gaps.h4,
 
                     _RadioRow(
                       label: loc.mod_preset_create_all_off,
@@ -88,7 +88,7 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
                       },
                     ),
 
-                    const SizedBox(height: AppSpacing.sm),
+                    Gaps.h8,
 
                     // Hint / 도움말
                     Text(
@@ -180,7 +180,7 @@ Future<String?> showEditPresetNameDialog(
       title: Row(
         children: [
           fluent.Icon(fluent.FluentIcons.edit, size: 18, color: accent),
-          const SizedBox(width: AppSpacing.xs),
+          Gaps.w4,
           const Text('이름 수정'),
         ],
       ),
@@ -209,7 +209,7 @@ Future<String?> showEditPresetNameDialog(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('프리셋 이름', style: TextStyle(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: AppSpacing.xs),
+                  Gaps.h4,
                   fluent.TextBox(
                     controller: nameController,
                     placeholder: '새 이름을 입력하세요',

@@ -173,7 +173,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                     },
                     child: const Text('취소'),
                   ),
-                  const SizedBox(width: AppSpacing.sm),
+                  Gaps.w8,
                   FilledButton(
                     onPressed: dirty
                         ? () async {
@@ -211,7 +211,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  Gaps.w6,
                   Button(
                     onPressed: () {
                       if (q.trim().isNotEmpty) {
@@ -230,7 +230,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                           FluentIcons.edit,
                           size: 12,
                         ),
-                        SizedBox(width: 4),
+                        Gaps.w4,
                         Text('편집'),
                       ],
                     ),
@@ -242,7 +242,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                 return Column(
                   children: [
                     toolbar,
-                    SizedBox(height: AppSpacing.md),
+                    Gaps.h12,
                     Expanded(
                       child: Center(
                         child: EmptyState.withDefault404(
@@ -399,7 +399,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
               return Column(
                 children: [
                   toolbar,
-                  SizedBox(height: AppSpacing.md),
+                  Gaps.h12,
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, constraints) {

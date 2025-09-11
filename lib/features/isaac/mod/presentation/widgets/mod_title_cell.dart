@@ -211,7 +211,7 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
                             child: BadgeStrip(badges: badges),
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        Gaps.w6,
                       ],
                       Flexible(
                         fit: FlexFit.tight,
@@ -235,7 +235,7 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
                     ],
                   ),
                   if (widget.showVersionUnderTitle) ...[
-                    const SizedBox(height: 2),
+                    Gaps.h2,
                     ConstrainedBox(
                       constraints: const BoxConstraints(minWidth: 0),
                       child: Text(

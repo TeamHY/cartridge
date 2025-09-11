@@ -111,13 +111,13 @@ class IsaacHomeSection extends ConsumerWidget {
                     Row(
                       children: [
                         thumb,
-                        const SizedBox(width: AppSpacing.md),
+                        Gaps.w12,
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(editionLabel, style: AppTypography.sectionTitle),
-                              const SizedBox(height: 2),
+                              Gaps.h2,
                               Text(
                                 (info.installPath == null || info.installPath!.isEmpty)
                                     ? '설치 경로를 찾을 수 없어요.'
@@ -159,7 +159,7 @@ class IsaacHomeSection extends ConsumerWidget {
                     ),
 
                     if (info.needsRepentogon && !info.repentogonInstalled) ...[
-                      const SizedBox(height: AppSpacing.sm),
+                      Gaps.h8,
                       Expander(
                         header: const Text('Repentogon 설치 안내'),
                         content: Column(
@@ -170,7 +170,7 @@ class IsaacHomeSection extends ConsumerWidget {
                             ] else ...[
                               const Text('· GitHub Actions에서 최신 ZIP을 받아 게임 폴더에 압축 해제하세요.'),
                             ],
-                            const SizedBox(height: 10),
+                            Gaps.h8,
                             const Text('※ 설치 후 "폴더 열기"로 DLL 배치 여부를 확인하세요.'),
                           ],
                         ),
@@ -181,7 +181,7 @@ class IsaacHomeSection extends ConsumerWidget {
               },
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
+          Gaps.h12,
           Wrap(
             spacing: horizontalSpacing,
             runSpacing: verticalSpacing,

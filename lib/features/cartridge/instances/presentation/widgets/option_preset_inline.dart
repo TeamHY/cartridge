@@ -193,7 +193,7 @@ class _OptionPresetFlyoutPanelState extends State<_OptionPresetFlyoutPanel> {
           Row(
             children: [
               Icon(FluentIcons.toolbox, size: 14, color: fTheme.accentColor),
-              const SizedBox(width: 6),
+              Gaps.w6,
               Expanded(
                 child: Text(
                   widget.headerLabel,
@@ -202,7 +202,7 @@ class _OptionPresetFlyoutPanelState extends State<_OptionPresetFlyoutPanel> {
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
-              const SizedBox(width: 6),
+              Gaps.w6,
               HyperlinkButton(
                 onPressed: widget.onManage,
                 child: const Text('관리'),
@@ -224,7 +224,7 @@ class _OptionPresetFlyoutPanelState extends State<_OptionPresetFlyoutPanel> {
                 controller: _scrollCtrl,
                 primary: false,
                 itemCount: widget.options.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 6),
+                separatorBuilder: (_, __) => Gaps.h6,
                 itemBuilder: (ctx, i) {
                   final o = widget.options[i];
                   final selected = (o.id == widget.selectedId);
@@ -301,7 +301,7 @@ class _OptionPresetTile extends StatelessWidget {
                 size: 14,
                 color: selected ? fTheme.accentColor : fTheme.inactiveColor,
               ),
-              const SizedBox(width: 10),
+              Gaps.w8,
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,7 +312,7 @@ class _OptionPresetTile extends StatelessWidget {
                         fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    Gaps.h2,
                     if (subtitle.isNotEmpty)
                       Text(
                         subtitle,
@@ -433,7 +433,7 @@ class _ChipLikeHoverableState extends State<_ChipLikeHoverable> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(widget.icon, size: 10, color: _hovered ? hoverTextColor : fTheme.inactiveColor),
-                const SizedBox(width: 6),
+                Gaps.w6,
                 Flexible(
                   fit: FlexFit.loose,
                   child: Text(

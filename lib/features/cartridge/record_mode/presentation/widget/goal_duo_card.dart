@@ -27,7 +27,7 @@ class GoalDuoCard extends StatelessWidget {
         border: Border.all(color: theme.resources.cardStrokeColorDefault, width: 0.8),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        if (icon != null) ...[Icon(icon, size: 14), const SizedBox(width: 6)],
+        if (icon != null) ...[Icon(icon, size: 14), Gaps.w6],
         Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
       ]),
     );
@@ -47,14 +47,14 @@ class GoalDuoCard extends StatelessWidget {
                 width: 148, height: 125, fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(width: 10),
+            Gaps.w8,
             Column(
               children: [
                 const Icon(FluentIcons.link),
                 Container(width: 2, height: 64, color: Colors.grey[80]),
               ],
             ),
-            const SizedBox(width: 10),
+            Gaps.w8,
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: Image.asset(
@@ -64,7 +64,7 @@ class GoalDuoCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        Gaps.h8,
         Wrap(
           spacing: 8, runSpacing: 8,
           children: [

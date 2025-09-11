@@ -195,7 +195,7 @@ class _BadgeCardTileState extends ConsumerState<BadgeCardTile>
                               ),
                             ),
                           ),
-                          const SizedBox(width: AppSpacing.xxs),
+                          Gaps.w2,
                           if (!widget.inEditMode)
                             FlyoutTarget(
                               controller: _moreFlyout,
@@ -214,7 +214,7 @@ class _BadgeCardTileState extends ConsumerState<BadgeCardTile>
                             ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.xxs),
+                      Gaps.h2,
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,

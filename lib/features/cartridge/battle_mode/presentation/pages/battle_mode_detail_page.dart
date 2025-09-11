@@ -82,7 +82,7 @@ class _BattleModeDetailPageState extends ConsumerState<BattleModeDetailPage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                Gaps.h16,
               ],
             );
           },

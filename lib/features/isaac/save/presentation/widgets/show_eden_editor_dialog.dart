@@ -101,7 +101,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
           title: Row(
             children: [
               Icon(FluentIcons.pro_hockey, size: 18, color: fTheme.accentColor.normal),
-              SizedBox(width: AppSpacing.xs),
+              Gaps.w4,
               const Text('에덴 토큰'),
             ],
           ),
@@ -133,7 +133,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                     ),
                   ),
 
-                SizedBox(height: AppSpacing.md),
+                Gaps.h12,
 
                 // 슬롯 선택
                 Padding(
@@ -174,7 +174,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (selected) const Icon(FluentIcons.check_mark, size: 14),
-                              if (selected) SizedBox(width: AppSpacing.xs),
+                              if (selected) Gaps.w4,
                               Text.rich(
                                 TextSpan(
                                   children: [
@@ -194,7 +194,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                   }),
                 ),
 
-                SizedBox(height: AppSpacing.md),
+                Gaps.h12,
 
                 if (s.loading) const ProgressBar(),
 
@@ -213,7 +213,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                         Row(
                           children: [
                             const Text('토큰 값', style: TextStyle(fontWeight: FontWeight.w600)),
-                            SizedBox(width: AppSpacing.sm),
+                            Gaps.w8,
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: AppSpacing.xs,
@@ -233,7 +233,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                           ],
                         ),
 
-                        SizedBox(height: AppSpacing.sm),
+                        Gaps.h8,
 
                         // 입력부
                         Row(
@@ -249,7 +249,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                                 onChanged: (v) => setState(() => newValue = _clamp((v ?? newValue ?? 0))),
                               ),
                             ),
-                            SizedBox(width: AppSpacing.sm),
+                            Gaps.w8,
                             Button(
                               onPressed: () => setState(() => newValue = kEdenMax),
                               child: const Text('최대(10,000)'),
@@ -260,7 +260,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                     ),
                   ),
 
-                  SizedBox(height: AppSpacing.md),
+                  Gaps.h12,
 
                   if (s.edition == IsaacEdition.rebirth)
                     InfoBar(
