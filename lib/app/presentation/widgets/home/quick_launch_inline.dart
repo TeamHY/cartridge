@@ -17,6 +17,7 @@ class QuickLaunchInline extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final fTheme = FluentTheme.of(context);
     final loc = AppLocalizations.of(context);
+    final accent2 = accent2Of(context, ref);
 
     Widget vanillaButtons(Color color) {
       final optionsAsync = ref.watch(optionPresetsControllerProvider);
@@ -57,7 +58,7 @@ class QuickLaunchInline extends ConsumerWidget {
             ),
           ),
           Gaps.w8,
-          Expanded(child: vanillaButtons(fTheme.accentColor)),
+          Expanded(child: vanillaButtons(accent2.normal)),
         ],
       ),
 
@@ -73,7 +74,7 @@ class QuickLaunchInline extends ConsumerWidget {
             ),
           ),
           Gaps.w8,
-          Expanded(child: vanillaButtons(fTheme.accentColor)),
+          Expanded(child: vanillaButtons(accent2.normal)),
         ],
       ),
 
@@ -112,7 +113,7 @@ class QuickLaunchInline extends ConsumerWidget {
               ),
             ],
             Gaps.w8,
-            Expanded(child: vanillaButtons(fTheme.accentColor)),
+            Expanded(child: vanillaButtons(accent2.normal)),
           ],
         );
       },

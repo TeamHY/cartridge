@@ -16,6 +16,7 @@ class AppColors {
   static const lightDivider = Color(0xFFe5e7eb);
   static const lightMicaBackgroundColor = Color(0xFFF5F7FA);
   static const lightAcrylicBackgroundColor = Color(0xC0F0F7FF);
+  static final AccentColor lightAccent2 = makeAccent2From(const Color(0xFF0676B9));
 
   // Dark
   static const darkBackground = Color(0xFF1E1E1E);
@@ -26,6 +27,7 @@ class AppColors {
     'dark':   Color(0xFF2563EB),
   });
   static const darkDivider = Color(0xFF454545);
+  static final AccentColor darkAccent2 = makeAccent2From(const Color(0xFF1f82c6));
 
   // OLED
   static const oledBackground = Color(0xFF000000);
@@ -41,6 +43,7 @@ class AppColors {
   static const tangerineBg      = Color(0xFF1C2433);
   static const tangerineCard    = Color(0xFF2A3040);
   static const tangerineDivider = Color(0xFF3D4354);
+  static final AccentColor tangerineAccent2 = makeAccent2From(const Color(0xFF9aaffd));
 
   // Claude (Light)
   static final claudeAccent = AccentColor.swatch(const {
@@ -51,4 +54,13 @@ class AppColors {
   static const claudeBg      = Color(0xFFf5f4ee);
   static const claudeCard    = Color(0xFFfaf9f5);
   static const claudeDivider = Color(0xFFdad9d4);
+}
+
+AccentColor makeAccent2From(Color seed) {
+  return seed.toAccentColor(
+    darkFactor: 0.10,
+    darkerFactor: 0.18,
+    lightFactor: 0.08,
+    lighterFactor: 0.16,
+  );
 }

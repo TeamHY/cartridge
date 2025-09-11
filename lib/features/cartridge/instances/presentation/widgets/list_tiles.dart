@@ -1,4 +1,4 @@
-import 'package:cartridge/app/presentation/widgets/badge.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/gestures.dart' show kPrimaryMouseButton;
@@ -88,7 +88,6 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
     final fTheme = FluentTheme.of(context);
     final loc = AppLocalizations.of(context);
     final dividerColor = fTheme.dividerColor;
-    final sem = ref.watch(themeSemanticsProvider);
     final br = BorderRadius.circular(10);
 
     // 동적/정적 뱃지 합성
@@ -97,7 +96,7 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
       final useRep = ref.watch(useRepentogonByPresetIdProvider(widget.optionPresetId));
       if (useRep) {
         computedBadges.add(
-          BadgeSpec(widget.repentogonBadgeLabel ?? loc.option_use_repentogon_label, sem.danger),
+          BadgeSpec(widget.repentogonBadgeLabel ?? loc.option_use_repentogon_label, repentogonStatusOf(context, ref)),
         );
       }
     }

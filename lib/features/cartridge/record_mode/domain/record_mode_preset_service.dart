@@ -15,7 +15,6 @@ class RecordModePresetServiceImpl implements RecordModePresetService {
   final RecordModeAllowedPrefsService _prefs;
   RecordModePresetServiceImpl(this._env, this._prefs);
 
-  bool _isRecorder(String name) => name.trim().toLowerCase() == 'cartridgerecorder';
 
   @override
   Future<GamePresetView> loadAllowedPresetView() async {
@@ -40,7 +39,7 @@ class RecordModePresetServiceImpl implements RecordModePresetService {
       final k = byName[norm(m.name)];
       final loc = (k == null) ? null : installed[k];
 
-      final isRecorder = _isRecorder(m.name);
+      final isRecorder = RecorderMod.isRecorder(m.name);
       final allowed = isRecorder ? true : serverAllowed;
 
       // default 값

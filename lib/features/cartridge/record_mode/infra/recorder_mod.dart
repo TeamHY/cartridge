@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 /// Moved from core/utils to feature-scoped infra layer to better reflect
 /// ownership and dependencies (dotenv, http).
 class RecorderMod {
+  static const String name = 'CartridgeRecorder';
+  static const String brandKey = name;
+  static const String directory = 'cartridge-recorder';
   static const modMetadata = """
 <metadata>
 	<name>CartridgeRecorder</name>
@@ -15,6 +18,8 @@ class RecorderMod {
 	<visibility/>
 </metadata>
 """;
+
+  static bool isRecorder(String name) => name.trim().toLowerCase() == 'cartridgerecorder';
 
   /// Fetches the main.lua template from configured URL and injects placeholders
   /// with the provided daily/weekly values.

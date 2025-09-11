@@ -76,6 +76,9 @@
   "isaac_action_steam_verify_integrity": "Verify integrity (Steam)",
   "isaac_action_eden_token": "Eden token",
 
+  "badge_cartridge_recorder": "Cartridge",
+  "badge_repentogon": "Repentogon",
+
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
   "home_button_record": "Record\nMode",

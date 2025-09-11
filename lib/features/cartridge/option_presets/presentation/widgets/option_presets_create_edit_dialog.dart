@@ -53,351 +53,393 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) {
-      final fTheme = FluentTheme.of(ctx);
-      final loc = AppLocalizations.of(ctx);
-      final accent = fTheme.accentColor.normal;
-      final dividerColor = fTheme.dividerColor;
-      final sem = ProviderScope.containerOf(ctx, listen: false)
-          .read(themeSemanticsProvider);
+      return Consumer(builder: (ctx, ref, _) {
+        final fTheme = FluentTheme.of(ctx);
+        final loc = AppLocalizations.of(ctx);
+        final accent = fTheme.accentColor.normal;
+        final dividerColor = fTheme.dividerColor;
 
-      // 자동 펼침용, 라벨만 안 써먹음
-      bool advancedTouched() {
-        final gammaTouched = (gamma - 1.0).abs() > 1e-9;
-        final debugTouched = enableDebugConsole;      // default: false
-        final pauseTouched = !pauseOnFocusLost;       // default: true
-        final mouseTouched = !mouseControl;           // default: true
-        final repenTouched = repentogonInstalled && useRepentogon; // default: false
-        return gammaTouched || debugTouched || pauseTouched || mouseTouched || repenTouched;
-      }
-      bool advancedOpen = advancedTouched(); // 처음 열 때 자동으로 펼침
+        // 자동 펼침용, 라벨만 안 써먹음
+        bool advancedTouched() {
+          final gammaTouched = (gamma - 1.0).abs() > 1e-9;
+          final debugTouched = enableDebugConsole; // default: false
+          final pauseTouched = !pauseOnFocusLost; // default: true
+          final mouseTouched = !mouseControl; // default: true
+          final repenTouched = repentogonInstalled &&
+              useRepentogon; // default: false
+          return gammaTouched || debugTouched || pauseTouched || mouseTouched ||
+              repenTouched;
+        }
+        bool advancedOpen = advancedTouched(); // 처음 열 때 자동으로 펼침
 
-      Widget sectionLabel(String text) => Padding(
-        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
+        Widget sectionLabel(String text) =>
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: Text(
+                text,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            );
 
-      Widget chipButton(String label, VoidCallback onPressed) {
-        return Button(
-          onPressed: onPressed,
-          style: ButtonStyle(
-            padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            ),
-            backgroundColor: WidgetStateProperty.all(
-              fTheme.accentColor.withAlpha(
-                fTheme.brightness == Brightness.dark ? 128 : 80,
+        Widget chipButton(String label, VoidCallback onPressed) {
+          return Button(
+            onPressed: onPressed,
+            style: ButtonStyle(
+              padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              ),
+              backgroundColor: WidgetStateProperty.all(
+                fTheme.accentColor.withAlpha(
+                  fTheme.brightness == Brightness.dark ? 128 : 80,
+                ),
+              ),
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               ),
             ),
-            shape: WidgetStateProperty.all(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            ),
-          ),
-          child: Text(label, style: const TextStyle(fontSize: 12)),
-        );
-      }
+            child: Text(label, style: const TextStyle(fontSize: 12)),
+          );
+        }
 
-      return StatefulBuilder(
-        builder: (ctx, setState) {
-          int? parseInt(TextEditingController c) {
-            final t = c.text.trim();
-            if (t.isEmpty) return null;
-            return int.tryParse(t);
-          }
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            int? parseInt(TextEditingController c) {
+              final t = c.text.trim();
+              if (t.isEmpty) return null;
+              return int.tryParse(t);
+            }
 
-          final previewW = parseInt(widthCtl)  ?? data.windowWidth;
-          final previewH = parseInt(heightCtl) ?? data.windowHeight;
-          final previewX = parseInt(xCtl)      ?? data.windowPosX;
-          final previewY = parseInt(yCtl)      ?? data.windowPosY;
+            final previewW = parseInt(widthCtl) ?? data.windowWidth;
+            final previewH = parseInt(heightCtl) ?? data.windowHeight;
+            final previewX = parseInt(xCtl) ?? data.windowPosX;
+            final previewY = parseInt(yCtl) ?? data.windowPosY;
 
-          void bindPreview() => setState(() {});
+            void bindPreview() => setState(() {});
 
-          void toggleFullscreen(bool v) {
-            setState(() {
-              isFullscreen = v;
-              if (isFullscreen) {
-                xCtl.text = '0';
-                yCtl.text = '0';
-              }
-            });
-          }
+            void toggleFullscreen(bool v) {
+              setState(() {
+                isFullscreen = v;
+                if (isFullscreen) {
+                  xCtl.text = '0';
+                  yCtl.text = '0';
+                }
+              });
+            }
 
-          Widget disableIfFullscreen(Widget child) {
-            if (!isFullscreen) return child;
-            return Opacity(
-              opacity: 0.5,
-              child: IgnorePointer(ignoring: true, child: child),
-            );
-          }
+            Widget disableIfFullscreen(Widget child) {
+              if (!isFullscreen) return child;
+              return Opacity(
+                opacity: 0.5,
+                child: IgnorePointer(ignoring: true, child: child),
+              );
+            }
 
-          return ContentDialog(
-            title: Row(
-              children: [
-                Icon(FluentIcons.single_column_edit, size: 18, color: accent),
-                Gaps.w4,
-                Text(isEditing
-                    ? loc.option_window_edit_title
-                    : loc.option_window_create_title),
-              ],
-            ),
-            constraints: const BoxConstraints(maxWidth: 600, maxHeight: 560),
-            content: ConstrainedBox(
+            return ContentDialog(
+              title: Row(
+                children: [
+                  Icon(FluentIcons.single_column_edit, size: 18, color: accent),
+                  Gaps.w4,
+                  Text(isEditing
+                      ? loc.option_window_edit_title
+                      : loc.option_window_create_title),
+                ],
+              ),
               constraints: const BoxConstraints(maxWidth: 600, maxHeight: 560),
-              child: Scrollbar(
-                controller: scrollCtl,
-                interactive: true,
-                child: SingleChildScrollView(
+              content: ConstrainedBox(
+                constraints: const BoxConstraints(
+                    maxWidth: 600, maxHeight: 560),
+                child: Scrollbar(
                   controller: scrollCtl,
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Row(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: fTheme.accentColor.withAlpha(
-                                  fTheme.brightness == Brightness.dark ? 128 : 80,
-                                ),
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                isFullscreen
-                                    ? loc.option_window_fullscreen
-                                    : '${previewW ?? '-'} × ${previewH ?? '-'} • X:${previewX ?? '-'} Y:${previewY ?? '-'}',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ),
-                            if (useRepentogon == true) ...[
-                              Gaps.w8,
+                  interactive: true,
+                  child: SingleChildScrollView(
+                    controller: scrollCtl,
+                    child: Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: [
                               Container(
-                                margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                margin: const EdgeInsets.only(
+                                    bottom: AppSpacing.sm),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: sem.danger.fg.withAlpha(
-                                    fTheme.brightness == Brightness.dark ? 128 : 80,
+                                  color: fTheme.accentColor.withAlpha(
+                                    fTheme.brightness == Brightness.dark
+                                        ? 128
+                                        : 80,
                                   ),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Text(
-                                  loc.option_use_repentogon_label,
+                                  isFullscreen
+                                      ? loc.option_window_fullscreen
+                                      : '${previewW ?? '-'} × ${previewH ??
+                                      '-'} • X:${previewX ??
+                                      '-'} Y:${previewY ?? '-'}',
                                   style: const TextStyle(fontSize: 12),
                                 ),
                               ),
-                            ]
-                          ],
-                        ),
-                      ),
-
-                      // 카드형 컨텐트
-                      Container(
-                        decoration: BoxDecoration(
-                          color: fTheme.cardColor,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: dividerColor),
-                        ),
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 프리셋 이름
-                            sectionLabel(loc.option_name_label),
-                            TextBox(
-                              controller: nameCtl,
-                              placeholder: loc.option_preset_fallback_name,
-                              onChanged: (_) => bindPreview(),
-                            ),
-                            Gaps.h12,
-                            // 전체화면 토글
-                            sectionLabel(loc.option_window_fullscreen),
-                            ToggleSwitch(
-                              checked: isFullscreen,
-                              onChanged: toggleFullscreen,
-                              content: Text(isFullscreen ? 'ON' : 'OFF'),
-                            ),
-                            Gaps.h12,
-                            // 추천 해상도
-                            sectionLabel(loc.option_window_resolution_recommend),
-                            disableIfFullscreen(
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: _quickSizes
-                                    .map((s) => chipButton('${s.$1} × ${s.$2}', () {
-                                  applyQuickSize(s);
-                                  bindPreview();
-                                }))
-                                    .toList(),
-                              ),
-                            ),
-                            Gaps.h12,
-
-                            // 가로 × 세로
-                            sectionLabel(loc.option_window_size_title),
-                            disableIfFullscreen(
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormBox(
-                                      controller: widthCtl,
-                                      placeholder: loc.option_window_width_label,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                      onChanged: (_) => bindPreview(),
+                              if (useRepentogon == true) ...[
+                                Gaps.w8,
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      bottom: AppSpacing.sm),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: repentogonStatusOf(context, ref).fg
+                                        .withAlpha(
+                                      fTheme.brightness == Brightness.dark
+                                          ? 128
+                                          : 80,
                                     ),
+                                    borderRadius: BorderRadius.circular(999),
                                   ),
-                                  Gaps.w8,
-                                  Expanded(
-                                    child: TextFormBox(
-                                      controller: heightCtl,
-                                      placeholder: loc.option_window_height_label,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                                      onChanged: (_) => bindPreview(),
-                                    ),
+                                  child: Text(
+                                    loc.option_use_repentogon_label,
+                                    style: const TextStyle(fontSize: 12),
                                   ),
-                                ],
-                              ),
-                            ),
-                            Gaps.h12,
-
-                            // X, Y
-                            sectionLabel(loc.option_window_position_title),
-                            disableIfFullscreen(
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormBox(
-                                      controller: xCtl,
-                                      placeholder: loc.option_window_pos_x_label,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(RegExp(r'-?\d+'))
-                                      ],
-                                      onChanged: (_) => bindPreview(),
-                                    ),
-                                  ),
-                                  Gaps.w8,
-                                  Expanded(
-                                    child: TextFormBox(
-                                      controller: yCtl,
-                                      placeholder: loc.option_window_pos_y_label,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(RegExp(r'-?\d+'))
-                                      ],
-                                      onChanged: (_) => bindPreview(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Gaps.h12,
-
-                      // ── 고급 옵션(접이식) ──────────────────────────────────
-                      // KeyedSubtree로 앵커 키를 감싸서 ensureVisible 타겟을 안정화
-                      KeyedSubtree(
-                        key: advancedAnchorKey,
-                        child: Expander(
-                          // advancedOpen 변경 시 key를 바꿔서 내부 상태 재초기화
-                          key: ValueKey<bool>(advancedOpen),
-                          initiallyExpanded: advancedOpen,
-                          onStateChanged: (v) => setState(() => advancedOpen = v),
-                          headerBackgroundColor: WidgetStateProperty.all(fTheme.cardColor),
-                          contentBackgroundColor: fTheme.cardColor,
-
-                          header: Text(loc.option_advanced_title),
-                          content: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Display: Gamma
-                              sectionLabel(loc.option_gamma_label),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Slider(
-                                      value: gamma,
-                                      min: 0.5,
-                                      max: 3.5,
-                                      onChanged: (v) => setState(() =>
-                                      gamma = double.parse(v.toStringAsFixed(2))),
-                                    ),
-                                  ),
-                                  Gaps.w8,
-                                  SizedBox(
-                                    width: 56,
-                                    child: TextBox(
-                                      placeholder: '1.0',
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
-                                      ],
-                                      onChanged: (t) {
-                                        final v = double.tryParse(t);
-                                        if (v == null) return;
-                                        setState(() => gamma = v.clamp(0.5, 3.5));
-                                      },
-                                      controller:
-                                      TextEditingController(text: gamma.toStringAsFixed(2)),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Gaps.h12,
-
-                              // Gameplay/System
-                              sectionLabel(loc.option_gameplay_title),
-                              Wrap(
-                                spacing: 12,
-                                runSpacing: 8,
-                                children: [
-                                  ToggleSwitch(
-                                    checked: enableDebugConsole,
-                                    onChanged: (v) => setState(() => enableDebugConsole = v),
-                                    content: Text(loc.option_debug_console_label),
-                                  ),
-                                  ToggleSwitch(
-                                    checked: pauseOnFocusLost,
-                                    onChanged: (v) => setState(() => pauseOnFocusLost = v),
-                                    content: Text(loc.option_pause_on_focus_lost_label),
-                                  ),
-                                  ToggleSwitch(
-                                    checked: mouseControl,
-                                    onChanged: (v) => setState(() => mouseControl = v),
-                                    content: Text(loc.option_mouse_control_label),
-                                  ),
-                                ],
-                              ),
-                              Gaps.h12,
-
-                              // Repentogon (설치된 사용자만 노출)
-                              if (repentogonInstalled) ...[
-                                const Divider(),
-                                sectionLabel('Repentogon'),
-                                ToggleSwitch(
-                                  checked: useRepentogon,
-                                  onChanged: (v) => setState(() => useRepentogon = v),
-                                  content: Text(loc.option_use_repentogon_label),
                                 ),
-                              ],
+                              ]
                             ],
                           ),
                         ),
-                      ),
-                    ],
+
+                        // 카드형 컨텐트
+                        Container(
+                          decoration: BoxDecoration(
+                            color: fTheme.cardColor,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: dividerColor),
+                          ),
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 프리셋 이름
+                              sectionLabel(loc.option_name_label),
+                              TextBox(
+                                controller: nameCtl,
+                                placeholder: loc.option_preset_fallback_name,
+                                onChanged: (_) => bindPreview(),
+                              ),
+                              Gaps.h12,
+                              // 전체화면 토글
+                              sectionLabel(loc.option_window_fullscreen),
+                              ToggleSwitch(
+                                checked: isFullscreen,
+                                onChanged: toggleFullscreen,
+                                content: Text(isFullscreen ? 'ON' : 'OFF'),
+                              ),
+                              Gaps.h12,
+                              // 추천 해상도
+                              sectionLabel(
+                                  loc.option_window_resolution_recommend),
+                              disableIfFullscreen(
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: _quickSizes
+                                      .map((s) =>
+                                      chipButton('${s.$1} × ${s.$2}', () {
+                                        applyQuickSize(s);
+                                        bindPreview();
+                                      }))
+                                      .toList(),
+                                ),
+                              ),
+                              Gaps.h12,
+
+                              // 가로 × 세로
+                              sectionLabel(loc.option_window_size_title),
+                              disableIfFullscreen(
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormBox(
+                                        controller: widthCtl,
+                                        placeholder: loc
+                                            .option_window_width_label,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        onChanged: (_) => bindPreview(),
+                                      ),
+                                    ),
+                                    Gaps.w8,
+                                    Expanded(
+                                      child: TextFormBox(
+                                        controller: heightCtl,
+                                        placeholder: loc
+                                            .option_window_height_label,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        onChanged: (_) => bindPreview(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Gaps.h12,
+
+                              // X, Y
+                              sectionLabel(loc.option_window_position_title),
+                              disableIfFullscreen(
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormBox(
+                                        controller: xCtl,
+                                        placeholder: loc
+                                            .option_window_pos_x_label,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(r'-?\d+'))
+                                        ],
+                                        onChanged: (_) => bindPreview(),
+                                      ),
+                                    ),
+                                    Gaps.w8,
+                                    Expanded(
+                                      child: TextFormBox(
+                                        controller: yCtl,
+                                        placeholder: loc
+                                            .option_window_pos_y_label,
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(r'-?\d+'))
+                                        ],
+                                        onChanged: (_) => bindPreview(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Gaps.h12,
+
+                        // ── 고급 옵션(접이식) ──────────────────────────────────
+                        // KeyedSubtree로 앵커 키를 감싸서 ensureVisible 타겟을 안정화
+                        KeyedSubtree(
+                          key: advancedAnchorKey,
+                          child: Expander(
+                            // advancedOpen 변경 시 key를 바꿔서 내부 상태 재초기화
+                            key: ValueKey<bool>(advancedOpen),
+                            initiallyExpanded: advancedOpen,
+                            onStateChanged: (v) =>
+                                setState(() => advancedOpen = v),
+                            headerBackgroundColor: WidgetStateProperty.all(
+                                fTheme.cardColor),
+                            contentBackgroundColor: fTheme.cardColor,
+
+                            header: Text(loc.option_advanced_title),
+                            content: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Display: Gamma
+                                sectionLabel(loc.option_gamma_label),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Slider(
+                                        value: gamma,
+                                        min: 0.5,
+                                        max: 3.5,
+                                        onChanged: (v) =>
+                                            setState(() =>
+                                            gamma = double.parse(
+                                                v.toStringAsFixed(2))),
+                                      ),
+                                    ),
+                                    Gaps.w8,
+                                    SizedBox(
+                                      width: 56,
+                                      child: TextBox(
+                                        placeholder: '1.0',
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.allow(
+                                              RegExp(r'^\d*\.?\d*')),
+                                        ],
+                                        onChanged: (t) {
+                                          final v = double.tryParse(t);
+                                          if (v == null) return;
+                                          setState(() =>
+                                          gamma = v.clamp(0.5, 3.5));
+                                        },
+                                        controller:
+                                        TextEditingController(
+                                            text: gamma.toStringAsFixed(2)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Gaps.h12,
+
+                                // Gameplay/System
+                                sectionLabel(loc.option_gameplay_title),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 8,
+                                  children: [
+                                    ToggleSwitch(
+                                      checked: enableDebugConsole,
+                                      onChanged: (v) =>
+                                          setState(() =>
+                                          enableDebugConsole = v),
+                                      content: Text(
+                                          loc.option_debug_console_label),
+                                    ),
+                                    ToggleSwitch(
+                                      checked: pauseOnFocusLost,
+                                      onChanged: (v) =>
+                                          setState(() => pauseOnFocusLost = v),
+                                      content: Text(
+                                          loc.option_pause_on_focus_lost_label),
+                                    ),
+                                    ToggleSwitch(
+                                      checked: mouseControl,
+                                      onChanged: (v) =>
+                                          setState(() => mouseControl = v),
+                                      content: Text(
+                                          loc.option_mouse_control_label),
+                                    ),
+                                  ],
+                                ),
+                                Gaps.h12,
+
+                                // Repentogon (설치된 사용자만 노출)
+                                if (repentogonInstalled) ...[
+                                  const Divider(),
+                                  sectionLabel('Repentogon'),
+                                  ToggleSwitch(
+                                    checked: useRepentogon,
+                                    onChanged: (v) =>
+                                        setState(() => useRepentogon = v),
+                                    content: Text(
+                                        loc.option_use_repentogon_label),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
               actions: [
                 SizedBox(
                   width: double.infinity,
@@ -410,11 +452,17 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                           width: double.infinity, // 셀 폭 가득
                           child: HyperlinkButton(
                             onPressed: () {
-                              if (!advancedOpen) setState(() => advancedOpen = true);
+                              if (!advancedOpen) {
+                                setState(() =>
+                                advancedOpen = true);
+                              }
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 if (!ctx.mounted) return;
-                                final anchorCtx = advancedAnchorKey.currentContext;
-                                if (anchorCtx == null || !anchorCtx.mounted) return;
+                                final anchorCtx = advancedAnchorKey
+                                    .currentContext;
+                                if (anchorCtx == null || !anchorCtx.mounted) {
+                                  return;
+                                }
                                 Scrollable.ensureVisible(
                                   anchorCtx,
                                   alignment: 0.05,
@@ -424,7 +472,8 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                             },
                             style: ButtonStyle(
                               padding: WidgetStateProperty.all(
-                                const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 6),
                               ),
                             ),
                             // 버튼 내용은 왼쪽 정렬 + 말줄임
@@ -469,7 +518,8 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                             onPressed: () => Navigator.pop(ctx, false),
                             style: ButtonStyle(
                               padding: WidgetStateProperty.all(
-                                const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 6),
                               ),
                             ),
                             // 버튼 내용은 오른쪽 정렬 + 말줄임
@@ -499,8 +549,10 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                               if (name.isEmpty) {
                                 err = loc.option_window_error_name_required;
                               } else if (!isFullscreen) {
-                                final width = int.tryParse(widthCtl.text.trim());
-                                final height = int.tryParse(heightCtl.text.trim());
+                                final width = int.tryParse(
+                                    widthCtl.text.trim());
+                                final height = int.tryParse(
+                                    heightCtl.text.trim());
                                 final posX = int.tryParse(xCtl.text.trim());
                                 final posY = int.tryParse(yCtl.text.trim());
                                 if (width == null ||
@@ -529,7 +581,8 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                             },
                             style: ButtonStyle(
                               padding: WidgetStateProperty.all(
-                                const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 6),
                               ),
                             ),
                             // 버튼 내용은 오른쪽 정렬 + 말줄임
@@ -549,9 +602,10 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                   ),
                 ),
               ],
-          );
-        },
-      );
+            );
+          },
+        );
+      });
     },
   );
 

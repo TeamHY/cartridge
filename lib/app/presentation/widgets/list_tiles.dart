@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/gestures.dart' show kPrimaryMouseButton;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/badge.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/theme/theme.dart';
 
 class BadgeCardTile extends ConsumerStatefulWidget {

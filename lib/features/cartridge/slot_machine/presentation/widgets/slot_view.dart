@@ -238,7 +238,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
                                   child: IconButton(
                                     icon: Icon(
                                       FluentIcons.delete,
-                                      color: sem.danger.fg, // theme.sem → sem.xxx로 수정
+                                      color: sem.danger.fg,
                                       size: 24,
                                     ),
                                     onPressed: () => showDialog(

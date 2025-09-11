@@ -304,7 +304,6 @@ class _PresetTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = FluentTheme.of(context);
-    final sem = ref.watch(themeSemanticsProvider);
     final loc = AppLocalizations.of(context);
 
     final selStroke = theme.resources.controlStrokeColorSecondary;
@@ -360,7 +359,7 @@ class _PresetTile extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: sem.danger.bg,
+                              color: repentogonStatusOf(context, ref).bg,
                               borderRadius: BorderRadius.circular(AppRadius.xs),
                             ),
                             child: Text(
@@ -368,7 +367,7 @@ class _PresetTile extends ConsumerWidget {
                               style: theme.typography.caption?.copyWith(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
-                                color: sem.danger.fg
+                                color: repentogonStatusOf(context, ref).fg
                               ),
                             ),
                           ),

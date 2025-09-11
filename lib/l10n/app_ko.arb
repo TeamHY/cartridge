@@ -37,7 +37,7 @@
   "vanilla_play_no_preset": "프리셋 없음",
   "option_preset_picker_title": "옵션 프리셋 선택",
   "option_preset_picker_empty": "해당하는 프리셋이 없습니다",
-  
+
   "quick_launch_instances_failed": "인스턴스를 불러올 수 없어요.",
   "quick_launch_no_instances": "인스턴스 없음",
 
@@ -75,6 +75,9 @@
   "isaac_action_steam_game_options": "스팀 게임 옵션",
   "isaac_action_steam_verify_integrity": "스팀 무결성 검사",
   "isaac_action_eden_token": "에덴 토큰",
+
+  "badge_cartridge_recorder": "Cartridge",
+  "badge_repentogon": "Repentogon",
 
   "home_preset_placeholder": "새 프리셋",
   "home_button_preset": "프리셋",

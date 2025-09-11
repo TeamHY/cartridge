@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/badge.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/content_scaffold.dart';
 import 'package:cartridge/app/presentation/widgets/editable_header_title.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
@@ -9,24 +9,10 @@ import 'package:cartridge/app/presentation/widgets/ut/ut_table.dart';
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/core/utils/shell_open.dart';
 import 'package:cartridge/core/utils/workshop_util.dart';
-import 'package:cartridge/features/cartridge/instances/application/instance_detail_controller.dart';
-import 'package:cartridge/features/cartridge/instances/domain/instance_mod_sort_key.dart';
-import 'package:cartridge/features/cartridge/instances/domain/instance_mod_view_sort.dart';
-import 'package:cartridge/features/cartridge/instances/domain/models/applied_preset_ref.dart';
-import 'package:cartridge/features/cartridge/instances/domain/models/instance_image.dart';
-import 'package:cartridge/features/cartridge/instances/domain/models/instance_view.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/controllers/instance_detail_page_controller.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/controllers/table_providers.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/create_instance_dialog.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_image/editable_image_thumb.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_image/instance_image_picker.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_preset_sidebar.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/option_preset_inline.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/show_mod_preset_picker_dialog.dart';
-import 'package:cartridge/features/isaac/mod/domain/models/mod_view.dart';
-import 'package:cartridge/features/isaac/mod/presentation/widgets/mod_title_cell.dart';
-import 'package:cartridge/features/steam/domain/steam_app_urls.dart';
-import 'package:cartridge/features/web_preview/application/web_preview_providers.dart';
+import 'package:cartridge/features/cartridge/instances/instances.dart';
+import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
+import 'package:cartridge/features/steam/steam.dart';
+import 'package:cartridge/features/web_preview/web_preview.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
@@ -564,10 +550,6 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                             final out = <BadgeSpec>[];
                             if (showEnabledPresetUnderTitle) {
                               out.addAll(presetBadges);
-                            }
-                            // (이미 쓰시던 조건 유지 예시)
-                            if (row.isLocalMod && row.displayName == 'CartridgeRecorder') {
-                              out.add(BadgeSpec('Record Mode', sem.neutral));
                             }
                             return out;
                           },

@@ -4,7 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/badge.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/content_scaffold.dart';
 import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:cartridge/app/presentation/widgets/list_tiles.dart';
@@ -265,7 +265,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
             BadgeCardTile buildTile(OptionPresetView v, {bool disableTap = false}) {
               final badges = <BadgeSpec>[BadgeSpec(v.primaryLabel, sem.info)];
               if (v.useRepentogon == true) {
-                badges.add(BadgeSpec(loc.option_use_repentogon_label, sem.danger));
+                badges.add(BadgeSpec(loc.option_use_repentogon_label, repentogonStatusOf(context, ref)));
               }
               return BadgeCardTile(
                 title: v.name,
@@ -323,7 +323,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
             BadgeCardTile buildInnerTile(OptionPresetView v) {
               final badges = <BadgeSpec>[BadgeSpec(v.primaryLabel, sem.info)];
               if (v.useRepentogon == true) {
-                badges.add(BadgeSpec(loc.option_use_repentogon_label, sem.danger));
+                badges.add(BadgeSpec(loc.option_use_repentogon_label, repentogonStatusOf(context, ref)));
               }
               return BadgeCardTile(
                 title: v.name,

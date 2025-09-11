@@ -1,19 +1,17 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'package:cartridge/core/log.dart';
-import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/badge.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/widgets/ut/ut_table.dart';
-import 'package:cartridge/features/isaac/mod/domain/models/mod_view.dart';
-import 'package:cartridge/features/steam/domain/steam_app_urls.dart';
-import 'package:cartridge/features/web_preview/application/web_preview_providers.dart';
-import 'package:cartridge/features/web_preview/application/web_preview_cache.dart';
+import 'package:cartridge/core/log.dart';
 import 'package:cartridge/core/utils/workshop_util.dart';
+import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
+import 'package:cartridge/features/steam/steam.dart';
+import 'package:cartridge/features/web_preview/web_preview.dart';
+import 'package:cartridge/theme/theme.dart';
 
 typedef ExtraBadgesBuilder = List<BadgeSpec> Function(ModView row, FluentThemeData ft);
 typedef OnTapTitle = Future<void> Function();
@@ -120,10 +118,8 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
   @override
   Widget build(BuildContext context) {
     final tTheme = UTTableTheme.of(context);
-    final sem = ref.watch(themeSemanticsProvider);
     final density = tTheme.density;
     final bool showThumb = density != UTTableDensity.compact;
-    final loc = AppLocalizations.of(context);
 
     final double thumbSize = switch (density) {
       UTTableDensity.compact => 0,
@@ -138,15 +134,13 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
     final preview = previewAsync.maybeWhen(data: (p) => p, orElse: () => null);
     final thumbPath = preview?.imagePath;
 
-    // 기본 배지(Missing/LOCAL)
-    final badges = <BadgeSpec>[];
-    if (widget.row.isMissing) {
-      badges.add(BadgeSpec(loc.mod_missing_short, sem.danger));
-    } else if (widget.row.isLocalMod) {
-      badges.add(BadgeSpec(loc.mod_local_short, sem.info));
-    }
-    if (widget.extraBadges != null) badges.addAll(widget.extraBadges!(widget.row, fTheme));
-
+    final badges = ModBadgePolicy.build<ModView>(
+      context: context,
+      ref: ref,
+      row: widget.row,
+      nameOf: (ModView m) => m.displayName,
+      seed: widget.extraBadges?.call(widget.row, fTheme) ?? const [],
+    );
     Widget thumbPlaceholder(double size) {
       final bg = fTheme.accentColor.normal.withAlpha(28);
       final border = fTheme.accentColor.normal.withAlpha(90);

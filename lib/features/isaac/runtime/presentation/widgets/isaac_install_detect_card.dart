@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/badge.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/app/presentation/widgets/ut/ut_header_refresh_button.dart';
 import 'package:cartridge/features/cartridge/setting/setting.dart';
@@ -81,7 +81,7 @@ class IsaacInstallDetectCard extends ConsumerWidget {
               info.installSource == InstallPathSource.manual ? sem.info : sem.warning,
             ),
             if (info.canUseRepentogon && info.repentogonInstalled)
-              BadgeSpec(loc.option_use_repentogon_label, sem.danger),
+              BadgeSpec(loc.option_use_repentogon_label, repentogonStatusOf(context, ref)),
           ];
 
           final pathLine = (info.installPath == null || info.installPath!.isEmpty)

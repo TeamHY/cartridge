@@ -101,13 +101,13 @@ class GameSessionServiceImpl implements GameSessionService {
     final recorderKey = installed.entries
         .firstWhere(
           (e) =>
-      e.value.metadata.name.trim() == 'CartridgeRecorder' ||
-          e.value.metadata.directory == 'cartridge-recorder',
+      e.value.metadata.name.trim() == RecorderMod.name ||
+          e.value.metadata.directory == RecorderMod.directory,
     )
         .key;
     map[recorderKey] = ModEntry(
       key: recorderKey,
-      workshopName: 'CartridgeRecorder',
+      workshopName: RecorderMod.name,
       enabled: true,
     );
 
@@ -211,8 +211,8 @@ class GameSessionServiceImpl implements GameSessionService {
     final recorderKey = installed.entries
         .firstWhere(
           (e) =>
-      e.value.metadata.name.trim() == 'CartridgeRecorder' ||
-          e.value.metadata.directory == 'cartridge-recorder',
+      e.value.metadata.name.trim() == RecorderMod.name ||
+          e.value.metadata.directory == RecorderMod.directory,
       orElse: () => installed.entries.first, // 안전장치(없을 일은 거의 없음)
     )
         .key;

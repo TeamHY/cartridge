@@ -6,7 +6,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/badge.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/widgets/search_toolbar.dart';
 import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_image/sprite_sheet.dart' as ss;
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
@@ -263,7 +263,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                 if (v.optionPresetId != null && v.optionPresetId is String) {
                   final optionPreset = ref.read(optionPresetByIdProvider(v.optionPresetId as String));
                   if (optionPreset?.useRepentogon == true) {
-                    badges.add(BadgeSpec(loc.option_use_repentogon_label, sem.danger));
+                    badges.add(BadgeSpec(loc.option_use_repentogon_label, repentogonStatusOf(context, ref)));
                   }
                 }
 
@@ -330,7 +330,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                 if (v.optionPresetId != null && v.optionPresetId is String) {
                   final optionPreset = ref.read(optionPresetByIdProvider(v.optionPresetId as String));
                   if (optionPreset?.useRepentogon == true) {
-                    badges.add(BadgeSpec(loc.option_use_repentogon_label, sem.danger));
+                    badges.add(BadgeSpec(loc.option_use_repentogon_label, repentogonStatusOf(context, ref)));
                   }
                 }
                 return InstanceBadgeCardTile(
