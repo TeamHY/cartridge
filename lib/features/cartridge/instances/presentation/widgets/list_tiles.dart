@@ -88,7 +88,7 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
     final fTheme = FluentTheme.of(context);
     final loc = AppLocalizations.of(context);
     final dividerColor = fTheme.dividerColor;
-    final br = BorderRadius.circular(10);
+    final br = BorderRadius.circular(AppRadius.md);
 
     // 동적/정적 뱃지 합성
     final List<BadgeSpec> computedBadges = List<BadgeSpec>.of(widget.badges);
@@ -200,7 +200,7 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
                     border: Border.all(color: cardBorder()),
                     boxShadow: cardShadow(),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
                   constraints: const BoxConstraints(minHeight: 120),
 
                   child: Row(
@@ -210,7 +210,7 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
                       SizedBox(
                         width: 82,
                         height: 82,
-                        child: RepaintBoundary( // ★ 썸네일까지 경계 분리
+                        child: RepaintBoundary(
                           child: Stack(
                             alignment: Alignment.center,
                             children: [
@@ -323,6 +323,7 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                Gaps.w4,
                                 Expanded(
                                   child: Tooltip(
                                     message: widget.title,
@@ -336,7 +337,7 @@ class _InstanceBadgeCardTileState extends ConsumerState<InstanceBadgeCardTile>
                                       widget.title,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                                      style: AppTypography.listTileTitle,
                                     ),
                                   ),
                                 ),

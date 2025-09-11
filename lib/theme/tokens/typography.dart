@@ -33,6 +33,13 @@ class AppTypography {
     height: 1.25,
   );
 
+  static const TextStyle listTileTitle = TextStyle(
+    fontFamily: fontSans,
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    height: 1.25,
+  );
+
   /// 본문 기본
   static const TextStyle body = TextStyle(
     fontFamily: fontSans,

@@ -13,43 +13,43 @@
   "navigation_option_preset": "옵션 프리셋",
   "navigation_settings": "설정",
 
-  "@error": { "description": "앱 시작 단계 오류 화면" },
-  "error_startup_message": "시작 중 문제가 발생했습니다. 다시 시도하거나 창을 닫아 주세요.",
+  "@error": { "description": "프로그램 시작 단계 오류 화면" },
+  "error_startup_message": "시작하는 데 실패했어요. 다시 시도하거나 잠시 후 다시 열어주세요.",
 
   "@home": {
     "description": "홈 화면 UI 전반"
   },
-  "play_instance_button_title": "인스턴스 플레이",
+  "play_instance_button_title": "게임 실행",
   "@play_instance_button_title": {
     "description": "메인 스플릿 버튼의 기본 타이틀"
   },
-  "instance_picker_title": "인스턴스 선택",
+  "instance_picker_title": "인스턴스 고르기",
   "@instance_picker_title": {
     "description": "드롭다운 패널 헤더"
   },
-  "instance_picker_empty": "해당하는 인스턴스가 없습니다",
+  "instance_picker_empty": "만들어진 인스턴스가 없어요",
   "vanilla_play_button_title": "바닐라 플레이",
-  "vanilla_play_checking": "확인 중...",
+  "vanilla_play_checking": "확인 중이에요",
   "@vanilla_play_checking": {
     "description": "Repentogon 설치 여부 조회 중 보조 텍스트"
   },
-  "vanilla_play_check_failed": "확인 실패",
-  "vanilla_play_no_preset": "프리셋 없음",
-  "option_preset_picker_title": "옵션 프리셋 선택",
-  "option_preset_picker_empty": "해당하는 프리셋이 없습니다",
+  "vanilla_play_check_failed": "확인하지 못했어요",
+  "vanilla_play_no_preset": "프리셋이 없어요",
+  "option_preset_picker_title": "옵션 프리셋 고르기",
+  "option_preset_picker_empty": "만들어진 프리셋이 없어요",
 
-  "quick_launch_instances_failed": "인스턴스를 불러올 수 없어요.",
-  "quick_launch_no_instances": "인스턴스 없음",
+  "quick_launch_instances_failed": "인스턴스를 불러오지 못했어요. 다시 시작해 보세요.",
+  "quick_launch_no_instances": "만들어진 인스턴스가 없어요",
 
-  "news_section_title": "Steam 아이작 뉴스",
-  "news_see_more": "뉴스 더보기",
-  "news_empty_title": "최근 뉴스가 없습니다",
-  "news_error_title": "새 소식을 불러오지 못했어요",
+  "news_section_title": "스팀 뉴스 - 아이작",
+  "news_see_more": "뉴스 더 보러 가기",
+  "news_empty_title": "최근 뉴스가 없어요",
+  "news_error_title": "뉴스를 불러오는 데 실패했어요",
 
-  "install_detect_load_failed": "정보를 불러오지 못했습니다.",
-  "install_detect_refresh_failed": "새로고침에 실패했습니다.",
-  "install_detect_install_path_attention": "설치 경로 점검 필요",
-  "install_detect_edition_unknown": "감지되지 않음",
+  "install_detect_load_failed": "정보를 불러오지 못했어요.",
+  "install_detect_refresh_failed": "새로고침하지 못했어요.",
+  "install_detect_install_path_attention": "설치 경로를 확인해 주세요",
+  "install_detect_edition_unknown": "알 수 없음",
   "install_detect_badge_manual_path": "수동 경로",
   "install_detect_badge_auto_detected": "자동 탐지",
   "install_detect_path_not_found": "설치 경로를 찾을 수 없어요.",
@@ -58,32 +58,32 @@
     "description": "경로 라벨",
     "placeholders": { "path": { "type": "String" } }
   },
-  "install_detect_status_ok": "정상 설치 경로입니다.",
-  "install_detect_status_dir_not_found_manual": "사용자 지정 경로의 폴더가 존재하지 않습니다",
-  "install_detect_status_dir_not_found_auto": "자동 탐지된 경로의 폴더가 존재하지 않습니다",
-  "install_detect_status_exe_not_found": "Isaac 실행 파일을 찾을 수 없습니다",
-  "install_detect_status_auto_detect_failed": "자동 탐지에 실패했습니다. Steam 설치/라이브러리 구성을 확인해 주세요.",
-  "install_detect_status_not_configured": "설치 경로가 아직 설정되지 않았습니다.",
-  "install_detect_repentogon_help_title": "Repentogon 설치 안내",
-  "install_detect_repentogon_help_repentance": "GitHub Releases에서 설치 EXE를 다운로드해 실행하세요.",
-  "install_detect_repentogon_help_prerepentance": "GitHub Actions에서 최신 ZIP을 받아 게임 폴더에 압축 해제하세요.",
-  "install_detect_repentogon_help_verify": "설치 후 \"폴더 열기\"로 DLL 배치 여부를 확인하세요.",
+  "install_detect_status_ok": "정상적으로 설치된 경로입니다.",
+  "install_detect_status_dir_not_found_manual": "선택한 폴더가 존재하지 않아요.",
+  "install_detect_status_dir_not_found_auto": "자동으로 폴더를 찾아봤지만 아무 것도 못 찾았어요.",
+  "install_detect_status_exe_not_found": "아이작 실행 파일을 찾을 수 없어요.",
+  "install_detect_status_auto_detect_failed": "자동으로 찾지 못했어요. 스팀 설치나 라이브러리 설정을 확인해 주세요.",
+  "install_detect_status_not_configured": "아직 설치 경로가 설정되지 않았어요.",
+  "install_detect_repentogon_help_title": "Repentogon 설치하기",
+  "install_detect_repentogon_help_repentance": "GitHub Releases에서 설치 파일(exe)을 다운받아 실행해 주세요.",
+  "install_detect_repentogon_help_prerepentance": "GitHub Actions에 최신 파일(zip)을 받아 게임 폴더에 압축을 풀어주세요.",
+  "install_detect_repentogon_help_verify": "설치 후 '폴더 열기'를 눌러 DLL 파일이 제대로 있는지 확인해 보세요.",
 
   "isaac_action_open_install_folder": "게임 설치 폴더 열기",
   "isaac_action_open_options_folder": "게임 옵션 폴더 열기",
   "isaac_action_open_save_folder": "세이브 폴더 열기",
-  "isaac_action_steam_game_options": "스팀 게임 옵션",
-  "isaac_action_steam_verify_integrity": "스팀 무결성 검사",
+  "isaac_action_steam_game_options": "스팀 게임 옵션 열기",
+  "isaac_action_steam_verify_integrity": "스팀 무결성 검사하기",
   "isaac_action_eden_token": "에덴 토큰",
 
   "badge_cartridge_recorder": "Cartridge",
   "badge_repentogon": "Repentogon",
 
-  "choose_steam_title": "스팀 계정을 선택",
-  "choose_steam_error_hint": "문제가 발생했어요. 다시 시도해 주세요.",
-  "choose_steam_empty_title": "표시할 계정이 없어요",
-  "choose_steam_empty_desc": "Steam에 로그인했는지 확인해 주세요.",
-  "choose_steam_name_unset": "Unknown",
+  "choose_steam_title": "어떤 스팀 계정으로 할까요?",
+  "choose_steam_error_hint": "문제가 생겼어요. 잠시 후 다시 시도해 주세요.",
+  "choose_steam_empty_title": "스팀 계정이 보이지 않아요",
+  "choose_steam_empty_desc": "스팀에 로그인했는지 확인하고, 다시 시도해 보세요.",
+  "choose_steam_name_unset": "알 수 없음",
 
   "eden_title": "에덴 토큰",
   "@eden_title": {
@@ -110,7 +110,7 @@
     "description": "스팀 계정이 하나도 없을 때 토스트/피드백 제목"
   },
 
-  "eden_warn_no_accounts_desc": "Steam에 로그인했는지, Steam Cloud 설정을 확인해 주세요.",
+  "eden_warn_no_accounts_desc": "스팀에 로그인했는지, 스팀 Cloud 설정을 확인해 주세요.",
   "@eden_warn_no_accounts_desc": {
     "description": "계정 없음일 때 상세 설명"
   },
@@ -130,7 +130,7 @@
     "description": "컨트롤러 내부 읽기 오류 시 안내 문구"
   },
 
-  "eden_slot_help": "게임의 저장 칸(슬롯)을 선택하세요.",
+  "eden_slot_help": "게임의 저장 슬롯을 선택하세요.",
   "@eden_slot_help": {
     "description": "슬롯 버튼 위의 안내 문구"
   },
@@ -192,6 +192,73 @@
   "promo_link_naver_cafe": "네이버 카페",
   "promo_link_donate_playsquad": "후원 (플레이스쿼드)",
   "promo_link_donate_toonation": "후원 (투네이션)",
+
+  "instance_error_title": "인스턴스를 불러오는 데 실패했어요",
+  "instance_menu_reorder": "순서 바꾸기",
+
+  "instance_reorder_saved_title": "저장",
+  "instance_reorder_saved_desc": "변경한 내용을 저장했어요.",
+  "instance_reorder_not_found_title": "대상 없음",
+  "instance_reorder_not_found_desc": "저장할 인스턴스를 찾지 못했어요.",
+  "instance_reorder_invalid_title": "저장 실패",
+  "instance_reorder_invalid_desc": "순서 정보가 올바르지 않아요.",
+  "instance_reorder_conflict_title": "충돌",
+  "instance_reorder_conflict_desc": "다른 변경과 충돌했어요. 다시 시도해 주세요.",
+  "instance_reorder_failure_title": "오류",
+  "instance_reorder_failure_desc": "오류가 생겨서 저장하지 못했어요.",
+
+  "instance_reorder_unavailable_title": "순서 바꾸기 불가",
+  "instance_reorder_unavailable_desc": "검색 중에는 순서를 바꿀 수 없어요. 검색을 먼저 끝내주세요.",
+
+  "mod_preset_search_placeholder": "프리셋 검색하기",
+  "mod_preset_create_button": "프리셋 만들기",
+  "mod_preset_empty_title": "프리셋이 없어요",
+
+  "mod_preset_error_title": "프리셋을 불러오지 못했어요.",
+
+  "mod_preset_menu_reorder": "순서 바꾸기",
+
+  "mod_preset_reorder_saved_title": "저장",
+  "mod_preset_reorder_saved_desc": "변경한 내용을 저장했어요.",
+  "mod_preset_reorder_not_found_title": "대상 없음",
+  "mod_preset_reorder_not_found_desc": "저장할 프리셋을 찾지 못했어요.",
+  "mod_preset_reorder_invalid_title": "저장 실패",
+  "mod_preset_reorder_invalid_desc": "순서 정보가 올바르지 않아요.",
+  "mod_preset_reorder_conflict_title": "충돌",
+  "mod_preset_reorder_conflict_desc": "다른 변경과 충돌했어요. 다시 시도해 주세요.",
+  "mod_preset_reorder_failure_title": "오류",
+  "mod_preset_reorder_failure_desc": "오류가 생겨서 저장하지 못했어요.",
+
+  "mod_preset_reorder_unavailable_title": "순서 바꾸기 불가",
+  "mod_preset_reorder_unavailable_desc": "검색 중에는 순서를 바꿀 수 없어요. 검색을 먼저 끝내주세요.",
+
+  "mod_preset_enabled_mods": "모드 {mod}",
+  "@mod_preset_enabled_mods": {
+    "description": "프리셋에서 활성화된 모드 개수 배지",
+    "placeholders": {
+      "mod": { "type": "int", "example": "5" }
+    }
+  },
+
+  "option_error_title": "옵션 프리셋을 불러오지 못했어요.",
+  "option_empty_title": "옵션 프리셋이 없어요",
+  "option_create_button": "옵션 프리셋 만들기",
+
+  "option_menu_reorder": "순서 바꾸기",
+
+  "option_reorder_saved_title": "저장",
+  "option_reorder_saved_desc": "변경한 내용을 저장했어요.",
+  "option_reorder_not_found_title": "대상 없음",
+  "option_reorder_not_found_desc": "저장할 프리셋을 찾지 못했어요.",
+  "option_reorder_invalid_title": "저장 실패",
+  "option_reorder_invalid_desc": "순서 정보가 올바르지 않아요.",
+  "option_reorder_conflict_title": "충돌",
+  "option_reorder_conflict_desc": "다른 변경과 충돌했어요. 다시 시도해 주세요.",
+  "option_reorder_failure_title": "오류",
+  "option_reorder_failure_desc": "오류가 생겨서 저장하지 못했어요.",
+
+  "option_reorder_unavailable_title": "순서 바꾸기 불가",
+  "option_reorder_unavailable_desc": "검색 중에는 순서를 바꿀 수 없어요. 검색을 먼저 끝내주세요.",
 
   "home_preset_placeholder": "새 프리셋",
   "home_button_preset": "프리셋",
@@ -331,8 +398,15 @@
   "instance_create_hint": "모드 프리셋을 불러와서 빠르게 세팅할 수 있어요.",
   "instance_create_validate_required": "이름을 입력하세요.",
   "instance_enabled_mods": "프리셋 {preset} │ 모드 {mod}",
-  "instance_search_placeholder": "인스턴스 검색...",
-  "instance_create_button": "인스턴스 생성",
+  "@instance_enabled_mods": {
+    "description": "인스턴스 리스트에서 추가 정보 라벨",
+    "placeholders": {
+      "preset": { "type": "int", "example": "2" },
+      "mod":    { "type": "int", "example": "5" }
+    }
+  },
+  "instance_search_placeholder": "인스턴스 검색하기",
+  "instance_create_button": "인스턴스 만들기",
   "instance_option_preset_label": "옵션 프리셋",
   "instance_empty_message": "인스턴스를 추가해주세요.",
   "instance_delete_title": "인스턴스 삭제",
@@ -343,9 +417,6 @@
   "@mod_preset": {
     "description": "모드 프리셋 항목 관련 텍스트"
   },
-  "mod_preset_search_placeholder": "프리셋 검색...",
-  "mod_preset_create_button": "프리셋 생성",
-  "mod_preset_enabled_mods": "모드 {count}",
 
   "mod_preset_create_title": "모드 프리셋 생성",
   "mod_preset_create_name_label": "모드 프리셋 이름",
@@ -415,7 +486,6 @@
   "option_position_label": "위치",
   "option_repentogon_label": "Repentogon",
   "option_search_placeholder": "프리셋 검색...",
-  "option_create_button": "프리셋 생성",
 
   "@nickname": {
     "description": "닉네임 변경 다이얼로그"

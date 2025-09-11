@@ -58,14 +58,16 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
       if (!ref.read(optionPresetsReorderModeProvider)) return;
       final ids   = ref.read(optionPresetsWorkingOrderProvider);
       final dirty = ref.read(optionPresetsReorderDirtyProvider);
+      final loc = AppLocalizations.of(context);
+
       if (dirty) {
         final result = await ref.read(optionPresetsControllerProvider.notifier).reorderOptionPresets(ids);
-        result.when(
-          ok:       (_, __, ___) => UiFeedback.success(context, '저장됨', '변경 내용이 저장되었습니다.'),
-          notFound: (_, __)      => UiFeedback.warn(context, '대상 없음', '저장할 옵션 프리셋을 찾지 못했습니다.'),
-          invalid:  (_, __, ___) => UiFeedback.error(context, '저장 실패', '정렬 데이터가 올바르지 않습니다.'),
-          conflict: (_, __)      => UiFeedback.warn(context, '충돌', '다른 변경과 충돌했습니다. 다시 시도하세요.'),
-          failure:  (_, __, ___) => UiFeedback.error(context, '오류', '정렬 저장 중 오류가 발생했습니다.'),
+        await result.when(
+          ok:       (_, __, ___) async => UiFeedback.success(context, loc.option_reorder_saved_title,     loc.option_reorder_saved_desc),
+          notFound: (_, __)      async => UiFeedback.warn(context,    loc.option_reorder_not_found_title,  loc.option_reorder_not_found_desc),
+          invalid:  (_, __, ___) async => UiFeedback.error(context,   loc.option_reorder_invalid_title,    loc.option_reorder_invalid_desc),
+          conflict: (_, __)      async => UiFeedback.warn(context,    loc.option_reorder_conflict_title,   loc.option_reorder_conflict_desc),
+          failure:  (_, __, ___) async => UiFeedback.error(context,   loc.option_reorder_failure_title,    loc.option_reorder_failure_desc),
         );
       }
       ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
@@ -101,148 +103,162 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final loc   = AppLocalizations.of(context);
+    final loc    = AppLocalizations.of(context);
     final fTheme = FluentTheme.of(context);
-    final sem = ref.watch(themeSemanticsProvider);
 
     final listAsync = ref.watch(orderedOptionPresetsForUiProvider);
     final inReorder = ref.watch(optionPresetsReorderModeProvider);
     final dirty     = ref.watch(optionPresetsReorderDirtyProvider);
     final q         = ref.watch(optionPresetsQueryProvider);
 
-    return ScaffoldPage(
-      header: const ContentHeaderBar.none(),
-      content: ContentShell(
-        scrollable: false,
-        child: listAsync.when(
-          loading: () => const Center(child: ProgressRing()),
-          error: (err, st) => Center(child: Text('프리셋 로딩 실패: $err')),
-          data: (List<OptionPresetView> list) {
-            if (inReorder) {
-              final working = ref.read(optionPresetsWorkingOrderProvider);
-              final curIds = list.map((e) => e.id).toList(growable: false);
-              final next = <String>[
-                ...working.where(curIds.contains),
-                ...curIds.where((id) => !working.contains(id)),
-              ];
-              if (next.length != working.length ||
-                  !const ListEquality().equals(next, working)) {
-                ref.read(optionPresetsWorkingOrderProvider.notifier).setAll(next);
-                ref
-                    .read(optionPresetsReorderDirtyProvider.notifier)
-                    .state = true;
-              }
+    // 상단 툴바 (로딩/에러에서도 항상 유지)
+    Widget toolbar0(List<OptionPresetView> currentList) {
+      return SearchToolbar(
+        controller: _searchCtrl,
+        placeholder: loc.option_search_placeholder,
+        onChanged: _onSearchChanged,
+        enabled: !inReorder,
+        actions: inReorder
+            ? [
+          Button(
+            onPressed: () {
+              ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
+              ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
+              ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(currentList);
+              _idleTimer?.cancel();
+              _dragReportedDirty = false;
+            },
+            child: Text(loc.common_cancel),
+          ),
+          Gaps.w8,
+          FilledButton(
+            onPressed: dirty
+                ? () async {
+              final ids = ref.read(optionPresetsWorkingOrderProvider);
+              final result = await ref.read(optionPresetsControllerProvider.notifier).reorderOptionPresets(ids);
+              await result.when(
+                ok:       (_, __, ___) async {
+                  ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
+                  ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
+                  UiFeedback.success(context, loc.option_reorder_saved_title, loc.option_reorder_saved_desc);
+                  _dragReportedDirty = false;
+                },
+                notFound: (_, __)      async => UiFeedback.warn(context,  loc.option_reorder_not_found_title, loc.option_reorder_not_found_desc),
+                invalid:  (_, __, ___) async => UiFeedback.error(context, loc.option_reorder_invalid_title,    loc.option_reorder_invalid_desc),
+                conflict: (_, __)      async => UiFeedback.warn(context,  loc.option_reorder_conflict_title,   loc.option_reorder_conflict_desc),
+                failure:  (_, __, ___) async => UiFeedback.error(context, loc.option_reorder_failure_title,    loc.option_reorder_failure_desc),
+              );
+              _idleTimer?.cancel();
             }
-
-            Future<void> createOrEdit({OptionPresetView? initial}) async {
+                : null,
+            child: Text(loc.common_save),
+          ),
+        ]
+            : [
+          Button(
+            onPressed: () async {
+              // 생성/수정 플로우 (신규)
               final repInstalled = await ref.read(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
-              OptionPresetView? init = initial;
-              if (init == null) {
-                try {
-                  init = await ref.read(optionPresetInitialFromCurrentProvider.future);
-                } catch (_) {
-                  init = null; // 실패하면 기존처럼 빈 값
-                }
+              OptionPresetView? init;
+              try {
+                init = await ref.read(optionPresetInitialFromCurrentProvider.future);
+              } catch (_) {
+                init = null;
               }
               if (!context.mounted) return;
-              final result = await showOptionPresetsCreateEditDialog(
-                context,
+              final result = await showOptionPresetsCreateEditDialog(context,
                 initial: init,
                 repentogonInstalled: repInstalled,
               );
               if (result == null) return;
 
               final ctl = ref.read(optionPresetsControllerProvider.notifier);
-              if (initial == null) {
+              if (init == null) {
                 final withId = result.id.trim().isEmpty ? result.copyWith(id: IdUtil.genId('op')) : result;
                 await ctl.create(withId);
               } else {
                 await ctl.fetch(result);
               }
+            },
+            child: Row(
+              children: [
+                const Icon(FluentIcons.add, size: 12),
+                Gaps.w4,
+                Text(loc.option_create_button),
+              ],
+            ),
+          ),
+          Gaps.w6,
+          Button(
+            onPressed: () {
+              if (q.trim().isNotEmpty) {
+                UiFeedback.warn(context, loc.option_reorder_unavailable_title, loc.option_reorder_unavailable_desc);
+                return;
+              }
+              ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
+              ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
+              ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(currentList);
+              _dragReportedDirty = false;
+              _startIdleTimer();
+            },
+            child: Row(
+              children: [
+                const Icon(FluentIcons.edit, size: 12),
+                Gaps.w4,
+                Text(loc.common_edit),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    return ScaffoldPage(
+      header: const ContentHeaderBar.none(),
+      content: ContentShell(
+        scrollable: false,
+        child: listAsync.when(
+          // 로딩: 툴바 + 본문 중앙 로더 (레이아웃 유지)
+          loading: () => Column(
+            children: [
+              toolbar0(const []),
+              Gaps.h12,
+              const Expanded(child: Center(child: ProgressRing())),
+            ],
+          ),
+
+          // 에러: 친화적 메시지 + 새로고침 (레이아웃 유지)
+          error: (_, __) => Column(
+            children: [
+              toolbar0(const []),
+              Gaps.h12,
+              Expanded(
+                child: Center(
+                  child: EmptyState.withDefault404(
+                    title: loc.option_error_title,
+                    primaryLabel: loc.common_refresh,
+                    onPrimary: () => ref.invalidate(orderedOptionPresetsForUiProvider),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          data: (List<OptionPresetView> list) {
+            if (inReorder) {
+              final working = ref.read(optionPresetsWorkingOrderProvider);
+              final curIds  = list.map((e) => e.id).toList(growable: false);
+              final next = <String>[
+                ...working.where(curIds.contains),
+                ...curIds.where((id) => !working.contains(id)),
+              ];
+              if (next.length != working.length || !const ListEquality().equals(next, working)) {
+                ref.read(optionPresetsWorkingOrderProvider.notifier).setAll(next);
+                ref.read(optionPresetsReorderDirtyProvider.notifier).state = true;
+              }
             }
 
-            // ── SearchToolbar(actions:) ──
-            final toolbar = SearchToolbar(
-              controller: _searchCtrl,
-              placeholder: loc.option_search_placeholder,
-              onChanged: _onSearchChanged,
-              enabled: !inReorder,
-              actions: inReorder
-                  ? [
-                Button(
-                  onPressed: () {
-                    ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
-                    ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-                    ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(list);
-                    _idleTimer?.cancel();
-                    _dragReportedDirty = false;
-                  },
-                  child: const Text('취소'),
-                ),
-                Gaps.w8,
-                FilledButton(
-                  onPressed: dirty
-                      ? () async {
-                    final ids = ref.read(optionPresetsWorkingOrderProvider);
-                    final result = await ref.read(optionPresetsControllerProvider.notifier).reorderOptionPresets(ids);
-                    await result.when(
-                      ok:       (_, __, ___) async {
-                        ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
-                        ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-                        UiFeedback.success(context, '저장됨', '변경 내용이 저장되었습니다.');
-                        _dragReportedDirty = false;
-                      },
-                      notFound: (_, __)      async => UiFeedback.warn(context, '대상 없음', '저장할 프리셋을 찾지 못했습니다.'),
-                      invalid:  (_, __, ___) async => UiFeedback.error(context, '저장 실패', '정렬 데이터가 올바르지 않습니다.'),
-                      conflict: (_, __)      async => UiFeedback.warn(context, '충돌', '다른 변경과 충돌했습니다. 다시 시도해 주세요.'),
-                      failure:  (_, __, ___) async => UiFeedback.error(context, '오류', '정렬 저장 중 오류가 발생했습니다.'),
-                    );
-                    _idleTimer?.cancel();
-                  }
-                      : null,
-                  child: const Text('저장'),
-                ),
-              ]
-                  : [
-                Button(
-                  onPressed: createOrEdit,
-                  child: Row(
-                    children: [
-                      const Icon(
-                        FluentIcons.add,
-                        size: 12,
-                      ),
-                      Gaps.w4,
-                      Text(loc.option_create_button),
-                    ],
-                  ),
-                ),
-                Gaps.w6,
-                Button(
-                  onPressed: () {
-                    if (q.trim().isNotEmpty) {
-                      UiFeedback.warn(context, '정렬 편집 불가', '검색 중에는 정렬을 시작할 수 없습니다.');
-                      return;
-                    }
-                    ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
-                    ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-                    ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(list);
-                    _dragReportedDirty = false;
-                    _startIdleTimer();
-                  },
-                  child: const Row(
-                    children: [
-                      Icon(
-                        FluentIcons.edit,
-                        size: 12,
-                      ),
-                      Gaps.w4,
-                      Text('편집'),
-                    ],
-                  ),
-                ),
-              ],
-            );
+            final toolbar = toolbar0(list);
 
             if (list.isEmpty) {
               return Column(
@@ -252,10 +268,20 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                   Expanded(
                     child: Center(
                       child: EmptyState.withDefault404(
-                        title: '옵션 프리셋이 없습니다',
-                        primaryLabel: '옵션 프리셋 만들기',
-                        onPrimary: createOrEdit,
-                      )
+                        title: loc.option_empty_title,
+                        primaryLabel: loc.option_create_button,
+                        onPrimary: () async {
+                          final repInstalled = await ref.read(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
+                          if (!context.mounted) return;
+                          final res = await showOptionPresetsCreateEditDialog(context,
+                            repentogonInstalled: repInstalled,
+                          );
+                          if (res == null) return;
+                          final ctl = ref.read(optionPresetsControllerProvider.notifier);
+                          final withId = res.id.trim().isNotEmpty ? res : res.copyWith(id: IdUtil.genId('op'));
+                          await ctl.create(withId);
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -263,9 +289,9 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
             }
 
             BadgeCardTile buildTile(OptionPresetView v, {bool disableTap = false}) {
-              final badges = <BadgeSpec>[BadgeSpec(v.primaryLabel, sem.info)];
+              final badges = <BadgeSpec>[BadgeSpec(v.primaryLabel, accent2StatusOf(context, ref))];
               if (v.useRepentogon == true) {
-                badges.add(BadgeSpec(loc.option_use_repentogon_label, repentogonStatusOf(context, ref)));
+                badges.add(BadgeSpec(AppLocalizations.of(context).option_use_repentogon_label, repentogonStatusOf(context, ref)));
               }
               return BadgeCardTile(
                 title: v.name,
@@ -278,17 +304,25 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                   _bumpIdleTimer();
                 }
                     : null,
-                onTap: disableTap ? () {} : () => createOrEdit(initial: v),
+                onTap: disableTap
+                    ? () {}
+                    : () async {
+                  final repInstalled = await ref.read(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
+                  if (!context.mounted) return;
+                  final res = await showOptionPresetsCreateEditDialog(context, initial: v, repentogonInstalled: repInstalled);
+                  if (res == null) return;
+                  await ref.read(optionPresetsControllerProvider.notifier).fetch(res);
+                },
                 menuBuilder: (ctx) => MenuFlyout(
                   color: fTheme.scaffoldBackgroundColor,
                   items: [
                     if (!inReorder)
                       MenuFlyoutItem(
-                        text: const Text('정렬 편집'),
+                        text: Text(loc.option_menu_reorder),
                         leading: const Icon(FluentIcons.drag_object),
                         onPressed: () {
                           if (q.trim().isNotEmpty) {
-                            UiFeedback.warn(context, '정렬 편집 불가', '검색 중에는 정렬을 시작할 수 없습니다.');
+                            UiFeedback.warn(context, loc.option_reorder_unavailable_title, loc.option_reorder_unavailable_desc);
                             return;
                           }
                           ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
@@ -303,55 +337,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                       leading: const Icon(FluentIcons.copy),
                       onPressed: () async {
                         await ref.read(optionPresetsControllerProvider.notifier).clone(
-                          v.id, loc.common_duplicate_suffix,
-                        );
-                      },
-                    ),
-                    MenuFlyoutItem(
-                      text: Text(loc.common_delete),
-                      leading: const Icon(FluentIcons.delete),
-                      onPressed: () async {
-                        await ref.read(optionPresetsControllerProvider.notifier).remove(v.id);
-                      },
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            // 타일
-            BadgeCardTile buildInnerTile(OptionPresetView v) {
-              final badges = <BadgeSpec>[BadgeSpec(v.primaryLabel, sem.info)];
-              if (v.useRepentogon == true) {
-                badges.add(BadgeSpec(loc.option_use_repentogon_label, repentogonStatusOf(context, ref)));
-              }
-              return BadgeCardTile(
-                title: v.name,
-                badges: badges,
-                onTap: () => createOrEdit(initial: v),
-                menuBuilder: (ctx) => MenuFlyout(
-                  color: fTheme.scaffoldBackgroundColor,
-                  items: [
-                    MenuFlyoutItem(
-                      text: const Text('정렬 편집'),
-                      leading: const Icon(FluentIcons.drag_object),
-                      onPressed: () {
-                        if (q.trim().isNotEmpty) {
-                          UiFeedback.warn(context, '정렬 편집 불가', '검색 중에는 정렬을 시작할 수 없습니다.');
-                          return;
-                        }
-                        ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
-                        ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-                        ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(list);
-                        _dragReportedDirty = false;
-                        _startIdleTimer();
-                      },
-                    ),
-                    MenuFlyoutItem(
-                      text: Text(loc.common_duplicate),
-                      leading: const Icon(FluentIcons.copy),
-                      onPressed: () async {
-                        await ref.read(optionPresetsControllerProvider.notifier).clone(v.id,
+                          v.id,
                           loc.common_duplicate_suffix,
                         );
                       },
@@ -368,6 +354,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
               );
             }
 
+            // 길게 눌러 정렬 모드 진입 지원(모바일/터치 대비)
             Widget buildTileWithLongPress(OptionPresetView v) {
               return GestureDetector(
                 onLongPress: () {
@@ -379,7 +366,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                   _dragReportedDirty = false;
                   _startIdleTimer();
                 },
-                child: buildInnerTile(v),
+                child: buildTile(v),
               );
             }
 
@@ -399,10 +386,8 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                         width: itemWidth,
                         child: Wiggle(
                           enabled: inReorder,
-                          phaseSeed: (v.id.hashCode % 628) / 100.0, // 0..6.28
-                          child: inReorder
-                              ? buildTile(v, disableTap: true)
-                              : buildTileWithLongPress(v),
+                          phaseSeed: (v.id.hashCode % 628) / 100.0,
+                          child: inReorder ? buildTile(v, disableTap: true) : buildTileWithLongPress(v),
                         ),
                       );
 
@@ -411,10 +396,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                           for (final v in list)
                             RepaintBoundary(
                               key: ValueKey(v.id),
-                              child: SizedBox(
-                                width: itemWidth,
-                                child: card(v),
-                              ),
+                              child: SizedBox(width: itemWidth, child: card(v)),
                             ),
                         ];
 
@@ -474,7 +456,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                 ),
               ],
             );
-          }
+          },
         ),
       ),
     );

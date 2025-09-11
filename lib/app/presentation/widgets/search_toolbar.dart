@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/theme/tokens/spacing.dart';
+import 'package:flutter/services.dart';
 
 class SearchToolbar extends StatelessWidget {
   const SearchToolbar({
@@ -39,35 +40,56 @@ class SearchToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasClear = controller.text.isNotEmpty;
 
+    void clear() {
+      if (controller.text.isEmpty) return;
+      controller.clear();
+      if (enabled && onChanged != null) onChanged!('');
+    }
+
     return Padding(
       padding: padding,
       child: Row(
         children: [
           Expanded(
-            child: TextBox(
-              controller: controller,
-              placeholder: placeholder,
-              enabled: enabled,
-              prefix: prefix ??
-                  const Padding(
-                    padding: EdgeInsets.only(left: AppSpacing.xs),
-                    child: Icon(FluentIcons.search),
+            child: Shortcuts(
+              shortcuts: <LogicalKeySet, Intent>{
+                LogicalKeySet(LogicalKeyboardKey.escape): const DismissIntent(),
+              },
+              child: Actions(
+                actions: <Type, Action<Intent>>{
+                  DismissIntent: CallbackAction<DismissIntent>(
+                    onInvoke: (intent) {
+                      clear();
+                      return null;
+                    },
                   ),
-              onChanged: enabled ? onChanged : null,
-              onSubmitted: enabled ? onSubmitted : null,
-              suffix: hasClear
-                  ? IconButton(
-                icon: const Icon(FluentIcons.chrome_close),
-                onPressed: () {
-                  controller.clear();
-                  if (enabled && onChanged != null) onChanged!('');
                 },
-              )
-                  : null,
+                child: TextBox(
+                  controller: controller,
+                  placeholder: placeholder,
+                  enabled: enabled,
+                  prefix: prefix ??
+                      const Padding(
+                        padding: EdgeInsets.only(left: AppSpacing.xs),
+                        child: Icon(FluentIcons.search),
+                      ),
+                  onChanged: enabled ? onChanged : null,
+                  onSubmitted: enabled ? onSubmitted : null,
+                  suffix: hasClear
+                      ? IconButton(
+                    icon: const Icon(FluentIcons.chrome_close),
+                    onPressed: () {
+                      controller.clear();
+                      if (enabled && onChanged != null) onChanged!('');
+                    },
+                  )
+                      : null,
+                ),
+              ),
             ),
           ),
           if (actions.isNotEmpty) ...[
-            Gaps.w8,
+            Gaps.w16,
             Row(children: actions),
           ],
         ],

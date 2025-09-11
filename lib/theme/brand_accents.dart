@@ -58,3 +58,25 @@ AccentColor accent2Of(BuildContext context, WidgetRef ref) {
   final resolve = ref.watch(accent2ResolverProvider);
   return resolve(theme.brightness, theme.accentColor);
 }
+
+StatusColor _statusFromSeed(Color seed, Brightness b) => StatusColor(
+  fg: seed,
+  bg: seed.withAlpha(b == Brightness.dark ? 60 : 20),
+  border: seed.withAlpha(b == Brightness.dark ? 130 : 160),
+);
+
+typedef Accent2StatusResolver = StatusColor Function(Brightness, AccentColor);
+
+final accent2StatusResolverProvider = Provider<Accent2StatusResolver>((ref) {
+  final resolveAccent2 = ref.watch(accent2ResolverProvider);
+  return (brightness, primaryAccent) {
+    final ac2 = resolveAccent2(brightness, primaryAccent);
+    return _statusFromSeed(ac2.normal, brightness);
+  };
+});
+
+StatusColor accent2StatusOf(BuildContext context, WidgetRef ref) {
+  final theme = FluentTheme.of(context);
+  final resolve = ref.watch(accent2StatusResolverProvider);
+  return resolve(theme.brightness, theme.accentColor);
+}

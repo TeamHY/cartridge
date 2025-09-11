@@ -170,7 +170,7 @@ class _BadgeCardTileState extends ConsumerState<BadgeCardTile>
                     border: Border.all(color: cardBorder()),
                     boxShadow: cardShadow(),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
                   constraints: const BoxConstraints(minHeight: 120),
 
                   child: Column(
@@ -180,6 +180,7 @@ class _BadgeCardTileState extends ConsumerState<BadgeCardTile>
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Gaps.w2,
                           Expanded(
                             child: Tooltip(
                               message: widget.title,
@@ -189,9 +190,7 @@ class _BadgeCardTileState extends ConsumerState<BadgeCardTile>
                                 widget.title,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 15),
+                                style: AppTypography.listTileTitle,
                               ),
                             ),
                           ),

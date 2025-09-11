@@ -193,6 +193,72 @@
   "promo_link_donate_playsquad": "Donate (Playsquad)",
   "promo_link_donate_toonation": "Donate (Toonation)",
 
+  "instance_error_title": "Failed to load instances.",
+  "instance_menu_reorder": "Edit order",
+
+  "instance_reorder_saved_title": "Saved",
+  "instance_reorder_saved_desc": "Your changes have been saved.",
+  "instance_reorder_not_found_title": "Nothing to save",
+  "instance_reorder_not_found_desc": "No instances were found to save.",
+  "instance_reorder_invalid_title": "Save failed",
+  "instance_reorder_invalid_desc": "The sort data is invalid.",
+  "instance_reorder_conflict_title": "Conflict",
+  "instance_reorder_conflict_desc": "There was a conflict with other changes. Please try again.",
+  "instance_reorder_failure_title": "Error",
+  "instance_reorder_failure_desc": "An error occurred while saving the order.",
+
+  "instance_reorder_unavailable_title": "Cannot edit order",
+  "instance_reorder_unavailable_desc": "You can’t start editing while searching.",
+
+  "mod_preset_search_placeholder": "Search presets",
+  "mod_preset_create_button": "Create preset",
+  "mod_preset_empty_title": "No presets yet",
+
+  "mod_preset_error_title": "Failed to load presets.",
+
+  "mod_preset_menu_reorder": "Edit order",
+
+  "mod_preset_reorder_saved_title": "Saved",
+  "mod_preset_reorder_saved_desc": "Your changes have been saved.",
+  "mod_preset_reorder_not_found_title": "Nothing to save",
+  "mod_preset_reorder_not_found_desc": "No presets were found to save.",
+  "mod_preset_reorder_invalid_title": "Save failed",
+  "mod_preset_reorder_invalid_desc": "The sort data is invalid.",
+  "mod_preset_reorder_conflict_title": "Conflict",
+  "mod_preset_reorder_conflict_desc": "There was a conflict with other changes. Please try again.",
+  "mod_preset_reorder_failure_title": "Error",
+  "mod_preset_reorder_failure_desc": "An error occurred while saving the order.",
+
+  "mod_preset_reorder_unavailable_title": "Cannot edit order",
+  "mod_preset_reorder_unavailable_desc": "You can’t start editing while searching.",
+
+  "mod_preset_enabled_mods": "{mod, plural, =0 {0 MOD} one {1 MOD} other {{mod} MODS}}",
+  "@mod_preset_enabled_mods": {
+    "description": "Badge text showing number of enabled mods in a preset",
+    "placeholders": {
+      "mod": { "type": "int", "example": "5" }
+    }
+  },
+
+  "option_error_title": "Failed to load option presets.",
+  "option_empty_title": "No option presets yet",
+  "option_create_button": "Create option preset",
+
+  "option_menu_reorder": "Edit order",
+
+  "option_reorder_saved_title": "Saved",
+  "option_reorder_saved_desc": "Your changes have been saved.",
+  "option_reorder_not_found_title": "Nothing to save",
+  "option_reorder_not_found_desc": "No option presets were found to save.",
+  "option_reorder_invalid_title": "Save failed",
+  "option_reorder_invalid_desc": "The sort data is invalid.",
+  "option_reorder_conflict_title": "Conflict",
+  "option_reorder_conflict_desc": "There was a conflict with other changes. Please try again.",
+  "option_reorder_failure_title": "Error",
+  "option_reorder_failure_desc": "An error occurred while saving the order.",
+
+  "option_reorder_unavailable_title": "Cannot edit order",
+  "option_reorder_unavailable_desc": "You can’t start editing while searching.",
 
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
@@ -332,7 +398,14 @@
   "instance_create_current_enabled": "Add only currently enabled mods",
   "instance_create_hint": "모드 프리셋을 불러와서 빠르게 세팅할 수 있어요.",
   "instance_create_validate_required": "Please enter a name.",
-  "instance_enabled_mods": "{preset} PRESET｜{mod} MOD",
+  "instance_enabled_mods": "{preset, plural, =0 {0 PRESET} one {1 PRESET} other {{preset} PRESETS}}｜{mod, plural, =0 {0 MOD} one {1 MOD} other {{mod} MODS}}",
+  "@instance_enabled_mods": {
+    "description": "Counts of applied presets and enabled mods (shown as 'X PRESET｜Y MOD')",
+    "placeholders": {
+      "preset": { "type": "int", "example": "2" },
+      "mod":    { "type": "int", "example": "5" }
+    }
+  },
   "instance_search_placeholder": "Search instances...",
   "instance_create_button": "Create instance",
   "instance_option_preset_label": "Option preset",
@@ -345,9 +418,6 @@
   "@mod_preset": {
     "description": "Mod Preset item related texts"
   },
-  "mod_preset_search_placeholder": "Search presets...",
-  "mod_preset_create_button": "Create preset",
-  "mod_preset_enabled_mods": "{count} MODS",
 
   "mod_preset_create_title": "Create Mod Preset",
   "mod_preset_create_name_label": "Mod Preset name",
@@ -417,7 +487,6 @@
   "option_position_label": "Position",
   "option_repentogon_label": "Repentogon",
   "option_search_placeholder": "Search presets...",
-  "option_create_button": "Create preset",
 
   "@nickname": {
     "description": "Nickname edit dialog"
