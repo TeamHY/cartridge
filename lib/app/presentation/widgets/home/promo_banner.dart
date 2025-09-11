@@ -284,9 +284,9 @@ class _LinkTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     final dividerColor =
-        (theme.dividerTheme.decoration as BoxDecoration?)?.color ?? const Color(0x14000000);
+        (fTheme.dividerTheme.decoration as BoxDecoration?)?.color ?? const Color(0x14000000);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -300,13 +300,13 @@ class _LinkTile extends StatelessWidget {
             height: double.infinity, // 부모(SizedBox)가 높이 결정(=tileHeight)
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: theme.cardColor,
+              color: fTheme.cardColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: dividerColor),
               boxShadow: hovered
                   ? [
                 BoxShadow(
-                  color: theme.shadowColor.withAlpha(30),
+                  color: fTheme.shadowColor.withAlpha(30),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),

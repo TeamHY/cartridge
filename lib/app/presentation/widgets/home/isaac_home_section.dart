@@ -40,19 +40,19 @@ class IsaacHomeSection extends ConsumerWidget {
               _buildActionTile(
                 context,
                 loc.isaac_action_open_install_folder,
-                FluentIcons.fabric_folder_fill,
+                FluentIcons.fabric_open_folder_horizontal,
                     () => openInstallFolder(context, ref),
               ),
               _buildActionTile(
                 context,
                 loc.isaac_action_open_options_folder,
-                FluentIcons.open_file,
+                FluentIcons.fabric_open_folder_horizontal,
                     () => openOptionsFolder(context, ref),
               ),
               _buildActionTile(
                 context,
                 loc.isaac_action_open_save_folder,
-                FluentIcons.folder_open,
+                FluentIcons.fabric_open_folder_horizontal,
                     () => openSaveFolder(context, ref),
               ),
               _buildActionTile(
@@ -127,14 +127,14 @@ class _ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     final enabled = onPressed != null;
 
     final tile = HoverButton(
       onPressed: onPressed,
       builder: (context, states) {
         final hovered = states.isHovered && enabled;
-        final bg = primary ? _primaryTint(theme) : theme.cardColor;
+        final bg = primary ? _primaryTint(fTheme) : fTheme.cardColor;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           padding: const EdgeInsets.symmetric(
@@ -144,11 +144,11 @@ class _ActionTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: theme.resources.controlStrokeColorDefault),
+            border: Border.all(color: fTheme.resources.controlStrokeColorDefault),
             boxShadow: hovered
                 ? [
               BoxShadow(
-                color: theme.shadowColor.withAlpha(60),
+                color: fTheme.shadowColor.withAlpha(60),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -158,14 +158,14 @@ class _ActionTile extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18, color: enabled ? null : theme.inactiveColor),
+              Icon(icon, size: 18, color: enabled ? null : fTheme.inactiveColor),
               Gaps.w8,
               Expanded(
                 child: Text(
                   label,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: enabled ? null : TextStyle(color: theme.inactiveColor),
+                  style: enabled ? null : TextStyle(color: fTheme.inactiveColor),
                 ),
               ),
             ],
@@ -178,10 +178,10 @@ class _ActionTile extends StatelessWidget {
   }
 }
 
-Color _primaryTint(FluentThemeData theme) {
-  final base = theme.cardColor; // 불투명 서피스
-  final overlay = theme.accentColor.normal.withAlpha(
-    theme.brightness == Brightness.dark ? 84 : 48,
+Color _primaryTint(FluentThemeData fTheme) {
+  final base = fTheme.cardColor; // 불투명 서피스
+  final overlay = fTheme.accentColor.normal.withAlpha(
+    fTheme.brightness == Brightness.dark ? 84 : 48,
   );
   return Color.alphaBlend(overlay, base);
 }

@@ -111,13 +111,13 @@ class _InstancePickerPanelState extends State<_InstancePickerPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     final loc = AppLocalizations.of(context);
 
     // 🎨 semantic tokens
-    final stroke = theme.resources.controlStrokeColorDefault;
-    final shadow = theme.shadowColor.withAlpha(28);
-    final panelBg = theme.cardColor;
+    final stroke = fTheme.resources.controlStrokeColorDefault;
+    final shadow = fTheme.shadowColor.withAlpha(28);
+    final panelBg = fTheme.cardColor;
 
     final list = (_q.trim().isEmpty)
         ? widget.instances
@@ -151,7 +151,7 @@ class _InstancePickerPanelState extends State<_InstancePickerPanel> {
               Gaps.w6,
               Text(
                 loc.instance_picker_title,
-                style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+                style: fTheme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -173,7 +173,7 @@ class _InstancePickerPanelState extends State<_InstancePickerPanel> {
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
                 child: Text(
                   loc.instance_picker_empty,
-                  style: theme.typography.body,
+                  style: fTheme.typography.body,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -220,11 +220,11 @@ class _InstanceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
 
-    final selStroke = theme.resources.controlStrokeColorSecondary;
-    final hoverFill = theme.cardColor; // subtle hover
-    final checkColor = theme.accentColor;
+    final selStroke = fTheme.resources.controlStrokeColorSecondary;
+    final hoverFill = fTheme.cardColor; // subtle hover
+    final checkColor = fTheme.accentColor;
 
     return HoverButton(
       onPressed: onTap,
@@ -258,7 +258,7 @@ class _InstanceTile extends StatelessWidget {
                   view.name,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+                  style: fTheme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
               Gaps.w8,

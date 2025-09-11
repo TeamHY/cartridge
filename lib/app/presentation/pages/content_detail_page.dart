@@ -12,7 +12,7 @@ class ContentDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
 
     return ScaffoldPage.scrollable(
       header: PageHeader(
@@ -58,16 +58,16 @@ class ContentDetailPage extends StatelessWidget {
                 Container(
                   constraints: const BoxConstraints(minHeight: 280),
                   decoration: BoxDecoration(
-                    color: theme.cardColor,
+                    color: fTheme.cardColor,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: theme.resources.cardStrokeColorDefault, width: 0.8),
+                    border: Border.all(color: fTheme.resources.cardStrokeColorDefault, width: 0.8),
                   ),
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: Text(
                       '컨텐츠 영역 (비어 있음)',
-                      style: TextStyle(color: theme.resources.textFillColorSecondary),
+                      style: TextStyle(color: fTheme.resources.textFillColorSecondary),
                     ),
                   ),
                 ),
@@ -110,9 +110,9 @@ class _ImageFallback extends StatelessWidget {
   const _ImageFallback();
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     return Container(
-      color: theme.micaBackgroundColor.withAlpha(160),
+      color: fTheme.micaBackgroundColor.withAlpha(160),
       child: const Center(child: Icon(FluentIcons.picture, size: 28)),
     );
   }

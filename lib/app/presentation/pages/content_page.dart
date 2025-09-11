@@ -204,7 +204,7 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 8),
       child: Text(
@@ -212,7 +212,7 @@ class _SectionHeader extends StatelessWidget {
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: theme.resources.textFillColorPrimary,
+          color: fTheme.resources.textFillColorPrimary,
         ),
       ),
     );
@@ -257,7 +257,7 @@ class _ContentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
+    final fTheme = FluentTheme.of(context);
     final isExternal = item.externalUrl != null;
 
     void handleTap() => onOpen();
@@ -268,12 +268,12 @@ class _ContentCard extends StatelessWidget {
         final hovered = states.isHovered;
         return Container(
           decoration: BoxDecoration(
-            color: theme.cardColor,
+            color: fTheme.cardColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: theme.resources.cardStrokeColorDefault, width: 0.8),
+            border: Border.all(color: fTheme.resources.cardStrokeColorDefault, width: 0.8),
             boxShadow: [
               BoxShadow(
-                color: hovered ? theme.accentColor.normal.withAlpha(40) : Colors.black.withAlpha(20),
+                color: hovered ? fTheme.accentColor.normal.withAlpha(40) : Colors.black.withAlpha(20),
                 blurRadius: hovered ? 12 : 8,
                 spreadRadius: hovered ? 1 : 0,
               ),
@@ -319,8 +319,8 @@ class _ContentCard extends StatelessWidget {
                           size: 16,
                           // 호버 시 약하게 강조
                           color: hovered
-                              ? theme.accentColor
-                              : theme.resources.textFillColorSecondary,
+                              ? fTheme.accentColor
+                              : fTheme.resources.textFillColorSecondary,
                         ),
                       ),
                     ],
