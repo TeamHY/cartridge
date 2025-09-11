@@ -179,6 +179,21 @@
     "description": "Toast description after successful save"
   },
 
+  "promo_intro_title": "아이작 오헌영 • Community & Support",
+  "promo_intro_desc": "A place made with Isaac players! Find streams, community, guides and various event news.",
+  "promo_intro_fallback_initials": "OH",
+
+  "promo_link_youtube": "YouTube",
+  "promo_link_chzzk": "Chzzk",
+  "promo_link_soop": "Soop",
+  "promo_link_twitch": "Twitch",
+  "promo_link_discord": "Discord",
+  "promo_link_kakao_openchat": "Kakao OpenChat",
+  "promo_link_naver_cafe": "Naver Cafe",
+  "promo_link_donate_playsquad": "Donate (Playsquad)",
+  "promo_link_donate_toonation": "Donate (Toonation)",
+
+
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
   "home_button_record": "Record\nMode",

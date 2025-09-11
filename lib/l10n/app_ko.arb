@@ -179,6 +179,20 @@
     "description": "저장 성공 토스트 상세"
   },
 
+  "promo_intro_title": "아이작 오헌영 • 커뮤니티 & 후원",
+  "promo_intro_desc": "아이작 플레이어들과 함께 만드는 공간! 방송, 커뮤니티, 공략, 그리고 다양한 이벤트 소식을 만나보세요.",
+  "promo_intro_fallback_initials": "OH",
+
+  "promo_link_youtube": "유튜브",
+  "promo_link_chzzk": "치지직",
+  "promo_link_soop": "SOOP",
+  "promo_link_twitch": "트위치",
+  "promo_link_discord": "디스코드",
+  "promo_link_kakao_openchat": "카카오 오픈채팅",
+  "promo_link_naver_cafe": "네이버 카페",
+  "promo_link_donate_playsquad": "후원 (플레이스쿼드)",
+  "promo_link_donate_toonation": "후원 (투네이션)",
+
   "home_preset_placeholder": "새 프리셋",
   "home_button_preset": "프리셋",
   "home_button_record": "기록 모드",

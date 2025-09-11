@@ -39,6 +39,7 @@ class IsaacInstallDetectCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: theme.resources.controlStrokeColorDefault),
       ),

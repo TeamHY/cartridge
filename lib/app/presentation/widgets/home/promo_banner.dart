@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart' as ul;
 
 import 'package:cartridge/app/presentation/widgets/home/home_card.dart';
 import 'package:cartridge/core/constants/urls.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
 class PromoBanner extends StatelessWidget {
@@ -10,76 +11,75 @@ class PromoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     final items = <SpanItem>[
       // intro = 3 cols
       SpanItem(span: 3, child: const _PromoIntro()),
       // buttons = 1 col
-      ..._getLinkTiles().map((w) => SpanItem(span: 1, child: w)),
+      ..._linkTiles(loc).map((w) => SpanItem(span: 1, child: w)),
     ];
 
     return HomeCard(
       child: ResponsiveSpanGrid(
         items: items,
-        // 원하는 느낌으로 조정 (예: 넓을 때 6, 조금 좁을 때 4)
         minCols: 2,
         maxCols: 6,
-        minCellWidth: 120, // 1칸 최소 너비, 상황에 맞게 조정
-        gutter: 12,
-        rowSpacing: 12,
-        tileHeight: 120, // 버튼/인트로 높이 통일
+        minCellWidth: 120,
+        gutter: AppSpacing.sm.toDouble(),     // 8
+        rowSpacing: AppSpacing.sm.toDouble(), // 8
+        tileHeight: 120,
       ),
     );
   }
 
-  List<Widget> _getLinkTiles() {
-    return [
-      _LinkTile(
-        label: 'YouTube',
-        urlGetter: () => AppUrls.youtube,
-        imagePath: 'assets/images/promo/youtube.png',
-      ),
-      _LinkTile(
-        label: 'Chzzk',
-        urlGetter: () => AppUrls.chzzk,
-        imagePath: 'assets/images/promo/chzzk.png',
-      ),
-      _LinkTile(
-        label: 'Soop',
-        urlGetter: () => AppUrls.afreeca,
-        imagePath: 'assets/images/promo/soop.png',
-      ),
-      _LinkTile(
-        label: 'Twitch',
-        urlGetter: () => AppUrls.twitch,
-        imagePath: 'assets/images/promo/twitch.png',
-      ),
-      _LinkTile(
-        label: 'Discord',
-        urlGetter: () => AppUrls.discord,
-        imagePath: 'assets/images/promo/discord.png',
-      ),
-      _LinkTile(
-        label: 'Kakao OpenChat',
-        urlGetter: () => AppUrls.openChat,
-        imagePath: 'assets/images/promo/kakaoTalk.png',
-      ),
-      _LinkTile(
-        label: 'Naver Cafe',
-        urlGetter: () => AppUrls.naverCafeHome,
-        imagePath: 'assets/images/promo/naver.png',
-      ),
-      _LinkTile(
-        label: 'Donate (Playsquad)',
-        urlGetter: () => AppUrls.donationPlaysquad,
-        imagePath: 'assets/images/promo/playsquad.png',
-      ),
-      _LinkTile(
-        label: 'Donate (Toonation)',
-        urlGetter: () => AppUrls.donation,
-        imagePath: 'assets/images/promo/toonation.png',
-      ),
-    ];
-  }
+  List<Widget> _linkTiles(AppLocalizations loc) => [
+    _LinkTile(
+      label: loc.promo_link_youtube,
+      urlGetter: () => AppUrls.youtube,
+      imagePath: 'assets/images/promo/youtube.png',
+    ),
+    _LinkTile(
+      label: loc.promo_link_chzzk,
+      urlGetter: () => AppUrls.chzzk,
+      imagePath: 'assets/images/promo/chzzk.png',
+    ),
+    _LinkTile(
+      label: loc.promo_link_soop,
+      urlGetter: () => AppUrls.afreeca,
+      imagePath: 'assets/images/promo/soop.png',
+    ),
+    _LinkTile(
+      label: loc.promo_link_twitch,
+      urlGetter: () => AppUrls.twitch,
+      imagePath: 'assets/images/promo/twitch.png',
+    ),
+    _LinkTile(
+      label: loc.promo_link_discord,
+      urlGetter: () => AppUrls.discord,
+      imagePath: 'assets/images/promo/discord.png',
+    ),
+    _LinkTile(
+      label: loc.promo_link_kakao_openchat,
+      urlGetter: () => AppUrls.openChat,
+      imagePath: 'assets/images/promo/kakaoTalk.png',
+    ),
+    _LinkTile(
+      label: loc.promo_link_naver_cafe,
+      urlGetter: () => AppUrls.naverCafeHome,
+      imagePath: 'assets/images/promo/naver.png',
+    ),
+    _LinkTile(
+      label: loc.promo_link_donate_playsquad,
+      urlGetter: () => AppUrls.donationPlaysquad,
+      imagePath: 'assets/images/promo/playsquad.png',
+    ),
+    _LinkTile(
+      label: loc.promo_link_donate_toonation,
+      urlGetter: () => AppUrls.donation,
+      imagePath: 'assets/images/promo/toonation.png',
+    ),
+  ];
 }
 
 /// 스팬 그리드 아이템
@@ -116,7 +116,6 @@ class ResponsiveSpanGrid extends StatelessWidget {
       builder: (_, constraints) {
         final cols = _calcCols(constraints.maxWidth);
         final cellWidth = _cellWidth(constraints.maxWidth, cols);
-
         final rows = _pack(items, cols);
 
         return Column(
@@ -139,7 +138,6 @@ class ResponsiveSpanGrid extends StatelessWidget {
   }
 
   int _calcCols(double maxWidth) {
-    // 한 칸 최소 너비 + gutter를 기준으로 대략적인 cols 산출
     final approx = ((maxWidth + gutter) / (minCellWidth + gutter)).floor();
     return approx.clamp(minCols, maxCols);
   }
@@ -211,21 +209,21 @@ class _PromoIntro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
     final accent = theme.accentColor.normal;
 
     return Container(
       width: double.infinity,
-      height: double.infinity, // 부모(SizedBox)가 높이 관리
-      padding: const EdgeInsets.all(16),
+      height: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: (theme.dividerTheme.decoration as BoxDecoration?)?.color ?? const Color(0x14000000),
-        ),
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: theme.dividerColor),
       ),
       child: Row(
         children: [
+          // 브랜드 아이콘(로딩/에러에도 고정 크기)
           Container(
             width: 64,
             height: 64,
@@ -242,25 +240,32 @@ class _PromoIntro extends StatelessWidget {
                 fit: BoxFit.cover,
                 cacheWidth: (64 * View.of(context).devicePixelRatio).round(),
                 cacheHeight: (64 * View.of(context).devicePixelRatio).round(),
-                errorBuilder: (_, __, ___) => const Text(
-                  'OH',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+                errorBuilder: (_, __, ___) => Text(
+                  loc.promo_intro_fallback_initials,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
                 ),
               ),
             ),
           ),
           Gaps.w16,
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  '아이작 오헌영 • 커뮤니티 & 후원',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                  loc.promo_intro_title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
                 ),
                 Gaps.h6,
-                Text('아이작 플레이어들과 함께 만드는 공간! 방송, 커뮤니티, 공략, 그리고 다양한 이벤트 소식들을 만나보세요.'),
+                Text(
+                  loc.promo_intro_desc,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.typography.body,
+                ),
               ],
             ),
           ),
@@ -275,6 +280,7 @@ class _LinkTile extends StatelessWidget {
   final String label;
   final String Function() urlGetter;
   final String imagePath;
+  final double _imageSize = 64.0;
 
   const _LinkTile({
     required this.label,
@@ -285,8 +291,6 @@ class _LinkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fTheme = FluentTheme.of(context);
-    final dividerColor =
-        (fTheme.dividerTheme.decoration as BoxDecoration?)?.color ?? const Color(0x14000000);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -294,40 +298,62 @@ class _LinkTile extends StatelessWidget {
         onPressed: () => _openUrl(urlGetter()),
         builder: (context, states) {
           final hovered = states.isHovered;
+          final pressed = states.isPressed;
+
+          // 기본 배경
+          final base = fTheme.cardColor;
+          final overlay = _tileOverlay(
+            brightness: fTheme.brightness,
+            hovered: hovered,
+            pressed: pressed,
+          );
+          final bg = Color.alphaBlend(overlay, base);
+
+          // hover 시 테두리도 살짝 강조
+          final borderColor = hovered
+              ? fTheme.resources.controlStrokeColorSecondary
+              : fTheme.resources.controlStrokeColorDefault;
           return AnimatedContainer(
             duration: const Duration(milliseconds: 120),
-            width: double.infinity, // 폭은 부모(SizedBox)가 결정
-            height: double.infinity, // 부모(SizedBox)가 높이 결정(=tileHeight)
-            padding: const EdgeInsets.all(8),
+            width: double.infinity,
+            height: double.infinity,
+            padding: const EdgeInsets.all(AppSpacing.xs),
             decoration: BoxDecoration(
-              color: fTheme.cardColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: dividerColor),
+              color: bg,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: borderColor),
               boxShadow: hovered
                   ? [
                 BoxShadow(
-                  color: fTheme.shadowColor.withAlpha(30),
+                  color: fTheme.shadowColor.withAlpha(60),
                   blurRadius: 12,
                   offset: const Offset(0, 6),
                 ),
               ]
                   : null,
             ),
+            clipBehavior: Clip.antiAlias,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // 아이콘(이미지 실패해도 고정 크기)
                 SizedBox(
-                  width: 64,
-                  height: 64,
+                  width: _imageSize,
+                  height: _imageSize,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                     child: Image.asset(
                       imagePath,
-                      width: 64,
-                      height: 64,
+                      width: _imageSize,
+                      height: _imageSize,
                       fit: BoxFit.contain,
-                      cacheWidth: (64 * View.of(context).devicePixelRatio).round(),
-                      cacheHeight: (64 * View.of(context).devicePixelRatio).round(),
+                      cacheWidth: (_imageSize * View.of(context).devicePixelRatio).round(),
+                      cacheHeight: (_imageSize * View.of(context).devicePixelRatio).round(),
+                      errorBuilder: (_, __, ___) => Container(
+                        color: fTheme.resources.subtleFillColorSecondary,
+                        alignment: Alignment.center,
+                        child: Icon(FluentIcons.link, color: fTheme.inactiveColor, size: 20),
+                      ),
                     ),
                   ),
                 ),
@@ -348,6 +374,24 @@ class _LinkTile extends StatelessWidget {
   }
 
   void _openUrl(String url) {
+    // 레이아웃 유지 목적: 실패해도 UI 변화 없음(토스트 등은 별도)
     ul.launchUrl(Uri.parse(url));
   }
+}
+Color _tileOverlay({
+  required Brightness brightness,
+  required bool hovered,
+  required bool pressed,
+}) {
+  if (pressed) {
+    return brightness == Brightness.dark
+        ? Colors.white.withAlpha(48)   // 다크: 더 밝게
+        : Colors.black.withAlpha(36);  // 라이트: 더 어둡게
+  }
+  if (hovered) {
+    return brightness == Brightness.dark
+        ? Colors.white.withAlpha(28)
+        : Colors.black.withAlpha(18);
+  }
+  return Colors.transparent;
 }

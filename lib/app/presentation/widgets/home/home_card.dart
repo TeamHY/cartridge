@@ -21,16 +21,15 @@ class HomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = FluentTheme.of(context);
-    final dividerColor =
-        (theme.dividerTheme.decoration as BoxDecoration?)?.color
-            ?? theme.resources.controlStrokeColorSecondary.withAlpha(32);
+    final fTheme = FluentTheme.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: fTheme.resources.cardBackgroundFillColorDefault,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: dividerColor),
+        border: Border.all(
+          color: fTheme.resources.controlStrokeColorSecondary.withAlpha(32),
+        ),
       ),
       padding: padding ?? const EdgeInsets.all(AppSpacing.md),
       child: Column(

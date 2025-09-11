@@ -162,8 +162,7 @@ class _NewsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = FluentTheme.of(context);
-    final stroke = theme.resources.controlStrokeColorDefault;
+    final fTheme = FluentTheme.of(context);
 
     final previewAsync = ref.watch(webPreviewProvider(item.item.url));
     final preview = previewAsync.maybeWhen(data: (p) => p, orElse: () => null);
@@ -191,7 +190,7 @@ class _NewsCard extends ConsumerWidget {
               key: ValueKey(liveThumbPath),
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) =>
-                  Container(color: theme.scaffoldBackgroundColor),
+                  Container(color: fTheme.scaffoldBackgroundColor),
             )
                 : _placeholderThumb(context),
           ),
@@ -207,20 +206,14 @@ class _NewsCard extends ConsumerWidget {
                 liveTitle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: theme.typography.bodyStrong?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
+                style: AppTypography.bodyStrong,
               ),
               Gaps.h4,
               // 날짜
               if (item.item.date != null)
                 Text(
                   _dateLabel(item.item.date),
-                  style: theme.typography.caption?.copyWith(
-                    color: theme.inactiveColor,
-                    fontSize: 12,
-                  ),
+                  style: AppTypography.caption,
                 ),
             ],
           ),
@@ -232,16 +225,32 @@ class _NewsCard extends ConsumerWidget {
       onPressed: () => ul.launchUrl(Uri.parse(item.item.url)),
       builder: (context, states) {
         final hovered = states.isHovered;
+        final pressed = states.isPressed;
+
+        // 기본 배경
+        final base = fTheme.cardColor;
+        final overlay = _tileOverlay(
+          brightness: fTheme.brightness,
+          hovered: hovered,
+          pressed: pressed,
+        );
+        final bg = Color.alphaBlend(overlay, base);
+
+        // hover 시 테두리도 살짝 강조
+        final borderColor = hovered
+            ? fTheme.resources.controlStrokeColorSecondary
+            : fTheme.resources.controlStrokeColorDefault;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           width: _newsCardWidth,
           decoration: BoxDecoration(
+            color: bg,
             borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: stroke),
+            border: Border.all(color: borderColor),
             boxShadow: hovered
                 ? [
               BoxShadow(
-                color: theme.shadowColor.withAlpha(theme.brightness == Brightness.dark ? 54: 28),
+                color: fTheme.shadowColor.withAlpha(60),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -497,4 +506,22 @@ class _MouseDragScrollBehavior extends ScrollBehavior {
     PointerDeviceKind.invertedStylus,
     PointerDeviceKind.unknown,
   };
+}
+
+Color _tileOverlay({
+  required Brightness brightness,
+  required bool hovered,
+  required bool pressed,
+}) {
+  if (pressed) {
+    return brightness == Brightness.dark
+        ? Colors.white.withAlpha(48)   // 다크: 더 밝게
+        : Colors.black.withAlpha(36);  // 라이트: 더 어둡게
+  }
+  if (hovered) {
+    return brightness == Brightness.dark
+        ? Colors.white.withAlpha(28)
+        : Colors.black.withAlpha(18);
+  }
+  return Colors.transparent;
 }

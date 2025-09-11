@@ -10,6 +10,5 @@ export 'presentation/pages/settings_page.dart';
 export 'presentation/widgets/labeled_block.dart';
 export 'presentation/widgets/path_input_group.dart';
 export 'presentation/widgets/settings_section.dart';
-export 'presentation/widgets/settings_section_card.dart';
 export 'presentation/widgets/theme_option_card.dart';
 export 'presentation/widgets/theme_palette_scroller.dart';
