@@ -54,18 +54,16 @@ class _HarnessState extends State<_Harness> {
               builder: (innerCtx) => Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // ⬇️ 키 추가!
                   Button(
                     key: const Key('open_button'),
                     child: const Text('Open'),
                     onPressed: () async {
                       final res = await showChooseSteamAccountDialog(
                         innerCtx,
-                        widget.items,
+                        items: widget.items,
                       );
                       setState(() {
                         if (res == null) {
-                          // ⬇️ 취소 시 현재 값을 유지 (즉, 초기엔 (none) 유지)
                           return;
                         }
                         final name = res.personaName?.trim();

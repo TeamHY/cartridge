@@ -1,68 +1,98 @@
 import 'dart:io';
-
-import 'package:cartridge/features/steam/domain/models/steam_account_profile.dart';
-import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 
-/// 선택 다이얼로그 (Theme 가이드 반영)
+import 'package:cartridge/features/steam/steam.dart';
+import 'package:cartridge/theme/theme.dart';
+
+/// 간단 상태 입력 방식:
+/// - items == null && error == null   => 로딩
+/// - error != null                    => 에러
+/// - items!.isEmpty                   => 빈 목록
+/// - 그 외                            => 목록 표시
 Future<SteamAccountProfile?> showChooseSteamAccountDialog(
-    BuildContext context,
-    List<SteamAccountProfile> items,
-    ) {
+    BuildContext context, {
+      List<SteamAccountProfile>? items,
+      Object? error,
+      VoidCallback? onRetry,
+    }) {
   final fTheme = FluentTheme.of(context);
-  final accent = fTheme.accentColor.normal;
+  final loc = AppLocalizations.of(context);
   final scrollCtrl = ScrollController();
+  final accent = fTheme.accentColor.normal;
+  final stroke = fTheme.dividerColor;
+
+  Widget body;
+  if (error != null) {
+    body = _MessageCard(
+      icon: FluentIcons.error,
+      title: loc.common_error,
+      subtitle: loc.choose_steam_error_hint,
+      primary: onRetry == null ? null : _MessageAction(label: loc.common_retry, onPressed: onRetry),
+    );
+  } else if (items == null) {
+    body = _SkeletonList();
+  } else if (items.isEmpty) {
+    // 빈 상태
+    body = _MessageCard(
+      icon: FluentIcons.contact,
+      title: loc.choose_steam_empty_title,
+      subtitle: loc.choose_steam_empty_desc,
+    );
+  } else {
+    // 계정 목록
+    body = Scrollbar(
+      controller: scrollCtrl,
+      interactive: true,
+      child: ListView.separated(
+        controller: scrollCtrl,
+        padding: const EdgeInsets.all(AppSpacing.md),
+        itemCount: items.length,
+        separatorBuilder: (_, __) => Gaps.h8,
+        itemBuilder: (ctx, i) => _AccountTile(
+          profile: items[i],
+          onTap: () => Navigator.of(ctx).pop(items[i]),
+          stroke: stroke,
+        ),
+      ),
+    );
+  }
 
   return showDialog<SteamAccountProfile?>(
     context: context,
     builder: (ctx) => ContentDialog(
-      // 헤더
+      constraints: const BoxConstraints(maxWidth: 420, maxHeight: 460),
       title: Row(
         children: [
-          Icon(FluentIcons.folder_open, size: 18, color: accent),
-          Gaps.w4,
-          const Text('세이브 폴더 선택'),
+          Icon(FluentIcons.fabric_open_folder_horizontal, size: 18, color: accent),
+          Gaps.w8,
+          Text(loc.choose_steam_title),
         ],
       ),
-      constraints: const BoxConstraints(maxWidth: 400, maxHeight: 420),
-      // 본문
       content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 400, maxHeight: 400),
-        child: Scrollbar(
-          controller: scrollCtrl,
-          interactive: true,
-          child: ListView.separated(
-            controller: scrollCtrl,
-            padding: EdgeInsets.all(AppSpacing.md),
-            itemCount: items.length,
-            separatorBuilder: (_, __) => Gaps.h8,
-            itemBuilder: (ctx, i) => _AccountTile(
-              profile: items[i],
-              borderColor: fTheme.dividerColor,
-              onTap: () => Navigator.of(ctx).pop(items[i]),
-            ),
-          ),
-        ),
+        constraints: const BoxConstraints(maxWidth: 420, maxHeight: 420),
+        child: body,
       ),
       actions: [
         Button(
-          child: const Text('취소'),
           onPressed: () => Navigator.of(ctx).pop(null),
+          child: Text(loc.common_cancel),
         ),
       ],
     ),
   );
 }
 
+/// 계정 타일(프로젝트 테마 스킨)
 class _AccountTile extends StatefulWidget {
   final SteamAccountProfile profile;
   final VoidCallback onTap;
-  final Color borderColor;
+  final Color stroke;
 
   const _AccountTile({
     required this.profile,
     required this.onTap,
-    required this.borderColor,
+    required this.stroke,
   });
 
   @override
@@ -70,117 +100,185 @@ class _AccountTile extends StatefulWidget {
 }
 
 class _AccountTileState extends State<_AccountTile> {
-  static const _r = 12.0; // theme.md: 카드/타일 공통 반지름
-  static const _fast = Duration(milliseconds: 140);
-
+  static const _fast = Duration(milliseconds: 120);
   bool _hovered = false;
   bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
     final fTheme = FluentTheme.of(context);
-    final accent = fTheme.accentColor;
+
+    Color overlay(bool hovered, bool pressed) {
+      final b = fTheme.brightness;
+      if (pressed) return b == Brightness.dark ? Colors.white.withAlpha(48) : Colors.black.withAlpha(36);
+      if (hovered) return b == Brightness.dark ? Colors.white.withAlpha(28) : Colors.black.withAlpha(18);
+      return Colors.transparent;
+    }
+
+    final name = (widget.profile.personaName?.trim().isNotEmpty ?? false)
+        ? widget.profile.personaName!.trim()
+        : AppLocalizations.of(context).choose_steam_name_unset;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      onExit:  (_) => setState(() => _hovered = false),
       cursor: SystemMouseCursors.click,
-      child: TweenAnimationBuilder<double>(
-        duration: _fast,
-        curve: Curves.easeOut,
-        tween: Tween(begin: 0, end: _hovered ? 1 : 0),
-        builder: (context, t, _) {
-          final borderColor = Color.lerp(widget.borderColor, accent, 0.35 * t)!;
-          final liftY = -2.0 * t + (_pressed ? 1.0 : 0.0);
-          final shadowOpacity = (24 + 36 * t).round();
-
-          return Transform.translate(
-            offset: Offset(0, liftY),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(_r),
-                boxShadow: [
-                  BoxShadow(
-                    color: fTheme.shadowColor.withAlpha(shadowOpacity),
-                    blurRadius: 10 + 8 * t,
-                    offset: Offset(0, 4 + 2 * t),
-                  ),
-                ],
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapUp:   (_) => setState(() => _pressed = false),
+        onTapCancel: () => setState(() => _pressed = false),
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: _fast,
+          transform: Matrix4.translationValues(0, _hovered ? -1 : 0, 0),
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          decoration: BoxDecoration(
+            color: Color.alphaBlend(overlay(_hovered, _pressed), fTheme.cardColor),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: _hovered ? fTheme.resources.controlStrokeColorSecondary : widget.stroke),
+            boxShadow: _hovered
+                ? [
+              BoxShadow(
+                color: fTheme.shadowColor.withAlpha(fTheme.brightness == Brightness.dark ? 54 : 28),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
-              child: Acrylic(
-                tint: fTheme.micaBackgroundColor,
-                luminosityAlpha: 0.0,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(_r)),
-                ),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTapDown: (_) => setState(() => _pressed = true),
-                  onTapUp: (_) => setState(() => _pressed = false),
-                  onTapCancel: () => setState(() => _pressed = false),
-                  onTap: widget.onTap,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(_r),
-                      border: Border.all(color: borderColor),
-                    ),
-                    padding: EdgeInsets.all(AppSpacing.sm),
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(_r - 4),
-                          child: (widget.profile.avatarPngPath != null)
-                              ? Image.file(
-                            File(widget.profile.avatarPngPath!),
-                            width: 40, height: 40, fit: BoxFit.cover,
-                          )
-                              : Container(
-                            width: 40, height: 40,
-                            color: fTheme.resources.systemFillColorSolidNeutralBackground,
-                            alignment: Alignment.center,
-                            child: const Icon(FluentIcons.contact, size: 20),
-                          ),
-                        ),
-                        Gaps.w8,
-                        Expanded(
-                          child: Text(
-                            (widget.profile.personaName?.trim().isNotEmpty ?? false)
-                                ? widget.profile.personaName!.trim()
-                                : '(이름 미설정)',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Color.lerp(
-                                fTheme.resources.textFillColorPrimary,
-                                accent,
-                                0.15 * t,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Gaps.w4,
-                        AnimatedOpacity(
-                          duration: _fast,
-                          opacity: 0.6 + 0.4 * t,
-                          child: Transform.translate(
-                            offset: Offset(2 * t, 0),
-                            child: Icon(
-                              FluentIcons.chevron_right,
-                              size: 10,
-                              color: fTheme.resources.textFillColorPrimary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+            ]
+                : null,
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                child: (widget.profile.avatarPngPath != null)
+                    ? Image.file(
+                  File(widget.profile.avatarPngPath!),
+                  width: 40, height: 40, fit: BoxFit.cover,
+                )
+                    : Container(
+                  width: 40, height: 40,
+                  color: fTheme.resources.subtleFillColorTertiary,
+                  alignment: Alignment.center,
+                  child: Icon(FluentIcons.contact, size: 20, color: fTheme.inactiveColor),
                 ),
               ),
-            ),
-          );
-        },
+              Gaps.w8,
+              Expanded(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: fTheme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+                ),
+              ),
+              Gaps.w4,
+              Icon(FluentIcons.chevron_right_small, size: 12, color: fTheme.resources.textFillColorPrimary),
+            ],
+          ),
+        ),
       ),
     );
   }
+}
+
+/// 로딩 스켈레톤
+class _SkeletonList extends StatelessWidget {
+  const _SkeletonList();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
+    return Column(
+      children: List.generate(4, (i) => i).map((_) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 40, height: 40,
+                  decoration: BoxDecoration(
+                    color: theme.resources.subtleFillColorTertiary,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                ),
+                Gaps.w8,
+                Expanded(
+                  child: Container(
+                    height: 14,
+                    decoration: BoxDecoration(
+                      color: theme.resources.subtleFillColorSecondary,
+                      borderRadius: BorderRadius.circular(AppRadius.xs),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+/// 메시지 카드(빈/에러 공용)
+class _MessageCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final _MessageAction? primary;
+
+  const _MessageCard({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.primary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 28, color: theme.inactiveColor),
+            Gaps.h8,
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            if (subtitle != null) ...[
+              Gaps.h6,
+              Text(
+                subtitle!,
+                textAlign: TextAlign.center,
+                style: theme.typography.caption,
+              ),
+            ],
+            if (primary != null) ...[
+              Gaps.h12,
+              Button(onPressed: primary!.onPressed, child: Text(primary!.label)),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MessageAction {
+  final String label;
+  final VoidCallback onPressed;
+  const _MessageAction({required this.label, required this.onPressed});
 }

@@ -236,13 +236,12 @@ class _NewsCard extends ConsumerWidget {
           duration: const Duration(milliseconds: 120),
           width: _newsCardWidth,
           decoration: BoxDecoration(
-            color: theme.cardColor,
             borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: stroke),
             boxShadow: hovered
                 ? [
               BoxShadow(
-                color: theme.shadowColor.withAlpha(28),
+                color: theme.shadowColor.withAlpha(theme.brightness == Brightness.dark ? 54: 28),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),

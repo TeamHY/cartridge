@@ -4,6 +4,7 @@ import 'package:cartridge/features/isaac/runtime/domain/isaac_versions.dart';
 import 'package:cartridge/features/isaac/save/application/eden_editor_controller.dart';
 import 'package:cartridge/features/isaac/save/presentation/widgets/show_choose_steam_account_dialog.dart';
 import 'package:cartridge/features/steam/domain/models/steam_account_profile.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,35 +16,38 @@ Future<void> openEdenTokenEditor(
     WidgetRef ref, {
       IsaacEdition? detectedEdition,
     }) async {
-  // 1) 계정 선택
+  final loc = AppLocalizations.of(context);
+
+  // 1) 계정 선택 (로딩/에러/빈 상태: 사용자 친화적으로)
   List<SteamAccountProfile> accounts;
   try {
     accounts = await ref.read(steamAccountsProvider.future);
   } catch (_) {
     if (context.mounted) {
-      UiFeedback.error(context, '조회 실패', '세이브 목록을 불러오지 못했어요.');
+      UiFeedback.error(context, loc.eden_err_accounts_title, loc.eden_err_accounts_desc);
     }
     return;
   }
   if (accounts.isEmpty) {
     if (context.mounted) {
-      UiFeedback.warn(context, '세이브를 찾지 못했어요', 'Steam Cloud 또는 로컬 세이브가 감지되지 않았습니다.');
+      UiFeedback.warn(context, loc.eden_warn_no_accounts_title, loc.eden_warn_no_accounts_desc);
     }
     return;
   }
   if (!context.mounted) return;
 
-  final account =
-  (accounts.length == 1) ? accounts.first : await showChooseSteamAccountDialog(context, accounts);
+  final account = (accounts.length == 1)
+      ? accounts.first
+      : await showChooseSteamAccountDialog(context, items: accounts);
   if (account == null) return;
 
-  // 2) 에디션/슬롯
+  // 2) 에디션/슬롯 조회
   final res = await ref.read(
     editionAndSlotsProvider((acc: account, detected: detectedEdition)).future,
   );
   if (res.slots.isEmpty) {
     if (context.mounted) {
-      UiFeedback.warn(context, '세이브 파일이 없어요', '에디션/슬롯별 세이브 파일을 찾지 못했습니다.');
+      UiFeedback.warn(context, loc.eden_warn_no_saves_title, loc.eden_warn_no_saves_desc);
     }
     return;
   }
@@ -73,7 +77,7 @@ class _EdenEditorDialog extends ConsumerStatefulWidget {
 }
 
 class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
-  static const _r = 12.0;
+  static const _slotHeight = 54.0; // 슬롯 버튼 고정 높이
   int? newValue;
 
   int _clamp(int v) => v < 0 ? 0 : (v > kEdenMax ? kEdenMax : v);
@@ -81,213 +85,315 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
   @override
   Widget build(BuildContext context) {
     final fTheme = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
     final asyncState = ref.watch(edenEditorControllerProvider(widget.args));
 
-    return asyncState.when(
-      loading: () => const ContentDialog(content: Center(child: ProgressRing())),
-      error: (e, _) => ContentDialog(
-        title: const Text('에덴 토큰'),
-        content: InfoBar(
-          title: const Text('오류'),
-          content: Text('$e'),
-          severity: InfoBarSeverity.error,
-        ),
-        actions: [Button(child: const Text('닫기'), onPressed: () => Navigator.of(context).pop())],
-      ),
-      data: (s) {
-        newValue ??= s.currentValue ?? 0;
+    Row titleRow(String text) => Row(
+      children: [
+        Icon(FluentIcons.pro_hockey, size: 18, color: fTheme.accentColor.normal),
+        Gaps.w4,
+        Text(text),
+      ],
+    );
 
-        return ContentDialog(
-          title: Row(
-            children: [
-              Icon(FluentIcons.pro_hockey, size: 18, color: fTheme.accentColor.normal),
-              Gaps.w4,
-              const Text('에덴 토큰'),
-            ],
-          ),
-          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
-          content: SingleChildScrollView(
-            padding: EdgeInsets.only(right: AppSpacing.xs),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 에디션 레이블
-                Padding(
-                  padding: EdgeInsets.only(bottom: AppSpacing.xs),
-                  child: Text(
-                    '${IsaacEditionInfo.folderName[s.edition]}',
-                    style: TextStyle(
-                      color: fTheme.resources.textFillColorSecondary,
-                      fontSize: 16,
-                    ),
-                  ),
+    // 공용 Dialog 빌더: loading 여부만 바꿔 동일 레이아웃 유지
+    Widget buildDialogContent({
+      required IsaacEdition edition,
+      required List<int> slots,
+      required int selectedSlot,
+      required bool isLoading,
+      required bool isSaving,
+      required int? currentValue,
+      String? warningText, // 내부 경고(파일 읽기 실패 등)
+    }) {
+      // 로딩 중에도 컨트롤은 그대로 보여주되 비활성화
+      final controlsEnabled = !isLoading && !isSaving && selectedSlot != 0;
+
+      // 초기 값 고정(로딩에서도 동일한 높이 확보)
+      newValue ??= currentValue ?? 0;
+
+      return SingleChildScrollView(
+        padding: const EdgeInsets.only(right: AppSpacing.xs),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 에디션 라벨
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: Text(
+                IsaacEditionInfo.folderName[edition] ?? '',
+                style: TextStyle(
+                  color: fTheme.resources.textFillColorSecondary,
+                  fontSize: 16,
                 ),
+              ),
+            ),
 
-                if (s.error != null)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: AppSpacing.xs),
-                    child: InfoBar(
-                      title: const Text('안내'),
-                      content: Text(s.error!),
-                      severity: InfoBarSeverity.warning,
-                    ),
-                  ),
+            // 슬롯 선택 섹션
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: Text(loc.eden_slot_help, style: AppTypography.caption),
+            ),
+            Row(
+              children: List.generate(3, (i) {
+                final slot = i + 1;
+                final exists = slots.contains(slot);
+                final selected = selectedSlot == slot;
 
-                Gaps.h12,
+                final bgColor = !exists
+                    ? fTheme.inactiveColor.withAlpha(16)
+                    : (selected
+                    ? fTheme.accentColor.normal.withAlpha(
+                  fTheme.brightness == Brightness.dark ? 48 : 36,
+                )
+                    : null);
 
-                // 슬롯 선택
-                Padding(
-                  padding: EdgeInsets.only(bottom: AppSpacing.xs),
-                  child: Text('게임의 저장 칸(슬롯)을 선택하세요.', style: fTheme.typography.caption),
-                ),
-                Row(
-                  children: List.generate(3, (i) {
-                    final slot = i + 1;
-                    final exists = s.slots.contains(slot);
-                    final selected = s.selectedSlot == slot;
-                    return Expanded(
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.only(end: i < 2 ? AppSpacing.sm : 0),
-                        child: Button(
-                          onPressed: (!exists || s.loading || s.saving)
-                              ? null
-                              : () async {
-                            await ref
-                                .read(edenEditorControllerProvider(widget.args).notifier)
-                                .selectSlot(slot);
-                            setState(() => newValue = null);
-                          },
-                          style: ButtonStyle(
-                            padding: WidgetStateProperty.all(
-                              EdgeInsets.symmetric(
-                                horizontal: AppSpacing.sm,
-                                vertical: AppSpacing.xs,
-                              ),
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsetsDirectional.only(end: i < 2 ? AppSpacing.sm : 0),
+                    child: SizedBox(
+                      height: _slotHeight, // 고정 높이
+                      child: Button(
+                        onPressed: (!exists || isLoading || isSaving)
+                            ? null
+                            : () async {
+                          await ref
+                              .read(edenEditorControllerProvider(widget.args).notifier)
+                              .selectSlot(slot);
+                          setState(() => newValue = null);
+                        },
+                        style: ButtonStyle(
+                          padding: WidgetStateProperty.all(
+                            const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.sm,
+                              vertical: AppSpacing.sm, // 세로 패딩 확대
                             ),
-                            backgroundColor: WidgetStateProperty.resolveWith((_) {
-                              if (!exists) return fTheme.inactiveColor.withAlpha(16);
-                              if (selected) return fTheme.accentColor.normal.withAlpha(36);
-                              return null;
-                            }),
                           ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (selected) const Icon(FluentIcons.check_mark, size: 14),
-                              if (selected) Gaps.w4,
-                              Text.rich(
-                                TextSpan(
-                                  children: [
-                                    const TextSpan(text: '슬롯 '),
-                                    TextSpan(
-                                      text: '$slot',
-                                      style: const TextStyle(fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                          backgroundColor: WidgetStateProperty.all(bgColor),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (selected) const Icon(FluentIcons.check_mark, size: 20),
+                            if (selected) Gaps.w4,
+                            Text(loc.eden_slot_label(slot), style: AppTypography.sectionTitle,),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+
+            Gaps.h16, // 섹션 간 여백 확대
+
+            Container(
+              decoration: BoxDecoration(
+                color: fTheme.cardColor,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(color: fTheme.dividerColor),
+              ),
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 헤더 + 현재값 Chip
+                  Row(
+                    children: [
+                      Text(
+                        loc.eden_value_label,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Gaps.w8,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: fTheme.accentColor.withAlpha(
+                            fTheme.brightness == Brightness.dark ? 128 : 80,
+                          ),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          loc.eden_current_chip(
+                            (currentValue?.toString() ?? '–'),
+                          ),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // 입력부 (로딩/세이빙 중에는 비활성화만)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: IgnorePointer(
+                          ignoring: !controlsEnabled,
+                          child: Opacity(
+                            opacity: controlsEnabled ? 1.0 : 0.6,
+                            child: NumberBox(
+                              value: newValue,
+                              min: 0,
+                              max: kEdenMax,
+                              smallChange: 1,
+                              largeChange: 10,
+                              mode: SpinButtonPlacementMode.inline,
+                              onChanged: (v) {
+                                if (!controlsEnabled) return;
+                                setState(() {
+                                  final next = v ?? newValue ?? 0;
+                                  newValue = _clamp(next);
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    );
-                  }),
-                ),
-
-                Gaps.h12,
-
-                if (s.loading) const ProgressBar(),
-
-                if (!s.loading && s.selectedSlot != 0) ...[
-                  Container(
-                    decoration: BoxDecoration(
-                      color: fTheme.cardColor,
-                      borderRadius: BorderRadius.circular(_r),
-                      border: Border.all(color: fTheme.dividerColor),
-                    ),
-                    padding: EdgeInsets.all(AppSpacing.md),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 헤더
-                        Row(
-                          children: [
-                            const Text('토큰 값', style: TextStyle(fontWeight: FontWeight.w600)),
-                            Gaps.w8,
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: AppSpacing.xs,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: fTheme.accentColor.withAlpha(
-                                  fTheme.brightness == Brightness.dark ? 128 : 80,
-                                ),
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                '현재: ${s.currentValue ?? '-'}',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ),
-                          ],
+                      Gaps.w8,
+                      SizedBox(
+                        height: 32,
+                        child: Button(
+                          onPressed: controlsEnabled
+                              ? () => setState(() => newValue = kEdenMax)
+                              : null,
+                          child: Text(loc.eden_btn_set_max(kEdenMax)),
                         ),
-
-                        Gaps.h8,
-
-                        // 입력부
-                        Row(
-                          children: [
-                            Expanded(
-                              child: NumberBox(
-                                value: newValue,
-                                min: 0,
-                                max: kEdenMax,
-                                smallChange: 1,
-                                largeChange: 10,
-                                mode: SpinButtonPlacementMode.inline,
-                                onChanged: (v) => setState(() => newValue = _clamp((v ?? newValue ?? 0))),
-                              ),
-                            ),
-                            Gaps.w8,
-                            Button(
-                              onPressed: () => setState(() => newValue = kEdenMax),
-                              child: const Text('최대(10,000)'),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-
-                  Gaps.h12,
-
-                  if (s.edition == IsaacEdition.rebirth)
-                    InfoBar(
-                      title: const Text('안내'),
-                      content: const Text('이 에디션에서는 값 변경을 지원하지 않아요. 다른 에디션에서 시도해 주세요.'),
-                      severity: InfoBarSeverity.info,
-                    ),
                 ],
-              ],
+              ),
             ),
+
+            const SizedBox(height: AppSpacing.md),
+
+            // 에디션 안내
+            if (edition == IsaacEdition.rebirth)
+              InfoBar(
+                title: Text(loc.common_notice),
+                content: Text(loc.eden_info_rebirth_unsupported),
+                severity: InfoBarSeverity.info,
+              ),
+
+
+            // 내부 경고(문구는 사용성 위주로)
+            if (warningText != null && warningText.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                child: InfoBar(
+                  title: Text(loc.common_notice),
+                  content: Text(warningText),
+                  severity: InfoBarSeverity.warning,
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
+    // === 상태별 렌더링 ===
+    return asyncState.when(
+      // 로딩: 동일한 레이아웃(컨트롤 비활성화) 유지
+      loading: () {
+        return ContentDialog(
+          title: titleRow(loc.eden_title),
+          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
+          content: buildDialogContent(
+            edition: widget.args.edition,
+            slots: widget.args.slots,
+            selectedSlot: widget.args.initialSlot,
+            isLoading: true,
+            isSaving: false,
+            currentValue: null,
+            warningText: null,
           ),
           actions: [
-            Button(child: const Text('닫기'), onPressed: () => Navigator.of(context).pop()),
+            Button(
+              child: Text(loc.common_close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
             FilledButton(
-              onPressed: (s.edition == IsaacEdition.rebirth || s.loading || s.saving || s.selectedSlot == 0)
-                  ? null
-                  : () async {
+              onPressed: null, // 로딩 중 비활성화
+              child: Text(loc.common_save),
+            ),
+          ],
+        );
+      },
+
+      // 에러: 레이아웃은 단순화
+      error: (_, __) {
+        return ContentDialog(
+          title: titleRow(loc.eden_title),
+          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
+          content: InfoBar(
+            title: Text(loc.common_error),
+            content: Text(loc.eden_err_generic),
+            severity: InfoBarSeverity.error,
+          ),
+          actions: [
+            Button(
+              child: Text(loc.common_close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        );
+      },
+
+      // 데이터 로딩 완료
+      data: (s) {
+        newValue ??= s.currentValue ?? 0;
+
+        final body = buildDialogContent(
+          edition: s.edition,
+          slots: s.slots,
+          selectedSlot: s.selectedSlot == 0 ? widget.args.initialSlot : s.selectedSlot,
+          isLoading: s.loading,
+          isSaving: s.saving,
+          currentValue: s.currentValue,
+          warningText: (s.error != null) ? loc.eden_warn_read_failed : null,
+        );
+
+        final canSave = s.edition != IsaacEdition.rebirth &&
+            !s.loading &&
+            !s.saving &&
+            s.selectedSlot != 0;
+
+        return ContentDialog(
+          title: titleRow(loc.eden_title),
+          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
+          content: body,
+          actions: [
+            Button(
+              child: Text(loc.common_close),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            FilledButton(
+              onPressed: canSave
+                  ? () async {
                 await ref
                     .read(edenEditorControllerProvider(widget.args).notifier)
                     .save(_clamp(newValue!));
+
                 final after = ref.read(edenEditorControllerProvider(widget.args)).value;
                 if (after?.error == null && context.mounted) {
-                  UiFeedback.success(context, '저장 완료', '변경한 값이 적용되었어요.');
+                  UiFeedback.success(
+                    context,
+                    loc.eden_saved_title,
+                    loc.eden_saved_desc,
+                  );
                   setState(() => newValue = after?.currentValue ?? newValue);
+                } else if (context.mounted) {
+                  UiFeedback.error(context, loc.common_error, loc.eden_err_generic);
                 }
-              },
-              child: s.saving ? const ProgressRing() : const Text('저장'),
+              }
+                  : null,
+              child: s.saving ? const ProgressRing() : Text(loc.common_save),
             ),
           ],
         );

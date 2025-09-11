@@ -134,7 +134,21 @@ class _ActionTile extends StatelessWidget {
       onPressed: onPressed,
       builder: (context, states) {
         final hovered = states.isHovered && enabled;
-        final bg = primary ? _primaryTint(fTheme) : fTheme.cardColor;
+        final pressed = states.isPressed && enabled;
+
+        // 기본 배경
+        final base = primary ? _primaryTint(fTheme) : fTheme.cardColor;
+        final overlay = _tileOverlay(
+          brightness: fTheme.brightness,
+          hovered: hovered,
+          pressed: pressed,
+        );
+        final bg = Color.alphaBlend(overlay, base);
+
+        // hover 시 테두리도 살짝 강조
+        final borderColor = hovered
+            ? fTheme.resources.controlStrokeColorSecondary
+            : fTheme.resources.controlStrokeColorDefault;
         return AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           padding: const EdgeInsets.symmetric(
@@ -144,7 +158,7 @@ class _ActionTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: fTheme.resources.controlStrokeColorDefault),
+            border: Border.all(color: borderColor),
             boxShadow: hovered
                 ? [
               BoxShadow(
@@ -184,4 +198,22 @@ Color _primaryTint(FluentThemeData fTheme) {
     fTheme.brightness == Brightness.dark ? 84 : 48,
   );
   return Color.alphaBlend(overlay, base);
+}
+
+Color _tileOverlay({
+  required Brightness brightness,
+  required bool hovered,
+  required bool pressed,
+}) {
+  if (pressed) {
+    return brightness == Brightness.dark
+        ? Colors.white.withAlpha(48)   // 다크: 더 밝게
+        : Colors.black.withAlpha(36);  // 라이트: 더 어둡게
+  }
+  if (hovered) {
+    return brightness == Brightness.dark
+        ? Colors.white.withAlpha(28)
+        : Colors.black.withAlpha(18);
+  }
+  return Colors.transparent;
 }

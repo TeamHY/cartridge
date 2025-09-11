@@ -307,81 +307,94 @@ class _PresetTile extends ConsumerWidget {
     final loc = AppLocalizations.of(context);
 
     final selStroke = theme.resources.controlStrokeColorSecondary;
-    final hoverFill = theme.cardColor;
+    final hoverFill = theme.resources.subtleFillColorSecondary;
     final checkColor = theme.accentColor;
 
     return HoverButton(
       onPressed: onTap,
       builder: (ctx, states) {
         final hovered = states.isHovered;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 100),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            color: hovered ? hoverFill : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(
-              color: selected ? selStroke : Colors.transparent,
-              width: selected ? 1.2 : 1.0,
-            ),
-          ),
-          child: Row(
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          child: Stack(
             children: [
-              // 텍스트
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 120),
+                    curve: Curves.easeOut,
+                    opacity: hovered ? 1.0 : 0.0,
+                    child: Container(color: hoverFill),
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.sm,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: selected ? selStroke : Colors.transparent,
+                    width: selected ? 1.2 : 1.0,
+                  ),
+                ),
+                child: Row(
                   children: [
-                    Text(
-                      view.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                    Gaps.h2,
-                    Row(
-                      children: [
-                        Text(
-                          _dimLabel(loc, view),
-                          style: theme.typography.caption?.copyWith(
-                            fontSize: 11,
-                            color: theme.inactiveColor,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            view.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
                           ),
-                        ),
-                        Gaps.w8,
-                        if (view.useRepentogon == true)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.xs,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: repentogonStatusOf(context, ref).bg,
-                              borderRadius: BorderRadius.circular(AppRadius.xs),
-                            ),
-                            child: Text(
-                              loc.option_use_repentogon_label,
-                              style: theme.typography.caption?.copyWith(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: repentogonStatusOf(context, ref).fg
+                          Gaps.h2,
+                          Row(
+                            children: [
+                              Text(
+                                _dimLabel(loc, view),
+                                style: theme.typography.caption?.copyWith(
+                                  fontSize: 11,
+                                  color: theme.inactiveColor,
+                                ),
                               ),
-                            ),
+                              Gaps.w8,
+                              if (view.useRepentogon == true)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.xs,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: repentogonStatusOf(context, ref).bg,
+                                    borderRadius: BorderRadius.circular(AppRadius.xs),
+                                  ),
+                                  child: Text(
+                                    loc.option_use_repentogon_label,
+                                    style: theme.typography.caption?.copyWith(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                      color: repentogonStatusOf(context, ref).fg,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
-                      ],
+                        ],
+                      ),
                     ),
+                    Gaps.w8,
+                    if (selected) Icon(FluentIcons.check_mark, size: 14, color: checkColor),
                   ],
                 ),
               ),
-              Gaps.w8,
-              if (selected) Icon(FluentIcons.check_mark, size: 14, color: checkColor),
             ],
           ),
-        );
-      },
+        );      },
     );
   }
 }

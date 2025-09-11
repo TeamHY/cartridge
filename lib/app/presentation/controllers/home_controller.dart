@@ -84,7 +84,7 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
 
   logI(tag, 'op=$op fn=openSaveFolder msg=multi candidates count=${candidates.length} showDialog=1');
   if (!context.mounted) return;
-  final chosen = await showChooseSteamAccountDialog(context, candidates);
+  final chosen = await showChooseSteamAccountDialog(context, items: candidates);
   if (chosen == null) {
     logW(tag, 'op=$op fn=openSaveFolder msg=user cancelled dialog=1');
     return;

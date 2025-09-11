@@ -54,6 +54,7 @@ class AppColors {
   static const claudeBg      = Color(0xFFf5f4ee);
   static const claudeCard    = Color(0xFFfaf9f5);
   static const claudeDivider = Color(0xFFdad9d4);
+  static final AccentColor claudeAccent2 = makeAccent2From(const Color(0xFF9c87f5));
 }
 
 AccentColor makeAccent2From(Color seed) {

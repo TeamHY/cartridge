@@ -17,10 +17,12 @@ final accent2OverridesProvider = Provider<_Accent2Overrides?>((ref) {
       return (light: AppColors.lightAccent2, dark: null);
     case AppThemeKey.dark:
       return (light: null, dark: AppColors.darkAccent2);
+    case AppThemeKey.oled:
+      return (light: null, dark: AppColors.darkAccent2);
     case AppThemeKey.tangerine:
       return (light: null, dark: AppColors.tangerineAccent2);
-    default:
-      return null; // 기본: 파생 규칙 사용
+    case AppThemeKey.claude:
+      return (light: AppColors.claudeAccent2, dark: null);
   }
 });
 

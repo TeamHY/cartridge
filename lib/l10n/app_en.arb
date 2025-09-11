@@ -79,6 +79,106 @@
   "badge_cartridge_recorder": "Cartridge",
   "badge_repentogon": "Repentogon",
 
+  "choose_steam_title": "Choose steam account",
+  "choose_steam_error_hint": "Something went wrong. Please try again.",
+  "choose_steam_empty_title": "No accounts found",
+  "choose_steam_empty_desc": "Please make sure you're signed in to Steam.",
+  "choose_steam_name_unset": "Unknown",
+
+  "eden_title": "Eden Token",
+  "@eden_title": {
+    "description": "Dialog title for Eden token editor"
+  },
+
+  "eden_err_generic": "Something went wrong. Please try again.",
+  "@eden_err_generic": {
+    "description": "Generic error message without exposing codes"
+  },
+
+  "eden_err_accounts_title": "Couldn’t load accounts",
+  "@eden_err_accounts_title": {
+    "description": "Toast/feedback title when loading steam accounts failed"
+  },
+
+  "eden_err_accounts_desc": "We couldn't fetch your save folders.",
+  "@eden_err_accounts_desc": {
+    "description": "Toast/feedback description for account loading failure"
+  },
+
+  "eden_warn_no_accounts_title": "No accounts detected",
+  "@eden_warn_no_accounts_title": {
+    "description": "Toast/feedback title when there are no Steam accounts"
+  },
+
+  "eden_warn_no_accounts_desc": "Please sign in to Steam or check Steam Cloud settings.",
+  "@eden_warn_no_accounts_desc": {
+    "description": "Toast/feedback description when accounts empty"
+  },
+
+  "eden_warn_no_saves_title": "No save files",
+  "@eden_warn_no_saves_title": {
+    "description": "Toast/feedback title when no edition/slot save files found"
+  },
+
+  "eden_warn_no_saves_desc": "We couldn’t find any save files for your game.",
+  "@eden_warn_no_saves_desc": {
+    "description": "Toast/feedback description for no save files"
+  },
+
+  "eden_warn_read_failed": "We couldn't read the current value. The value shown may be outdated.",
+  "@eden_warn_read_failed": {
+    "description": "Inline warning when controller returns an internal read error"
+  },
+
+  "eden_slot_help": "Choose a save slot from your game.",
+  "@eden_slot_help": {
+    "description": "Helper text above slot buttons"
+  },
+
+  "eden_slot_label": "Slot {num}",
+  "@eden_slot_label": {
+    "description": "Slot button label",
+    "placeholders": {
+      "num": { "type": "int", "example": "2" }
+    }
+  },
+
+  "eden_value_label": "Token count",
+  "@eden_value_label": {
+    "description": "Header for the value editor"
+  },
+
+  "eden_current_chip": "Current: {value}",
+  "@eden_current_chip": {
+    "description": "Chip showing current stored value",
+    "placeholders": {
+      "value": { "type": "String", "example": "1234" }
+    }
+  },
+
+  "eden_btn_set_max": "Max ({max})",
+  "@eden_btn_set_max": {
+    "description": "Button to set the maximum token value",
+    "placeholders": {
+      "max": { "type": "int", "example": "10000" }
+    }
+  },
+
+  "eden_info_rebirth_unsupported": "Changing values is not supported in this edition. Please try another edition.",
+  "@eden_info_rebirth_unsupported": {
+    "description": "Info bar message for Rebirth edition limitation"
+  },
+
+  "eden_saved_title": "Saved",
+  "@eden_saved_title": {
+    "description": "Toast title after successful save"
+  },
+
+  "eden_saved_desc": "Your changes have been applied.",
+  "@eden_saved_desc": {
+    "description": "Toast description after successful save"
+  },
+
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
   "home_button_record": "Record\nMode",
@@ -418,6 +518,7 @@
   "common_loading": "Loading…",
   "common_none_label": "(NONE)",
   "common_nothing_selected": "No items selected.",
+  "common_notice": "Notice",
   "common_play": "Play",
   "common_refresh": "Refresh",
   "common_remove_favorite": "Not Favorites",

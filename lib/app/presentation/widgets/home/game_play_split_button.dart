@@ -223,50 +223,66 @@ class _InstanceTile extends StatelessWidget {
     final fTheme = FluentTheme.of(context);
 
     final selStroke = fTheme.resources.controlStrokeColorSecondary;
-    final hoverFill = fTheme.cardColor; // subtle hover
+    final hoverFill = fTheme.resources.subtleFillColorSecondary;
     final checkColor = fTheme.accentColor;
 
     return HoverButton(
       onPressed: onTap,
       builder: (ctx, states) {
         final hovered = states.isHovered;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 100),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            color: hovered ? hoverFill : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(
-              color: selected ? selStroke : Colors.transparent,
-              width: selected ? 1.2 : 1.0,
-            ),
-          ),
-          child: Row(
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          child: Stack(
             children: [
-              InstanceImageThumb(
-                image: view.image,
-                fallbackSeed: view.name,
-                size: 32,
-                borderRadius: BorderRadius.circular(AppRadius.sm),
-              ),
-              Gaps.w8,
-              Expanded(
-                child: Text(
-                  view.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: fTheme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+              // 1) Hover 배경 오버레이(불투명도만 애니메이션)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 120),
+                    curve: Curves.easeOut,
+                    opacity: hovered ? 1.0 : 0.0,
+                    child: Container(color: hoverFill),
+                  ),
                 ),
               ),
-              Gaps.w8,
-              if (selected) Icon(FluentIcons.check_mark, size: 14, color: checkColor),
+              // 2) 내용 + 테두리 (항상 동일, 색 보간 없음)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.sm,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: selected ? selStroke : Colors.transparent,
+                    width: selected ? 1.2 : 1.0,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    InstanceImageThumb(
+                      image: view.image,
+                      fallbackSeed: view.name,
+                      size: 32,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    Gaps.w8,
+                    Expanded(
+                      child: Text(
+                        view.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: fTheme.typography.bodyStrong?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    Gaps.w8,
+                    if (selected) Icon(FluentIcons.check_mark, size: 14, color: checkColor),
+                  ],
+                ),
+              ),
             ],
           ),
-        );
-      },
+        );      },
     );
   }
 }
