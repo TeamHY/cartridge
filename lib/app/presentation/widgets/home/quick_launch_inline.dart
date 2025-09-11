@@ -25,7 +25,7 @@ class QuickLaunchInline extends ConsumerWidget {
         loading: () => UtSplitButton.single(
           mainButtonText: '바닐라 플레이',
           secondaryText: '프리셋 로딩 중…',
-          buttonColor: fTheme.accentColor, // context에서 가져오거나 인자로 전달
+          buttonColor: fTheme.accentColor,
           onPressed: null,
           enabled: false,
         ),

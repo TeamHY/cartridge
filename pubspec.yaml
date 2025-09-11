@@ -45,6 +45,7 @@ dependencies:
   # ── Filesystem / IO ─────────────────────────────────────────────────────────
   path_provider: ^2.0.15            # [FS] 앱/문서 디렉터리 경로 획득(모드 스캔, 프리셋 저장)
   file_selector: ^1.0.3             # [FS/UI] 플랫폼 파일/폴더 선택(네이티브 다이얼로그)
+  file: ^7.0.1                      # [FS Abstraction] 테스트 가능한 FileSystem(Local/Memory 교체 DI). 단위테스트에서 MemoryFileSystem 사용
   tailf: ^1.1.0                     # [Logs] 파일 실시간 tail(기록 모드 로그 리딩)
   path: ^1.9.1                      # [FS/Path] 경로 조작(join, basename 등). 런타임에서 저장 경로/파일명 계산에 사용.
 

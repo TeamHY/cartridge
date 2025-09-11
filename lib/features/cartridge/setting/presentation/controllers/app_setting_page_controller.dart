@@ -107,6 +107,6 @@ class IsaacAutoInfo {
     this.installSource = InstallPathSource.auto,
   });
 
-  bool get needsRepentogon =>
+  bool get canUseRepentogon =>
       edition == IsaacEdition.repentance || edition == IsaacEdition.repentancePlus;
 }

@@ -10,6 +10,7 @@ import 'package:cartridge/app/presentation/desktop_grid.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/setting/setting.dart';
+import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/main.dart';
 import 'package:cartridge/theme/theme.dart';
@@ -280,10 +281,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // 설치 감지 패널 (분리)
-                      InstallDetectPanel(
-                        useAutoInstall: _autoInstall,
-                        manualInstallPath: _pathController.text,
-                      ),
+                      const IsaacInstallDetectCard(),
                       Gaps.h16,
 
                       // 아이작 설치 폴더

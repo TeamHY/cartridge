@@ -9,3 +9,4 @@ export 'domain/isaac_steam_ids.dart';
 export 'domain/isaac_versions.dart';
 export 'domain/repentogon.dart';
 export 'domain/runtime_args.dart';
+export 'presentation/widgets/isaac_install_detect_card.dart';

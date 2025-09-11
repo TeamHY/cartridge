@@ -7,7 +7,6 @@ export 'domain/setting_policy.dart';
 export 'domain/setting_service.dart';
 export 'presentation/controllers/app_setting_page_controller.dart';
 export 'presentation/pages/settings_page.dart';
-export 'presentation/widgets/install_detect_panel.dart';
 export 'presentation/widgets/labeled_block.dart';
 export 'presentation/widgets/path_input_group.dart';
 export 'presentation/widgets/settings_section.dart';
