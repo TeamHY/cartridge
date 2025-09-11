@@ -38,6 +38,11 @@
   "option_preset_picker_title": "옵션 프리셋 선택",
   "option_preset_picker_empty": "해당하는 프리셋이 없습니다",
 
+  "news_section_title": "Steam 아이작 뉴스",
+  "news_see_more": "뉴스 더보기",
+  "news_empty_title": "최근 뉴스가 없습니다",
+  "news_error_title": "새 소식을 불러오지 못했어요",
+
   "home_preset_placeholder": "새 프리셋",
   "home_button_preset": "프리셋",
   "home_button_record": "기록 모드",

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui' show PointerDeviceKind;
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart' as ul;
@@ -9,8 +10,6 @@ import 'package:cartridge/features/web_preview/web_preview.dart';
 import 'package:cartridge/app/presentation/widgets/home/home_card.dart';
 import 'package:cartridge/theme/theme.dart';
 
-
-const _cardRadius = 12.0;
 const _newsViewportHeight = 200.0;
 const _newsCardWidth = 240.0;
 const _newsThumbHeight = 115.0;
@@ -20,50 +19,130 @@ class SteamNewsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context);
     final newsAsync = ref.watch(steamNewsCardsProvider);
 
     return HomeCard(
-      title: 'Steam Isaac News',
+      title: loc.news_section_title,
       trailing: HyperlinkButton(
-        child: const Text('뉴스 더보기'),
+        child: Text(loc.news_see_more),
         onPressed: () => ul.launchUrl(
           Uri.parse('https://store.steampowered.com/news/app/250900'),
         ),
       ),
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs, horizontal: AppSpacing.md),
-      child: newsAsync.when(
-        loading: () => const Center(child: ProgressRing()),
-        error: (e, _) => Text('Failed to load news: $e'),
-        data: (cards) {
-          if (cards.isEmpty) {
-            return _NewsEmptyStrip(
-              onRefresh: () => ref.invalidate(steamNewsCardsProvider),
-            );
-          }
-          final ctrl = ScrollController();
-          return SizedBox(
-            height: _newsViewportHeight,
-            child: _EdgeFadedHScroll(
-              controller: ctrl,
-              fadeWidth: 16,
-              child: ScrollConfiguration(
-                behavior: const _MouseDragScrollBehavior(),
-                child: Scrollbar(
-                  controller: ctrl,
-                  interactive: true,
-                  child: ListView.separated(
-                    controller: ctrl,
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(right: 4),
-                    itemCount: cards.length,
-                    separatorBuilder: (_, __) => Gaps.w12,
-                    itemBuilder: (context, i) => _NewsCard(item: cards[i]),
-                  ),
-                ),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.sm,
+        AppSpacing.md,
+        AppSpacing.md,
+      ),
+      child: SizedBox(
+        height: _newsViewportHeight,
+        child: newsAsync.when(
+          loading: () => _NewsStrip.fixed(
+            children: const [
+              _NewsSkeletonCard(),
+              _NewsSkeletonCard(),
+              _NewsSkeletonCard(),
+            ],
+          ),
+          // 에러: 심플 메시지 + 새로고침
+          error: (_, __) => _NewsStrip.fixed(
+            children: [
+              _NewsMessageCard.icon(
+                icon: FluentIcons.sync_error,
+                title: loc.news_error_title,
+                actionLabel: loc.common_refresh,
+                onPressed: () => ref.invalidate(steamNewsCardsProvider),
               ),
-            ),
-          );
-        },
+            ],
+          ),
+          data: (cards) {
+            if (cards.isEmpty) {
+              return _NewsStrip.fixed(
+                children: [
+                  _NewsMessageCard.icon(
+                    icon: FluentIcons.news,
+                    title: loc.news_empty_title,
+                    actionLabel: loc.common_refresh,
+                    onPressed: () => ref.invalidate(steamNewsCardsProvider),
+                  ),
+                ],
+              );
+            }
+            return _NewsStrip.builder(
+              itemCount: cards.length,
+              itemBuilder: (context, i) => _NewsCard(item: cards[i]),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// 공통: 가로 스트립(에지 페이드 + 스크롤바 + 동일 padding/spacing)
+class _NewsStrip extends StatefulWidget {
+  final List<Widget>? fixedChildren;
+  final int? itemCount;
+  final Widget Function(BuildContext, int)? itemBuilder;
+
+  const _NewsStrip._({this.fixedChildren, this.itemCount, this.itemBuilder});
+
+  factory _NewsStrip.fixed({required List<Widget> children}) =>
+      _NewsStrip._(fixedChildren: children);
+
+  factory _NewsStrip.builder({
+    required int itemCount,
+    required Widget Function(BuildContext, int) itemBuilder,
+  }) => _NewsStrip._(itemCount: itemCount, itemBuilder: itemBuilder);
+
+  @override
+  State<_NewsStrip> createState() => _NewsStripState();
+}
+
+class _NewsStripState extends State<_NewsStrip> {
+  late final ScrollController _ctrl = ScrollController();
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final list = (widget.fixedChildren != null)
+        ? ListView.separated(
+      key: const PageStorageKey('steam_news_list'),
+      primary: true,
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.only(right: 4),
+      itemCount: widget.fixedChildren!.length,
+      separatorBuilder: (_, __) => Gaps.w12,
+      itemBuilder: (_, i) => widget.fixedChildren![i],
+    )
+        : ListView.separated(
+      primary: true,
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.only(right: 4),
+      itemCount: widget.itemCount!,
+      separatorBuilder: (_, __) => Gaps.w12,
+      itemBuilder: widget.itemBuilder!,
+    );
+
+    return _EdgeFadedHScroll(
+      controller: _ctrl,
+      fadeWidth: 16,
+      child: ScrollConfiguration(
+        behavior: const _MouseDragScrollBehavior(),
+        child: PrimaryScrollController(
+          controller: _ctrl,
+          child: Scrollbar(
+            interactive: true,
+            child: list,
+          ),
+        ),
       ),
     );
   }
@@ -81,24 +160,16 @@ class _NewsCard extends ConsumerWidget {
     return '$y.$m.$day';
   }
 
-  String _host(String url) {
-    try {
-      return Uri.parse(url).host;
-    } catch (_) {
-      return '';
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = FluentTheme.of(context);
-    final dividerColor = theme.dividerColor;
+    final stroke = theme.resources.controlStrokeColorDefault;
 
     final previewAsync = ref.watch(webPreviewProvider(item.item.url));
     final preview = previewAsync.maybeWhen(data: (p) => p, orElse: () => null);
 
     final liveThumbPath = preview?.imagePath ?? item.thumbPath;
-    final liveTitle     = (preview?.title.isNotEmpty ?? false)
+    final liveTitle = (preview?.title.isNotEmpty ?? false)
         ? preview!.title
         : item.item.title;
 
@@ -108,8 +179,8 @@ class _NewsCard extends ConsumerWidget {
         // 썸네일
         ClipRRect(
           borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(_cardRadius),
-            topRight: Radius.circular(_cardRadius),
+            topLeft: Radius.circular(AppRadius.lg),
+            topRight: Radius.circular(AppRadius.lg),
           ),
           child: SizedBox(
             width: _newsCardWidth,
@@ -117,16 +188,17 @@ class _NewsCard extends ConsumerWidget {
             child: (liveThumbPath ?? '').isNotEmpty
                 ? Image.file(
               File(liveThumbPath!),
-              key: ValueKey(liveThumbPath),       // 경로 바뀌면 강제 리빌드
+              key: ValueKey(liveThumbPath),
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(color: theme.scaffoldBackgroundColor),
+              errorBuilder: (_, __, ___) =>
+                  Container(color: theme.scaffoldBackgroundColor),
             )
                 : _placeholderThumb(context),
           ),
         ),
         // 본문
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.sm),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -135,13 +207,21 @@ class _NewsCard extends ConsumerWidget {
                 liveTitle,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                style: theme.typography.bodyStrong?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
               ),
               Gaps.h4,
-              // 날짜 + 호스트
+              // 날짜
               if (item.item.date != null)
-                Text(_dateLabel(item.item.date),
-                    style: TextStyle(color: theme.inactiveColor, fontSize: 12)),
+                Text(
+                  _dateLabel(item.item.date),
+                  style: theme.typography.caption?.copyWith(
+                    color: theme.inactiveColor,
+                    fontSize: 12,
+                  ),
+                ),
             ],
           ),
         ),
@@ -157,8 +237,8 @@ class _NewsCard extends ConsumerWidget {
           width: _newsCardWidth,
           decoration: BoxDecoration(
             color: theme.cardColor,
-            borderRadius: BorderRadius.circular(_cardRadius),
-            border: Border.all(color: dividerColor),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: stroke),
             boxShadow: hovered
                 ? [
               BoxShadow(
@@ -176,8 +256,6 @@ class _NewsCard extends ConsumerWidget {
     );
   }
 
-  String finalHost(String url) => _host(url);
-
   Widget _placeholderThumb(BuildContext ctx) {
     final theme = FluentTheme.of(ctx);
     return Container(
@@ -187,6 +265,111 @@ class _NewsCard extends ConsumerWidget {
     );
   }
 }
+
+/// 스켈레톤 카드(로딩)
+class _NewsSkeletonCard extends StatelessWidget {
+  const _NewsSkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
+    final stroke = theme.resources.controlStrokeColorDefault;
+
+    Widget block({double h = 14, double w = 120}) => Container(
+      height: h,
+      width: w,
+      decoration: BoxDecoration(
+        color: theme.resources.subtleFillColorSecondary,
+        borderRadius: BorderRadius.circular(AppRadius.xs),
+      ),
+    );
+
+    return Container(
+      width: _newsCardWidth,
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: stroke),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 썸네일 영역 스켈레톤
+          Container(
+            width: _newsCardWidth,
+            height: _newsThumbHeight,
+            color: theme.resources.subtleFillColorTertiary,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                block(h: 16, w: _newsCardWidth - 48),
+                Gaps.h6,
+                block(h: 14, w: _newsCardWidth * 0.5),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 메시지/에러 카드(빈/에러 공용)
+class _NewsMessageCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String actionLabel;
+  final VoidCallback onPressed;
+
+  const _NewsMessageCard.icon({
+    required this.icon,
+    required this.title,
+    required this.actionLabel,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
+    final stroke = theme.resources.controlStrokeColorDefault;
+
+    return Container(
+      width: _newsCardWidth,
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: stroke),
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 28, color: theme.inactiveColor),
+              Gaps.h8,
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: theme.typography.bodyStrong?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Gaps.h12,
+              Button(onPressed: onPressed, child: Text(actionLabel)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// === 아래 유틸 그대로 사용 ===
 
 class _EdgeFadedHScroll extends StatefulWidget {
   final Widget child;
@@ -315,41 +498,4 @@ class _MouseDragScrollBehavior extends ScrollBehavior {
     PointerDeviceKind.invertedStylus,
     PointerDeviceKind.unknown,
   };
-}
-
-class _NewsEmptyStrip extends ConsumerWidget {
-  final VoidCallback onRefresh;
-  const _NewsEmptyStrip({required this.onRefresh});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = FluentTheme.of(context);
-    return SizedBox(
-      height: _newsViewportHeight,
-      child: Row(
-        children: [
-          Container(
-            width: _newsCardWidth,
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(_cardRadius),
-              border: Border.all(color: theme.dividerColor),
-            ),
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(FluentIcons.news, size: 28, color: theme.inactiveColor),
-                  Gaps.h8,
-                  const Text('최근 뉴스가 없습니다', style: TextStyle(fontWeight: FontWeight.w600)),
-                  Gaps.h12,
-                  Button(onPressed: onRefresh, child: const Text('새로고침')),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

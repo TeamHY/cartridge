@@ -38,6 +38,11 @@
   "option_preset_picker_title": "Select option preset",
   "option_preset_picker_empty": "No presets found",
 
+  "news_section_title": "Steam Isaac News",
+  "news_see_more": "See more news",
+  "news_empty_title": "No recent news",
+  "news_error_title": "Couldn't load news",
+
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
   "home_button_record": "Record\nMode",
