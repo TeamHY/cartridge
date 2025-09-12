@@ -137,7 +137,7 @@ class _RadioRow extends StatelessWidget {
           horizontal: AppSpacing.sm,
         ),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(AppRadius.sm),
+          borderRadius: AppShapes.chip,
         ),
         child: Row(
           children: [

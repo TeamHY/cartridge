@@ -370,7 +370,7 @@ class _ModPresetPickerField extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
               color: bg,
-              borderRadius: BorderRadius.circular(AppRadius.sm),
+              borderRadius: AppShapes.chip,
               border: Border.all(color: stroke),
               boxShadow: hovered
                   ? [

@@ -613,6 +613,8 @@
   "common_none_label": "(NONE)",
   "common_nothing_selected": "No items selected.",
   "common_notice": "Notice",
+  "common_off": "OFF",
+  "common_on": "ON",
   "common_play": "Play",
   "common_refresh": "Refresh",
   "common_remove_favorite": "Not Favorites",

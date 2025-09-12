@@ -7,4 +7,8 @@ export 'domain/policy/option_preset_policy.dart';
 export 'domain/option_presets_service.dart';
 export 'presentation/controllers/option_presets_page_controller.dart';
 export 'presentation/pages/option_presets_tab.dart';
+export 'presentation/widgets/option_preset_advanced_section.dart';
+export 'presentation/widgets/option_preset_basic_section.dart';
+export 'presentation/widgets/option_preset_header.dart';
+export 'presentation/widgets/option_preset_validators.dart';
 export 'presentation/widgets/option_presets_create_edit_dialog.dart';

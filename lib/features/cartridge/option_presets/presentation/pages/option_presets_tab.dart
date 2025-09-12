@@ -11,7 +11,6 @@ import 'package:cartridge/app/presentation/widgets/list_tiles.dart';
 import 'package:cartridge/app/presentation/widgets/search_toolbar.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/core/service_providers.dart';
-import 'package:cartridge/core/utils/id.dart';
 import 'package:cartridge/core/utils/wiggle.dart';
 import 'package:cartridge/features/cartridge/option_presets/option_presets.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -102,9 +101,8 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
     if (result == null) return;
 
     final ctl = ref.read(optionPresetsControllerProvider.notifier);
-    if (init == null) {
-      final withId = result.id.trim().isEmpty ? result.copyWith(id: IdUtil.genId('op')) : result;
-      await ctl.create(withId);
+    if (init?.id == null || init!.id.isEmpty) {
+      await ctl.create(result);
     } else {
       await ctl.fetch(result);
     }

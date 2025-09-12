@@ -624,6 +624,8 @@
   "common_none_label": "(없음)",
   "common_nothing_selected": "선택된 항목이 없습니다.",
   "common_notice": "알림",
+  "common_off": "OFF",
+  "common_on": "ON",
   "common_play": "플레이",
   "common_refresh": "새로 고침",
   "common_remove_favorite": "즐겨찾기 취소",

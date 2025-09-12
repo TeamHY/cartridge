@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
-import 'package:cartridge/theme/tokens/spacing.dart';
-import 'package:cartridge/theme/tokens/typography.dart';
+import 'package:cartridge/theme/theme.dart';
 
 /// 통일된 컨텐츠 레이아웃 규격
 class ContentLayout {
@@ -190,7 +189,7 @@ class ContentHeaderBar extends StatelessWidget {
                   children: [
                     if (kind == ContentHeaderKind.backImageText) ...[
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: AppShapes.card,
                         child: SizedBox(width: 80, height: 80, child: leadingEditable),
                       ),
                       Gaps.w12,
