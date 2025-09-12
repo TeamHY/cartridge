@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
 import 'package:cartridge/theme/theme.dart';
@@ -22,27 +23,28 @@ class UTInfoChipsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Wrap(
       spacing: 6,
       runSpacing: 6,
       children: [
         _InfoChip(
           icon: FluentIcons.bulleted_list,
-          label: '전체',
+          label: loc.infochips_total_label,
           value: total,
           tone: _ChipTone.neutral,
         ),
         if (showMatched)
           _InfoChip(
             icon: FluentIcons.search,
-            label: '검색됨',
+            label: loc.infochips_matched_label,
             value: matched,
             tone: _ChipTone.info,
           ),
         if (showSelected)
           _InfoChip(
             icon: FluentIcons.check_mark,
-            label: '선택됨',
+            label: loc.infochips_selected_label,
             value: selected,
             tone: _ChipTone.success,
           ),

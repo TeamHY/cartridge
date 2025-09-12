@@ -740,5 +740,95 @@
   "doc_load_fail_title": "We couldn’t load the document",
   "@doc_load_fail_title": { "description": "Markdown load failure - title" },
   "doc_load_fail_desc": "Please try again in a moment.",
-  "@doc_load_fail_desc": { "description": "Markdown load failure - description" }
+  "@doc_load_fail_desc": { "description": "Markdown load failure - description" },
+
+  "selection_share": "Share",
+  "@selection_share": { "description": "Share dropdown title for selected items" },
+
+  "selection_copy_plain": "Copy as text",
+  "@selection_copy_plain": { "description": "Copy selected items as plain text" },
+
+  "selection_copy_markdown": "Copy as Markdown",
+  "@selection_copy_markdown": { "description": "Copy selected items as Markdown" },
+
+  "selection_copy_html": "Copy as HTML links",
+  "@selection_copy_html": { "description": "Copy selected items as HTML links" },
+
+  "selection_favorite_on": "Add to favorites",
+  "@selection_favorite_on": { "description": "Turn favorites on for selected items" },
+
+  "selection_favorite_off": "Remove from favorites",
+  "@selection_favorite_off": { "description": "Turn favorites off for selected items" },
+
+  "selection_enable_mods": "Enable mods",
+  "@selection_enable_mods": { "description": "Enable selected mods" },
+
+  "selection_disable_mods": "Disable mods",
+  "@selection_disable_mods": { "description": "Disable selected mods" },
+
+  "table_search_hint": "Search",
+  "@table_search_hint": { "description": "Table search input hint" },
+
+  "table_empty": "No items",
+  "@table_empty": { "description": "When the table has no data" },
+
+  "table_no_results": "No results. Try a different query or clear filters.",
+  "@table_no_results": { "description": "When no results match after search/filter" },
+
+  "infochips_total_label": "Total",
+  "@infochips_total_label": { "description": "Info chip: total items label" },
+
+  "infochips_matched_label": "Matched",
+  "@infochips_matched_label": { "description": "Info chip: matched items label" },
+
+  "infochips_selected_label": "Selected",
+  "@infochips_selected_label": { "description": "Info chip: selected items label" },
+
+  "table_filter": "Filter",
+  "@table_filter": { "description": "Table toolbar: Filter button" },
+
+  "table_preset": "Preset",
+  "@table_preset": { "description": "Table toolbar: Preset button" },
+
+  "table_search": "Search",
+  "@table_search": { "description": "Tooltip/collapsed icon: Search" },
+
+  "table_clear": "Clear all",
+  "@table_clear": { "description": "Filter flyout: Clear all" },
+
+  "table_multi_select_hint": "You can pick multiple items",
+  "@table_multi_select_hint": { "description": "Filter flyout bottom hint" },
+
+  "table_density_compact": "Compact",
+  "@table_density_compact": { "description": "Density: Compact" },
+
+  "table_density_comfortable": "Comfortable",
+  "@table_density_comfortable": { "description": "Density: Comfortable" },
+
+  "table_density_tile": "Tile",
+  "@table_density_tile": { "description": "Density: Tile" },
+
+  "table_sidebar_label": "Left sidebar",
+  "@table_sidebar_label": { "description": "View mode flyout: sidebar toggle label" },
+
+  "table_sidebar_unavailable": "Sidebar isn’t available at this width",
+  "@table_sidebar_unavailable": { "description": "Sidebar unsupported hint" },
+
+  "table_summary_selected_short": "Selected {count}",
+  "@table_summary_selected_short": {
+    "description": "Summary chip: selected count",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "table_summary_matched_short": "Matched {count}",
+  "@table_summary_matched_short": {
+    "description": "Summary chip: matched count",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "table_summary_total_short": "Total {count}",
+  "@table_summary_total_short": {
+    "description": "Summary chip: total count",
+    "placeholders": { "count": { "type": "int" } }
+  }
 }

@@ -47,7 +47,7 @@
 - id: promo-cafe
   category: hyZone
   type: link
-  title: { ko: 오헌영 네이버 카페, en: Hy’s Naver Café }
+  title: { ko: 오헌영 네이버 카페, en: 아이작 오헌영’s Naver Café }
   description:
     ko: 공지/커뮤니티 소식 보러가기
     en: Notices and community updates.

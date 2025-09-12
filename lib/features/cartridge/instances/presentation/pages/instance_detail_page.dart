@@ -450,6 +450,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                     initialAscending: app.ascending ?? true,
                     comparators: comparators,
                     headerTrailing: UTHeaderRefreshButton(
+                      tooltip: loc.common_refresh,
                       onRefresh: () async {
                         await uiCtrl.refreshFromStore();
                         if (!context.mounted) return;

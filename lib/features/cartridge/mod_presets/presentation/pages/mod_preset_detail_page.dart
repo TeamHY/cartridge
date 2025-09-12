@@ -277,6 +277,7 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                     initialDensity: UTTableDensity.tile,
                     comparators: comparators,
                     headerTrailing: UTHeaderRefreshButton(
+                      tooltip: loc.common_refresh,
                       onRefresh: () async {
                         await uiCtrl.refreshFromStore();
                         if (!context.mounted) return;

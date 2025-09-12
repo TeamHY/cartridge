@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 
@@ -135,6 +136,7 @@ class _UTTableToolbarChipsState<T> extends State<UTTableToolbarChips<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return LayoutBuilder(builder: (context, box) {
       final w = box.maxWidth;
 
@@ -183,7 +185,7 @@ class _UTTableToolbarChipsState<T> extends State<UTTableToolbarChips<T>> {
           // 2) Filter 그룹 버튼
           if (baseFilterIds.isNotEmpty) ...[
             _GroupFlyoutButton<T>(
-              label: 'Filter',
+              label: loc.table_filter,
               icon: FluentIcons.filter,
               activeCount: baseActiveCount,
               items: [
@@ -211,7 +213,7 @@ class _UTTableToolbarChipsState<T> extends State<UTTableToolbarChips<T>> {
           // 3) Preset 그룹 버튼
           if (showPresetToolbar) ...[
             _GroupFlyoutButton<T>(
-              label: 'Preset',
+              label: loc.table_filter,
               icon: FluentIcons.tag,
               activeCount: presetActiveCount,
               items: [
@@ -347,6 +349,7 @@ class _DensityFlyoutButtonState extends State<_DensityFlyoutButton> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     IconData mainIcon;
     switch (widget.density) {
       case UTTableDensity.comfortable: mainIcon = FluentIcons.density_comfy; break;
@@ -395,21 +398,21 @@ class _DensityFlyoutButtonState extends State<_DensityFlyoutButton> {
                 children: [
                   item(
                     icon: FluentIcons.density_default,
-                    label: 'Compact',
+                    label: loc.table_density_compact,
                     selected: widget.density == UTTableDensity.compact,
                     onTap: () { widget.onSelect(UTTableDensity.compact); Flyout.of(context).close(); },
                   ),
                   Gaps.h4,
                   item(
                     icon: FluentIcons.density_comfy,
-                    label: 'Comfortable',
+                    label: loc.table_density_comfortable,
                     selected: widget.density == UTTableDensity.comfortable,
                     onTap: () { widget.onSelect(UTTableDensity.comfortable); Flyout.of(context).close(); },
                   ),
                   Gaps.h4,
                   item(
-                    icon: FluentIcons.side_panel, // 원하면 타일을 상징하는 아이콘으로 변경
-                    label: 'Tile',
+                    icon: FluentIcons.side_panel,
+                    label: loc.table_density_tile,
                     selected: widget.density == UTTableDensity.tile,
                     onTap: () { widget.onSelect(UTTableDensity.tile); Flyout.of(context).close(); },
                   ),
@@ -490,9 +493,9 @@ class _AdaptiveSearchState extends State<_AdaptiveSearch>
 
   @override
   Widget build(BuildContext context) {
-    // 아이콘(항상 보임)
+    final loc = AppLocalizations.of(context);
     final iconBtn = Tooltip(
-      message: 'Search',
+      message: loc.table_search,
       child: Button(
         style: ButtonStyle(padding: WidgetStateProperty.all(EdgeInsets.all(8))),
         onPressed: () {
@@ -692,6 +695,7 @@ class _GroupFlyoutBodyState extends State<_GroupFlyoutBody> {
   @override
   Widget build(BuildContext context) {
     final t = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
 
     Widget chip(_GroupItem it) {
       final active = widget.isActive(it.id);
@@ -740,7 +744,7 @@ class _GroupFlyoutBodyState extends State<_GroupFlyoutBody> {
                     widget.onClearAll();
                     setState(() {});
                   },
-                  child: const Text('Clear'),
+                  child: Text(loc.table_clear),
                 ),
             ],
           ),
@@ -753,7 +757,7 @@ class _GroupFlyoutBodyState extends State<_GroupFlyoutBody> {
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '복수 선택 가능',
+              loc.table_multi_select_hint,
               style: TextStyle(
                 fontSize: 11,
                 color: (t.brightness == Brightness.dark
@@ -795,10 +799,11 @@ class _SummaryChip extends StatelessWidget {
     final bg = base.withAlpha(isDark ? 60 : 24);
     final border = base.withAlpha(isDark ? 130 : 160);
 
+    final loc = AppLocalizations.of(context);
     final parts = <String>[];
-    if (showSelected) parts.add('Sel $selected');
-    if (showMatched) parts.add('Mat $matched');
-    parts.add('/ $total');
+    if (showSelected) parts.add(loc.table_summary_selected_short(selected));
+    if (showMatched)  parts.add(loc.table_summary_matched_short(matched));
+    parts.add(loc.table_summary_total_short(total));
 
     return Container(
       height: 22,
@@ -869,6 +874,7 @@ class _ViewModeFlyoutButtonState extends State<_ViewModeFlyoutButton> {
   @override
   Widget build(BuildContext context) {
     final t = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
 
     IconData mainIcon;
     switch (widget.density) {
@@ -908,7 +914,7 @@ class _ViewModeFlyoutButtonState extends State<_ViewModeFlyoutButton> {
         children: [
           const Icon(FluentIcons.side_panel, size: 14),
           Gaps.w8,
-          const Expanded(child: Text('Left sidebar')),
+          Expanded(child: Text(loc.table_sidebar_label)),
           ToggleSwitch(
             checked: widget.sidebarOn,
             onChanged: (widget.onToggleSidebar != null && widget.sidebarSupported)
@@ -936,23 +942,11 @@ class _ViewModeFlyoutButtonState extends State<_ViewModeFlyoutButton> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  densityItem(
-                    icon: FluentIcons.density_default,
-                    label: 'Compact',
-                    value: UTTableDensity.compact,
-                  ),
+                  densityItem(icon: FluentIcons.density_default, label: loc.table_density_compact,     value: UTTableDensity.compact),
                   Gaps.h4,
-                  densityItem(
-                    icon: FluentIcons.density_comfy,
-                    label: 'Comfortable',
-                    value: UTTableDensity.comfortable,
-                  ),
+                  densityItem(icon: FluentIcons.density_comfy,   label: loc.table_density_comfortable, value: UTTableDensity.comfortable),
                   Gaps.h4,
-                  densityItem(
-                    icon: FluentIcons.side_panel, // 타일을 상징하는 아이콘 원하면 변경
-                    label: 'Tile',
-                    value: UTTableDensity.tile,
-                  ),
+                  densityItem(icon: FluentIcons.side_panel,      label: loc.table_density_tile,         value: UTTableDensity.tile),
                   if (widget.showSidebarToggle) const Padding(
                     padding: EdgeInsets.symmetric(vertical: 6),
                     child: Divider(),
@@ -962,7 +956,7 @@ class _ViewModeFlyoutButtonState extends State<_ViewModeFlyoutButton> {
                     Padding(
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
-                        'Sidebar not available at this width',
+                        loc.table_sidebar_unavailable,
                         style: TextStyle(
                           fontSize: 11,
                           color: (t.brightness == Brightness.dark ? Colors.white : Colors.black)

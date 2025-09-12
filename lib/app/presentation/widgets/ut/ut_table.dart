@@ -7,7 +7,6 @@ export 'ut_table_floating_bar.dart';
 export 'ut_table_frame.dart';
 export 'ut_table_info_chips.dart';
 export 'ut_table_theme.dart';
-export 'ut_table_toolbar.dart';
 export 'ut_table_toolbar_chips.dart';
 export 'ut_types.dart';
 export 'ut_width_resolver.dart';

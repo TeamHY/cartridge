@@ -165,7 +165,7 @@ Face off with your friend.
 `url: { ko: ..., en: ... }`처럼 언어별로 적어 주세요.
 
 **Q. Markdown 미리보기는 어떻게 해요?**
-일반 문서 편집기(예: VS Code, Typora 등)에서 미리 볼 수 있어요. 앱에선 자동으로 현재 언어만 표시됩니다.
+일반 문서 편집기(예: VS Code 등)에서 미리 볼 수 있어요. 앱에선 자동으로 현재 언어만 표시됩니다.
 
 **Q. 추가했는데 앱에 안 보여요.**
 경로 오타(대소문자, 확장자)를 먼저 확인해 주세요. 문제가 지속되면 관리자에게 문의하세요.
@@ -179,30 +179,30 @@ Face off with your friend.
 
 1. 썸네일 넣기
 
-```
-assets/content/my-thumb.png
-```
+    ```
+    assets/content/my-thumb.png
+    ```
 
 2. 상세 작성
 
-```
-assets/content/my-detail.md
-```
+    ```
+    assets/content/my-detail.md
+    ```
 
-(위의 lang 블록 템플릿을 복사해 내용을 채워 넣으세요.)
+    (위의 lang 블록 템플릿을 복사해 내용을 채워 넣으세요.)
 
 3. `index.yaml`에 블록 추가
 
-```yaml
-- id: my-content
-  category: hyZone
-  type: detail
-  title: { ko: 나의 컨텐츠, en: My Content }
-  description:
-    ko: 새롭게 컨텐츠를 추가해보세요.
-    en: Add a new content.
-  image: assets/content/my-thumb.png
-  markdown: assets/content/my-detail.md
-```
+    ```yaml
+    - id: my-content
+      category: hyZone
+      type: detail
+      title: { ko: 나의 컨텐츠, en: My Content }
+      description:
+        ko: 새롭게 컨텐츠를 추가해보세요.
+        en: Add a new content.
+      image: assets/content/my-thumb.png
+      markdown: assets/content/my-detail.md
+    ```
 
-완료입니다. 앱을 다시 실행하면 목록에 나타납니다.
+    완료입니다. 앱을 다시 실행하면 목록에 나타납니다.

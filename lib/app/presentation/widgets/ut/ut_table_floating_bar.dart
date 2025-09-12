@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'package:fluent_ui/fluent_ui.dart';
-
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
 enum _ResponsiveMode { iconText, textOnly, iconOnly }
@@ -46,6 +46,7 @@ class UTFloatingSelectionBar<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final fTheme = FluentTheme.of(context);
     final isDark = fTheme.brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     // 반응형 폭 계산
     final double screenW = MediaQuery.of(context).size.width;
@@ -72,7 +73,7 @@ class UTFloatingSelectionBar<T> extends StatelessWidget {
       ),
       boxShadow: [
         BoxShadow(
-          color:  Color.fromARGB(90, 0, 0, 0).withAlpha(isDark ? 90 : 40),
+          color: const Color.fromARGB(90, 0, 0, 0).withAlpha(isDark ? 90 : 40),
           blurRadius: 16,
           offset: const Offset(0, 8),
         ),
@@ -80,7 +81,7 @@ class UTFloatingSelectionBar<T> extends StatelessWidget {
           color: accentHalo,
           blurRadius: 22,
           spreadRadius: 1.5,
-          offset: Offset(0, 0),
+          offset: const Offset(0, 0),
         ),
       ],
     );
@@ -104,6 +105,7 @@ class UTFloatingSelectionBar<T> extends StatelessWidget {
         case _ResponsiveMode.iconOnly:
           child = Tooltip(
             message: label,
+            style: const TooltipThemeData(waitDuration: Duration(milliseconds: 0)),
             child: Icon(icon, size: 16),
           );
           break;
@@ -119,17 +121,17 @@ class UTFloatingSelectionBar<T> extends StatelessWidget {
     final List<MenuFlyoutItemBase> shareItems = [
       if (onSharePlainSelected != null)
         MenuFlyoutItem(
-          text: const Text('Copy (Plain text)'),
+          text: Text(loc.selection_copy_plain),
           onPressed: () => onSharePlainSelected!(selected),
         ),
       if (onShareMarkdownSelected != null)
         MenuFlyoutItem(
-          text: const Text('Copy (Markdown)'),
+          text: Text(loc.selection_copy_markdown),
           onPressed: () => onShareMarkdownSelected!(selected),
         ),
       if (onShareRichSelected != null)
         MenuFlyoutItem(
-          text: const Text('Copy (HTML links)'),
+          text: Text(loc.selection_copy_html),
           onPressed: () => onShareRichSelected!(selected),
         ),
     ];
@@ -137,42 +139,26 @@ class UTFloatingSelectionBar<T> extends StatelessWidget {
     final buttons = <Widget>[
       if (shareItems.isNotEmpty)
         DropDownButton(
-          title: const Row(
+          title: Row(
             children: [
-              Icon(FluentIcons.share),
+              const Icon(FluentIcons.share),
               Gaps.w6,
-              Text('Share'),
+              Text(loc.selection_share),
             ],
           ),
-          items: [
-            if (onSharePlainSelected != null)
-              MenuFlyoutItem(
-                text: const Text('Copy (Plain text)'),
-                onPressed: () => onSharePlainSelected!(selected),
-              ),
-            if (onShareMarkdownSelected != null)
-              MenuFlyoutItem(
-                text: const Text('Copy (Markdown)'),
-                onPressed: () => onShareMarkdownSelected!(selected),
-              ),
-            if (onShareRichSelected != null)
-              MenuFlyoutItem(
-                text: const Text('Copy (HTML links)'),
-                onPressed: () => onShareRichSelected!(selected),
-              ),
-          ],
+          items: shareItems,
         ),
       if (canFavoriteOn != null && favOnTargets.isNotEmpty)
-        btn('즐겨찾기 ON', FluentIcons.heart_fill,
+        btn(loc.selection_favorite_on, FluentIcons.heart_fill,
             onFavoriteOnSelected == null ? null : () => onFavoriteOnSelected!(favOnTargets)),
       if (canFavoriteOff != null && favOffTargets.isNotEmpty)
-        btn('즐겨찾기 OFF', FluentIcons.heart,
+        btn(loc.selection_favorite_off, FluentIcons.heart,
             onFavoriteOffSelected == null ? null : () => onFavoriteOffSelected!(favOffTargets)),
       if (canEnable != null && enTargets.isNotEmpty)
-        btn('모드 활성화', FluentIcons.power_button,
+        btn(loc.selection_enable_mods, FluentIcons.power_button,
             onEnableSelected == null ? null : () => onEnableSelected!(enTargets)),
       if (canDisable != null && disTargets.isNotEmpty)
-        btn('모드 비활성화', FluentIcons.blocked2,
+        btn(loc.selection_disable_mods, FluentIcons.blocked2,
             onDisableSelected == null ? null : () => onDisableSelected!(disTargets)),
     ];
 

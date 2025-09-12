@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -42,7 +43,7 @@ class UTTableFrame<T> extends StatefulWidget {
     // 검색 / 필터
     this.showSearch = true,
     this.initialQuery,
-    this.searchHintText = 'Search…',
+    this.searchHintText,
     this.stringify,
     this.searchMatcher,
     this.quickFilters = const [],
@@ -115,7 +116,7 @@ class UTTableFrame<T> extends StatefulWidget {
   // 검색 / 필터
   final bool showSearch;
   final String? initialQuery;
-  final String searchHintText;
+  final String? searchHintText;
   final String Function(T row)? stringify;
   final bool Function(T row, String query)? searchMatcher;
   final List<UTQuickFilter<T>> quickFilters;
@@ -600,6 +601,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, _) {
@@ -710,7 +712,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
               showSearch: widget.showSearch,
               searchController: _searchCtrl,
               searchFocusNode: _searchFocus,
-              searchHintText: widget.searchHintText,
+              searchHintText: widget.searchHintText ?? loc.table_search_hint,
               controller: _toolbarCtrl,
               onQueryChanged: (v) {
                 _ctrl.setQuery(v);
@@ -787,23 +789,13 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
 
             Widget buildBody() {
               if (view.isEmpty) {
+                final empty = widget.emptyPlaceholder ??
+                    Center(child: Text(loc.table_empty));
+                final noResults = widget.noResultsPlaceholder ??
+                    Center(child: Text(loc.table_no_results));
                 return hasFiniteHeight
-                    ? Expanded(
-                  child: (filteredThen == 0
-                      ? (widget.emptyPlaceholder ??
-                      const Center(child: Text('No items')))
-                      : (widget.noResultsPlaceholder ??
-                      const Center(
-                        child: Text('No results — try a different query or clear filters'),
-                      ))),
-                )
-                    : (filteredThen == 0
-                    ? (widget.emptyPlaceholder ??
-                    const Center(child: Text('No items')))
-                    : (widget.noResultsPlaceholder ??
-                    const Center(
-                      child: Text('No results — try a different query or clear filters'),
-                    )));
+                    ? Expanded(child: (filteredThen == 0 ? empty : noResults))
+                    : (filteredThen == 0 ? empty : noResults);
             }
             // Body
               final list = ListView.separated(

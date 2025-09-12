@@ -741,6 +741,95 @@
   "doc_load_fail_title": "문서를 불러오지 못했어요",
   "@doc_load_fail_title": { "description": "마크다운 문서 로드 실패-타이틀" },
   "doc_load_fail_desc": "잠시 후 다시 시도해 주세요.",
-  "@doc_load_fail_desc": { "description": "마크다운 문서 로드 실패-설명" }
+  "@doc_load_fail_desc": { "description": "마크다운 문서 로드 실패-설명" },
 
+  "selection_share": "공유",
+  "@selection_share": { "description": "선택 항목 공유 드롭다운 타이틀" },
+
+  "selection_copy_plain": "텍스트로 복사",
+  "@selection_copy_plain": { "description": "선택 항목을 일반 텍스트로 복사" },
+
+  "selection_copy_markdown": "마크다운으로 복사",
+  "@selection_copy_markdown": { "description": "선택 항목을 마크다운으로 복사" },
+
+  "selection_copy_html": "HTML 링크로 복사",
+  "@selection_copy_html": { "description": "선택 항목을 HTML 링크로 복사" },
+
+  "selection_favorite_on": "즐겨찾기 추가",
+  "@selection_favorite_on": { "description": "선택 항목 즐겨찾기 켜기" },
+
+  "selection_favorite_off": "즐겨찾기 해제",
+  "@selection_favorite_off": { "description": "선택 항목 즐겨찾기 끄기" },
+
+  "selection_enable_mods": "모드 켜기",
+  "@selection_enable_mods": { "description": "선택한 모드 활성화" },
+
+  "selection_disable_mods": "모드 끄기",
+  "@selection_disable_mods": { "description": "선택한 모드 비활성화" },
+
+  "table_search_hint": "검색",
+  "@table_search_hint": { "description": "테이블 검색 입력 힌트" },
+
+  "table_empty": "항목이 없어요",
+  "@table_empty": { "description": "테이블 데이터가 비어 있을 때" },
+
+  "table_no_results": "결과가 없어요. 검색어를 바꾸거나 필터를 지워 보세요.",
+  "@table_no_results": { "description": "검색/필터 이후 결과가 없을 때" },
+
+  "infochips_total_label": "전체",
+  "@infochips_total_label": { "description": "정보 칩: 전체 항목 수 라벨" },
+
+  "infochips_matched_label": "검색됨",
+  "@infochips_matched_label": { "description": "정보 칩: 검색/필터 결과 수 라벨" },
+
+  "infochips_selected_label": "선택됨",
+  "@infochips_selected_label": { "description": "정보 칩: 선택된 항목 수 라벨" },
+
+  "table_filter": "필터",
+  "@table_filter": { "description": "테이블 툴바: 필터 버튼" },
+
+  "table_preset": "프리셋",
+  "@table_preset": { "description": "테이블 툴바: 프리셋 버튼" },
+
+  "table_search": "검색",
+  "@table_search": { "description": "툴팁/접힘 아이콘: 검색" },
+
+  "table_clear": "모두 해제",
+  "@table_clear": { "description": "필터 플라이아웃: 모두 해제 버튼" },
+
+  "table_multi_select_hint": "여러 개를 함께 고를 수 있어요",
+  "@table_multi_select_hint": { "description": "필터 플라이아웃 하단 안내" },
+
+  "table_density_compact": "컴팩트",
+  "@table_density_compact": { "description": "밀도: Compact" },
+
+  "table_density_comfortable": "보통",
+  "@table_density_comfortable": { "description": "밀도: Comfortable" },
+
+  "table_density_tile": "타일",
+  "@table_density_tile": { "description": "밀도: Tile" },
+
+  "table_sidebar_label": "왼쪽 사이드바",
+  "@table_sidebar_label": { "description": "뷰 모드 플라이아웃: 사이드바 토글 레이블" },
+
+  "table_sidebar_unavailable": "이 화면 너비에서는 사이드바를 사용할 수 없어요",
+  "@table_sidebar_unavailable": { "description": "사이드바 미지원 안내 문구" },
+
+  "table_summary_selected_short": "선택 {count}",
+  "@table_summary_selected_short": {
+    "description": "요약 칩: 선택 수",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "table_summary_matched_short": "결과 {count}",
+  "@table_summary_matched_short": {
+    "description": "요약 칩: 매칭 수",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "table_summary_total_short": "총 {count}",
+  "@table_summary_total_short": {
+    "description": "요약 칩: 전체 수",
+    "placeholders": { "count": { "type": "int" } }
+  }
 }
