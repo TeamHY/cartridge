@@ -537,6 +537,8 @@
   "slot_remove_item": "Remove Item",
   "slot_default": "Default",
   "slot_empty_message": "No Slot items found.",
+  "slot_error_title": "We couldn't load your slots",
+  "slot_error_desc": "Please try again in a moment.",
 
   "@roulette": {
     "description": "Roulette dialog messages"

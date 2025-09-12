@@ -1,3 +1,4 @@
+import 'package:cartridge/features/cartridge/slot_machine/presentation/widgets/status_card.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
@@ -63,7 +64,12 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
     }
   }
 
-  Widget _addSlotButton(BuildContext context, {bool large = false, required bool left}) {
+  Widget _addSlotButton(
+    BuildContext context, {
+    bool large = false,
+    required bool left,
+    bool enabled = true,
+  }) {
     final fTheme = FluentTheme.of(context);
     final sem = ref.watch(themeSemanticsProvider);
     final loc = AppLocalizations.of(context);
@@ -77,9 +83,13 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
         message: loc.slot_add_item,
         style: const TooltipThemeData(waitDuration: Duration.zero),
         child: IconButton(
-          icon: Icon(FluentIcons.add, size: size * 0.85, color: sem.success.fg), // 의미색
+          icon: Icon(
+            FluentIcons.add,
+            size: size * 0.85,
+            color: enabled ? sem.success.fg : null,
+          ),
           iconButtonMode: IconButtonMode.large,
-          onPressed: () => _onAddSlot(left: left),
+          onPressed: enabled ? () => _onAddSlot(left: left) : null,
           style: ButtonStyle(
             padding: WidgetStateProperty.all(EdgeInsets.zero),
             backgroundColor: WidgetStateProperty.all(fTheme.cardColor),
@@ -107,7 +117,14 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
           // 가로/세로 모두 중앙
           child: slotsAsync.when(
             loading: () => const ProgressRing(),
-            error: (e, _) => Text('Error: $e'),
+            error: (_, __) {
+              return StatusCard(
+                title: loc.slot_error_title,
+                description: loc.slot_error_desc,
+                primaryLabel: loc.common_retry,
+                onPrimary: () => ref.invalidate(slotMachineControllerProvider),
+              );
+              },
             data: (slots) {
               if (slots.isEmpty) {
                 return SizedBox.expand(

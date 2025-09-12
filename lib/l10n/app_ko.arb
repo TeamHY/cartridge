@@ -537,6 +537,8 @@
   "slot_remove_item": "항목 제거",
   "slot_default": "기본",
   "slot_empty_message": "슬롯이 하나도 없어요.",
+  "slot_error_title": "슬롯을 불러오지 못했어요",
+  "slot_error_desc": "잠시 후 다시 시도해 주세요.",
 
   "@roulette": {
     "description": "돌림판 다이얼로그"
