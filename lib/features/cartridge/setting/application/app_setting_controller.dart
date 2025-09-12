@@ -31,8 +31,10 @@ class AppSettingController extends AsyncNotifier<AppSetting> {
     int? rerunDelay,
     String? languageCode,
     String? themeName,
+    String? steamPath,
     String? isaacPath,
     String? optionsIniPath,
+    bool? useAutoDetectSteamPath,
     bool? useAutoDetectInstallPath,
     bool? useAutoDetectOptionsIni,
   }) async {
@@ -41,8 +43,10 @@ class AppSettingController extends AsyncNotifier<AppSetting> {
       rerunDelay: rerunDelay,
       languageCode: languageCode,
       themeName: themeName,
+      steamPath: steamPath,
       isaacPath: isaacPath,
       optionsIniPath: optionsIniPath,
+      useAutoDetectSteamPath: useAutoDetectSteamPath,
       useAutoDetectInstallPath: useAutoDetectInstallPath,
       useAutoDetectOptionsIni: useAutoDetectOptionsIni,
     );

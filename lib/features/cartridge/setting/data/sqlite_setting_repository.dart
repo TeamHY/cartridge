@@ -41,21 +41,25 @@ class SqliteSettingRepository implements ISettingRepository {
 
   // ── Mapping ────────────────────────────────────────────────────────────────
   Map<String, Object?> _toMap(AppSetting s) => {
+    'steam_path': s.steamPath,
     'isaac_path': s.isaacPath,
     'rerun_delay': s.rerunDelay,
     'language_code': s.languageCode,
     'theme_name': s.themeName,
     'options_ini_path': s.optionsIniPath,
+    'use_auto_detect_steam_path': s.useAutoDetectSteamPath ? 1 : 0,
     'use_auto_detect_install_path': s.useAutoDetectInstallPath ? 1 : 0,
     'use_auto_detect_options_ini': s.useAutoDetectOptionsIni ? 1 : 0,
   };
 
   AppSetting _fromMap(Map<String, Object?> m) => AppSetting(
+    steamPath: (m['steam_path'] as String?) ?? '',
     isaacPath: (m['isaac_path'] as String?) ?? '',
     rerunDelay: (m['rerun_delay'] as int?) ?? 1000,
     languageCode: (m['language_code'] as String?) ?? 'ko',
     themeName: (m['theme_name'] as String?) ?? 'system',
     optionsIniPath: (m['options_ini_path'] as String?) ?? '',
+    useAutoDetectSteamPath: ((m['use_auto_detect_steam_path'] as int?) ?? 1) != 0,
     useAutoDetectInstallPath: ((m['use_auto_detect_install_path'] as int?) ?? 1) != 0,
     useAutoDetectOptionsIni: ((m['use_auto_detect_options_ini'] as int?) ?? 1) != 0,
   );

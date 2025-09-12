@@ -28,11 +28,17 @@ class IsaacRuntimeService {
 
   // ── Steam/설치/에디션 ────────────────────────────────────────────────────────
 
-  Future<String?> findIsaacInstallPath() =>
-      library.findGameInstallPath(IsaacSteamIds.appId);
+  Future<String?> findIsaacInstallPath({String? steamBaseOverride}) =>
+      library.findGameInstallPath(
+        IsaacSteamIds.appId,
+        steamBaseOverride: steamBaseOverride,
+      );
 
-  Future<IsaacEdition?> inferIsaacEdition() async {
-    final depots = await library.readInstalledDepots(IsaacSteamIds.appId);
+  Future<IsaacEdition?> inferIsaacEdition({String? steamBaseOverride}) async {
+    final depots = await library.readInstalledDepots(
+      IsaacSteamIds.appId,
+      steamBaseOverride: steamBaseOverride,
+    );
     final edition = IsaacEditionInfo.chooseEditionFromDepots(depots);
     logI(_tag, 'inferIsaacEdition → $edition, depots=$depots');
     return edition;
@@ -60,7 +66,8 @@ class IsaacRuntimeService {
   Future<Process?> startIsaac({
     required String installPath,
     List<String> extraArgs = const [],
-    bool? viaSteam, // 호환용. 규칙이 우선
+    bool? viaSteam,
+    String? steamBaseOverride,
   }) async {
     final userPath = installPath;
     final userExe  = File(p.join(userPath, isaacExeFile));
@@ -69,7 +76,7 @@ class IsaacRuntimeService {
     // 자동탐지 경로(스팀 설치 기준)
     String? autoPath;
     try {
-      autoPath = await findIsaacInstallPath();
+      autoPath = await findIsaacInstallPath(steamBaseOverride: steamBaseOverride);
     } catch (_) {
       autoPath = null;
     }
@@ -105,7 +112,10 @@ class IsaacRuntimeService {
 
     // ── 실행 ────────────────────────────────────────────────────────────────
     if (shouldRunViaSteam) {
-      final proc = await _startViaSteam(extraArgs: extraArgs);
+      final proc = await _startViaSteam(
+        extraArgs: extraArgs,
+        steamBaseOverride: steamBaseOverride,
+      );
       if (proc != null) return proc;
 
       // Steam 실패 시에도 더 이상 다른 폴백 없음 (사용자 의사/규칙 존중)
@@ -115,6 +125,7 @@ class IsaacRuntimeService {
       return _startDirect(installPath: userPath, extraArgs: extraArgs);
     }
   }
+
   Future<bool> isIsaacRunning() async {
     if (!Platform.isWindows) return false;
     try {
@@ -174,8 +185,11 @@ class IsaacRuntimeService {
     return norm(a) == norm(b);
   }
 
-  Future<Process?> _startViaSteam({required List<String> extraArgs}) async {
-    final steamExe = await _resolveSteamExePath();
+  Future<Process?> _startViaSteam({
+    required List<String> extraArgs,
+    String? steamBaseOverride,
+  }) async {
+    final steamExe = await _resolveSteamExePath(steamBaseOverride: steamBaseOverride);
     if (steamExe == null) {
       logE(_tag, 'steam.exe 위치를 찾을 수 없습니다.', null);
       return null;
@@ -219,7 +233,31 @@ class IsaacRuntimeService {
       return null;
     }
   }
-  Future<String?> _resolveSteamExePath() async {
+  Future<String?> _resolveSteamExePath({String? steamBaseOverride}) async {
+    // 0) Settings 기반 override 우선
+    // - 사용자가 지정한 폴더(예: C:\Program Files (x86)\Steam),
+    if (steamBaseOverride != null && steamBaseOverride.trim().isNotEmpty) {
+      final override = steamBaseOverride.trim();
+      // exe 직접 지정 케이스
+      final asFile = File(override);
+      if (await asFile.exists()) {
+        logI(_tag, 'steam.exe resolved (override=file): $override');
+        return asFile.path;
+      }
+      // 디렉터리 지정 케이스
+      final asDir = Directory(override);
+      if (await asDir.exists()) {
+        final candidate = File(p.join(asDir.path, 'steam.exe'));
+        if (await candidate.exists()) {
+          logI(_tag, 'steam.exe resolved (override=dir): ${candidate.path}');
+          return candidate.path;
+        }
+        logW(_tag, 'override 디렉터리에 steam.exe 없음: ${asDir.path}');
+      } else {
+        logW(_tag, 'override 경로가 존재하지 않습니다: $override');
+      }
+    }
+
     // 1) ENV override
     final envPath = Platform.environment['STEAM_EXE'];
     if (envPath != null && await File(envPath).exists()) {

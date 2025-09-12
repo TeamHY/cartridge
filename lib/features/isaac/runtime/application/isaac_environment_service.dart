@@ -47,7 +47,13 @@ class IsaacEnvironmentService {
   }
 
   // ── installPath 결정 ────────────────────────────────────────────────────────
-
+  // Settings → steamBaseOverride 유틸
+  Future<String?> _steamBaseOverrideFromSettings() async {
+    final s = await _settings.getNormalized();
+    if (s.useAutoDetectSteamPath) return null;
+    final v = s.steamPath.trim();
+    return v.isEmpty ? null : v;
+  }
 
   /// 2) 우선순위(수동/자동)에 따라 경로 결정 + 상세 상태 반환
   /// - 수동 선택(useAutoDetectInstallPath == false)이면 **반드시 그 경로**만 검사
@@ -90,8 +96,10 @@ class IsaacEnvironmentService {
       );
     }
 
-    // 자동탐지 모드
-    final auto = await _isaac.findIsaacInstallPath(); // 기존 로직 활용
+    final steamBase = await _steamBaseOverrideFromSettings();
+    final auto = await _isaac.findIsaacInstallPath(
+      steamBaseOverride: steamBase,
+    );
     if (auto == null || auto.trim().isEmpty) {
       return const InstallPathResolution(
         path: null,
@@ -196,7 +204,9 @@ class IsaacEnvironmentService {
   Future<String?> _autoDetectOptionsIni({
     List<String> fallbackCandidates = const [],
   }) async {
-    final preferred = await _isaac.inferIsaacEdition();
+    final preferred = await _isaac.inferIsaacEdition(
+      steamBaseOverride: await _steamBaseOverrideFromSettings(),
+    );
     logI(_tag, 'infer Isaac Edition: $preferred');
 
     final candidates = await _pathResolver.listCandidateOptionsIniPaths(

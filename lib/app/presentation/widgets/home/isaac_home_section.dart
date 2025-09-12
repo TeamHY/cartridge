@@ -45,15 +45,15 @@ class IsaacHomeSection extends ConsumerWidget {
               ),
               _buildActionTile(
                 context,
-                loc.isaac_action_open_options_folder,
-                FluentIcons.fabric_open_folder_horizontal,
-                    () => openOptionsFolder(context, ref),
-              ),
-              _buildActionTile(
-                context,
                 loc.isaac_action_open_save_folder,
                 FluentIcons.fabric_open_folder_horizontal,
                     () => openSaveFolder(context, ref),
+              ),
+              _buildActionTile(
+                context,
+                loc.isaac_action_open_options_folder,
+                FluentIcons.fabric_open_folder_horizontal,
+                    () => openOptionsFolder(context, ref),
               ),
               _buildActionTile(
                 context,

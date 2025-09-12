@@ -3,27 +3,38 @@ import 'dart:io';
 import 'package:cartridge/core/log.dart';
 import 'package:path/path.dart' as p;
 
-import 'package:cartridge/features/steam/domain/steam_users_port.dart';
-import 'package:cartridge/features/steam/domain/models/steam_account_profile.dart';
+import 'package:cartridge/features/cartridge/setting/setting.dart';
 import 'package:cartridge/features/isaac/runtime/domain/isaac_steam_ids.dart';
-import 'package:cartridge/features/steam/domain/steam_install_port.dart';
+import 'package:cartridge/features/steam/steam.dart';
 
 class SteamUsersVdfRepository implements SteamUsersPort {
   static const _tag = 'SteamUsersVdfRepository';
   static const _offset = 76561197960265728;
   final SteamInstallPort install;
+  final SettingService settings;
 
-  const SteamUsersVdfRepository({required this.install});
+  const SteamUsersVdfRepository({
+    required this.install,
+    required this.settings,
+  });
+
+  Future<String?> _steamBaseOverrideFromSettings() async {
+    final s = await settings.getNormalized();
+    if (s.useAutoDetectSteamPath) return null;
+    final v = s.steamPath.trim();
+    return v.isEmpty ? null : v;
+  }
 
   @override
   Future<List<SteamAccountProfile>> findAccountsWithIsaacSaves() async {
     const op = 'findAccounts';
-    final base = await install.resolveBaseDir(/* override: settings.steamInstallPath */);
+    final override = await _steamBaseOverrideFromSettings();
+    final base = await install.resolveBaseDir(override: override);
     if (base == null) {
       logW(_tag, 'op=$op msg=steam base not found');
       return const [];
     }
-    logI(_tag, 'op=$op msg=start base=$base');
+    logI(_tag, 'op=$op msg=start base=$base override=${override ?? "auto"}');
 
     final userdata = Directory(p.join(base, 'userdata'));
     if (!userdata.existsSync()) {

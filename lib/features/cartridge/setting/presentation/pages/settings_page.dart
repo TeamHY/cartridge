@@ -26,7 +26,8 @@ class SettingsPage extends ConsumerStatefulWidget {
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late final TextEditingController _pathController;
+  late final TextEditingController _steamPathController;
+  late final TextEditingController _isaacPathController;
   late final TextEditingController _optionIniController;
   late final TextEditingController _rerunDelayController;
 
@@ -34,13 +35,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   String _selectedLanguageCode = 'ko';
   AppThemeKey _selectedTheme = AppThemeKey.system;
   int _rerunDelay = 1000;
+  bool _autoSteam = true;
   bool _autoInstall = true;
   bool _autoOptionsIni = true;
 
   @override
   void initState() {
     super.initState();
-    _pathController = TextEditingController();
+    _steamPathController = TextEditingController();
+    _isaacPathController = TextEditingController();
     _optionIniController = TextEditingController();
     _rerunDelayController = TextEditingController();
     ref.read(appSettingControllerProvider).whenData(_applyFrom);
@@ -48,7 +51,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   @override
   void dispose() {
-    _pathController.dispose();
+    _steamPathController.dispose();
+    _isaacPathController.dispose();
     _optionIniController.dispose();
     _rerunDelayController.dispose();
     super.dispose();
@@ -56,12 +60,14 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   // 모델 → 폼
   void _applyFrom(AppSetting s) {
-    _pathController.text = s.isaacPath;
+    _steamPathController.text = s.steamPath;
+    _isaacPathController.text = s.isaacPath;
     _optionIniController.text = s.optionsIniPath;
     _selectedLanguageCode = s.languageCode;
     _selectedTheme = _parseThemeKey(s.themeName);
     _rerunDelay = s.rerunDelay;
     _rerunDelayController.text = _rerunDelay.toString();
+    _autoSteam = s.useAutoDetectSteamPath;
     _autoInstall = s.useAutoDetectInstallPath;
     _autoOptionsIni = s.useAutoDetectOptionsIni;
   }
@@ -78,13 +84,21 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     if (!_isChanged && mounted) setState(() => _isChanged = true);
   }
 
-  Future<void> _openGameProperties() =>
-      ref.read(appSettingPageControllerProvider).openGameProperties();
+  // 스팀 설치 경로 자동 탐지
+  Future<void> _detectSteamPath() async {
+    final found = await ref.read(appSettingPageControllerProvider).detectSteamPath();
+    if (!mounted) return;
+    final loc = AppLocalizations.of(context);
+    if (found == null) {
+      UiFeedback.warn(context, loc.setting_detect_path_fail_title, loc.setting_detect_path_fail_desc);
+      return;
+    }
+    setState(() { _steamPathController.text = found; _isChanged = true; });
+    UiFeedback.success(context, loc.setting_detect_path_success_title, found);
+    FocusScope.of(context).unfocus();
+  }
 
-  Future<void> _runIntegrityCheck() =>
-      ref.read(appSettingPageControllerProvider).runIntegrityCheck();
-
-  // 설치 경로 자동 탐지
+  // 아이작 설치 경로 자동 탐지
   Future<void> _detectIsaacPathFromSteam() async {
     final found = await ref.read(appSettingPageControllerProvider).detectInstallPath();
     if (!mounted) return;
@@ -93,7 +107,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       UiFeedback.warn(context, loc.setting_detect_path_fail_title, loc.setting_detect_path_fail_desc);
       return;
     }
-    setState(() { _pathController.text = found; _isChanged = true; });
+    setState(() { _isaacPathController.text = found; _isChanged = true; });
     UiFeedback.success(context, loc.setting_detect_path_success_title, found);
     FocusScope.of(context).unfocus();
   }
@@ -125,15 +139,27 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     });
   }
 
-  Future<void> _browseIsaacPath() async {
+  Future<void> _browseSteamPath() async {
     final loc = AppLocalizations.of(context);
     final picked = await getDirectoryPath(
-      initialDirectory: _pathController.text.isNotEmpty ? _pathController.text : null,
+      initialDirectory: _steamPathController.text.isNotEmpty ? _steamPathController.text : null,
       confirmButtonText: loc.common_select,
     );
     if (!mounted) return;
     if (picked != null && picked.trim().isNotEmpty) {
-      setState(() { _pathController.text = picked; _isChanged = true; });
+      setState(() { _steamPathController.text = picked; _isChanged = true; });
+    }
+  }
+
+  Future<void> _browseIsaacPath() async {
+    final loc = AppLocalizations.of(context);
+    final picked = await getDirectoryPath(
+      initialDirectory: _isaacPathController.text.isNotEmpty ? _isaacPathController.text : null,
+      confirmButtonText: loc.common_select,
+    );
+    if (!mounted) return;
+    if (picked != null && picked.trim().isNotEmpty) {
+      setState(() { _isaacPathController.text = picked; _isChanged = true; });
     }
   }
 
@@ -162,11 +188,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     ref.read(appSettingControllerProvider).whenData((s) => prevLang = s.languageCode);
 
     await ref.read(appSettingControllerProvider.notifier).patch(
-      isaacPath: _pathController.text.trim(),
+      steamPath: _steamPathController.text.trim(),
+      isaacPath: _isaacPathController.text.trim(),
       optionsIniPath: _optionIniController.text.trim(),
       rerunDelay: _rerunDelay,
       languageCode: _selectedLanguageCode,
       themeName: _selectedTheme.name,
+      useAutoDetectSteamPath: _autoSteam,
       useAutoDetectInstallPath: _autoInstall,
       useAutoDetectOptionsIni: _autoOptionsIni,
     );
@@ -284,29 +312,46 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       const IsaacInstallDetectCard(),
                       Gaps.h16,
 
+                      // 스팀 클라이언트 경로
+                      Text(loc.setting_steam_path_label, style: AppTypography.sectionTitle),
+                      Gaps.h4,
+                      Text(loc.setting_folder_path_help, style: fTheme.typography.caption),
+                      Gaps.h8,
+                      PathInputGroup(
+                        isFile: true,
+                        auto: _autoSteam,
+                        controller: _steamPathController,
+                        placeholder: r'C:\Program Files (x86)\Steam\',
+                        onModeChanged: (useAuto) => setState(() { _autoSteam = useAuto; _isChanged = true; }),
+                        onPick: _browseSteamPath,
+                        onDetect: _detectSteamPath,
+                        pickLabel: loc.setting_pick_folder,
+                      ),
+
+                      Gaps.h16, const Divider(style: DividerThemeData(horizontalMargin: EdgeInsets.zero)), Gaps.h16,
+
                       // 아이작 설치 폴더
                       Text(loc.setting_isaac_path_label, style: AppTypography.sectionTitle),
                       Gaps.h4,
-                      Text('설치 위치를 자동으로 사용하거나, 직접 지정할 수 있어요.', style: AppTypography.caption),
+                      Text(loc.setting_folder_path_help, style: AppTypography.caption),
                       Gaps.h8,
                       PathInputGroup(
                         isFile: false,
                         auto: _autoInstall,
-                        controller: _pathController,
+                        controller: _isaacPathController,
                         placeholder: r'C:\...\Steam\steamapps\common\The Binding of Isaac Rebirth',
                         onModeChanged: (useAuto) => setState(() { _autoInstall = useAuto; _isChanged = true; }),
                         onPick: _browseIsaacPath,
                         onDetect: _detectIsaacPathFromSteam,
-                        pickLabel: '폴더 선택',
+                        pickLabel: loc.setting_pick_folder,
                       ),
 
-                      Gaps.h16,
-                      const Divider(), Gaps.h16,
+                      Gaps.h16, const Divider(style: DividerThemeData(horizontalMargin: EdgeInsets.zero)), Gaps.h16,
 
                       // options.ini 파일
                       Text(loc.setting_options_ini_path_label, style: AppTypography.sectionTitle),
                       Gaps.h4,
-                      Text('자동으로 찾거나, 직접 파일을 선택할 수 있어요.', style: fTheme.typography.caption),
+                      Text(loc.setting_file_path_help, style: fTheme.typography.caption),
                       Gaps.h8,
                       PathInputGroup(
                         isFile: true,
@@ -316,29 +361,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         onModeChanged: (useAuto) => setState(() { _autoOptionsIni = useAuto; _isChanged = true; }),
                         onPick: _browseOptionsIniPath,
                         onDetect: _detectOptionsIniPathFromSteam,
-                        pickLabel: '파일 선택',
+                        pickLabel: loc.setting_pick_file,
                       ),
 
-                      Gaps.h16,
-                      const Divider(style: DividerThemeData(horizontalMargin: EdgeInsets.zero)),
-                      Gaps.h16,
-
-                      // Steam 도구
-                      Text('Steam 속성', style: AppTypography.sectionTitle),
-                      Gaps.h4,
-                      Text('Steam 게임 속성 창을 엽니다. 실행 인자 등을 설정할 수 있어요.', style: AppTypography.caption),
-                      Gaps.h8,
-                      Button(onPressed: _openGameProperties, child: Text(loc.setting_open_properties)),
-
-                      Gaps.h12,
-                      Text('무결성 검사', style: AppTypography.sectionTitle),
-                      Gaps.h4,
-                      Text('설치 파일 손상 여부를 확인하고, 문제가 있으면 복구합니다.', style: AppTypography.caption),
-                      Gaps.h8,
-                      FilledButton(onPressed: _runIntegrityCheck, child: Text(loc.setting_verify_integrity)),
-
-                      Gaps.h16,
-                      const Divider(), Gaps.h16,
+                      Gaps.h16, const Divider(style: DividerThemeData(horizontalMargin: EdgeInsets.zero)), Gaps.h16,
 
                       // 자동 재시작 지연
                       Text(loc.setting_rerun_delay_label, style: AppTypography.sectionTitle),

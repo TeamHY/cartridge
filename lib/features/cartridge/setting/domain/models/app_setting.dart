@@ -22,6 +22,9 @@ sealed class AppSetting with _$AppSetting {
 
   /// 기본값을 @Default 로 선언하여 생성/역직렬화 모두 동일한 초기값을 갖습니다.
   factory AppSetting({
+    /// 스팀 설치 경로
+    @Default('') String steamPath,
+
     /// The Binding of Isaac 설치 경로
     @Default('') String isaacPath,
 
@@ -37,6 +40,9 @@ sealed class AppSetting with _$AppSetting {
 
     /// 사용자 지정 options.ini 절대 경로(자동탐지 미사용 시 사용)
     @Default('') String optionsIniPath,
+
+    /// 게임 설치 경로 자동탐지 사용 여부
+    @Default(true) bool useAutoDetectSteamPath,
 
     /// 게임 설치 경로 자동탐지 사용 여부
     @Default(true) bool useAutoDetectInstallPath,
@@ -63,11 +69,13 @@ sealed class AppSetting with _$AppSetting {
 
   /// 동치 비교(정규화 여부 판단에 사용)
   bool equals(AppSetting b) =>
-      isaacPath == b.isaacPath &&
+      steamPath == b.steamPath &&
+          isaacPath == b.isaacPath &&
           optionsIniPath == b.optionsIniPath &&
           rerunDelay == b.rerunDelay &&
           languageCode == b.languageCode &&
           themeName == b.themeName &&
+          useAutoDetectSteamPath == b.useAutoDetectSteamPath &&
           useAutoDetectInstallPath == b.useAutoDetectInstallPath &&
           useAutoDetectOptionsIni == b.useAutoDetectOptionsIni;
 }

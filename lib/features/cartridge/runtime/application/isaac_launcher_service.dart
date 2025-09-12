@@ -65,11 +65,24 @@ class IsaacLauncherService {
     } catch (e, st) {
       logE(_tag, 'ModsService.applyPreset 실패', e, st);
     }
-
+    final steamBaseOverride = _resolveSteamBaseOverride(appSetting);
+    if (steamBaseOverride != null) {
+      logI(_tag, 'Steam base override 적용: $steamBaseOverride');
+    } else {
+      logI(_tag, 'Steam base 자동탐지 모드(override 없음)');
+    }
     // 4) 실행
     return runtime.startIsaac(
       installPath: installPathOverride ?? env.installPath,
       extraArgs: effectiveArgs,
+      steamBaseOverride: steamBaseOverride,
     );
+  }
+
+  String? _resolveSteamBaseOverride(AppSetting? s) {
+    if (s == null) return null;
+    if (s.useAutoDetectSteamPath) return null;
+    final v = s.steamPath.trim();
+    return v.isEmpty ? null : v;
   }
 }

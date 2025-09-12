@@ -2,11 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/setting/setting.dart';
-import 'package:cartridge/features/isaac/runtime/application/install_path_result.dart';
-import 'package:cartridge/features/isaac/runtime/application/isaac_environment_service.dart';
-import 'package:cartridge/features/isaac/runtime/application/isaac_path_resolver.dart';
-import 'package:cartridge/features/isaac/runtime/application/isaac_runtime_service.dart';
-import 'package:cartridge/features/isaac/runtime/domain/isaac_versions.dart';
+import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
+import 'package:cartridge/features/steam/steam.dart';
 
 
 /// 설정 화면 전용 액션(UI 유틸). 전역 상태는 appSettingController가 소유.
@@ -14,6 +11,7 @@ class AppSettingPageController {
   AppSettingPageController(this.ref);
   final Ref ref;
 
+  SteamInstallPort get _steam => ref.read(steamInstallPortProvider);
   IsaacRuntimeService get _isaac => ref.read(isaacRuntimeServiceProvider);
   IsaacEnvironmentService get _env => ref.read(isaacEnvironmentServiceProvider);
   IsaacPathResolver get _pathResolver => ref.read(isaacPathResolverProvider);
@@ -36,13 +34,18 @@ class AppSettingPageController {
       );
 
   Future<void> setAutoDetect({
+    bool? steamPath,
     bool? installPath,
     bool? optionsIni,
   }) =>
       ref.read(appSettingControllerProvider.notifier).patch(
+        useAutoDetectSteamPath: steamPath,
         useAutoDetectInstallPath: installPath,
         useAutoDetectOptionsIni: optionsIni,
       );
+
+  Future<String?> detectSteamPath() =>
+      _steam.autoDetectBaseDir();
 
   Future<String?> detectInstallPath() =>
       _isaac.findIsaacInstallPath();

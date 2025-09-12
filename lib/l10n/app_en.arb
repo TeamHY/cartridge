@@ -340,66 +340,18 @@
   "setting_theme_claude": "Claude",
 
   "setting_section_game_title": "Game",
-  "setting_section_detect_and_path_title": "Install & Paths",
-  "setting_section_detect_and_path_desc": "Check your installed edition and set required paths.",
-  "setting_detect_edition_title": "Game Edition",
-  "setting_detect_edition_desc": "Detected edition preview.",
   "setting_section_game_desc": "Set Isaac install path and relaunch delay.",
+  "setting_steam_path_label": "Steam Install Folder",
   "setting_isaac_path_label": "Isaac Install Folder",
-  "setting_path_label": "Path",
-  "setting_tools_title": "tools",
   "setting_options_ini_path_label": "Isaac Options.ini path",
   "setting_rerun_delay_label": "Restart delay (1000 = 1 second)",
 
-  "setting_isaac_path_desc": "Where the executable and mods are located.",
-  "setting_use_auto_detect": "Use auto detect",
   "setting_pick_folder": "Choose folder",
-  "setting_detect_auto": "Auto detect",
-  "setting_isaac_path_help": "Pick the folder manually or let the app search common Steam locations.",
-
-  "setting_steam_tools_label": "Steam tools",
-  "setting_open_properties": "Open Game Properties",
-  "setting_verify_integrity": "Verify Integrity",
-
-  "setting_detect_path_failed": "An error occurred during detection: {error}",
-  "@setting_detect_path_failed": {
-    "description": "error message when detecting path failed",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "setting_section_detect_preview_title": "Auto-detection preview",
-  "setting_section_detect_preview_desc": "Detected Isaac",
-  "setting_detect_preview_edition": "Current edition",
-  "setting_detect_not_found": "Not found",
+  "setting_folder_path_help": "You can set the installation path to be detected automatically or specify it manually.",
+  "setting_file_path_help": "You can set the option file path to be detected automatically or specify it manually.",
 
   "setting_saved_desc": "Settings have been saved.",
-
-  "setting_options_ini_desc": "The options.ini path differs by edition. This file will be edited.",
   "setting_pick_file": "Choose file",
-  "setting_options_ini_help": "Select options.ini manually or search known user folders automatically.",
-
-  "setting_repentogon_section_title": "Repentogon",
-  "setting_repentogon_desc": "An extended launcher/features mod. Install only if needed.",
-  "setting_repentogon_status_title": "Status",
-  "setting_repentogon_open_install_folder": "Open install folder",
-  "setting_repentogon_open_guide": "View install guide",
-
-  "steam_tools_section_title": "Steam Tools",
-  "steam_tools_section_desc": "Open Steam properties or run integrity check.",
-  "steam_open_properties_title": "Open Properties",
-  "steam_open_properties_desc": "Opens the Steam game properties window. You can review launch options.",
-  "steam_open_properties_button": "Open Properties",
-  "steam_integrity_check_title": "Verify Integrity",
-  "steam_integrity_check_desc": "Checks for corrupted files and restores them if needed.",
-  "steam_integrity_check_button": "Start Check",
-
-  "restart_section_title": "Auto Restart",
-  "restart_section_desc": "Restarts the game after applying mods. Too short delay may skip changes.",
-  "restart_delay_title": "Delay",
-  "restart_delay_desc": "Recommended 500–3000 ms",
 
   "setting_section_about_title": "About",
   "setting_section_about_desc": "Check licenses and app version.",

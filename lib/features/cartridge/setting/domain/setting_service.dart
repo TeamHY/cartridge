@@ -75,22 +75,26 @@ class SettingService {
 
   /// 개별 필드 업데이트(부분 업데이트). 내부에서 정규화 후 저장합니다.
   Future<Result<AppSetting>> update({
+    String? steamPath,
     String? isaacPath,
     String? optionsIniPath,
     int? rerunDelay,
     String? languageCode,
     String? themeName,
+    bool? useAutoDetectSteamPath,
     bool? useAutoDetectInstallPath,
     bool? useAutoDetectOptionsIni,
   }) async {
     try {
       final curr = await getNormalized();
       var next = curr.copyWith(
+        steamPath: steamPath ?? curr.steamPath,
         isaacPath: isaacPath ?? curr.isaacPath,
         optionsIniPath: optionsIniPath ?? curr.optionsIniPath,
         rerunDelay: rerunDelay ?? curr.rerunDelay,
         languageCode: languageCode ?? curr.languageCode,
         themeName: themeName ?? curr.themeName,
+        useAutoDetectSteamPath: useAutoDetectSteamPath ?? curr.useAutoDetectSteamPath,
         useAutoDetectInstallPath: useAutoDetectInstallPath ?? curr.useAutoDetectInstallPath,
         useAutoDetectOptionsIni: useAutoDetectOptionsIni ?? curr.useAutoDetectOptionsIni,
       );

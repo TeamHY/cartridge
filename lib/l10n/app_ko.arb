@@ -352,66 +352,18 @@
   "setting_theme_claude": "Claude",
 
   "setting_section_game_title": "게임 설정",
-  "setting_section_detect_and_path_title": "설치/경로",
-  "setting_section_detect_and_path_desc": "설치된 버전을 확인하고 필요한 경로를 설정합니다.",
-  "setting_detect_edition_title": "게임 에디션",
-  "setting_detect_edition_desc": "감지된 에디션 미리보기예요.",
   "setting_section_game_desc": "아이작 설치 경로와 재실행 지연 시간을 설정합니다.",
+  "setting_steam_path_label": "스팀 설치 폴더",
   "setting_isaac_path_label": "아이작 설치 폴더",
-  "setting_path_label": "경로",
-  "setting_tools_title": "도구",
   "setting_options_ini_path_label": "아이작 options.ini 파일 경로",
   "setting_rerun_delay_label": "재시작 지연시간 (1000 = 1초)",
 
-  "setting_isaac_path_desc": "실행 파일과 모드가 있는 위치예요.",
-  "setting_use_auto_detect": "자동 검색 사용",
   "setting_pick_folder": "폴더 선택",
-  "setting_detect_auto": "자동 검색 실행",
-  "setting_isaac_path_help": "직접 폴더를 선택하거나, 앱이 일반적인 Steam 위치에서 찾아 채우도록 할 수 있어요.",
-
-  "setting_steam_tools_label": "스팀 관련 기능",
-  "setting_open_properties": "게임 속성 열기",
-  "setting_verify_integrity": "무결성 검사",
-
-  "setting_detect_path_failed": "탐지 중 오류가 발생했습니다: {error}",
-  "@setting_detect_path_failed": {
-    "description": "탐지 중 에러 stack trace",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "setting_section_detect_preview_title": "자동 감지 미리보기",
-  "setting_section_detect_preview_desc": "탐지된 아이작 게임",
-  "setting_detect_preview_edition": "현재 아이작 에디션",
-  "setting_detect_not_found": "감지되지 않았습니다",
+  "setting_folder_path_help": "설치 위치를 자동으로 찾도록 설정하거나, 직접 지정할 수 있어요.",
+  "setting_file_path_help": "설치 위치를 자동으로 찾도록 설정하거나, 직접 지정할 수 있어요.",
 
   "setting_saved_desc": "설정이 저장되었습니다.",
-
-  "setting_options_ini_desc": "에디션마다 options.ini 위치가 달라요. 이 파일을 수정합니다.",
   "setting_pick_file": "파일 선택",
-  "setting_options_ini_help": "options.ini를 직접 지정하거나, 알려진 사용자 폴더에서 자동으로 찾을 수 있어요.",
-
-  "setting_repentogon_section_title": "Repentogon",
-  "setting_repentogon_desc": "아이작 확장 런처/기능 모드입니다. 필요할 때만 설치하세요.",
-  "setting_repentogon_status_title": "설치 상태",
-  "setting_repentogon_open_install_folder": "설치 폴더 열기",
-  "setting_repentogon_open_guide": "설치 방법 보기",
-
-  "steam_tools_section_title": "Steam 도구",
-  "steam_tools_section_desc": "Steam 속성 창을 열거나 무결성 검사를 실행합니다.",
-  "steam_open_properties_title": "속성 열기",
-  "steam_open_properties_desc": "Steam 게임 속성 창을 엽니다. 실행 인자 등을 확인할 수 있어요.",
-  "steam_open_properties_button": "속성 열기",
-  "steam_integrity_check_title": "무결성 검사",
-  "steam_integrity_check_desc": "설치 파일 손상 여부를 확인하고 필요하면 자동으로 복구합니다.",
-  "steam_integrity_check_button": "검사 시작",
-
-  "restart_section_title": "자동 재시작",
-  "restart_section_desc": "모드 적용 후 게임을 다시 시작합니다. 지연이 너무 짧으면 반영이 누락될 수 있어요.",
-  "restart_delay_title": "지연 시간",
-  "restart_delay_desc": "권장 500–3000 ms",
 
   "setting_section_about_title": "정보",
   "setting_section_about_desc": "라이선스와 앱 버전을 확인하세요.",

@@ -45,11 +45,13 @@ Future<Database> appDatabase() {
       b.execute('''
         CREATE TABLE app_setting(
           id INTEGER PRIMARY KEY CHECK(id = 1),
+          steam_path TEXT NOT NULL DEFAULT '',
           isaac_path TEXT NOT NULL DEFAULT '',
           rerun_delay INTEGER NOT NULL DEFAULT 1000,
           language_code TEXT NOT NULL DEFAULT 'ko',
           theme_name TEXT NOT NULL DEFAULT 'system',
           options_ini_path TEXT NOT NULL DEFAULT '',
+          use_auto_detect_steam_path INTEGER NOT NULL DEFAULT 1,
           use_auto_detect_install_path INTEGER NOT NULL DEFAULT 1,
           use_auto_detect_options_ini INTEGER NOT NULL DEFAULT 1
         );

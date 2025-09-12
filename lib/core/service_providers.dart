@@ -53,7 +53,8 @@ final steamLibraryPortProvider = Provider<SteamLibraryPort>((ref) {
 // Steam users (loginusers.vdf/세이브 경로) — 설치 경로 주입
 final steamUsersPortProvider = Provider<SteamUsersPort>((ref) {
   final install = ref.watch(steamInstallPortProvider);
-  return SteamUsersVdfRepository(install: install);
+  final settings = ref.watch(settingServiceProvider);
+  return SteamUsersVdfRepository(install: install, settings: settings);
 });
 
 
