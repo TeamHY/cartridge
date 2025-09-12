@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/app/presentation/content_scaffold.dart';
-import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/widgets/list_page/list_page.dart';
 import 'package:cartridge/app/presentation/widgets/search_toolbar.dart';
@@ -33,8 +31,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
   final _normalScroll = ScrollController();
   final _editScroll   = ScrollController();
   Timer? _debounce;
-  Timer? _idleTimer;
-  static const _idleDuration = Duration(minutes: 1);
+  late final ReorderAutosave _autosave;
   bool _dragReportedDirty = false;
 
   @override
@@ -42,6 +39,28 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
     super.initState();
     _searchCtrl.addListener(() => setState(() {}));
     ss.SpriteSheetLoader.load('assets/images/instance_thumbs.png');
+    _autosave = ReorderAutosave(
+      duration: const Duration(minutes: 1),
+      isEnabled: () => ref.read(instancesReorderModeProvider),
+      isDirty:   () => ref.read(instancesReorderDirtyProvider),
+      getIds:    () => ref.read(instancesWorkingOrderProvider),
+      commit: (ids) async {
+        final loc = AppLocalizations.of(context);
+        final result = await ref.read(instancesControllerProvider.notifier).reorderInstances(ids);
+        await result.when(
+          ok:       (_, __, ___) async => UiFeedback.success(context, loc.instance_reorder_saved_title,     loc.instance_reorder_saved_desc),
+          notFound: (_, __)      async => UiFeedback.warn(context,    loc.instance_reorder_not_found_title,  loc.instance_reorder_not_found_desc),
+          invalid:  (_, __, ___) async => UiFeedback.error(context,   loc.instance_reorder_invalid_title,    loc.instance_reorder_invalid_desc),
+          conflict: (_, __)      async => UiFeedback.warn(context,    loc.instance_reorder_conflict_title,   loc.instance_reorder_conflict_desc),
+          failure:  (_, __, ___) async => UiFeedback.error(context,   loc.instance_reorder_failure_title,    loc.instance_reorder_failure_desc),
+        );
+      },
+      resetAfterSave: () {
+        ref.read(instancesReorderModeProvider.notifier).state  = false;
+        ref.read(instancesReorderDirtyProvider.notifier).state = false;
+        _dragReportedDirty = false;
+      },
+    );
   }
 
   @override
@@ -50,37 +69,8 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
     _normalScroll.dispose();
     _editScroll.dispose();
     _searchCtrl.dispose();
-    _idleTimer?.cancel();
+    _autosave.cancel();
     super.dispose();
-  }
-
-  void _startIdleTimer() {
-    _idleTimer?.cancel();
-    _idleTimer = Timer(_idleDuration, () async {
-      if (!ref.read(instancesReorderModeProvider)) return;
-      final ids   = ref.read(instancesWorkingOrderProvider);
-      final dirty = ref.read(instancesReorderDirtyProvider);
-      final loc = AppLocalizations.of(context);
-
-      if (dirty) {
-        final result = await ref.read(instancesControllerProvider.notifier).reorderInstances(ids);
-        await result.when(
-          ok:       (_, __, ___) async => UiFeedback.success(context, loc.instance_reorder_saved_title, loc.instance_reorder_saved_desc),
-          notFound: (_, __)      async => UiFeedback.warn(context, loc.instance_reorder_not_found_title, loc.instance_reorder_not_found_desc),
-          invalid:  (_, __, ___) async => UiFeedback.error(context, loc.instance_reorder_invalid_title, loc.instance_reorder_invalid_desc),
-          conflict: (_, __)      async => UiFeedback.warn(context, loc.instance_reorder_conflict_title, loc.instance_reorder_conflict_desc),
-          failure:  (_, __, ___) async => UiFeedback.error(context, loc.instance_reorder_failure_title, loc.instance_reorder_failure_desc),
-        );
-      }
-      ref.read(instancesReorderModeProvider.notifier).state  = false;
-      ref.read(instancesReorderDirtyProvider.notifier).state = false;
-      _dragReportedDirty = false;
-      _idleTimer?.cancel();
-    });
-  }
-
-  void _bumpIdleTimer() {
-    if (ref.read(instancesReorderModeProvider)) _startIdleTimer();
   }
 
   void _onSearchChanged(String v) {
@@ -92,8 +82,41 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
         ref.read(instancesReorderDirtyProvider.notifier).state = false;
         ref.read(instancesWorkingOrderProvider.notifier).reset();
         _dragReportedDirty = false;
+        _autosave.cancel();
       }
     });
+  }
+
+  Future<void> createFlow() async {
+    final res = await showCreateInstanceDialog(context);
+    if (res == null) return;
+    final result = await ref.read(instancesControllerProvider.notifier).createInstance(
+      name: res.name,
+      seedMode: res.seedMode,
+      presetIds: res.presetIds,
+      optionPresetId: res.optionPresetId,
+    );
+    await result.when(
+      ok: (data, _, __) async { if (data != null) await _goDetail(data.id, data.name); },
+      notFound: (_, __) async {},
+      invalid:  (_, __, ___) async {},
+      conflict: (_, __) async {},
+      failure:  (_, __, ___) async {},
+    );
+  }
+
+  void _enterReorder(List<InstanceView> currentList) {
+    final q = ref.read(instancesQueryProvider).trim();
+    final loc = AppLocalizations.of(context);
+    if (q.isNotEmpty) {
+      UiFeedback.warn(context, loc.instance_reorder_unavailable_title, loc.instance_reorder_unavailable_desc);
+      return;
+    }
+    ref.read(instancesReorderModeProvider.notifier).state  = true;
+    ref.read(instancesReorderDirtyProvider.notifier).state = false;
+    ref.read(instancesWorkingOrderProvider.notifier).syncFrom(currentList);
+    _dragReportedDirty = false;
+    _autosave.start();
   }
 
   Future<void> _goDetail(String id, String name) async {
@@ -106,14 +129,11 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final fTheme = FluentTheme.of(context);
-
-    // 옵션 프리셋과 연동되므로 관찰 유지
     ref.watch(optionPresetsControllerProvider);
 
     final listAsync = ref.watch(orderedInstancesForUiProvider);
     final inReorder = ref.watch(instancesReorderModeProvider);
     final dirty     = ref.watch(instancesReorderDirtyProvider);
-    final q         = ref.watch(instancesQueryProvider);
 
     Widget toolbar(List<InstanceView> currentList) {
       return SearchToolbar(
@@ -128,8 +148,8 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
               ref.read(instancesReorderModeProvider.notifier).state  = false;
               ref.read(instancesReorderDirtyProvider.notifier).state = false;
               ref.read(instancesWorkingOrderProvider.notifier).syncFrom(currentList);
-              _idleTimer?.cancel();
               _dragReportedDirty = false;
+              _autosave.cancel();
             },
             child: Text(loc.common_cancel),
           ),
@@ -151,7 +171,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                 conflict: (_, __)      async => UiFeedback.warn(context, loc.instance_reorder_conflict_title, loc.instance_reorder_conflict_desc),
                 failure:  (_, __, ___) async => UiFeedback.error(context, loc.instance_reorder_failure_title, loc.instance_reorder_failure_desc),
               );
-              _idleTimer?.cancel();
+              _autosave.cancel();
             }
                 : null,
             child: Text(loc.common_save),
@@ -159,23 +179,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
         ]
             : [
           Button(
-            onPressed: () async {
-              final res = await showCreateInstanceDialog(context);
-              if (res == null) return;
-              final result = await ref.read(instancesControllerProvider.notifier).createInstance(
-                name: res.name,
-                seedMode: res.seedMode,
-                presetIds: res.presetIds,
-                optionPresetId: res.optionPresetId,
-              );
-              await result.when(
-                ok: (data, _, __) async { if (data != null) await _goDetail(data.id, data.name); },
-                notFound: (_, __) async {},
-                invalid:  (_, __, ___) async {},
-                conflict: (_, __) async {},
-                failure:  (_, __, ___) async {},
-              );
-            },
+            onPressed: createFlow,
             child: Row(
               children: [
                 const Icon(FluentIcons.add, size: 12),
@@ -186,17 +190,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
           ),
           Gaps.w6,
           Button(
-            onPressed: () {
-              if (q.trim().isNotEmpty) {
-                UiFeedback.warn(context, loc.instance_reorder_unavailable_title, loc.instance_reorder_unavailable_desc);
-                return;
-              }
-              ref.read(instancesReorderModeProvider.notifier).state  = true;
-              ref.read(instancesReorderDirtyProvider.notifier).state = false;
-              ref.read(instancesWorkingOrderProvider.notifier).syncFrom(currentList);
-              _dragReportedDirty = false;
-              _startIdleTimer();
-            },
+            onPressed: () => _enterReorder(currentList),
             child: Row(
               children: [
                 const Icon(FluentIcons.edit, size: 12),
@@ -225,18 +219,40 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
 
           // ——— DATA ———
           data: (List<InstanceView> list) {
+
             // 정렬 모드일 때 워킹 오더 동기화
             if (inReorder) {
-              final working = ref.read(instancesWorkingOrderProvider);
-              final curIds  = list.map((e) => e.id).toList(growable: false);
-              final next = <String>[
-                ...working.where(curIds.contains),
-                ...curIds.where((id) => !working.contains(id)),
-              ];
-              if (next.length != working.length || !const ListEquality().equals(next, working)) {
-                ref.read(instancesWorkingOrderProvider.notifier).setAll(next);
-                ref.read(instancesReorderDirtyProvider.notifier).state = true;
+              final workingNow = ref.read(instancesWorkingOrderProvider);
+              final merged = mergeWorkingOrder(workingNow, list, (e) => e.id);
+
+              final needsUpdate = merged.length != workingNow.length
+                  || !const ListEquality().equals(merged, workingNow);
+
+              if (needsUpdate) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  if (!ref.read(instancesReorderModeProvider)) return;
+                  final latestList = ref.read(orderedInstancesForUiProvider).maybeWhen(
+                    data: (l) => l,
+                    orElse: () => list,
+                  );
+                  final latestWorking = ref.read(instancesWorkingOrderProvider);
+                  final mergedLatest = mergeWorkingOrder(latestWorking, latestList, (e) => e.id);
+
+                  ref.read(instancesWorkingOrderProvider.notifier).setAll(mergedLatest);
+                  ref.read(instancesReorderDirtyProvider.notifier).state = true;
+                });
               }
+            }
+
+
+            if (list.isEmpty) {
+              return ListPageEmptyShell.with404(
+                topBar: toolbar(list),
+                title: loc.instance_empty_message,
+                primaryLabel: loc.instance_create_button,
+                onPrimary: createFlow,
+              );
             }
 
             // 타일 빌더(뱃지/메뉴 포함)
@@ -260,7 +276,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                     ? () async {
                   await ref.read(instancesControllerProvider.notifier).deleteInstance(v.id);
                   ref.read(instancesReorderDirtyProvider.notifier).state = true;
-                  _bumpIdleTimer();
+                  _autosave.bump();
                 }
                     : null,
                 onPlayInstance: () async {
@@ -274,17 +290,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                       MenuFlyoutItem(
                         text: Text(loc.instance_menu_reorder),
                         leading: const Icon(FluentIcons.drag_object),
-                        onPressed: () {
-                          if (q.trim().isNotEmpty) {
-                            UiFeedback.warn(context, loc.instance_reorder_unavailable_title, loc.instance_reorder_unavailable_desc);
-                            return;
-                          }
-                          ref.read(instancesReorderModeProvider.notifier).state  = true;
-                          ref.read(instancesReorderDirtyProvider.notifier).state = false;
-                          ref.read(instancesWorkingOrderProvider.notifier).syncFrom(list);
-                          _dragReportedDirty = false;
-                          _startIdleTimer();
-                        },
+                        onPressed: () => _enterReorder(list),
                       ),
                     MenuFlyoutItem(
                       text: Text(loc.common_duplicate),
@@ -331,17 +337,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                     MenuFlyoutItem(
                       text: Text(loc.instance_menu_reorder),
                       leading: const Icon(FluentIcons.drag_object),
-                      onPressed: () {
-                        if (q.trim().isNotEmpty) {
-                          UiFeedback.warn(context, loc.instance_reorder_unavailable_title, loc.instance_reorder_unavailable_desc);
-                          return;
-                        }
-                        ref.read(instancesReorderModeProvider.notifier).state  = true;
-                        ref.read(instancesReorderDirtyProvider.notifier).state = false;
-                        ref.read(instancesWorkingOrderProvider.notifier).syncFrom(list);
-                        _dragReportedDirty = false;
-                        _startIdleTimer();
-                      },
+                      onPressed: () => _enterReorder(list),
                     ),
                     MenuFlyoutItem(
                       text: Text(loc.common_duplicate),
@@ -367,51 +363,8 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
 
             Widget buildTileWithLongPress(InstanceView v) {
               return GestureDetector(
-                onLongPress: () {
-                  if (inReorder) return;
-                  if (q.trim().isNotEmpty) return;
-                  ref.read(instancesReorderModeProvider.notifier).state  = true;
-                  ref.read(instancesReorderDirtyProvider.notifier).state = false;
-                  ref.read(instancesWorkingOrderProvider.notifier).syncFrom(list);
-                  _dragReportedDirty = false;
-                  _startIdleTimer();
-                },
+                onLongPress: () => _enterReorder(list),
                 child: buildInnerTile(v),
-              );
-            }
-
-            // 빈 상태
-            if (list.isEmpty) {
-              return Column(
-                children: [
-                  toolbar(list),
-                  Gaps.h12,
-                  Expanded(
-                    child: Center(
-                      child: EmptyState.withDefault404(
-                        title: loc.instance_empty_message,
-                        primaryLabel: loc.instance_create_button,
-                        onPrimary: () async {
-                          final res = await showCreateInstanceDialog(context);
-                          if (res == null) return;
-                          final result = await ref.read(instancesControllerProvider.notifier).createInstance(
-                            name: res.name,
-                            seedMode: res.seedMode,
-                            presetIds: res.presetIds,
-                            optionPresetId: res.optionPresetId,
-                          );
-                          await result.when(
-                            ok: (data, _, __) async { if (data != null) await _goDetail(data.id, data.name); },
-                            notFound: (_, __) async {},
-                            invalid:  (_, __, ___) async {},
-                            conflict: (_, __) async {},
-                            failure:  (_, __, ___) async {},
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
               );
             }
 
@@ -428,79 +381,41 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                       final itemWidth =
                           (constraints.maxWidth - spacing * (cols - 1)) / cols;
 
-                      Widget card(InstanceView v) => SizedBox(
+                      Widget card(InstanceView v, {required bool forReorder}) => SizedBox(
                         width: itemWidth,
                         child: Wiggle(
                           enabled: inReorder,
                           phaseSeed: (v.id.hashCode % 628) / 100.0,
-                          child: inReorder
+                          child: forReorder
                               ? buildTile(v, disableTap: true)
                               : buildTileWithLongPress(v),
                         ),
                       );
 
-                      if (inReorder) {
-                        final children = [
-                          for (final v in list)
-                            RepaintBoundary(
-                              key: ValueKey(v.id),
-                              child: SizedBox(
-                                width: itemWidth,
-                                child: card(v),
-                              ),
-                            ),
-                        ];
-
-                        return ReorderableBuilder<_Fake>(
-                          scrollController: _editScroll,
-                          enableLongPress: false,
-                          onReorder: (reorderFn) {
-                            final idsBefore = ref.read(instancesWorkingOrderProvider);
-                            final fake  = idsBefore.map((e) => _Fake(id: e)).toList();
-                            final after = reorderFn(fake).cast<_Fake>().map((e) => e.id).toList();
-
-                            ref.read(instancesWorkingOrderProvider.notifier).setAll(after);
-                            if (!_dragReportedDirty) {
-                              _dragReportedDirty = true;
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (mounted) {
-                                  ref.read(instancesReorderDirtyProvider.notifier).state = true;
-                                }
-                              });
-                            }
-                            _bumpIdleTimer();
-                          },
-                          builder: (reorderedChildren) {
-                            return MouseRegion(
-                              onHover: (_) => _bumpIdleTimer(),
-                              child: RepaintBoundary(
-                                child: GridView(
-                                  controller: _editScroll,
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: cols,
-                                    crossAxisSpacing: spacing,
-                                    mainAxisSpacing: spacing,
-                                    mainAxisExtent: 100,
-                                  ),
-                                  children: reorderedChildren,
-                                ),
-                              ),
-                            );
-                          },
-                          children: children,
-                        );
-                      }
-
-                      return GridView.builder(
-                        controller: _normalScroll,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: cols,
-                          crossAxisSpacing: spacing,
-                          mainAxisSpacing: spacing,
-                          mainAxisExtent: 100,
-                        ),
-                        itemCount: list.length,
-                        itemBuilder: (_, i) => card(list[i]),
+                      return ReorderGrid<InstanceView>(
+                        items: list,
+                        idOf: (e) => e.id,
+                        inReorder: inReorder,
+                        crossAxisCount: cols,
+                        spacing: spacing,
+                        mainAxisExtent: 100,
+                        normalScrollController: _normalScroll,
+                        editScrollController: _editScroll,
+                        normalItemBuilder: (item) => card(item, forReorder: false),
+                        reorderItemBuilder: (item) => card(item, forReorder: true),
+                        onReorder: (newIds) {
+                          ref.read(instancesWorkingOrderProvider.notifier).setAll(newIds);
+                          if (!_dragReportedDirty) {
+                            _dragReportedDirty = true;
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (mounted) {
+                                ref.read(instancesReorderDirtyProvider.notifier).state = true;
+                              }
+                            });
+                          }
+                          _autosave.bump();
+                        },
+                        onHoverDuringReorder: _autosave.bump,
                       );
                     },
                   ),
@@ -512,9 +427,4 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
       ),
     );
   }
-}
-
-class _Fake {
-  final String id;
-  _Fake({required this.id});
 }

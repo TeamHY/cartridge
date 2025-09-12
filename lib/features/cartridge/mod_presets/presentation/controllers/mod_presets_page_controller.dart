@@ -1,3 +1,4 @@
+import 'package:cartridge/app/presentation/widgets/list_page/reorder_helpers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/features/cartridge/mod_presets/application/mod_presets_controller.dart';
 import 'package:cartridge/features/cartridge/mod_presets/domain/models/mod_preset_view.dart';
@@ -81,17 +82,6 @@ Provider<AsyncValue<List<ModPresetView>>>((ref) {
 
   return baseAsync.whenData((base) {
     if (!inReorder || order.isEmpty) return base;
-
-    // 현재 리스트를 id→view 맵으로
-    final map = {for (final v in base) v.key: v};
-    final out = <ModPresetView>[];
-
-    // working order 순서대로 채우고, 혹시 빠진 항목이 있으면 뒤에 덧붙임(방어적)
-    for (final id in order) {
-      final v = map.remove(id);
-      if (v != null) out.add(v);
-    }
-    if (map.isNotEmpty) out.addAll(map.values);
-    return out;
+    return applyWorkingOrder<ModPresetView>(base, order, (e) => e.key);
   });
 });

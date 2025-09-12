@@ -1,8 +1,7 @@
-import 'package:cartridge/features/cartridge/option_presets/application/option_presets_controller.dart';
+import 'package:cartridge/app/presentation/widgets/list_page/reorder_helpers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/features/cartridge/instances/application/instances_controller.dart';
-import 'package:cartridge/features/cartridge/instances/domain/models/instance_view.dart';
+import 'package:cartridge/features/cartridge/instances/instances.dart';
 
 
 /// 인스턴스 목록 화면 전용 프레젠테이션 상태.
@@ -24,16 +23,6 @@ Provider<AsyncValue<List<InstanceView>>>((ref) {
         .toList(growable: false);
   });
 });
-
-final useRepentogonByPresetIdProvider =
-Provider.family<bool, String?>((ref, presetId) {
-  if (presetId == null || presetId.isEmpty) return false;
-  // 필요한 필드만 구독해 리빌드 최소화
-  return ref.watch(
-    optionPresetByIdProvider(presetId).select((p) => p?.useRepentogon ?? false),
-  );
-});
-
 /// 정렬 모드 on/off
 final instancesReorderModeProvider = StateProvider<bool>((ref) => false);
 
@@ -80,17 +69,6 @@ Provider<AsyncValue<List<InstanceView>>>((ref) {
 
   return baseAsync.whenData((base) {
     if (!inReorder || order.isEmpty) return base;
-
-    // 현재 리스트를 id→view 맵으로
-    final map = {for (final v in base) v.id: v};
-    final out = <InstanceView>[];
-
-    // working order 순서대로 채우고, 혹시 빠진 항목이 있으면 뒤에 덧붙임(방어적)
-    for (final id in order) {
-      final v = map.remove(id);
-      if (v != null) out.add(v);
-    }
-    if (map.isNotEmpty) out.addAll(map.values);
-    return out;
+    return applyWorkingOrder<InstanceView>(base, order, (e) => e.id);
   });
 });

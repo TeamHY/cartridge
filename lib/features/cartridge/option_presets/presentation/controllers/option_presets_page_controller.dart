@@ -1,3 +1,4 @@
+import 'package:cartridge/app/presentation/widgets/list_page/reorder_helpers.dart';
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/setting/application/app_setting_controller.dart';
 import 'package:cartridge/features/isaac/options/application/isaac_options_ini_service.dart';
@@ -67,18 +68,7 @@ Provider<AsyncValue<List<OptionPresetView>>>((ref) {
 
   return baseAsync.whenData((base) {
     if (!inReorder || order.isEmpty) return base;
-
-    // 현재 리스트를 id→view 맵으로
-    final map = {for (final v in base) v.id: v};
-    final out = <OptionPresetView>[];
-
-    // working order 순서대로 채우고, 혹시 빠진 항목이 있으면 뒤에 덧붙임(방어적)
-    for (final id in order) {
-      final v = map.remove(id);
-      if (v != null) out.add(v);
-    }
-    if (map.isNotEmpty) out.addAll(map.values);
-    return out;
+    return applyWorkingOrder<OptionPresetView>(base, order, (e) => e.id);
   });
 });
 

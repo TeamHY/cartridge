@@ -1,26 +1,21 @@
 import 'dart:async';
+import 'package:cartridge/core/result.dart';
 import 'package:collection/collection.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/app/presentation/content_scaffold.dart';
-import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/widgets/list_page/list_page.dart';
 import 'package:cartridge/app/presentation/widgets/list_tiles.dart';
 import 'package:cartridge/app/presentation/widgets/search_toolbar.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
-import 'package:cartridge/core/result.dart';
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/core/utils/id.dart';
 import 'package:cartridge/core/utils/wiggle.dart';
-import 'package:cartridge/features/cartridge/option_presets/domain/models/option_preset_view.dart';
-import 'package:cartridge/features/cartridge/option_presets/presentation/controllers/option_presets_page_controller.dart';
-import 'package:cartridge/features/cartridge/option_presets/presentation/widgets/option_presets_create_edit_dialog.dart';
+import 'package:cartridge/features/cartridge/option_presets/option_presets.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
-
 
 class OptionPresetsTab extends ConsumerStatefulWidget {
   const OptionPresetsTab({super.key});
@@ -34,35 +29,21 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
   final _normalScroll = ScrollController();
   final _editScroll   = ScrollController();
   Timer? _debounce;
-  Timer? _idleTimer;
-  static const _idleDuration = Duration(minutes: 1);
+  late final ReorderAutosave _autosave;
   bool _dragReportedDirty = false;
 
   @override
   void initState() {
     super.initState();
     _searchCtrl.addListener(() => setState(() {}));
-  }
 
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    _idleTimer?.cancel();
-    _searchCtrl.dispose();
-    _normalScroll.dispose();
-    _editScroll.dispose();
-    super.dispose();
-  }
-
-  void _startIdleTimer() {
-    _idleTimer?.cancel();
-    _idleTimer = Timer(_idleDuration, () async {
-      if (!ref.read(optionPresetsReorderModeProvider)) return;
-      final ids   = ref.read(optionPresetsWorkingOrderProvider);
-      final dirty = ref.read(optionPresetsReorderDirtyProvider);
-      final loc = AppLocalizations.of(context);
-
-      if (dirty) {
+    _autosave = ReorderAutosave(
+      duration: const Duration(minutes: 1),
+      isEnabled: () => ref.read(optionPresetsReorderModeProvider),
+      isDirty:   () => ref.read(optionPresetsReorderDirtyProvider),
+      getIds:    () => ref.read(optionPresetsWorkingOrderProvider),
+      commit: (ids) async {
+        final loc = AppLocalizations.of(context);
         final result = await ref.read(optionPresetsControllerProvider.notifier).reorderOptionPresets(ids);
         await result.when(
           ok:       (_, __, ___) async => UiFeedback.success(context, loc.option_reorder_saved_title,     loc.option_reorder_saved_desc),
@@ -71,30 +52,76 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
           conflict: (_, __)      async => UiFeedback.warn(context,    loc.option_reorder_conflict_title,   loc.option_reorder_conflict_desc),
           failure:  (_, __, ___) async => UiFeedback.error(context,   loc.option_reorder_failure_title,    loc.option_reorder_failure_desc),
         );
-      }
-      ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
-      ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-      _dragReportedDirty = false;
-      _idleTimer?.cancel();
-    });
+      },
+      resetAfterSave: () {
+        ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
+        ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
+        _dragReportedDirty = false;
+      },
+    );
   }
 
-  void _bumpIdleTimer() {
-    if (ref.read(optionPresetsReorderModeProvider)) _startIdleTimer();
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _autosave.cancel();
+    _searchCtrl.dispose();
+    _normalScroll.dispose();
+    _editScroll.dispose();
+    super.dispose();
   }
 
   void _onSearchChanged(String v) {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 200), () {
       ref.read(optionPresetsQueryProvider.notifier).state = v.trim();
-
       if (ref.read(optionPresetsReorderModeProvider)) {
-        ref.read(optionPresetsReorderModeProvider.notifier).state = false;
+        ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
         ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
         ref.read(optionPresetsWorkingOrderProvider.notifier).reset();
         _dragReportedDirty = false;
+        _autosave.cancel();
       }
     });
+  }
+
+  Future<void> createFlow() async {
+    final repInstalled = await ref.read(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
+    OptionPresetView? init;
+    try {
+      init = await ref.read(optionPresetInitialFromCurrentProvider.future);
+    } catch (_) {
+      init = null;
+    }
+    if (!mounted) return;
+    final result = await showOptionPresetsCreateEditDialog(
+      context,
+      initial: init,
+      repentogonInstalled: repInstalled,
+    );
+    if (result == null) return;
+
+    final ctl = ref.read(optionPresetsControllerProvider.notifier);
+    if (init == null) {
+      final withId = result.id.trim().isEmpty ? result.copyWith(id: IdUtil.genId('op')) : result;
+      await ctl.create(withId);
+    } else {
+      await ctl.fetch(result);
+    }
+  }
+
+  void _enterReorder(List<OptionPresetView> currentList) {
+    final q = ref.read(optionPresetsQueryProvider).trim();
+    final loc = AppLocalizations.of(context);
+    if (q.isNotEmpty) {
+      UiFeedback.warn(context, loc.option_reorder_unavailable_title, loc.option_reorder_unavailable_desc);
+      return;
+    }
+    ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
+    ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
+    ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(currentList);
+    _dragReportedDirty = false;
+    _autosave.start();
   }
 
   int _calcCols(double maxW) {
@@ -111,7 +138,6 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
     final listAsync = ref.watch(orderedOptionPresetsForUiProvider);
     final inReorder = ref.watch(optionPresetsReorderModeProvider);
     final dirty     = ref.watch(optionPresetsReorderDirtyProvider);
-    final q         = ref.watch(optionPresetsQueryProvider);
 
     // 상단 툴바 (로딩/에러에서도 항상 유지)
     Widget toolbar0(List<OptionPresetView> currentList) {
@@ -127,8 +153,8 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
               ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
               ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
               ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(currentList);
-              _idleTimer?.cancel();
               _dragReportedDirty = false;
+              _autosave.cancel();
             },
             child: Text(loc.common_cancel),
           ),
@@ -150,7 +176,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                 conflict: (_, __)      async => UiFeedback.warn(context,  loc.option_reorder_conflict_title,   loc.option_reorder_conflict_desc),
                 failure:  (_, __, ___) async => UiFeedback.error(context, loc.option_reorder_failure_title,    loc.option_reorder_failure_desc),
               );
-              _idleTimer?.cancel();
+              _autosave.cancel();
             }
                 : null,
             child: Text(loc.common_save),
@@ -158,30 +184,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
         ]
             : [
           Button(
-            onPressed: () async {
-              // 생성/수정 플로우 (신규)
-              final repInstalled = await ref.read(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
-              OptionPresetView? init;
-              try {
-                init = await ref.read(optionPresetInitialFromCurrentProvider.future);
-              } catch (_) {
-                init = null;
-              }
-              if (!context.mounted) return;
-              final result = await showOptionPresetsCreateEditDialog(context,
-                initial: init,
-                repentogonInstalled: repInstalled,
-              );
-              if (result == null) return;
-
-              final ctl = ref.read(optionPresetsControllerProvider.notifier);
-              if (init == null) {
-                final withId = result.id.trim().isEmpty ? result.copyWith(id: IdUtil.genId('op')) : result;
-                await ctl.create(withId);
-              } else {
-                await ctl.fetch(result);
-              }
-            },
+            onPressed: createFlow,
             child: Row(
               children: [
                 const Icon(FluentIcons.add, size: 12),
@@ -192,17 +195,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
           ),
           Gaps.w6,
           Button(
-            onPressed: () {
-              if (q.trim().isNotEmpty) {
-                UiFeedback.warn(context, loc.option_reorder_unavailable_title, loc.option_reorder_unavailable_desc);
-                return;
-              }
-              ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
-              ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-              ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(currentList);
-              _dragReportedDirty = false;
-              _startIdleTimer();
-            },
+            onPressed: () => _enterReorder(currentList),
             child: Row(
               children: [
                 const Icon(FluentIcons.edit, size: 12),
@@ -221,54 +214,37 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
         scrollable: false,
         child: listAsync.when(
           loading: () => ListPageLoadingShell(topBar: toolbar0(const [])),
-          error: (_, __) => ListPageErrorShell(
+          error:   (_, __) => ListPageErrorShell(
             topBar: toolbar0(const []),
-            title: loc.option_error_title,
+            title:       loc.option_error_title,
             description: loc.error_startup_message,
             primaryLabel: loc.common_retry,
             onPrimary: () => ref.invalidate(orderedOptionPresetsForUiProvider),
           ),
           data: (List<OptionPresetView> list) {
             if (inReorder) {
-              final working = ref.read(optionPresetsWorkingOrderProvider);
-              final curIds  = list.map((e) => e.id).toList(growable: false);
-              final next = <String>[
-                ...working.where(curIds.contains),
-                ...curIds.where((id) => !working.contains(id)),
-              ];
-              if (next.length != working.length || !const ListEquality().equals(next, working)) {
-                ref.read(optionPresetsWorkingOrderProvider.notifier).setAll(next);
-                ref.read(optionPresetsReorderDirtyProvider.notifier).state = true;
+              final workingNow = ref.read(optionPresetsWorkingOrderProvider);
+              final merged = mergeWorkingOrder(workingNow, list, (e) => e.id);
+              if (merged.length != workingNow.length || !const ListEquality().equals(merged, workingNow)) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted || !ref.read(optionPresetsReorderModeProvider)) return;
+                  final latestList = ref.read(orderedOptionPresetsForUiProvider).maybeWhen(data: (l) => l, orElse: () => list);
+                  final latestWorking = ref.read(optionPresetsWorkingOrderProvider);
+                  final mergedLatest = mergeWorkingOrder(latestWorking, latestList, (e) => e.id);
+                  ref.read(optionPresetsWorkingOrderProvider.notifier).setAll(mergedLatest);
+                  ref.read(optionPresetsReorderDirtyProvider.notifier).state = true;
+                });
               }
             }
 
             final toolbar = toolbar0(list);
 
             if (list.isEmpty) {
-              return Column(
-                children: [
-                  toolbar,
-                  Gaps.h12,
-                  Expanded(
-                    child: Center(
-                      child: EmptyState.withDefault404(
-                        title: loc.option_empty_title,
-                        primaryLabel: loc.option_create_button,
-                        onPrimary: () async {
-                          final repInstalled = await ref.read(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
-                          if (!context.mounted) return;
-                          final res = await showOptionPresetsCreateEditDialog(context,
-                            repentogonInstalled: repInstalled,
-                          );
-                          if (res == null) return;
-                          final ctl = ref.read(optionPresetsControllerProvider.notifier);
-                          final withId = res.id.trim().isNotEmpty ? res : res.copyWith(id: IdUtil.genId('op'));
-                          await ctl.create(withId);
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+              return ListPageEmptyShell.with404(
+                topBar: toolbar,
+                title: loc.option_empty_title,
+                primaryLabel: loc.option_create_button,
+                onPrimary: createFlow,
               );
             }
 
@@ -285,7 +261,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                     ? () async {
                   await ref.read(optionPresetsControllerProvider.notifier).remove(v.id);
                   ref.read(optionPresetsReorderDirtyProvider.notifier).state = true;
-                  _bumpIdleTimer();
+                  _autosave.bump();
                 }
                     : null,
                 onTap: disableTap
@@ -304,17 +280,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                       MenuFlyoutItem(
                         text: Text(loc.option_menu_reorder),
                         leading: const Icon(FluentIcons.drag_object),
-                        onPressed: () {
-                          if (q.trim().isNotEmpty) {
-                            UiFeedback.warn(context, loc.option_reorder_unavailable_title, loc.option_reorder_unavailable_desc);
-                            return;
-                          }
-                          ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
-                          ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-                          ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(list);
-                          _dragReportedDirty = false;
-                          _startIdleTimer();
-                        },
+                        onPressed: () => _enterReorder(list),
                       ),
                     MenuFlyoutItem(
                       text: Text(loc.common_duplicate),
@@ -338,18 +304,10 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
               );
             }
 
-            // 길게 눌러 정렬 모드 진입 지원(모바일/터치 대비)
+            // 길게 눌러 정렬 모드 진입
             Widget buildTileWithLongPress(OptionPresetView v) {
               return GestureDetector(
-                onLongPress: () {
-                  if (inReorder) return;
-                  if (q.trim().isNotEmpty) return;
-                  ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
-                  ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-                  ref.read(optionPresetsWorkingOrderProvider.notifier).syncFrom(list);
-                  _dragReportedDirty = false;
-                  _startIdleTimer();
-                },
+                onLongPress: () => _enterReorder(list),
                 child: buildTile(v),
               );
             }
@@ -366,74 +324,41 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                       final itemWidth =
                           (constraints.maxWidth - spacing * (cols - 1)) / cols;
 
-                      Widget card(OptionPresetView v) => SizedBox(
+                      Widget card(OptionPresetView v, {required bool forReorder}) => SizedBox(
                         width: itemWidth,
                         child: Wiggle(
                           enabled: inReorder,
                           phaseSeed: (v.id.hashCode % 628) / 100.0,
-                          child: inReorder ? buildTile(v, disableTap: true) : buildTileWithLongPress(v),
+                          child: forReorder
+                              ? buildTile(v, disableTap: true)
+                              : buildTileWithLongPress(v),
                         ),
                       );
 
-                      if (inReorder) {
-                        final children = [
-                          for (final v in list)
-                            RepaintBoundary(
-                              key: ValueKey(v.id),
-                              child: SizedBox(width: itemWidth, child: card(v)),
-                            ),
-                        ];
-
-                        return ReorderableBuilder<_Fake>(
-                          scrollController: _editScroll,
-                          enableLongPress: false,
-                          onReorder: (reorderFn) {
-                            final idsBefore = ref.read(optionPresetsWorkingOrderProvider);
-                            final fake  = idsBefore.map((e) => _Fake(id: e)).toList();
-                            final after = reorderFn(fake).cast<_Fake>().map((e) => e.id).toList();
-
-                            ref.read(optionPresetsWorkingOrderProvider.notifier).setAll(after);
-                            if (!_dragReportedDirty) {
-                              _dragReportedDirty = true;
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                if (mounted) {
-                                  ref.read(optionPresetsReorderDirtyProvider.notifier).state = true;
-                                }
-                              });
-                            }
-                            _bumpIdleTimer();
-                          },
-                          builder: (reorderedChildren) {
-                            return MouseRegion(
-                              onHover: (_) => _bumpIdleTimer(),
-                              child: RepaintBoundary(
-                                child: GridView(
-                                  controller: _editScroll,
-                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: cols,
-                                    crossAxisSpacing: spacing,
-                                    mainAxisSpacing: spacing,
-                                    mainAxisExtent: 100,
-                                  ),
-                                  children: reorderedChildren,
-                                ),
-                              ),
-                            );
-                          },
-                          children: children,
-                        );
-                      }
-
-                      return GridView.builder(
-                        controller: _normalScroll,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: cols,
-                          crossAxisSpacing: spacing,
-                          mainAxisSpacing: spacing,
-                          mainAxisExtent: 100,
-                        ),
-                        itemCount: list.length,
-                        itemBuilder: (_, i) => card(list[i]),
+                      return ReorderGrid<OptionPresetView>(
+                        items: list,
+                        idOf: (e) => e.id,
+                        inReorder: inReorder,
+                        crossAxisCount: cols,
+                        spacing: spacing,
+                        mainAxisExtent: 100,
+                        normalScrollController: _normalScroll,
+                        editScrollController: _editScroll,
+                        normalItemBuilder: (item) => card(item, forReorder: false),
+                        reorderItemBuilder: (item) => card(item, forReorder: true),
+                        onReorder: (newIds) {
+                          ref.read(optionPresetsWorkingOrderProvider.notifier).setAll(newIds);
+                          if (!_dragReportedDirty) {
+                            _dragReportedDirty = true;
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              if (mounted) {
+                                ref.read(optionPresetsReorderDirtyProvider.notifier).state = true;
+                              }
+                            });
+                          }
+                          _autosave.bump();
+                        },
+                        onHoverDuringReorder: _autosave.bump,
                       );
                     },
                   ),
@@ -445,9 +370,4 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
       ),
     );
   }
-}
-
-class _Fake {
-  final String id;
-  _Fake({required this.id});
 }

@@ -1,11 +1,9 @@
-import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/gestures.dart' show kPrimaryMouseButton;
 
-import 'package:cartridge/features/cartridge/instances/domain/models/instance_image.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/controllers/instances_page_controller.dart';
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_image/instance_image_thumb.dart';
+import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
+import 'package:cartridge/features/cartridge/instances/instances.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
