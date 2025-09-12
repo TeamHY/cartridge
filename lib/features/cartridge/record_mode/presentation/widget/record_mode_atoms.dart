@@ -133,7 +133,7 @@ class _InfoChips {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: fill,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: AppShapes.pill,
           border: Border.all(color: stroke, width: .8),
         ),
         child: Row(
@@ -214,7 +214,7 @@ class GameItemCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: t.accentColor.withAlpha(190),
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: AppShapes.pill,
                         ),
                         child: Text(badge!, style: const TextStyle(color: Colors.white)),
                       ),

@@ -215,7 +215,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                           color: fTheme.accentColor.withAlpha(
                             fTheme.brightness == Brightness.dark ? 128 : 80,
                           ),
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: AppShapes.pill,
                         ),
                         child: Text(
                           loc.eden_current_chip(

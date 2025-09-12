@@ -16,4 +16,5 @@ class AppShapes {
   static final BorderRadius panel  = BorderRadius.circular(AppRadius.lg);
   static final BorderRadius dialog = BorderRadius.circular(AppRadius.lg);
   static final BorderRadius chip   = BorderRadius.circular(AppRadius.sm);
+  static final BorderRadius pill   = BorderRadius.circular(999);
 }

@@ -18,7 +18,7 @@ class PlusPill extends ConsumerWidget {
       decoration: BoxDecoration(
         color: sem.neutral.bg,
         border: Border.all(color: sem.neutral.border),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppShapes.pill,
       ),
       child: Text(
         '+${count.toString()}',

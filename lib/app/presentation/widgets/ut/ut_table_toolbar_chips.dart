@@ -624,7 +624,7 @@ class _GroupFlyoutButtonState<T> extends State<_GroupFlyoutButton<T>> {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: FluentTheme.of(context).accentColor.normal.withAlpha(46),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppShapes.pill,
       ),
       child: Text(
         '${widget.activeCount}',
@@ -805,7 +805,7 @@ class _SummaryChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppShapes.pill,
         border: Border.all(color: border),
       ),
       alignment: Alignment.center,

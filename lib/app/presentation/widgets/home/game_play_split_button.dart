@@ -264,7 +264,7 @@ class _InstanceTile extends StatelessWidget {
                       image: view.image,
                       fallbackSeed: view.name,
                       size: 32,
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      borderRadius: AppShapes.chip,
                     ),
                     Gaps.w8,
                     Expanded(

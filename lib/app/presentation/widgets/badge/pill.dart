@@ -15,7 +15,7 @@ class Pill extends StatelessWidget {
       decoration: BoxDecoration(
         color: spec.statusColor.bg,
         border: Border.all(color: spec.statusColor.border),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppShapes.pill,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

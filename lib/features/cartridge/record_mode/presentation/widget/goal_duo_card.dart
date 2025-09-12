@@ -23,7 +23,7 @@ class GoalDuoCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: theme.micaBackgroundColor.withAlpha(120),
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: AppShapes.pill,
         border: Border.all(color: theme.resources.cardStrokeColorDefault, width: 0.8),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
