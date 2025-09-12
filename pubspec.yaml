@@ -73,6 +73,9 @@ dependencies:
   intl: ^0.20.2                     # [i18n] 날짜·숫자 포맷
   characters: ^1.4.0                # [i18n] 유니코드 문자 경계 처리(다국어 타이틀 파싱 안정성)
 
+  # ── Platform / App Info ─────────────────────────────────────────────────────
+  package_info_plus: ^9.0.0         # [Platform] 앱 패키지 버전 조회
+
   # ── Platform / Windows ──────────────────────────────────────────────────────
   win32_registry: ^2.1.0            # [Windows] 레지스트리 조회(예: Steam 설치 경로 탐색). 런타임 의존.
   sqflite: ^2.4.2                   # [DB] 로컬 SQLite 액세스(설정/캐시/슬롯 데이터 등)
@@ -87,14 +90,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  mocktail: ^1.0.4            # [Test] 단위/위젯 테스트용 mocking 프레임워크
-  golden_toolkit: ^0.15.0     # [Test/Golden] 골든 이미지 테스트 도구( --update-goldens 로 베이스라인 갱신 )
-  flutter_lints: ^6.0.0       # [Lint] 권장 린트 세트(analysis_options.yaml에서 활성화)
+  mocktail: ^1.0.4                  # [Test] 단위/위젯 테스트용 mocking 프레임워크
+  golden_toolkit: ^0.15.0           # [Test/Golden] 골든 이미지 테스트 도구( --update-goldens 로 베이스라인 갱신 )
+  flutter_lints: ^6.0.0             # [Lint] 권장 린트 세트(analysis_options.yaml에서 활성화)
 
   # ── Codegen / Model ─────────────────────────────────────────────────────────
-  build_runner: ^2.8.0        # [Codegen] 코드 생성 실행기(Freezed/JsonSerializable 빌드 진입점)
-  freezed: ^3.2.2             # [Codegen] 불변 데이터 클래스/union/sealed 생성기( *.freezed.dart )
-  json_serializable: ^6.11.1  # [Codegen] JSON (de)serialize 생성기( *.g.dart )
+  build_runner: ^2.8.0              # [Codegen] 코드 생성 실행기(Freezed/JsonSerializable 빌드 진입점)
+  freezed: ^3.2.2                   # [Codegen] 불변 데이터 클래스/union/sealed 생성기( *.freezed.dart )
+  json_serializable: ^6.11.1        # [Codegen] JSON (de)serialize 생성기( *.g.dart )
 
 
 dependency_overrides:

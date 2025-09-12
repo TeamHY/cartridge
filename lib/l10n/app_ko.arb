@@ -249,13 +249,13 @@
   "mod_preset_create_name_label": "이름",
   "mod_preset_create_name_placeholder": "모드 프리셋 이름",
   "mod_preset_create_initial_mode_label": "처음에 어떻게 시작할까요?",
-  "mod_preset_create_all_off": "모드 모두 끄기",
+  "mod_preset_create_all_off": "모두 비활성화된 상태에서 시작하기",
   "@mod_preset_create_all_off": {
-    "description": "프리셋 초기값으로 모든 모드를 비활성화 상태로 설정해놓고 생성하는 옵션"
+    "description": "프리셋을 만들 때, 모든 모드가 비활성화된 상태를 기본값으로 설정합니다."
   },
-  "mod_preset_create_current_enabled": "지금 켠 모드로 시작",
+  "mod_preset_create_current_enabled": "지금 활성화된 모드 그대로 사용하기",
   "@mod_preset_create_current_enabled": {
-    "description": "프리셋 초기값으로 로컬 컴퓨터에 세팅되어 있는 모드 활성화 기준대로 프리셋에 반영하여 생성하는 옵션"
+    "description": "프리셋을 만들 때, 현재 게임에 적용된 모드 활성화 상태를 그대로 기본값으로 설정합니다."
   },
   "mod_preset_create_validate_required": "이름을 입력해 주세요.",
 
@@ -288,13 +288,13 @@
   "instance_create_name_label": "이름",
   "instance_create_name_placeholder": "인스턴스 이름",
   "instance_create_initial_mode_label": "처음에 어떻게 시작할까요?",
-  "instance_create_all_off": "모드 모두 끄기",
+  "instance_create_all_off": "모두 비활성화된 상태에서 시작하기",
   "@instance_create_all_off": {
-    "description": "인스턴스 초기값으로 모든 모드를 비활성화 상태로 설정해놓고 생성하는 옵션"
+    "description": "프리셋을 만들 때, 모든 모드가 비활성화된 상태를 기본값으로 설정합니다."
   },
-  "instance_create_current_enabled": "지금 켠 모드로 시작",
+  "instance_create_current_enabled": "지금 활성화된 모드 그대로 사용하기",
   "@instance_create_current_enabled": {
-    "description": "인스턴스 초기값으로 로컬 컴퓨터에 세팅되어 있는 모드 활성화 기준대로 프리셋에 반영하여 생성하는 옵션"
+    "description": "프리셋을 만들 때, 현재 게임에 적용된 모드 활성화 상태를 그대로 기본값으로 설정합니다."
   },
   "preset_tab_mod": "모드 프리셋",
   "instance_option_preset_label": "옵션 프리셋",
@@ -357,6 +357,7 @@
   "setting_isaac_path_label": "아이작 설치 폴더",
   "setting_options_ini_path_label": "아이작 options.ini 파일 경로",
   "setting_rerun_delay_label": "재시작 지연시간 (1000 = 1초)",
+  "setting_rerun_delay_hint": "기본 1000ms, 권장은 500–3000ms예요.",
 
   "setting_pick_folder": "폴더 선택",
   "setting_folder_path_help": "설치 위치를 자동으로 찾도록 설정하거나, 직접 지정할 수 있어요.",
@@ -366,7 +367,7 @@
   "setting_pick_file": "파일 선택",
 
   "setting_section_about_title": "정보",
-  "setting_section_about_desc": "라이선스와 앱 버전을 확인하세요.",
+  "setting_section_about_desc": "라이선스와 프로그램 버전을 확인하세요.",
 
   "setting_validate_required": "필수 항목입니다.",
   "setting_validate_number_required": "숫자를 입력하세요.",
@@ -379,6 +380,11 @@
 
   "setting_detect_options_ini_fail_title": "options.ini를 찾지 못했어요",
   "setting_detect_options_ini_fail_desc": "options.ini 경로를 감지하지 못했습니다. 파일을 직접 선택해 주세요.",
+  "path_mode_auto": "자동 탐지",
+  "path_mode_manual": "직접 지정",
+  "path_detect_fill_tooltip": "자동 탐지로 입력칸을 채워요.",
+  "path_detect_fill_button": "자동으로 채우기",
+  "about_version_label": "버전",
 
   "@instance": {
     "description": "인스턴스 항목 관련 텍스트"

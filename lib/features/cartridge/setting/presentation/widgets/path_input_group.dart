@@ -13,6 +13,7 @@ class PathInputGroup extends StatelessWidget {
     required this.onPick,
     required this.onDetect,
     required this.pickLabel,
+    this.isBusy = false,
   });
 
   final bool isFile;
@@ -22,7 +23,8 @@ class PathInputGroup extends StatelessWidget {
   final ValueChanged<bool> onModeChanged;
   final VoidCallback onPick;
   final VoidCallback onDetect;
-  final String pickLabel; // '폴더 선택' 또는 '파일 선택'
+  final String pickLabel;
+  final bool isBusy;
 
   @override
   Widget build(BuildContext context) {
@@ -39,11 +41,11 @@ class PathInputGroup extends StatelessWidget {
           children: [
             Row(mainAxisSize: MainAxisSize.min, children: [
               RadioButton(checked: auto, onChanged: (_) => onModeChanged(true)),
-              Gaps.w6, const Text('자동 탐지'),
+              Gaps.w6, Text(loc.path_mode_auto, style: AppTypography.body),
             ]),
             Row(mainAxisSize: MainAxisSize.min, children: [
               RadioButton(checked: !auto, onChanged: (_) => onModeChanged(false)),
-              Gaps.w6, const Text('직접 지정'),
+              Gaps.w6, Text(loc.path_mode_manual, style: AppTypography.body),
             ]),
           ],
         ),
@@ -77,20 +79,27 @@ class PathInputGroup extends StatelessWidget {
             runSpacing: 8,
             children: [
               FilledButton(
-                onPressed: onPick,
+                onPressed: isBusy ? null : onPick,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(isFile ? FluentIcons.open_file : FluentIcons.open_folder_horizontal),
                   Gaps.w6, Text(pickLabel),
                 ]),
               ),
               Tooltip(
-                message: '자동 탐지 결과를 입력칸에만 채웁니다. 모드는 그대로 유지돼요.',
+                message: loc.path_detect_fill_tooltip,
                 child: Button(
-                  onPressed: onDetect,
-                  child: Row(mainAxisSize: MainAxisSize.min, children: const [
-                    Icon(FluentIcons.search), Gaps.w6, Text('자동으로 채우기'),
+                  onPressed: isBusy ? null : onDetect,
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(FluentIcons.search),
+                    Gaps.w6,
+                    Text(loc.path_detect_fill_button),
                   ]),
                 ),
+              ),
+              Gaps.w6,
+              SizedBox(
+                width: 16, height: 16,
+                child: isBusy ? const ProgressRing(strokeWidth: 2) : const SizedBox.shrink(),
               ),
             ],
           ),

@@ -249,8 +249,14 @@
   "mod_preset_create_name_label": "Name",
   "mod_preset_create_name_placeholder": "Mod preset name",
   "mod_preset_create_initial_mode_label": "How should we start?",
-  "mod_preset_create_all_off": "Turn all mods off",
+  "mod_preset_create_all_off": "Start with all mods disabled",
+  "@mod_preset_create_all_off": {
+    "description": "When creating a new preset, this option sets all mods to be disabled by default."
+  },
   "mod_preset_create_current_enabled": "Use currently enabled mods",
+  "@mod_preset_create_current_enabled": {
+    "description": "When creating a new preset, this option uses your current in-game mod activation status as the default."
+  },
   "mod_preset_create_validate_required": "Please enter a name.",
 
   "mod_preset_edit_title": "Edit name",
@@ -282,8 +288,14 @@
   "instance_create_name_label": "Name",
   "instance_create_name_placeholder": "Instance name",
   "instance_create_initial_mode_label": "How should we start?",
-  "instance_create_all_off": "Turn all mods off",
+  "instance_create_all_off": "Start with all mods disabled",
+  "@instance_create_all_off": {
+    "description": "When creating a new preset, this option sets all mods to be disabled by default."
+  },
   "instance_create_current_enabled": "Use currently enabled mods",
+  "@instance_create_current_enabled": {
+    "description": "When creating a new preset, this option uses your current in-game mod activation status as the default."
+  },
   "preset_tab_mod": "Mod presets",
   "instance_option_preset_label": "Option preset",
   "instance_option_none": "None",
@@ -328,7 +340,7 @@
   "setting_section_basic_desc": "Choose language and theme.",
   "setting_dialog_title": "Settings",
   "setting_language_label": "Language",
-  "setting_language_ko": "Korean",
+  "setting_language_ko": "한국어",
   "setting_language_en": "English",
   "setting_license_button": "License",
   "setting_theme_label": "Theme",
@@ -345,6 +357,7 @@
   "setting_isaac_path_label": "Isaac Install Folder",
   "setting_options_ini_path_label": "Isaac Options.ini path",
   "setting_rerun_delay_label": "Restart delay (1000 = 1 second)",
+  "setting_rerun_delay_hint": "Default is 1000 ms; we recommend 500–3000 ms.",
 
   "setting_pick_folder": "Choose folder",
   "setting_folder_path_help": "You can set the installation path to be detected automatically or specify it manually.",
@@ -354,7 +367,7 @@
   "setting_pick_file": "Choose file",
 
   "setting_section_about_title": "About",
-  "setting_section_about_desc": "Check licenses and app version.",
+  "setting_section_about_desc": "Check licenses and Cartridge version.",
 
   "setting_validate_required": "This field is required.",
   "setting_validate_number_required": "Enter a number.",
@@ -367,7 +380,11 @@
 
   "setting_detect_options_ini_fail_title": "options.ini not found",
   "setting_detect_options_ini_fail_desc": "Couldn’t detect options.ini. Please select the file manually.",
-
+  "path_mode_auto": "Auto-detect",
+  "path_mode_manual": "Choose manually",
+  "path_detect_fill_tooltip": "Fill the field using auto-detect.",
+  "path_detect_fill_button": "Fill automatically",
+  "about_version_label": "Version",
 
   "@instance": {
     "description": "Instance item related texts"

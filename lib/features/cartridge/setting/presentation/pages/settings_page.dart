@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:cartridge/app/presentation/content_scaffold.dart';
@@ -12,7 +13,6 @@ import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/setting/setting.dart';
 import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:cartridge/main.dart';
 import 'package:cartridge/theme/theme.dart';
 
 
@@ -38,6 +38,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   bool _autoSteam = true;
   bool _autoInstall = true;
   bool _autoOptionsIni = true;
+  String? _appVersion;
 
   @override
   void initState() {
@@ -47,6 +48,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _optionIniController = TextEditingController();
     _rerunDelayController = TextEditingController();
     ref.read(appSettingControllerProvider).whenData(_applyFrom);
+    _loadAppVersion();
   }
 
   @override
@@ -56,6 +58,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     _optionIniController.dispose();
     _rerunDelayController.dispose();
     super.dispose();
+  }
+  Future<void> _loadAppVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (!mounted) return;
+      setState(() => _appVersion = info.version);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _appVersion = null);
+    }
   }
 
   // 모델 → 폼
@@ -228,6 +240,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
     final loc = AppLocalizations.of(context);
     final fTheme = FluentTheme.of(context);
+    final async = ref.watch(appSettingControllerProvider);
+    final isLoading = async.isLoading;
+    final hasError  = async.hasError;
+    final displayVersion = (isLoading || hasError) ? '—' : (_appVersion ?? '—');
 
     final actions = <Widget>[
       Button(onPressed: _isChanged ? _saveSettings : null,
@@ -244,7 +260,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         header: ContentHeaderBar.text(
           title: loc.setting_page_title,
           actions: [
-            if (_isChanged) ...[
+            if (_isChanged && !isLoading) ...[
               Icon(FluentIcons.circle_shape_solid, size: 10, color: fTheme.accentColor),
               Gaps.w8,
             ],
@@ -315,7 +331,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       // 스팀 클라이언트 경로
                       Text(loc.setting_steam_path_label, style: AppTypography.sectionTitle),
                       Gaps.h4,
-                      Text(loc.setting_folder_path_help, style: fTheme.typography.caption),
+                      Text(loc.setting_folder_path_help, style: AppTypography.caption),
                       Gaps.h8,
                       PathInputGroup(
                         isFile: true,
@@ -351,7 +367,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       // options.ini 파일
                       Text(loc.setting_options_ini_path_label, style: AppTypography.sectionTitle),
                       Gaps.h4,
-                      Text(loc.setting_file_path_help, style: fTheme.typography.caption),
+                      Text(loc.setting_file_path_help, style: AppTypography.caption),
                       Gaps.h8,
                       PathInputGroup(
                         isFile: true,
@@ -369,7 +385,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       // 자동 재시작 지연
                       Text(loc.setting_rerun_delay_label, style: AppTypography.sectionTitle),
                       Gaps.h4,
-                      Text('기본 1000ms, 권장 500–3000ms', style: AppTypography.caption),
+                      Text(loc.setting_rerun_delay_hint, style: AppTypography.caption),
                       Gaps.h8,
                       SizedBox(
                         width: 220,
@@ -407,8 +423,18 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('v$currentVersion', style: AppTypography.body),
+                      // 1줄: 앱 이름 + 버전 라벨 + 버전값
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(loc.app_name, style: AppTypography.body),
+                          Text('v$displayVersion', style: AppTypography.body),
+                        ],
+                      ),
                       Gaps.h8,
+                      // 2줄: 라이선스 버튼
                       Button(
                         onPressed: () {
                           Navigator.of(context).push(
@@ -419,8 +445,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                   cardColor: fTheme.scaffoldBackgroundColor,
                                 ),
                                 child: material.LicensePage(
-                                  applicationName: 'Cartridge',
-                                  applicationVersion: currentVersion.toString(),
+                                  applicationName: loc.app_name,
+                                  applicationVersion: displayVersion == '—' ? '' : displayVersion,
                                 ),
                               ),
                             ),
