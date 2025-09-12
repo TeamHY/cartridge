@@ -1,3 +1,5 @@
+import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -29,14 +31,21 @@ class FakeEdenPort implements EdenTokensPort {
 }
 
 class _Host extends ConsumerWidget {
-  const _Host();
+  const _Host({this.locale = const Locale('ko')});
+  final Locale locale;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FluentApp(
-      localizationsDelegates: const [FluentLocalizations.delegate],
-      supportedLocales: const [Locale('en')],
-      locale: const Locale('en'),
+      localizationsDelegates: [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        FluentLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: locale,
       home: NavigationView(
         content: ScaffoldPage(
           content: Center(
@@ -58,6 +67,7 @@ void main() {
     // Arrange
     final acc = MockSteamAccountProfile();
     final fakePort = FakeEdenPort();
+    final l = await AppLocalizations.delegate.load(const Locale('ko'));
 
     final overrides = <Override>[
       steamAccountsProvider.overrideWith((ref) async => [acc]),
@@ -69,18 +79,18 @@ void main() {
     ];
 
     await tester.pumpWidget(
-      ProviderScope(overrides: overrides, child: const _Host()),
+      ProviderScope(overrides: overrides, child: const _Host(locale: Locale('ko'))),
     );
 
     // 다이얼로그 오픈
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();
-    expect(find.text('에덴 토큰'), findsOneWidget);
+    expect(find.text(l.eden_title), findsOneWidget);
 
     // Act: 값 최대 → 저장
-    await tester.tap(find.text('최대(10,000)'));
+    await tester.tap(find.text(l.eden_btn_set_max(10000)));
     await tester.pump(); // 값 반영
-    await tester.tap(find.text('저장'));
+    await tester.tap(find.text(l.common_save));
 
     // 저장 비동기 처리 + 상태 갱신 한 프레임 확보
     await tester.pump();                         // onPressed 반환

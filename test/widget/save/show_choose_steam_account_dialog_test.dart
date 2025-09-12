@@ -1,4 +1,6 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -32,7 +34,12 @@ class _FakeProfile implements SteamAccountProfile {
 /// 하네스: 버튼으로 다이얼로그를 열고, 선택 결과를 Text로 노출
 class _Harness extends StatefulWidget {
   final List<SteamAccountProfile> items;
-  const _Harness({required this.items});
+  final Locale locale;
+
+  const _Harness({
+    required this.items,
+    this.locale = const Locale('ko'),
+  });
 
   @override
   State<_Harness> createState() => _HarnessState();
@@ -44,9 +51,15 @@ class _HarnessState extends State<_Harness> {
   @override
   Widget build(BuildContext context) {
     return FluentApp(
-      localizationsDelegates: const [FluentLocalizations.delegate],
-      supportedLocales: const [Locale('en')],
-      locale: const Locale('en'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('ko')],
+      locale: widget.locale,
       home: NavigationView(
         content: ScaffoldPage(
           content: Center(
@@ -62,13 +75,14 @@ class _HarnessState extends State<_Harness> {
                         innerCtx,
                         items: widget.items,
                       );
+                      final l = AppLocalizations.of(innerCtx);
                       setState(() {
                         if (res == null) {
                           return;
                         }
                         final name = res.personaName?.trim();
                         _selectedLabel =
-                        (name == null || name.isEmpty) ? '(이름 미설정)' : name;
+                        (name == null || name.isEmpty) ? l.common_unknown : name;
                       });
                     },
                   ),
@@ -87,25 +101,27 @@ class _HarnessState extends State<_Harness> {
 
 void main() {
   testWidgets('다이얼로그 오픈 시 제목과 항목들이 보인다 (AAA)', (tester) async {
+    final l = await AppLocalizations.delegate.load(const Locale('ko'));
     // Arrange
     final p1 = _FakeProfile('Alice');
     final p2 = _FakeProfile(''); // 빈 이름 -> "(이름 미설정)"로 표기됨
-    await tester.pumpWidget(ProviderScope(child: _Harness(items: [p1, p2])));
+    await tester.pumpWidget(ProviderScope(child: _Harness(items: [p1, p2], locale: Locale('ko'))));
 
     // Act
     await tester.tap(find.byKey(const ValueKey('open_button')));
     await tester.pumpAndSettle();
 
     // Assert
-    expect(find.text('세이브 폴더 선택'), findsOneWidget);
+    expect(find.text(l.choose_steam_title), findsOneWidget);
     expect(find.text('Alice'), findsOneWidget);
-    expect(find.text('(이름 미설정)'), findsOneWidget);
+    expect(find.text(l.common_unknown), findsOneWidget);
   });
 
   testWidgets('취소 시 null로 닫히고 라벨은 (none) 유지 (AAA)', (tester) async {
+    final l = await AppLocalizations.delegate.load(const Locale('ko'));
     // Arrange
     final items = <SteamAccountProfile>[_FakeProfile('홍길동')];
-    await tester.pumpWidget(ProviderScope(child: _Harness(items: items)));
+    await tester.pumpWidget(ProviderScope(child: _Harness(items: items, locale: Locale('ko'))));
 
     final label = find.byKey(const ValueKey('selected_label'));
     expect(label, findsOneWidget);
@@ -114,9 +130,9 @@ void main() {
     // Act: 열기 → 취소
     await tester.tap(find.byKey(const ValueKey('open_button')));
     await tester.pumpAndSettle();
-    expect(find.text('세이브 폴더 선택'), findsOneWidget);
+    expect(find.text(l.choose_steam_title), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(Button, '취소'));
+    await tester.tap(find.widgetWithText(Button, l.common_cancel));
     await tester.pumpAndSettle();
 
     // Assert: 여전히 (none)

@@ -154,6 +154,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                     child: SizedBox(
                       height: _slotHeight, // 고정 높이
                       child: Button(
+                        key: ValueKey('slot_btn_$slot'),
                         onPressed: (!exists || isLoading || isSaving)
                             ? null
                             : () async {
@@ -275,6 +276,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
             // 에디션 안내
             if (edition == IsaacEdition.rebirth)
               InfoBar(
+                key: const ValueKey('rebirth_warning_notice'),
                 title: Text(loc.common_notice),
                 content: Text(loc.eden_info_rebirth_unsupported),
                 severity: InfoBarSeverity.info,
@@ -286,6 +288,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
               Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                 child: InfoBar(
+                  key: const ValueKey('warning_notice'),
                   title: Text(loc.common_notice),
                   content: Text(warningText),
                   severity: InfoBarSeverity.warning,
@@ -302,6 +305,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
       // 로딩: 동일한 레이아웃(컨트롤 비활성화) 유지
       loading: () {
         return ContentDialog(
+          key: const ValueKey('eden_dialog'),
           title: titleRow(loc.eden_title),
           constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
           content: buildDialogContent(
@@ -319,6 +323,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             FilledButton(
+              key: const ValueKey('save_button'),
               onPressed: null, // 로딩 중 비활성화
               child: Text(loc.common_save),
             ),
@@ -329,9 +334,11 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
       // 에러: 레이아웃은 단순화
       error: (_, __) {
         return ContentDialog(
+          key: const ValueKey('eden_dialog'),
           title: titleRow(loc.eden_title),
           constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
           content: InfoBar(
+            key: const ValueKey('error_notice'),
             title: Text(loc.common_error),
             content: Text(loc.eden_err_generic),
             severity: InfoBarSeverity.error,
@@ -365,6 +372,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
             s.selectedSlot != 0;
 
         return ContentDialog(
+          key: const ValueKey('eden_dialog'),
           title: titleRow(loc.eden_title),
           constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
           content: body,
@@ -374,6 +382,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
               onPressed: () => Navigator.of(context).pop(),
             ),
             FilledButton(
+              key: const ValueKey('save_button'),
               onPressed: canSave
                   ? () async {
                 await ref

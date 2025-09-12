@@ -1,3 +1,5 @@
+import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
@@ -25,14 +27,21 @@ class FakeEdenPort implements EdenTokensPort {
 }
 
 class _Host extends ConsumerWidget {
-  const _Host();
+  const _Host({this.locale = const Locale('ko')});
+  final Locale locale;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FluentApp(
-      localizationsDelegates: const [FluentLocalizations.delegate],
-      supportedLocales: const [Locale('en')], // 필요 언어만
-      locale: const Locale('en'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('ko')],
+      locale: locale,
       theme: FluentThemeData(
         fontFamily: 'Pretendard',
       ),
@@ -59,6 +68,7 @@ void main() {
   testGoldens('초기 오픈: 다이얼로그 골든이 매칭된다 (AAA)', (tester) async {
     // Arrange: 계정 1개, 에디션/슬롯 고정, 포트 페이크
     final acc = MockSteamAccountProfile();
+    final l = await AppLocalizations.delegate.load(const Locale('ko'));
 
     final overrides = <Override>[
       steamAccountsProvider.overrideWith((ref) async => [acc]),
@@ -70,7 +80,7 @@ void main() {
 
     await loadAppFonts();
     await tester.pumpWidgetBuilder(
-      ProviderScope(overrides: overrides, child: const _Host()),
+      ProviderScope(overrides: overrides, child: const _Host(locale: Locale('ko'))),
       surfaceSize: const Size(800, 600),
     );
 
@@ -79,7 +89,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Assert (텍스트 존재 + Golden)
-    expect(find.text('에덴 토큰'), findsOneWidget);
+    expect(find.text(l.eden_title), findsOneWidget);
     await screenMatchesGolden(tester, 'eden_dialog_initial');
   });
 }

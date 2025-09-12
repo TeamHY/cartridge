@@ -11,6 +11,7 @@ import 'package:cartridge/theme/theme.dart';
 class FluentTestHost extends ConsumerWidget {
   final Widget? child;
   final VoidCallback? onOpen;
+  final void Function(BuildContext, WidgetRef)? onOpenWithRef;
   final bool needButton;
   final AppThemeKey themeKey;
   final List<Override> overrides;
@@ -18,11 +19,13 @@ class FluentTestHost extends ConsumerWidget {
   final bool useAppLocalizations;
   final Locale locale;
   final bool wrapWithScaffoldPage;
+  final bool withOverlay;
 
   const FluentTestHost({
     super.key,
     this.child,
     this.onOpen,
+    this.onOpenWithRef,
     this.needButton = false,
     this.themeKey = AppThemeKey.light,
     this.overrides = const [],
@@ -30,6 +33,7 @@ class FluentTestHost extends ConsumerWidget {
     this.useAppLocalizations = true,
     this.locale = const Locale('ko'),
     this.wrapWithScaffoldPage = true,
+    this.withOverlay = false,
   });
 
   @override
@@ -47,7 +51,19 @@ class FluentTestHost extends ConsumerWidget {
 
     final content = Center(
       child: needButton
-          ? Button(onPressed: onOpen, child: const Text('Open'))
+          ? Builder(
+              builder: (innerCtx) => Button(
+                key: const ValueKey('test_open_button'),
+                onPressed: () {
+                  if (onOpenWithRef != null) {
+                    onOpenWithRef!(innerCtx, ref);
+                  } else {
+                    onOpen?.call();
+                  }
+                },
+                child: const Text('Open'),
+              ),
+            )
           : (child ?? const SizedBox.shrink()),
     );
 
@@ -60,7 +76,7 @@ class FluentTestHost extends ConsumerWidget {
       home = content;
     }
 
-    return ProviderScope(
+    Widget app = ProviderScope(
       overrides: [
         selectedThemeKeyProvider.overrideWithValue(themeKey),
         themeSemanticsProvider.overrideWithValue(sem),
@@ -77,6 +93,13 @@ class FluentTestHost extends ConsumerWidget {
         home: home,
       ),
     );
+
+    if (withOverlay) {
+      app = Overlay(
+        initialEntries: [OverlayEntry(builder: (_) => app)],
+      );
+    }
+    return app;
   }
 }
 

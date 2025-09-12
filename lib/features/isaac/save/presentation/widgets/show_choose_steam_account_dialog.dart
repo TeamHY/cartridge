@@ -61,7 +61,7 @@ Future<SteamAccountProfile?> showChooseSteamAccountDialog(
   return showDialog<SteamAccountProfile?>(
     context: context,
     builder: (ctx) => ContentDialog(
-      constraints: const BoxConstraints(maxWidth: 420, maxHeight: 460),
+      constraints: const BoxConstraints(maxWidth: 500, maxHeight: 460),
       title: Row(
         children: [
           Icon(FluentIcons.fabric_open_folder_horizontal, size: 18, color: accent),
@@ -70,7 +70,7 @@ Future<SteamAccountProfile?> showChooseSteamAccountDialog(
         ],
       ),
       content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 420, maxHeight: 420),
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 460),
         child: body,
       ),
       actions: [
