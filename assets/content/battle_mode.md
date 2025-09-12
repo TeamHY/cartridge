@@ -1,3 +1,4 @@
+<!-- lang:ko -->
 ## 1) 방송 세팅
 
 1. 위 플랫폼 중 하나를 선택해 채널을 준비합니다.
@@ -8,8 +9,6 @@
 
     * 씬: 게임 캡처(또는 윈도 캡처), 마이크/데스크탑 오디오 추가
     * 출력 해상도/프레임, 비트레이트는 각 플랫폼 권장치에 맞춰 설정
-   
-3. 방송 시작/종료, 전환 핫키를 등록해두면 진행이 수월합니다.
 
 ---
 
@@ -102,3 +101,114 @@
 
 **Q. 모드 충돌이 나는 것 같아요.**
 컬렉션만 남기고 나머지를 끄고 재시도해 보세요. 충돌이 지속되면 최근 변경 사항을 디스코드 패치 노트에서 확인하세요.
+<!-- /lang -->
+
+<!-- lang:en -->
+> **Just so you know:**
+> Our streamer, 아이작 오헌영, is from Korea and doesn't speak much English. 
+> This guide is here to help, but you might need a translator for direct communication during the stream.
+
+## 1) Streaming setup
+
+1. Pick one of the platforms and prepare your channel.
+
+   Examples: [Kick](https://kick.com/), [YouTube](https://www.youtube.com/), [SOOP](https://www.sooplive.co.kr/), [Chzzk](https://chzzk.naver.com/), 
+
+2. Install [OBS Studio](https://obsproject.com/) and set up a basic output.
+
+    * Scene: Game Capture (or Window Capture), add Mic/Desktop Audio
+    * Set output resolution/FPS and bitrate to each platform’s recommended values
+
+---
+
+## 2) Timer setup
+
+Streamer **아이작 오헌영** uses **XNote Stopwatch**.
+
+* Download: [Homepage](http://www.xnotestopwatch.com/) / [Direct download](http://www.xnotestopwatch.com/download.html#download)
+* Recommended settings after install
+
+    1. Turn on “Always on top”
+    2. Adjust background opacity and font size (readability)
+    3. Example hotkeys: Start/Pause (F1), Lap (F2), Reset (F3)
+    4. Add the timer to your OBS scene via Window Capture so viewers can clearly see the time
+
+You can use any timer. As long as the time is clearly visible on screen, you’re good.
+
+---
+
+## 3) Mod setup
+
+Subscribe/enable the **Steam mod collection** for matches.
+
+* [아이작 오헌영’s mod collection for Battle](https://steamcommunity.com/sharedfiles/filedetails/?id=3011322863)
+
+Recommended steps:
+
+1. Click **Subscribe All** at the link above
+2. Launch the game and check the **Mods** menu to ensure the subscribed mods are enabled
+3. If you suspect conflicts, keep only the essentials and try again
+
+---
+
+## 4) Apply for a match
+
+Write a post on the board below.
+
+* Application board: [Open](https://cafe.naver.com/f-e/cafes/31117909/menus/6)
+* Write a post: [Open](https://cafe.naver.com/ca-fe/cafes/31117909/menus/6/articles/write?boardType=L)
+
+Must include:
+
+* Title: **m/d Match Request**
+* Body: Include **at least one link to your live stream**
+
+Example:
+
+```text
+Title: 9/8 Match Request
+Body: https://chzzk.naver.com/xxxxx  (my live stream link)
+```
+
+---
+
+## Rules in detail
+
+1. **Time limit**: 35 minutes per run. If you exceed the limit, that run counts as a **death**.
+
+2. **Character**: Round 1 is Eden. From Round 2, the **loser of the previous round** chooses.
+
+3. **Boss**: Round 1 is **random**. From Round 2, the **loser** chooses.
+
+4. **Extra life (early only)**: If you die **before defeating the Stage 2 boss**, you may retry **once**.
+
+5. **Surrender**: If your opponent surrenders, you may **farm only up to the current stage**.
+
+6. **Continue**: You may continue **only from sections you’ve already cleared**.
+
+If anything is unclear during a match, pause the timer and ask.
+
+---
+
+## Resources & updates
+
+* Battle mode collection: [Steam collection](https://steamcommunity.com/sharedfiles/filedetails/?id=3011322863)
+* **Astrobirth** patch notes (item/feature changes):
+  [Discord channel](https://discord.com/channels/1019860214494806088/1389181550964379648)
+
+Rules/meta may change with patches. Please check the latest notices.
+
+---
+
+## FAQ
+
+**Q. Do I have to use one of the platforms above?**
+No. Any platform works as long as both sides can watch live. In your application post, include a **valid link** to your stream.
+
+**Q. Does the timer have to be XNote?**
+No. Any timer is fine if the time is clearly visible, and it’s easy to start/stop/reset.
+
+**Q. I think there’s a mod conflict.**
+Leave only the collection enabled and try again. If it continues, check recent changes in the Discord patch notes.
+
+<!-- /lang -->

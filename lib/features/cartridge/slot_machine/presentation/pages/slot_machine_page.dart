@@ -1,4 +1,4 @@
-import 'package:cartridge/features/cartridge/slot_machine/presentation/widgets/status_card.dart';
+import 'package:cartridge/app/presentation/widgets/status_card.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
@@ -65,11 +65,11 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
   }
 
   Widget _addSlotButton(
-    BuildContext context, {
-    bool large = false,
-    required bool left,
-    bool enabled = true,
-  }) {
+      BuildContext context, {
+        bool large = false,
+        required bool left,
+        bool enabled = true,
+      }) {
     final fTheme = FluentTheme.of(context);
     final sem = ref.watch(themeSemanticsProvider);
     final loc = AppLocalizations.of(context);
@@ -124,7 +124,7 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
                 primaryLabel: loc.common_retry,
                 onPrimary: () => ref.invalidate(slotMachineControllerProvider),
               );
-              },
+            },
             data: (slots) {
               if (slots.isEmpty) {
                 return SizedBox.expand(

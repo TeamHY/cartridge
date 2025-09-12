@@ -4,8 +4,9 @@ import 'package:cartridge/theme/theme.dart';
 
 class EmptyState extends StatefulWidget {
   final String title;
-  final String primaryLabel;
-  final VoidCallback onPrimary;
+  final String? primaryLabel;
+  final VoidCallback? onPrimary;
+  final Icon? primaryIcon;
   final List<String> assetCandidates;
 
   final double minImageSize;
@@ -19,6 +20,7 @@ class EmptyState extends StatefulWidget {
     required this.title,
     required this.primaryLabel,
     required this.onPrimary,
+    required this.primaryIcon,
     required this.assetCandidates,
     this.minImageSize = 96,
     this.maxImageSize = 200,
@@ -31,8 +33,9 @@ class EmptyState extends StatefulWidget {
   factory EmptyState.withDefault404({
     Key? key,
     required String title,
-    required String primaryLabel,
-    required VoidCallback onPrimary,
+    String? primaryLabel,
+    Icon? primaryIcon,
+    VoidCallback? onPrimary,
     int? seed,
   }) {
     const defaults = <String>[
@@ -47,6 +50,7 @@ class EmptyState extends StatefulWidget {
       key: key,
       title: title,
       primaryLabel: primaryLabel,
+      primaryIcon: primaryIcon,
       onPrimary: onPrimary,
       assetCandidates: defaults,
       seed: seed,
@@ -103,24 +107,28 @@ class _EmptyStateState extends State<EmptyState> {
                     style: fTheme.typography.subtitle,
                     textAlign: TextAlign.center,
                   ),
-                  Gaps.h8,
-                  SizedBox(
-                    height: 36,
-                    child: FilledButton(
-                      onPressed: widget.onPrimary,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(FluentIcons.add, size: 14),
-                            Gaps.w8,
-                            Text(widget.primaryLabel),
-                          ],
+                  if (widget.primaryLabel != null
+                      && widget.primaryLabel!.isNotEmpty
+                      && widget.onPrimary != null) ...[
+                    Gaps.h8,
+                    SizedBox(
+                      height: 36,
+                      child: FilledButton(
+                        onPressed: widget.onPrimary,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              widget.primaryIcon ?? const Icon(FluentIcons.add, size: 14),
+                              Gaps.w8,
+                              Text(widget.primaryLabel!),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                   Gaps.h16,
                 ],
               ),
@@ -160,6 +168,11 @@ class _InvertingAssetImage extends StatelessWidget {
       height: size,
       filterQuality: FilterQuality.medium,
       fit: BoxFit.contain,
+      errorBuilder: (context, error, stack) => Icon(
+        FluentIcons.picture,
+        size: size * 0.7,
+        color: FluentTheme.of(context).resources.textFillColorSecondary,
+      ),
     );
     if (!(enabled && isDark)) return image;
     return ColorFiltered(

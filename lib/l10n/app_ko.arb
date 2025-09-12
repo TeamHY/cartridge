@@ -707,5 +707,40 @@
   "record_goal_mega_satan": "메가 사탄",
   "record_goal_the_lamb": "어린양(The Lamb)",
   "record_goal_the_beast": "비스트",
-  "record_goal_delirium": "델리리움"
+  "record_goal_delirium": "델리리움",
+
+
+  "content_category_hyzone": "헌영이와 아이작 같이 즐기기",
+  "content_category_info": "정보",
+  "content_external_link_tooltip": "외부 링크",
+  "content_open_link_fail_title": "링크를 열 수 없어요",
+  "content_open_link_fail_desc": "'{title}'을 열지 못했어요.",
+  "@content_open_link_fail_desc": {
+    "description": "컨텐츠 타이틀",
+    "placeholders": {
+      "title": { "type": "String", "example": "Repentogon" }
+    }
+  },
+  "content_open_link_error_title": "열기 실패",
+  "content_open_link_error_desc": "지금은 링크를 열 수 없어요. 잠시 후 다시 시도해 주세요.",
+  "content_custom_unavailable_title": "준비 중이에요",
+  "@content_custom_unavailable_title": { "description": "커스텀 타입이 아직 구현되지 않았을 때 타이틀" },
+  "content_custom_unavailable_desc": "아직 열 수 없는 콘텐츠예요.",
+  "@content_custom_unavailable_desc": { "description": "커스텀 타입 미지원 상세 설명" },
+
+  "content_list_load_fail_title": "목록을 불러오지 못했어요",
+  "@content_list_load_fail_title": { "description": "컨텐츠 인덱스 로드 실패-타이틀" },
+  "content_list_load_fail_desc": "잠시 후 다시 시도해 주세요.",
+  "@content_list_load_fail_desc": { "description": "컨텐츠 인덱스 로드 실패-설명" },
+
+  "content_open_link_empty_title": "링크를 열 수 없어요",
+  "@content_open_link_empty_title": { "description": "외부 링크 URL이 비었을 때 타이틀" },
+  "content_open_link_empty_desc": "주소가 비어 있어요.",
+  "@content_open_link_empty_desc": { "description": "외부 링크 URL 없음 안내" },
+
+  "doc_load_fail_title": "문서를 불러오지 못했어요",
+  "@doc_load_fail_title": { "description": "마크다운 문서 로드 실패-타이틀" },
+  "doc_load_fail_desc": "잠시 후 다시 시도해 주세요.",
+  "@doc_load_fail_desc": { "description": "마크다운 문서 로드 실패-설명" }
+
 }

@@ -40,7 +40,7 @@ class YoutubeBanner extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
                 child: Image.asset(
-                  'assets/images/contents/시참대회.png',
+                  'assets/content/시참대회.png',
                   width: 192,
                   height: 108, // 16:9
                   fit: BoxFit.cover,

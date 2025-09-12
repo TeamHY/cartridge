@@ -707,5 +707,38 @@
   "record_goal_mega_satan": "Mega Satan",
   "record_goal_the_lamb": "The Lamb",
   "record_goal_the_beast": "The beast",
-  "record_goal_delirium": "Delirium"
+  "record_goal_delirium": "Delirium",
+
+  "content_category_hyzone": "Play with 아이작 오헌영",
+  "content_category_info": "Info",
+  "content_external_link_tooltip": "External link",
+  "content_open_link_fail_title": "We couldn't open the link",
+  "content_open_link_fail_desc": "We couldn't open '{title}' in your browser.",
+  "@content_open_link_fail_desc": {
+    "description": "content title",
+    "placeholders": {
+      "title": { "type": "String", "example": "Repentogon" }
+    }
+  },
+  "content_open_link_error_title": "Couldn't open",
+  "content_open_link_error_desc": "We can't open the link right now. Please try again in a moment.",
+  "content_custom_unavailable_title": "Coming soon",
+  "@content_custom_unavailable_title": { "description": "Shown when a custom content type isn’t implemented yet" },
+  "content_custom_unavailable_desc": "This content isn’t available yet.",
+  "@content_custom_unavailable_desc": { "description": "Custom type not supported - description" },
+
+  "content_list_load_fail_title": "We couldn’t load the list",
+  "@content_list_load_fail_title": { "description": "Content index load failure - title" },
+  "content_list_load_fail_desc": "Please try again in a moment.",
+  "@content_list_load_fail_desc": { "description": "Content index load failure - description" },
+
+  "content_open_link_empty_title": "Can’t open the link",
+  "@content_open_link_empty_title": { "description": "When external link URL is missing - title" },
+  "content_open_link_empty_desc": "There’s no URL.",
+  "@content_open_link_empty_desc": { "description": "When external link URL is missing - description" },
+
+  "doc_load_fail_title": "We couldn’t load the document",
+  "@doc_load_fail_title": { "description": "Markdown load failure - title" },
+  "doc_load_fail_desc": "Please try again in a moment.",
+  "@doc_load_fail_desc": { "description": "Markdown load failure - description" }
 }

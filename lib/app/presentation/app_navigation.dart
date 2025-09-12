@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/app/presentation/app_scaffold.dart';
-import 'package:cartridge/app/presentation/pages/content_page.dart';
+import 'package:cartridge/features/cartridge/content/content_page.dart';
 import 'package:cartridge/app/presentation/pages/home_page.dart';
 import 'package:cartridge/features/cartridge/instances/instances.dart';
 import 'package:cartridge/features/cartridge/mod_presets/mod_presets.dart';

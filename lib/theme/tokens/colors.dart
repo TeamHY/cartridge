@@ -6,8 +6,8 @@ enum AppThemeKey { system, light, dark, oled, tangerine, claude }
 /// 레거시 색 팔레트(의미는 기존과 동일)
 class AppColors {
   // Light
-  static const lightBackground = Color(0xfff5f5f5);
-  static const lightSurface = Color(0xffffffff);
+  static const lightBackground = Color(0xfff0f0f0);
+  static const lightSurface = Color(0xfff7f7f7);
   static final lightAccent = AccentColor.swatch(const {
     'normal': Color(0xFF2563EB),
     'light':  Color(0xFF3B82F6),

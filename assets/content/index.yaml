@@ -1,0 +1,55 @@
+# 컨텐츠 리스트 (읽기 쉬운 키셋)
+# - id: 고유아이디
+# - category: hyZone | info
+# - type: custom | detail | link
+# - title/description: ko/en 동시 보관 (필요한 언어만 적어도 됨)
+# - image: 썸네일 자산 경로
+# - markdown: type==detail 일 때 마크다운 자산 경로
+# - url: type==link 일 때 링크 (문자열 또는 {ko:/en:} 맵 지원)
+- id: record
+  category: hyZone
+  type: custom
+  title: { ko: 시참대회, en: Custom Speedrun Championship }
+  description:
+    ko: 오헌영의 아이작 기록 경쟁
+    en: 아이작 오헌영's Isaac Speedrun challenge.
+  image: assets/content/시참대회.png
+- id: battle
+  category: hyZone
+  type: detail
+  title: { ko: 대결모드, en: Battle Mode }
+  description:
+    ko: 오헌영과 아이작 대결해 보세요
+    en: Go head-to-head with 아이작 오헌영.
+  image: assets/content/대결모드.png
+  markdown: assets/content/battle_mode.md
+
+- id: info-isaacguru
+  category: info
+  type: link
+  title: { ko: Isaac Guru Laboratory, en: Isaac Guru Laboratory }
+  description:
+    ko: 아이템 정보를 빠르게 찾아보세요
+    en: Look up item info fast.
+  image: assets/content/isaacguru_com.jpg
+  url: https://isaacguru.com/
+
+- id: info-repentogon
+  category: info
+  type: link
+  title: { ko: Repentogon, en: Repentogon }
+  description:
+    ko: 아이작 모드의 새 지평을 열다.
+    en: A new horizon for Isaac modding.
+  image: assets/content/리펜토곤.png
+  url: https://github.com/TeamREPENTOGON/REPENTOGON
+
+- id: promo-cafe
+  category: hyZone
+  type: link
+  title: { ko: 오헌영 네이버 카페, en: Hy’s Naver Café }
+  description:
+    ko: 공지/커뮤니티 소식 보러가기
+    en: Notices and community updates.
+  image: assets/content/네이버카페.png
+  url: https://cafe.naver.com/iwt2hw
