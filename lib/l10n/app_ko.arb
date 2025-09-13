@@ -338,6 +338,27 @@
   "instance_option_error": "목록을 불러오지 못했어요",
   "instance_create_validate_required": "이름을 입력해 주세요.",
 
+  "instance_sidebar_all": "모든 모드",
+  "@instance_sidebar_all": { "description": "사이드바 상단: 모든 모드 필터" },
+
+  "instance_sidebar_with_preset": "프리셋 모드",
+  "@instance_sidebar_with_preset": { "description": "사이드바 상단: 프리셋이 있는 모드만 보기" },
+
+  "instance_sidebar_no_preset": "개별 모드",
+  "@instance_sidebar_no_preset": { "description": "사이드바 상단: 프리셋이 없는 모드만 보기" },
+
+  "instance_sidebar_presets": "프리셋",
+  "@instance_sidebar_presets": { "description": "사이드바 프리셋 섹션 헤더" },
+
+  "instance_sidebar_edit_tooltip": "프리셋 추가·제거",
+  "@instance_sidebar_edit_tooltip": { "description": "프리셋 편집 버튼 툴팁" },
+
+  "instance_sidebar_loading": "불러오는 중이에요",
+  "@instance_sidebar_loading": { "description": "사이드바 로딩 상태 안내 문구" },
+
+  "instance_sidebar_load_failed": "목록을 불러오지 못했어요",
+  "@instance_sidebar_load_failed": { "description": "사이드바 에러 상태 안내 문구(에러 코드는 숨김)" },
+
   "home_preset_placeholder": "새 프리셋",
   "home_button_preset": "프리셋",
   "home_button_record": "기록 모드",

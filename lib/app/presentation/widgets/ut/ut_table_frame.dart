@@ -611,7 +611,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
             final bool hasFiniteHeight =
                 constraints.hasBoundedHeight && constraints.maxHeight.isFinite;
             // 화면 폭이 좁으면 Instance View(사이드바) 금지
-            const kDividerPadding = AppSpacing.xs;
+            const kDividerPadding = AppSpacing.sm;
             final needDividerSpace = (kDividerPadding * 2 + 1);
             final canUseInstance =
                 (widget.leftSidebar != null) &&
@@ -959,12 +959,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
                       width: widget.leftSidebarWidth,
                       child: widget.leftSidebar!,
                     ),
-                    const Divider(
-                      direction: Axis.vertical,
-                      style: DividerThemeData(
-                        verticalMargin: EdgeInsets.symmetric(horizontal: kDividerPadding),
-                      ),
-                    ),
+                    Gaps.w16,
                     Expanded(child: rightPane),
                   ],
                 )

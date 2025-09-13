@@ -26,7 +26,7 @@ class BadgeStrip extends StatelessWidget {
       child: LayoutBuilder(
         builder: (ctx, box) {
           final fTheme = FluentTheme.of(ctx);
-          final maxW = box.maxWidth - 4; // 셀에서 ConstrainedBox로 감싸면 유한값이 들어옴. 2px 추가 gap, 근사치 방어
+          final maxW = box.maxWidth - 4;
 
           // 유효 폭이 없으면 그냥 한 줄로(최대한 안전하게) 다 보여주기
           if (!maxW.isFinite) {
@@ -35,7 +35,11 @@ class BadgeStrip extends StatelessWidget {
 
           // 극단적으로 좁은 경우: 오버플로우 방어 (툴바/체크박스 등과 겹칠 때)
           if (maxW <= 28) {
-            return _onlyPlus(count: badges.length, tooltip: _tooltipText(), scaleDown: true);
+            return _onlyPlus(
+              count: badges.length,
+              hiddenBadges: badges,
+              scaleDown: true,
+            );
           }
 
           // 각 배지의 예상 폭 측정
@@ -101,22 +105,19 @@ class BadgeStrip extends StatelessWidget {
           // 일부는 보이고, 나머지는 (+n)
           if (visible > 0) {
             final shown = badges.take(visible).toList();
+            final hiddenList = badges.skip(visible).toList();
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 ..._pills(shown, fTheme, gap),
                 SizedBox(width: gap),
-                Tooltip(
-                  message: _tooltipText(),
-                  style: const TooltipThemeData(waitDuration: Duration(milliseconds: 80)),
-                  child: PlusPill(hidden),
-                ),
+                PlusPillFlyout(count: hidden, hiddenBadges: hiddenList),
               ],
             );
           }
 
           // 완전 좁아서 전부 접는 경우: (+n)만
-          return _onlyPlus(count: hidden, tooltip: _tooltipText());
+          return _onlyPlus(count: hidden, hiddenBadges: badges);
         },
       ),
     );
@@ -139,12 +140,12 @@ class BadgeStrip extends StatelessWidget {
   }
 
   // (+n)만 표시 (아주 좁은 경우 대비로 scaleDown 옵션)
-  Widget _onlyPlus({required int count, required String tooltip, bool scaleDown = false}) {
-    final pill = Tooltip(
-      message: tooltip,
-      style: const TooltipThemeData(waitDuration: Duration(milliseconds: 80)),
-      child: PlusPill(count),
-    );
+  Widget _onlyPlus({
+    required int count,
+    required List<BadgeSpec> hiddenBadges,
+    bool scaleDown = false,
+  }) {
+    final pill = PlusPillFlyout(count: count, hiddenBadges: hiddenBadges);
     return scaleDown
         ? FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: pill)
         : pill;
@@ -160,8 +161,6 @@ class BadgeStrip extends StatelessWidget {
     return children;
   }
 
-  // 툴팁 텍스트(전체 목록)
-  String _tooltipText() => badges.map((b) => b.text).join('\n');
 
   // 폭 추정 유틸들 -------------------------------------------------------------
 

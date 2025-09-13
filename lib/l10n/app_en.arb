@@ -338,6 +338,14 @@
   "instance_option_error": "Couldn't load the list",
   "instance_create_validate_required": "Please enter a name.",
 
+  "instance_sidebar_all": "All mods",
+  "instance_sidebar_with_preset": "In presets",
+  "instance_sidebar_no_preset": "Not in any preset",
+  "instance_sidebar_presets": "Presets",
+  "instance_sidebar_edit_tooltip": "Add or remove presets",
+  "instance_sidebar_loading": "Loading…",
+  "instance_sidebar_load_failed": "Couldn't load the list",
+
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
   "home_button_record": "Record\nMode",

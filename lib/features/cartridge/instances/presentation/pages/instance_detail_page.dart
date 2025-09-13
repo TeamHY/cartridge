@@ -540,6 +540,9 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                         final versionVisible        = vis?.isVisible('version')        ?? true;
                         final enabledPresetVisible  = vis?.isVisible('enabledPreset')  ?? true;
 
+                        final isNarrowVersion = !versionVisible;
+                        final isNarrowPreset  = !enabledPresetVisible;
+
                         final nameForRow = nameOf(r);
 
                         // enabledPreset → BadgeSpec 목록으로 변환 (한 번만 계산해 재사용)
@@ -565,9 +568,11 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                           key: ValueKey(r.id),
                           row: r,
                           displayName: nameForRow,
-
                           showVersionUnderTitle: showVersionUnderTitle,
-
+                          placeholderFallback: 'M',
+                          prewarmPreview: true,
+                          isNarrowVersion: isNarrowVersion,
+                          isNarrowPreset:  isNarrowPreset,
                           extraBadges: (row, ft) {
                             final out = <BadgeSpec>[];
                             if (showEnabledPresetUnderTitle) {
@@ -575,12 +580,9 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                             }
                             return out;
                           },
-
                           onTapTitle: r.modId.isEmpty
                               ? null
                               : () async => ref.read(isaacSteamLinksProvider).openIsaacWorkshopItem(r.modId),
-                          placeholderFallback: 'M',
-                          prewarmPreview: true,
                         );
                       }),
                       BadgeStrip(

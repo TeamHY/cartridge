@@ -20,6 +20,8 @@ class ModTitleCell extends ConsumerStatefulWidget {
   final ModView row;
   final String displayName;
   final bool showVersionUnderTitle;
+  final bool isNarrowVersion;
+  final bool isNarrowPreset;
 
   /// 제목 클릭 동작(예: 워크샵 페이지 열기)
   final OnTapTitle? onTapTitle;
@@ -42,6 +44,8 @@ class ModTitleCell extends ConsumerStatefulWidget {
     this.extraBadges,
     this.placeholderFallback = 'M',
     this.prewarmPreview = true,
+    this.isNarrowVersion = false,
+    this.isNarrowPreset = false,
   });
 
   @override
@@ -184,7 +188,65 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
     return LayoutBuilder(
       builder: (ctx, box) {
         final cellW = box.maxWidth;
-        final hideBadges = cellW < 160;
+        const inlineBadgeHideCutoff = 160.0;
+        final hideBadgesInline = cellW < inlineBadgeHideCutoff;
+
+        final isTile = density == UTTableDensity.tile;
+        final useVerticalStackForTile = isTile && (widget.isNarrowVersion || widget.isNarrowPreset);
+
+        Widget titleWidget() => ClipRect(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 0),
+            child: UTActionCell(
+              onTap: widget.onTapTitle,
+              child: Text(
+                widget.displayName,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                textWidthBasis: TextWidthBasis.parent,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+          ),
+        );
+
+        Widget? versionLine() => (widget.showVersionUnderTitle && widget.isNarrowVersion)
+            ? ConstrainedBox(
+          constraints: const BoxConstraints(minWidth: 0),
+          child: Text(
+            'version: ${widget.row.version}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 11, color: FluentTheme.of(context).resources.textFillColorSecondary),
+            textWidthBasis: TextWidthBasis.parent,
+          ),
+        )
+            : null;
+
+        // ── tile + (version 또는 preset 숨김) → 세로 스택: 제목 → (버전) → 배지 ──
+        if (useVerticalStackForTile) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (thumb != null) thumb,
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleWidget(),
+                    if (versionLine() != null) ...[ Gaps.h2, versionLine()! ],
+                    if (badges.isNotEmpty) ...[
+                      Gaps.h2,
+                      BadgeStrip(badges: badges),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
 
         return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -197,7 +259,7 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
                 children: [
                   Row(
                     children: [
-                      if (!hideBadges && badges.isNotEmpty) ...[
+                      if (widget.isNarrowPreset && !hideBadgesInline && badges.isNotEmpty) ...[
                         Flexible(
                           fit: FlexFit.loose,
                           child: ConstrainedBox(
@@ -207,40 +269,10 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
                         ),
                         Gaps.w6,
                       ],
-                      Flexible(
-                        fit: FlexFit.tight,
-                        child: ClipRect(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(minWidth: 0),
-                            child: UTActionCell(
-                              onTap: widget.onTapTitle,
-                              child: Text(
-                                widget.displayName,
-                                maxLines: 1,
-                                softWrap: false,
-                                overflow: TextOverflow.ellipsis,
-                                textWidthBasis: TextWidthBasis.parent,
-                                style: const TextStyle(fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      Flexible(fit: FlexFit.tight, child: titleWidget()),
                     ],
                   ),
-                  if (widget.showVersionUnderTitle) ...[
-                    Gaps.h2,
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(minWidth: 0),
-                      child: Text(
-                        'version: ${widget.row.version}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11, color: fTheme.resources.textFillColorSecondary),
-                        textWidthBasis: TextWidthBasis.parent,
-                      ),
-                    ),
-                  ],
+                  if (versionLine() != null) ...[ Gaps.h2, versionLine()! ],
                 ],
               ),
             ),

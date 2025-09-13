@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,7 +44,6 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
     for (final pid in next.difference(current)) { controller.toggleFilter('mp_$pid', enable: true); }
   }
 
-
   bool _modeAll(UTTableController c)  => !c.activeFilterIds.contains('mpt_has') && !c.activeFilterIds.contains('mpt_none');
   bool _modeHas(UTTableController c)  =>  c.activeFilterIds.contains('mpt_has');
   bool _modeNone(UTTableController c) =>  c.activeFilterIds.contains('mpt_none');
@@ -83,11 +83,15 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final tableCtrl = ref.watch(instanceTableCtrlProvider(widget.instanceId));
     final appAsync  = ref.watch(instanceDetailControllerProvider(widget.instanceId));
 
     // 카운트 계산
     int total = 0, withPreset = 0, noPreset = 0;
+    final isLoading = appAsync.isLoading;
+    final hasError = appAsync.hasError;
+
     appAsync.whenData((v) {
       total = v.items.length;
       withPreset = v.items.where((m) => m.enabledByPresets.isNotEmpty).length;
@@ -116,7 +120,7 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
             // 상단 메일형 내비게이션 3종
             SidebarTile(
               icon: FluentIcons.view_all,
-              label: '모든 모드',
+              label: loc.instance_sidebar_all,
               count: total,
               selected: isModeAll,
               onTap: () => _setModeAll(tableCtrl, allIds),
@@ -124,7 +128,7 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
             Gaps.h6,
             SidebarTile(
               icon: FluentIcons.tag,
-              label: '프리셋만 보기',
+              label: loc.instance_sidebar_with_preset,
               count: withPreset,
               selected: isModeHas,
               onTap: () => _setModeHas(tableCtrl),
@@ -132,23 +136,30 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
             Gaps.h6,
             SidebarTile(
               icon: FluentIcons.clear_filter,
-              label: '프리셋이 없는 모드만 보기',
+              label: loc.instance_sidebar_no_preset,
               count: noPreset,
               selected: isModeNone,
               onTap: () => _setModeNone(tableCtrl, allIds),
             ),
             const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8),
-              child: Divider(),
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              child: Divider(
+                style: DividerThemeData(
+                  horizontalMargin: EdgeInsets.zero,
+                ),
+              ),
             ),
 
             // 프리셋 섹션 헤더 + 편집
             Row(
               children: [
-                const Text('프리셋', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(
+                  loc.instance_sidebar_presets,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
                 const Spacer(),
                 Tooltip(
-                  message: '프리셋 추가/제거',
+                  message: loc.instance_sidebar_edit_tooltip,
                   child: IconButton(
                     icon: const Icon(FluentIcons.edit),
                     onPressed: widget.onAddPresets,
@@ -157,7 +168,16 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
               ],
             ),
             Gaps.h8,
-
+            if (isLoading || hasError) ...[
+              // 텍스트만 가볍게 노출 (에러 코드는 숨김)
+              Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                child: Text(
+                  isLoading ? loc.instance_sidebar_loading : loc.instance_sidebar_load_failed,
+                  style: FluentTheme.of(context).typography.caption,
+                ),
+              ),
+            ],
             // 프리셋 다중 선택(합집합). "프리셋 없음" 모드에선 비활성화
             Expanded(
               child: PresetTileList(
@@ -165,7 +185,6 @@ class _InstancePresetSidebarState extends ConsumerState<InstancePresetSidebar> {
                 selectedIds: activeIds,
                 onToggleSelected: togglePreset,
                 controller: _listCtrl,
-                // ★ 실제 프리셋 타일을 눌렀을 때만 '프리셋만 보기' 모드 보장
                 ensurePresetOnlyMode: () => _ensureModeHas(tableCtrl),
               ),
             ),
