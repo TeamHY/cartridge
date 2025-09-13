@@ -209,6 +209,41 @@
 
   "instance_reorder_unavailable_title": "Cannot edit order",
   "instance_reorder_unavailable_desc": "You can’t start editing while searching.",
+  "instance_quickfilter_has_preset": "Has preset",
+  "instance_quickfilter_no_preset": "No preset",
+
+  "instance_table_header_enabled_preset": "Presets",
+
+  "instance_load_failed": "Couldn't load the instance",
+
+  "instance_play_failed_title": "Couldn't start",
+  "instance_play_failed_body": "Couldn't start. Something went wrong",
+  "common_changes_applied": "Changes applied.",
+
+  "instance_image_picker_title": "Choose instance image",
+  "instance_image_picker_tab_sprite": "Sprites",
+  "instance_image_picker_tab_image": "Image",
+
+  "instance_image_preview_title": "Preview",
+  "instance_image_error_not_found_title": "We couldn’t load the image",
+  "instance_image_error_not_found_body": "Pick another file or use the sprite tab.",
+
+  "common_image": "Image",
+  "instance_image_pick_file": "Choose image file",
+  "common_clear_selection": "Clear selection",
+
+  "instance_image_current_selection": "Current selection",
+  "instance_image_no_file_selected": "No file selected",
+
+  "instance_image_boxfit_label": "Fit",
+  "instance_image_boxfit_cover": "Fill",
+  "instance_image_boxfit_contain": "Fit inside",
+  "instance_image_boxfit_fill": "Stretch (may distort)",
+  "instance_image_boxfit_fitWidth": "Fit width",
+  "instance_image_boxfit_fitHeight": "Fit height",
+  "instance_image_boxfit_none": "Original size",
+
+  "instance_image_reselect": "Pick again",
 
   "mod_preset_search_placeholder": "Search presets",
   "mod_preset_create_button": "Create preset",
@@ -417,8 +452,30 @@
   "mod_table_header_version": "Version",
   "mod_table_header_enabled": "Enabled",
   "mod_action_open_folder": "Open local folder",
+  "mod_table_header_folder": "Folder",
   "mod_missing_short": "MISSING",
   "mod_local_short": "LOCAL",
+  "mod_preset_action_rename": "Rename",
+  "common_coming_soon": "Coming soon",
+
+  "mod_preset_rename_success_body": "Name has been updated.",
+
+  "mod_preset_load_failed": "Couldn't load preset",
+  "mod_table_reloaded": "Table reloaded.",
+
+  "mod_menu_remove": "Remove mod",
+  "mod_menu_open_folder": "Open mod folder",
+  "mod_menu_open_page": "Open mod page",
+
+  "mod_favorite_tooltip_selected": "Unfavorite",
+  "mod_favorite_tooltip_unselected": "Favorite",
+
+  "mod_action_delete_missing": "Delete missing mod",
+
+  "mod_quickfilter_favorite": "Favorite",
+  "mod_quickfilter_installed": "Installed",
+  "mod_quickfilter_missing": "Missing",
+  "mod_quickfilter_enabled": "Enabled",
 
   "@game_config": {
     "description": "Game Config Dialog"
@@ -598,6 +655,7 @@
   "common_unknown": "Unknown",
   "common_untitled": "Untitled",
   "common_update": "Update",
+  "common_export": "Export",
 
   "@mod": {
     "description": "Mod related strings"
@@ -830,5 +888,33 @@
   "@table_summary_total_short": {
     "description": "Summary chip: total count",
     "placeholders": { "count": { "type": "int" } }
-  }
+  },
+
+  "editable_title_hint": "Enter a name",
+  "@editable_title_hint": { "description": "Inline header title edit placeholder" },
+
+  "home_open_install_fail_title": "Couldn't find the install folder",
+  "@home_open_install_fail_title": { "description": "Install path auto-detection failed - title" },
+  "home_open_install_fail_desc": "We couldn't detect it automatically. Please set it once in Settings.",
+  "@home_open_install_fail_desc": { "description": "Install path auto-detection failed - body" },
+
+  "home_open_options_fail_title": "Couldn't find options.ini",
+  "@home_open_options_fail_title": { "description": "options.ini auto-detection failed - title" },
+  "home_open_options_fail_desc": "We couldn't detect the file automatically. Please check the path in Settings.",
+  "@home_open_options_fail_desc": { "description": "options.ini auto-detection failed - body" },
+
+  "home_save_candidates_fail_title": "Couldn't check your saves",
+  "@home_save_candidates_fail_title": { "description": "Save candidates query failed - title" },
+  "home_save_candidates_fail_desc": "We ran into a problem while looking for your save location. Please try again in a moment.",
+  "@home_save_candidates_fail_desc": { "description": "Save candidates query failed - body" },
+
+  "home_save_not_found_title": "No saves found",
+  "@home_save_not_found_title": { "description": "No save candidates - title" },
+  "home_save_not_found_desc": "We couldn't detect Steam Cloud or a local save.",
+  "@home_save_not_found_desc": { "description": "No save candidates - body" },
+
+  "common_open_folder_fail_title": "Couldn't open",
+  "@common_open_folder_fail_title": { "description": "Open folder failed - title" },
+  "common_open_folder_fail_desc": "We couldn't open the folder.",
+  "@common_open_folder_fail_desc": { "description": "Open folder failed - body" }
 }

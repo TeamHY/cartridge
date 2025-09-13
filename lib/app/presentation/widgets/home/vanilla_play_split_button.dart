@@ -22,7 +22,6 @@ class VanillaPlaySplitButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = FluentTheme.of(context);
     final loc = AppLocalizations.of(context);
     final repAsync = ref.watch(repentogonInstalledProvider);
 
@@ -75,21 +74,21 @@ class VanillaPlaySplitButton extends ConsumerWidget {
         loading: () => UtSplitButton.single(
           mainButtonText: loc.vanilla_play_button_title,
           secondaryText: loc.vanilla_play_checking,
-          buttonColor: theme.accentColor,
+          buttonColor: buttonColor,
           onPressed: _noop,
           enabled: false,
         ),
         error: (_, __) => UtSplitButton.single(
           mainButtonText: loc.vanilla_play_button_title,
           secondaryText: loc.vanilla_play_check_failed,
-          buttonColor: theme.accentColor,
+          buttonColor: buttonColor,
           onPressed: _noop,
           enabled: false,
         ),
         data: (installed) => UtSplitButton.single(
           mainButtonText: loc.vanilla_play_button_title,
           secondaryText: loc.vanilla_play_no_preset,
-          buttonColor: theme.accentColor,
+          buttonColor: buttonColor,
           onPressed: () {
             // 프리셋 없이 바로 실행 (Repentogon 설치시 -repentogonoff)
             if (installed) {
@@ -109,14 +108,14 @@ class VanillaPlaySplitButton extends ConsumerWidget {
       loading: () => UtSplitButton.single(
         mainButtonText: loc.vanilla_play_button_title,
         secondaryText: loc.vanilla_play_checking,
-        buttonColor: theme.accentColor,
+        buttonColor: buttonColor,
         onPressed: _noop,
         enabled: false,
       ),
       error: (_, __) => UtSplitButton.single(
         mainButtonText: loc.vanilla_play_button_title,
         secondaryText: loc.vanilla_play_check_failed,
-        buttonColor: theme.accentColor,
+        buttonColor: buttonColor,
         onPressed: _noop,
         enabled: false,
       ),

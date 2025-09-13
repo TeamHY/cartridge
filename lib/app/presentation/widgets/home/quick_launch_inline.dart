@@ -25,14 +25,14 @@ class QuickLaunchInline extends ConsumerWidget {
         loading: () => UtSplitButton.single(
           mainButtonText: loc.vanilla_play_button_title,
           secondaryText: loc.common_loading,
-          buttonColor: fTheme.accentColor,
+          buttonColor: color,
           onPressed: null,
           enabled: false,
         ),
         error: (_, __) => UtSplitButton.single(
           mainButtonText: loc.vanilla_play_button_title,
           secondaryText: loc.vanilla_play_check_failed,
-          buttonColor: fTheme.accentColor,
+          buttonColor: color,
           onPressed: null,
           enabled: false,
         ),

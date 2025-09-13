@@ -1,3 +1,4 @@
+import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -160,11 +161,11 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
     final rows = ref.watch(instanceVisibleResolvedProvider(widget.instanceId));
     final tableCtrl = ref.watch(instanceTableCtrlProvider(widget.instanceId));
     final presetFilters = ref.watch(presetQuickFiltersProvider(widget.instanceId));
-    final metaPresetFilters = <UTQuickFilter<ModView>>[
-      UTQuickFilter<ModView>(id: 'mpt_has', label: 'PresetOnly', test: (r) => r.enabledByPresets.isNotEmpty),
-      UTQuickFilter<ModView>(id: 'mpt_none', label: 'NoPreset', test: (r) => r.enabledByPresets.isEmpty),
-    ];
     final loc = AppLocalizations.of(context);
+    final metaPresetFilters = <UTQuickFilter<ModView>>[
+      UTQuickFilter<ModView>(id: 'mpt_has', label: loc.instance_quickfilter_has_preset, test: (r) => r.enabledByPresets.isNotEmpty),
+      UTQuickFilter<ModView>(id: 'mpt_none', label: loc.instance_quickfilter_no_preset, test: (r) => r.enabledByPresets.isEmpty),
+    ];
     final fTheme = FluentTheme.of(context);
     final sem = ref.watch(themeSemanticsProvider);
 
@@ -202,12 +203,12 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
         width: UTWidth.px(52),
         sortable: true,
         resizable: false,
-        tooltip: 'Favorite',
+        tooltip: loc.mod_table_header_favorite,
       ),
       UTColumnSpec(id: 'displayName', title: loc.mod_table_header_name, width: UTWidth.flex(3), sortable: true, minPx: 120),
       UTColumnSpec(
         id: 'enabledPreset',
-        title: 'enabledPreset',
+        title: loc.instance_table_header_enabled_preset,
         width: UTWidth.flex(1),
         sortable: true,
         minPx: 120,
@@ -217,7 +218,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
       UTColumnSpec(id: 'enabled', title: loc.mod_table_header_enabled, width: UTWidth.px(80), sortable: true),
       UTColumnSpec(
         id: 'folder',
-        title: 'Folder',
+        title: loc.mod_table_header_folder,
         header: const Padding(padding: EdgeInsets.all(8), child: Icon(FluentIcons.open_folder_horizontal, size: 16)),
         width: UTWidth.px(52),
         sortable: false,
@@ -313,7 +314,11 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                       await ref.read(instancePlayServiceProvider).playByInstanceId(widget.instanceId);
                     } catch (e) {
                       if (!context.mounted) return;
-                      UiFeedback.error(context, '실행 실패', '$e');
+                      UiFeedback.error(
+                        context,
+                        loc.instance_play_failed_title,
+                        loc.instance_play_failed_body,
+                      );
                     }
                   },
                   child: Row(
@@ -338,7 +343,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                         items: [
                           MenuFlyoutItem(
                             leading: const Icon(FluentIcons.edit),
-                            text: const Text('편집'),
+                            text: Text(loc.common_edit),
                             onPressed: () async {
                               Flyout.of(ctx).close();
 
@@ -380,14 +385,22 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
 
                               if (!context.mounted) return;
                               if (changed) {
-                                UiFeedback.success(context, '저장됨', '변경되었습니다.');
+                                UiFeedback.success(
+                                  context,
+                                  loc.common_saved,
+                                  loc.common_changes_applied,
+                                );
                               }
                             },
                           ),
                           MenuFlyoutItem(
                             leading: const Icon(FluentIcons.download),
-                            text: const Text('Export'),
-                            onPressed: () => UiFeedback.info(context, 'Export', 'Coming soon'),
+                            text: Text(loc.common_export),
+                            onPressed: () => UiFeedback.info(
+                              context,
+                              loc.common_export,
+                              loc.common_coming_soon,
+                            ),
                           ),
                           const MenuFlyoutSeparator(),
                           MenuFlyoutItem(
@@ -415,7 +428,9 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
               height: bodyHeight,
               child: appAsync.when(
                 loading: () => const Center(child: ProgressRing()),
-                error: (err, _) => Center(child: Text('인스턴스 로딩 실패r: $err')),
+                error: (err, _) => EmptyState.withDefault404(
+                  title: loc.instance_load_failed,
+                ),
                 data: (app) {
                   if (_nameController.text != app.name) {
                     _nameController.text = app.name;
@@ -454,7 +469,11 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                       onRefresh: () async {
                         await uiCtrl.refreshFromStore();
                         if (!context.mounted) return;
-                        UiFeedback.success(context, 'Refreshed', 'Table reloaded');
+                        UiFeedback.success(
+                          context,
+                          loc.common_refresh,
+                          loc.mod_table_reloaded,
+                        );
                       },
                     ),
                     reserveTrailing: true,
@@ -473,20 +492,20 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                               if (r.isMissing) {
                                 items.add(MenuFlyoutItem(
                                   leading: const Icon(FluentIcons.delete),
-                                  text: const Text('모드 제거'),
+                                  text: Text(loc.mod_menu_remove),
                                   onPressed: () => uiCtrl.removeByKey(r.id),
                                 ));
                               } else {
                                 items.add(MenuFlyoutItem(
                                   leading: const Icon(FluentIcons.open_folder_horizontal),
-                                  text: const Text('모드 폴더 열기'),
+                                  text: Text(loc.mod_menu_open_folder),
                                   onPressed: () => openFolder(r.installPath),
                                 ));
                               }
                               if (r.modId.isNotEmpty) {
                                 items.add(MenuFlyoutItem(
                                   leading: const Icon(FluentIcons.navigate_external_inline),
-                                  text: const Text('모드 페이지 열기'),
+                                  text: Text(loc.mod_menu_open_page),
                                   onPressed: () async {
                                     await ref.read(isaacSteamLinksProvider).openIsaacWorkshopItem(r.modId);
                                     if (!ctx.mounted) return;
@@ -502,7 +521,9 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                     ),
                     cellBuilder: (ctx, r) => [
                       Tooltip(
-                        message: r.favorite ? 'Unfavorite' : 'Favorite',
+                        message: r.favorite
+                            ? loc.mod_favorite_tooltip_selected
+                            : loc.mod_favorite_tooltip_unselected,
                         child: IconButton(
                           icon: Icon(r.favorite ? FluentIcons.heart_fill : FluentIcons.heart, size: 16, color: fTheme.accentColor),
                           onPressed: () => uiCtrl.toggleFavorite(r.id),
@@ -527,7 +548,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                                 (e) => e.presetId == pid,
                             orElse: () => AppliedPresetLabelView(presetId: pid, presetName: pid),
                           ).presetName;
-                          return BadgeSpec(label, sem.info);
+                          return BadgeSpec(label, accent2StatusOf(context, ref));
                         }).toList(growable: false);
 
                         // ── 밀도별 정책 ───────────────────────────────────────────
@@ -569,7 +590,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                                 (e) => e.presetId == pid,
                             orElse: () => AppliedPresetLabelView(presetId: pid, presetName: pid),
                           ).presetName;
-                          return BadgeSpec(label, sem.info);
+                          return BadgeSpec(label, accent2StatusOf(context, ref));
                         })
                             .toList(),
                       ),
@@ -577,14 +598,14 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                       ToggleSwitch(checked: r.enabled, onChanged: (v) => uiCtrl.setEnabled(r.id, v)),
                       r.isInstalled
                           ? Tooltip(
-                        message: 'Open local folder',
+                        message: loc.mod_action_open_folder,
                         child: IconButton(
                           icon: const Icon(FluentIcons.open_folder_horizontal, size: 16),
                           onPressed: () => openFolder(r.installPath),
                         ),
                       )
                           : Tooltip(
-                        message: 'Delete Missing Mod',
+                        message: loc.mod_action_delete_missing,
                         child: IconButton(
                           icon: Icon(FluentIcons.delete, size: 16, color: sem.danger.fg),
                           onPressed: () => uiCtrl.removeByKey(r.id),
@@ -601,10 +622,10 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                       return '$name $ver ${it.id} $tags';
                     },
                     quickFilters: [
-                      UTQuickFilter<ModView>(id: 'favorite', label: 'Favorite', test: (r) => r.favorite),
-                      UTQuickFilter<ModView>(id: 'installed', label: 'Installed', test: (r) => r.isInstalled),
-                      UTQuickFilter<ModView>(id: 'missing', label: 'Missing', test: (r) => r.isMissing),
-                      UTQuickFilter<ModView>(id: 'enabled', label: 'Enabled', test: (r) => r.enabled),
+                      UTQuickFilter<ModView>(id: 'favorite', label: loc.mod_quickfilter_favorite, test: (r) => r.favorite),
+                      UTQuickFilter<ModView>(id: 'installed', label: loc.mod_quickfilter_installed, test: (r) => r.isInstalled),
+                      UTQuickFilter<ModView>(id: 'missing', label: loc.mod_quickfilter_missing, test: (r) => r.isMissing),
+                      UTQuickFilter<ModView>(id: 'enabled', label: loc.mod_quickfilter_enabled, test: (r) => r.enabled),
                       ...metaPresetFilters,
                       ...presetFilters, // 프리셋 그룹은 Toolbar에서 sidebarOn일 때 자동 숨김
                     ],

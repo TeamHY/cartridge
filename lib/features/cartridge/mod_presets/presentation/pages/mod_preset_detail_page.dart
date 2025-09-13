@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -108,7 +109,7 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
     final List<UTColumnSpec> columns = [
       UTColumnSpec(
         id: 'favorite',
-        title: 'Favorite',
+        title: loc.mod_table_header_favorite,
         header: Padding(
           padding: const EdgeInsets.all(8),
           child: Icon(FluentIcons.heart, size: 16, color: fTheme.accentColor),
@@ -116,7 +117,7 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
         width: UTWidth.px(52),
         sortable: true,
         resizable: false,
-        tooltip: 'Favorite',
+        tooltip: loc.mod_table_header_favorite,
       ),
       UTColumnSpec(
         id: 'displayName',
@@ -129,7 +130,7 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
       UTColumnSpec(id: 'enabled', title: loc.mod_table_header_enabled, width: UTWidth.px(100), sortable: true),
       UTColumnSpec(
         id: 'folder',
-        title: 'Folder',
+        title: loc.mod_table_header_folder,
         header: const Padding(padding: EdgeInsets.all(8), child: Icon(FluentIcons.open_folder_horizontal, size: 16)),
         width: UTWidth.px(52),
         sortable: false,
@@ -198,7 +199,7 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                         items: [
                           MenuFlyoutItem(
                             leading: const Icon(FluentIcons.edit),
-                            text: const Text('이름 수정'),
+                            text: Text(loc.mod_preset_edit_title),
                             onPressed: () async {
                               Flyout.of(ctx).close();
                               final cur = ref.read(modPresetDetailControllerProvider(widget.presetId));
@@ -209,13 +210,21 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                               if (trimmed.isEmpty || trimmed == currentName.trim()) return;
                               await ref.read(modPresetDetailPageControllerProvider(widget.presetId).notifier).saveName(trimmed);
                               if (!context.mounted) return;
-                              UiFeedback.success(context, '저장됨', '이름이 변경되었습니다.');
+                              UiFeedback.success(
+                                context,
+                                loc.common_saved,
+                                loc.mod_preset_rename_success_body,
+                              );
                             },
                           ),
                           MenuFlyoutItem(
                             leading: const Icon(FluentIcons.download),
-                            text: const Text('Export'),
-                            onPressed: () => UiFeedback.info(context, 'Export', 'Coming soon'),
+                            text: Text(loc.common_export),
+                            onPressed: () => UiFeedback.info(
+                              context,
+                              loc.common_export,
+                              loc.common_coming_soon,
+                            ),
                           ),
                           const MenuFlyoutSeparator(),
                           MenuFlyoutItem(
@@ -243,7 +252,9 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
               height: bodyHeight,
               child: appAsync.when(
                 loading: () => const Center(child: ProgressRing()),
-                error: (err, _) => Center(child: Text('프리셋 로딩 실패: $err')),
+                error: (_, __) => EmptyState.withDefault404(
+                  title: loc.mod_preset_load_failed,
+                ),
                 data: (app) {
                   if (_nameController.text != app.name) {
                     _nameController.text = app.name;
@@ -281,7 +292,11 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                       onRefresh: () async {
                         await uiCtrl.refreshFromStore();
                         if (!context.mounted) return;
-                        UiFeedback.success(context, 'Refreshed', 'Table reloaded');
+                        UiFeedback.success(
+                          context,
+                          loc.common_refresh,
+                          loc.mod_table_reloaded,
+                        );
                       },
                     ),
                     reserveTrailing: true,
@@ -298,20 +313,20 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                               if (r.isMissing) {
                                 items.add(MenuFlyoutItem(
                                   leading: const Icon(FluentIcons.delete),
-                                  text: const Text('모드 제거'),
+                                  text: Text(loc.mod_menu_remove),
                                   onPressed: () => uiCtrl.removeByKey(r.id),
                                 ));
                               } else {
                                 items.add(MenuFlyoutItem(
                                   leading: const Icon(FluentIcons.open_folder_horizontal),
-                                  text: const Text('모드 폴더 열기'),
+                                  text: Text(loc.mod_menu_open_folder),
                                   onPressed: () => openFolder(r.installPath),
                                 ));
                               }
                               if (r.modId.isNotEmpty) {
                                 items.add(MenuFlyoutItem(
                                   leading: const Icon(FluentIcons.navigate_external_inline),
-                                  text: const Text('모드 페이지 열기'),
+                                  text: Text(loc.mod_menu_open_page),
                                   onPressed: () async {
                                     await ref.read(isaacSteamLinksProvider).openIsaacWorkshopItem(r.modId);
                                     if (!ctx.mounted) return;
@@ -327,7 +342,9 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                     ),
                     cellBuilder: (ctx, r) => [
                       Tooltip(
-                        message: r.favorite ? 'Unfavorite' : 'Favorite',
+                        message: r.favorite
+                            ? loc.mod_favorite_tooltip_selected
+                            : loc.mod_favorite_tooltip_unselected,
                         child: IconButton(
                           icon: Icon(r.favorite ? FluentIcons.heart_fill : FluentIcons.heart, size: 16, color: fTheme.accentColor),
                           onPressed: () => uiCtrl.toggleFavorite(r.id),
@@ -355,14 +372,14 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                       ToggleSwitch(checked: r.enabled, onChanged: (v) => uiCtrl.setEnabled(r.id, v)),
                       r.isInstalled
                           ? Tooltip(
-                        message: 'Open local folder',
+                        message: loc.mod_action_open_folder,
                         child: IconButton(
                           icon: const Icon(FluentIcons.open_folder_horizontal, size: 16),
                           onPressed: () => openFolder(r.installPath),
                         ),
                       )
                           : Tooltip(
-                        message: 'Delete Missing Mod',
+                        message: loc.mod_action_delete_missing,
                         child: IconButton(
                           icon: Icon(FluentIcons.delete, size: 16, color: sem.danger.fg),
                           onPressed: () => uiCtrl.removeByKey(r.id),
@@ -379,10 +396,10 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                       return '$name $ver ${it.id} $tags';
                     },
                     quickFilters: [
-                      UTQuickFilter<ModView>(id: 'favorite', label: 'Favorite', test: (r) => r.favorite),
-                      UTQuickFilter<ModView>(id: 'installed', label: 'Installed', test: (r) => r.isInstalled),
-                      UTQuickFilter<ModView>(id: 'missing', label: 'Missing', test: (r) => r.isMissing),
-                      UTQuickFilter<ModView>(id: 'enabled', label: 'Enabled', test: (r) => r.enabled),
+                      UTQuickFilter<ModView>(id: 'favorite', label: loc.mod_quickfilter_favorite, test: (r) => r.favorite),
+                      UTQuickFilter<ModView>(id: 'installed', label: loc.mod_quickfilter_installed, test: (r) => r.isInstalled),
+                      UTQuickFilter<ModView>(id: 'missing', label: loc.mod_quickfilter_missing, test: (r) => r.isMissing),
+                      UTQuickFilter<ModView>(id: 'enabled', label: loc.mod_quickfilter_enabled, test: (r) => r.enabled),
                     ],
                     quickFiltersAreAnd: true,
                     showFloatingSelectionBar: true,

@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_image/sprite_sheet.dart';
 import 'package:cartridge/features/cartridge/instances/domain/instance_policy.dart';
@@ -53,13 +55,18 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
   int hoveredSprite = -1;
   int pressedSprite = -1;
 
+  final GlobalKey selectedSpriteKey = GlobalKey();
+  final GlobalKey gridKey = GlobalKey();
+  final ScrollController spriteScrollController = ScrollController();
+  final ScrollController detailsScrollController = ScrollController();
+  bool didEnsureSpriteVisible = false;
+
   // ---------------------------
   // 유틸
   // ---------------------------
 
   // 스프라이트 셀 렌더
-  Widget spriteTile(BuildContext ctx, int index,
-      {double size = 80, BorderRadius? br}) {
+  Widget spriteTile(BuildContext ctx, int index, {double size = 80, BorderRadius? br}) {
     return SpriteTile(
       asset: InstanceImageRules.assetPath,
       grid: grid,
@@ -88,17 +95,17 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
 
   // 보기 방식 라디오(Fluent RadioButton)
   Widget boxFitRadios({
-    required BuildContext ctx,
+    required AppLocalizations loc,
     required BoxFit value,
     required ValueChanged<BoxFit> onChanged,
   }) {
     final options = <(BoxFit, String)>[
-      (BoxFit.cover, '가득 채우기'),
-      (BoxFit.contain, '전체 보이기'),
-      (BoxFit.fill, '늘리기(왜곡 가능)'),
-      (BoxFit.fitWidth, '너비 맞춤'),
-      (BoxFit.fitHeight, '높이 맞춤'),
-      (BoxFit.none, '원본 크기'),
+      (BoxFit.cover,     loc.instance_image_boxfit_cover),
+      (BoxFit.contain,   loc.instance_image_boxfit_contain),
+      (BoxFit.fill,      loc.instance_image_boxfit_fill),
+      (BoxFit.fitWidth,  loc.instance_image_boxfit_fitWidth),
+      (BoxFit.fitHeight, loc.instance_image_boxfit_fitHeight),
+      (BoxFit.none,      loc.instance_image_boxfit_none),
     ];
 
     return Column(
@@ -113,8 +120,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
             onChanged: (checked) {
               if (checked) onChanged(o.$1);
             },
-            // 라벨 + 보조설명
-            content: Text(o.$2, style: const TextStyle(fontWeight: FontWeight.w600)),
+            content: Text(o.$2, style: AppTypography.body),
           ),
         );
       }),
@@ -129,6 +135,44 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
         final fTheme = FluentTheme.of(ctx);
         final dividerColor = fTheme.dividerColor;
         final accent = fTheme.accentColor.normal;
+        final loc = AppLocalizations.of(ctx);
+        final sem = ProviderScope.containerOf(ctx).read(themeSemanticsProvider);
+
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          if (!didEnsureSpriteVisible && tabIndex == 0 && spriteScrollController.hasClients) {
+            didEnsureSpriteVisible = true;
+
+            // 1) 대략적 오프셋으로 먼저 점프(셀을 빌드시키기 위함)
+            final gridBox = gridKey.currentContext?.findRenderObject() as RenderBox?;
+            if (gridBox != null) {
+              const spacing = 8.0; // gridDelegate와 동일
+              final pad = AppSpacing.md; // GridView.padding (좌우)
+              final cols = InstanceImageRules.spriteCols;
+              final gridWidth = gridBox.size.width;
+              final tileWidth = (gridWidth - pad * 2 - spacing * (cols - 1)) / cols;
+              final row = selectedSprite ~/ cols;
+              final rowExtent = tileWidth + spacing; // aspectRatio=1 → 높이=tileWidth
+              final approxOffset = (rowExtent * row).clamp(
+                0.0,
+                spriteScrollController.position.maxScrollExtent,
+              );
+              // 점프(애니메이션 없이 빠르게)
+              spriteScrollController.jumpTo(approxOffset);
+            }
+
+            // 2) 한 프레임 양보 후 정확히 맞추기
+            await Future<void>.delayed(const Duration(milliseconds: 16));
+            final c = selectedSpriteKey.currentContext;
+            if (c != null && c.mounted) {
+              Scrollable.ensureVisible(
+                c,
+                alignment: 0.3,
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOut,
+              );
+            }
+          }
+        });
 
         // ---------------------------
         // 스프라이트 탭
@@ -138,11 +182,11 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
             decoration: BoxDecoration(
               color: fTheme.cardColor,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: dividerColor,
-              ),
+              border: Border.all(color: dividerColor),
             ),
             child: GridView.builder(
+              key: gridKey,
+              controller: spriteScrollController,
               padding: const EdgeInsets.all(AppSpacing.md),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: InstanceImageRules.spriteCols,
@@ -157,39 +201,51 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
                 final isPressed = (i == pressedSprite);
 
                 final baseBorder = isSelected ? accent : dividerColor;
-                final bg =
-                isSelected ? fTheme.acrylicBackgroundColor.withAlpha(200) : fTheme.cardColor;
-
-                Widget cell = Container(
-                  decoration: BoxDecoration(
-                    color: bg,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: baseBorder,
-                      width: isSelected ? 2 : 1,
-                    ),
-                    boxShadow: isHovered
-                        ? [
-                      BoxShadow(
-                        color: accent.withAlpha(50),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                        : const [],
-                  ),
-                  foregroundDecoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: baseBorder,
-                      width: isSelected ? 5 : 1,
-                    ),
-                  ),
-                  child: Center(child: spriteTile(ctx, i, size: 80)),
-                );
+                final bg = isSelected
+                    ? fTheme.acrylicBackgroundColor.withAlpha(200)
+                    : fTheme.cardColor;
 
                 final scale = isPressed ? 0.940 : (isHovered ? 0.970 : 1.0);
+
+                final cell = AnimatedScale(
+                  scale: scale,
+                  duration: const Duration(milliseconds: 100),
+                  curve: Curves.easeOut,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: bg,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: baseBorder, width: isSelected ? 2 : 1),
+                    ),
+                    foregroundDecoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: baseBorder, width: isSelected ? 5 : 1),
+                    ),
+                    child: Stack(
+                      clipBehavior: Clip.hardEdge,
+                      children: [
+                        Center(child: spriteTile(ctx, i, size: 80)),
+
+                        if (isSelected)
+                          Positioned(
+                            left: 6,
+                            top: 6,
+                            child: IgnorePointer(
+                              ignoring: true, // 배지가 터치를 가로채지 않도록
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                child: Icon(
+                                  FluentIcons.skype_circle_check,
+                                  size: 16,
+                                  color: accent, // 배지 테두리와 톤 맞춤
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
 
                 return MouseRegion(
                   onEnter: (_) => setState(() => hoveredSprite = i),
@@ -199,12 +255,9 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
                     onTapCancel: () => setState(() => pressedSprite = -1),
                     onTapUp: (_) => setState(() => pressedSprite = -1),
                     onTap: () => setState(() => selectedSprite = i),
-                    child: AnimatedScale(
-                      scale: scale,
-                      duration: const Duration(milliseconds: 100),
-                      curve: Curves.easeOut,
-                      child: cell,
-                    ),
+                    child: isSelected
+                        ? KeyedSubtree(key: selectedSpriteKey, child: cell)
+                        : cell,
                   ),
                 );
               },
@@ -213,11 +266,51 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
         }
 
         // ---------------------------
-        // 이미지 탭 (옵션 A: 2-Column)
+        // 이미지 탭
         // ---------------------------
         Widget userFilePane() {
-          const previewSize = 220.0; // 80x80 미리보기
+          const previewSize = 220.0;
           final br = BorderRadius.circular(12);
+
+          // 에러 카드 UI (프리뷰 내부에 표시)
+          Widget errorPreviewCard() {
+            // 카드 배경을 danger.bg와 카드 배경을 살짝 블렌딩해 “붉은 기”만
+            final blended = Color.alphaBlend(sem.danger.bg.withAlpha(40), fTheme.cardColor);
+            return Container(
+              width: previewSize,
+              height: previewSize,
+              decoration: BoxDecoration(
+                color: blended,
+                borderRadius: br,
+                border: Border.all(color: sem.danger.fg.withAlpha(140)),
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(FluentIcons.photo_error, size: 40, color: sem.danger.fg),
+                      const SizedBox(height: 8),
+                      ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: previewSize - 24),
+                        child: Text(
+                          loc.instance_image_error_not_found_body,
+                          textAlign: TextAlign.center,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis, // overflow 방어
+                          style: TextStyle(
+                            color: sem.danger.fg,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
 
           Widget previewCard() {
             // 1) 아무 것도 없을 때
@@ -226,54 +319,19 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
                 width: previewSize,
                 height: previewSize,
                 decoration: BoxDecoration(
-                  color: fTheme.cardColor,
+                  color: fTheme.resources.controlFillColorSecondary,
                   borderRadius: br,
                   border: Border.all(color: dividerColor),
-                  boxShadow: const [
-                    BoxShadow(
-                      blurRadius: 14,
-                      spreadRadius: 1,
-                      offset: Offset(0, 4),
-                      color: Color(0x22000000),
-                    )
-                  ],
                 ),
                 child: Center(
-                  child: Icon(
-                    FluentIcons.photo2,
-                    size: 48,
-                    color: fTheme.inactiveColor,
-                  ),
+                  child: Icon(FluentIcons.photo2, size: 48, color: fTheme.inactiveColor),
                 ),
               );
             }
 
-            // 2) 파일 없음/손상 등 → 아이콘 플레이스홀더
+            // 2) 파일 없음/손상/디코딩 실패 → 에러 카드로
             if (!userFileExists || previewDecodeError) {
-              return Container(
-                width: previewSize,
-                height: previewSize,
-                decoration: BoxDecoration(
-                  color: fTheme.cardColor,
-                  borderRadius: br,
-                  border: Border.all(color: dividerColor),
-                  boxShadow: const [
-                    BoxShadow(
-                      blurRadius: 14,
-                      spreadRadius: 1,
-                      offset: Offset(0, 4),
-                      color: Color(0x22000000),
-                    )
-                  ],
-                ),
-                child: Center(
-                  child: Icon(
-                    FluentIcons.photo2,
-                    size: 48,
-                    color: fTheme.inactiveColor,
-                  ),
-                ),
-              );
+              return errorPreviewCard();
             }
 
             // 3) 정상 미리보기
@@ -283,14 +341,6 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
               decoration: BoxDecoration(
                 borderRadius: br,
                 border: Border.all(color: dividerColor),
-                boxShadow: const [
-                  BoxShadow(
-                    blurRadius: 14,
-                    spreadRadius: 1,
-                    offset: Offset(0, 4),
-                    color: Color(0x22000000),
-                  )
-                ],
               ),
               clipBehavior: Clip.antiAlias,
               child: Image.file(
@@ -301,7 +351,6 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
                 filterQuality: FilterQuality.medium,
                 gaplessPlayback: true,
                 isAntiAlias: false,
-                // 디코딩 실패 시 상태 반영 + 아이콘 플레이스홀더로 전환
                 errorBuilder: (context, error, stack) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     if (!previewDecodeError) {
@@ -309,78 +358,57 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
                     }
                   });
                   return Center(
-                    child: Icon(
-                      FluentIcons.photo2,
-                      size: 48,
-                      color: fTheme.inactiveColor,
-                    ),
+                    child: Icon(FluentIcons.photo_error, size: 40, color: sem.danger.fg),
                   );
                 },
               ),
             );
           }
 
-          // 좌측: "미리보기" 그룹 + (조건부) InfoBar(카드 아래)
+          // 좌측: "미리보기" 그룹 (InfoBar는 제거, 미리보기 카드에서 바로 알림)
           Widget leftPanel() {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 6),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
                   child: Text(
-                    '미리보기',
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    loc.instance_image_preview_title,
+                    style: AppTypography.bodyStrong,
                   ),
                 ),
                 previewCard(),
-                if (pickedPath != null && (!userFileExists || previewDecodeError)) ...[
-                  Gaps.h8,
-                  SizedBox(
-                    width: 300, // InfoBar 가독성 확보
-                    child: InfoBar(
-                      title: const Text('파일을 찾을 수 없거나 손상되었습니다.'),
-                      content: const Text('다시 선택하거나 스프라이트 탭을 사용하세요.'),
-                      severity: InfoBarSeverity.error,
-                      isLong: true,
-                      action: Button(
-                        onPressed: () {
-                          pickUserFile(setState);
-                        },
-                        child: const Text('다시 선택…'),
-                      ),
-                    ),
-                  ),
-                ],
               ],
             );
           }
 
-          // 우측: 섹션 4개(이미지/현재 선택/보기 방식/안내)
+          // 우측: 이미지 선택/현재 선택/보기 방식
           Widget rightPanel() {
             return Expanded(
-              child: Scrollbar( // fluent_ui의 Scrollbar
+              child: Scrollbar(
+                controller: detailsScrollController,
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(right: 8), // 스크롤바와 내용 간격 확보
+                  controller: detailsScrollController,
+                  padding: const EdgeInsets.only(right: 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // ① 이미지
                       InfoLabel(
-                        label: '이미지',
+                        label: loc.common_image,
+                        labelStyle: AppTypography.bodyStrong,
                         child: Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: [
                             Button(
-                              onPressed: () {
-                                pickUserFile(setState);
-                              },
-                              child: const Row(
+                              onPressed: () => pickUserFile(setState),
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(FluentIcons.folder_open),
+                                  const Icon(FluentIcons.folder_open),
                                   Gaps.w6,
-                                  Text('이미지 파일 선택…'),
+                                  Text(loc.instance_image_pick_file),
                                 ],
                               ),
                             ),
@@ -393,7 +421,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
                                     previewDecodeError = false;
                                   });
                                 },
-                                child: const Text('선택 해제'),
+                                child: Text(loc.common_clear_selection),
                               ),
                           ],
                         ),
@@ -403,32 +431,31 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
 
                       // ② 현재 선택
                       InfoLabel(
-                        label: '현재 선택',
+                        label: loc.instance_image_current_selection,
+                        labelStyle: AppTypography.bodyStrong,
                         child: Text(
-                          pickedPath ?? '선택된 파일이 없습니다.',
+                          pickedPath ?? loc.instance_image_no_file_selected,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontWeight: pickedPath == null ? FontWeight.normal : FontWeight.w500,
-                            color: (pickedPath != null && (!userFileExists || previewDecodeError))
-                                ? Colors.red
-                                : (pickedPath == null ? fTheme.inactiveColor : null),
+                            color: pickedPath == null ? fTheme.inactiveColor : null,
                           ),
                         ),
                       ),
 
                       Gaps.h12,
 
-                      // ③ 보기 방식 (라디오 버튼)
+                      // ③ 보기 방식 (라디오)
                       InfoLabel(
-                        label: '보기 방식',
+                        label: loc.instance_image_boxfit_label,
+                        labelStyle: AppTypography.bodyStrong,
                         child: boxFitRadios(
-                          ctx: ctx,
+                          loc: loc,
                           value: fit,
                           onChanged: (v) => setState(() => fit = v),
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -441,9 +468,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
             decoration: BoxDecoration(
               color: fTheme.cardColor,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: dividerColor,
-              ),
+              border: Border.all(color: dividerColor),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,7 +490,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
             children: [
               Icon(FluentIcons.image_search, size: 18, color: accent),
               Gaps.w4,
-              const Text('인스턴스 이미지 선택'),
+              Text(loc.instance_image_picker_title),
             ],
           ),
           constraints: const BoxConstraints(maxWidth: 720, maxHeight: 560),
@@ -474,17 +499,20 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
             height: 420,
             child: TabView(
               currentIndex: tabIndex,
-              onChanged: (i) => setState(() => tabIndex = i),
+              onChanged: (i) {
+                didEnsureSpriteVisible = false;
+                setState(() => tabIndex = i);
+              },
               tabs: [
                 Tab(
-                  text: const Text('스프라이트'),
+                  text: Text(loc.instance_image_picker_tab_sprite),
                   icon: const Icon(FluentIcons.grid_view_small),
                   body: spriteGrid(),
                   selectedForegroundColor: WidgetStateProperty.all(fTheme.selectionColor),
                   selectedBackgroundColor: WidgetStateProperty.all(fTheme.acrylicBackgroundColor),
                 ),
                 Tab(
-                  text: const Text('이미지'),
+                  text: Text(loc.instance_image_picker_tab_image),
                   icon: const Icon(FluentIcons.image_pixel),
                   body: userFilePane(),
                   selectedForegroundColor: WidgetStateProperty.all(fTheme.selectionColor),
@@ -496,7 +524,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
           actions: [
             Button(
               onPressed: () => Navigator.pop(ctx, null),
-              child: const Text('취소'),
+              child: Text(loc.common_cancel),
             ),
             FilledButton(
               onPressed: canApply
@@ -510,7 +538,7 @@ Future<InstanceImagePickResult?> showInstanceImagePickerDialog(
                 }
               }
                   : null,
-              child: const Text('적용'),
+              child: Text(loc.common_apply),
             ),
           ],
         );

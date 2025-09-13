@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
@@ -13,7 +14,6 @@ final vanillaPresetIdProvider = StateProvider<String?>((ref) => null);
 final recentInstanceIdProvider = StateProvider<String?>((ref) => null);
 
 
-
 Future<bool> isRepentogonInstalled(WidgetRef ref) async {
   return await ref.read(repentogonInstalledProvider.future);
 }
@@ -21,8 +21,16 @@ Future<bool> isRepentogonInstalled(WidgetRef ref) async {
 Future<void> openInstallFolder(BuildContext context, WidgetRef ref) async {
   final env = ref.read(isaacEnvironmentServiceProvider);
   final path = await env.resolveInstallPath();
+  if (!context.mounted) return;
+  final loc = AppLocalizations.of(context);
   if (path == null) {
-    if (context.mounted) UiFeedback.warn(context, '설치 경로를 찾지 못했어요', '설치 경로 자동 탐지가 실패했습니다. Settings에서 확인해 주세요.');
+    if (context.mounted) {
+      UiFeedback.warn(
+        context,
+        loc.home_open_install_fail_title,
+        loc.home_open_install_fail_desc,
+      );
+    }
     return;
   }
   if (!context.mounted) return;
@@ -32,8 +40,16 @@ Future<void> openInstallFolder(BuildContext context, WidgetRef ref) async {
 Future<void> openOptionsFolder(BuildContext context, WidgetRef ref) async {
   final env = ref.read(isaacEnvironmentServiceProvider);
   final ini = await env.resolveOptionsIniPath();
+  if (!context.mounted) return;
+  final loc = AppLocalizations.of(context);
   if (ini == null) {
-    if (context.mounted) UiFeedback.warn(context, 'options.ini 경로를 찾지 못했어요', '자동 탐지가 실패했습니다. Settings에서 확인해 주세요.');
+    if (context.mounted) {
+      UiFeedback.warn(
+        context,
+        loc.home_open_options_fail_title,
+        loc.home_open_options_fail_desc,
+      );
+    }
     return;
   }
   final dir = p.dirname(ini);
@@ -47,6 +63,8 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
 
   logI(tag, 'op=$op fn=openSaveFolder msg=start');
   final svc = ref.read(isaacSaveServiceProvider);
+  if (!context.mounted) return;
+  final loc = AppLocalizations.of(context);
 
   List<SteamAccountProfile> candidates;
   try {
@@ -54,7 +72,11 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
   } catch (e, st) {
     logE(tag, 'op=$op fn=openSaveFolder msg=candidate fetch failed', e, st);
     if (context.mounted) {
-      UiFeedback.error(context, '조회 실패', '세이브 후보 조회 중 오류가 발생했습니다.');
+      UiFeedback.error(
+        context,
+        loc.home_save_candidates_fail_title,
+        loc.home_save_candidates_fail_desc,
+      );
     }
     return;
   }
@@ -62,8 +84,11 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
   if (candidates.isEmpty) {
     logW(tag, 'op=$op fn=openSaveFolder msg=no candidates');
     if (context.mounted) {
-      UiFeedback.warn(context, '세이브를 찾지 못했어요',
-          'Steam Cloud 또는 로컬 세이브가 감지되지 않았습니다.');
+      UiFeedback.warn(
+        context,
+        loc.home_save_not_found_title,
+        loc.home_save_not_found_desc,
+      );
     }
     return;
   }
@@ -77,7 +102,13 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
       await openFolder(c.savePath);
     } catch (e, st) {
       logE(tag, 'op=$op fn=openSaveFolder msg=openFolder failed path=${c.savePath}', e, st);
-      if (context.mounted) UiFeedback.error(context, '열기 실패', '폴더를 열 수 없습니다.');
+      if (context.mounted) {
+        UiFeedback.error(
+          context,
+          loc.common_open_folder_fail_title,
+          loc.common_open_folder_fail_desc,
+        );
+      }
     }
     return;
   }
@@ -97,6 +128,12 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
     await openFolder(chosen.savePath);
   } catch (e, st) {
     logE(tag, 'op=$op fn=openSaveFolder msg=openFolder failed path=${chosen.savePath}', e, st);
-    if (context.mounted) UiFeedback.error(context, '열기 실패', '폴더를 열 수 없습니다.');
+    if (context.mounted) {
+      UiFeedback.error(
+        context,
+        loc.common_open_folder_fail_title,
+        loc.common_open_folder_fail_desc,
+      );
+    }
   }
 }

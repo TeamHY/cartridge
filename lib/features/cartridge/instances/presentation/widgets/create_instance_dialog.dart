@@ -348,11 +348,9 @@ class _ModPresetPickerField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
-    final stroke = theme.resources.controlStrokeColorDefault;
-    final bg = theme.resources.controlFillColorDefault;
-    final textColor = theme.typography.body?.color;
+    final stroke = theme.resources.controlStrokeColorSecondary;
+    final textColor = theme.typography.body?.color ?? theme.resources.textFillColorPrimary;
     final hintColor = theme.inactiveColor;
-
     final hasSelection = selectedCount > 0;
     final label = hasSelection
         ? AppLocalizations.of(context).mod_presets_selected(selectedCount)
@@ -365,22 +363,23 @@ class _ModPresetPickerField extends StatelessWidget {
         onPressed: onPressed,
         builder: (ctx, states) {
           final hovered = states.isHovered;
+          final pressed = states.isPressed;
+          final base = theme.resources.controlFillColorDefault;
+          final overlay = _tileOverlay(
+            brightness: theme.brightness,
+            hovered: hovered,
+            pressed: pressed,
+          );
+          final bg = Color.alphaBlend(overlay, base);
+          final baseTextColor = hasSelection ? textColor : hintColor;
+          final textButtonColor = hovered ? theme.resources.textFillColorSecondary : baseTextColor;
           return AnimatedContainer(
             duration: const Duration(milliseconds: 120),
             padding: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
               color: bg,
               borderRadius: AppShapes.chip,
-              border: Border.all(color: stroke),
-              boxShadow: hovered
-                  ? [
-                BoxShadow(
-                  color: theme.shadowColor.withAlpha(theme.brightness == Brightness.dark ? 60 : 28),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-                  : null,
+              border: Border.all(color: pressed ? theme.resources.controlStrokeColorDefault : stroke),
             ),
             child: Row(
               children: [
@@ -390,7 +389,7 @@ class _ModPresetPickerField extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: hasSelection ? textColor : hintColor,
+                      color: textButtonColor,
                       fontWeight: hasSelection ? FontWeight.w600 : FontWeight.w400,
                     ),
                   ),
@@ -442,4 +441,22 @@ class _RadioRow extends StatelessWidget {
       ),
     );
   }
+}
+
+Color _tileOverlay({
+  required Brightness brightness,
+  required bool hovered,
+  required bool pressed,
+}) {
+  if (pressed) {
+    return brightness == Brightness.dark
+        ? Colors.white.withAlpha(1)
+        : Colors.black.withAlpha(5);
+  }
+  if (hovered) {
+    return brightness == Brightness.dark
+        ? Colors.white.withAlpha(4)
+        : Colors.black.withAlpha(5);
+  }
+  return Colors.transparent;
 }

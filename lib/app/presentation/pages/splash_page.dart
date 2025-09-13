@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
 import 'package:cartridge/theme/theme.dart';
@@ -39,7 +40,7 @@ class SplashPage extends StatelessWidget {
             maintainState: true,
             maintainAnimation: true,
             maintainSize: true,
-            child: Semantics(label: 'Loading', child: ProgressRing()),
+            child: Semantics(label: AppLocalizations.of(context).common_loading, child: ProgressRing()),
           ),
         ],
       ),

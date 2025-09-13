@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:cartridge/theme/tokens/spacing.dart';
@@ -10,7 +11,7 @@ class EditableHeaderTitle extends StatefulWidget {
   final VoidCallback onCancel;
   final VoidCallback onStartEdit;
 
-  final String hintText;
+  final String? hintText;
   final bool autofocusWhenEditing;
   final int maxLines;
   final TextOverflow overflow;
@@ -22,7 +23,7 @@ class EditableHeaderTitle extends StatefulWidget {
     required this.onSave,
     required this.onCancel,
     required this.onStartEdit,
-    this.hintText = 'Enter a name',
+    this.hintText,
     this.autofocusWhenEditing = true,
     this.maxLines = 1,
     this.overflow = TextOverflow.ellipsis,
@@ -80,6 +81,7 @@ class _EditableHeaderTitleState extends State<EditableHeaderTitle> {
   @override
   Widget build(BuildContext context) {
     final fTheme = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
 
     // 보기 모드: 제목 + 연필 아이콘 전체가 클릭 영역, 아이콘은 hover시에만 나타남
     if (!widget.editing) {
@@ -119,6 +121,8 @@ class _EditableHeaderTitleState extends State<EditableHeaderTitle> {
       );
     }
 
+    final hint = widget.hintText ?? loc.editable_title_hint;
+
     // 편집 모드
     return Row(
       children: [
@@ -144,7 +148,7 @@ class _EditableHeaderTitleState extends State<EditableHeaderTitle> {
                 focusNode: _focus,
                 child: TextBox(
                   controller: _ctrl,
-                  placeholder: widget.hintText,
+                  placeholder: hint,
                   onSubmitted: (_) => _submit(),
                 ),
               ),
@@ -153,7 +157,7 @@ class _EditableHeaderTitleState extends State<EditableHeaderTitle> {
         ),
         Gaps.w4,
         Tooltip(
-          message: '저장 (Enter)',
+          message: loc.common_save,
           child: FilledButton(
             onPressed: _ctrl.text.trim().isEmpty ? null : _submit,
             child: const Icon(FluentIcons.save, size: 16),
@@ -161,7 +165,7 @@ class _EditableHeaderTitleState extends State<EditableHeaderTitle> {
         ),
         Gaps.w4,
         Tooltip(
-          message: '취소 (Esc)',
+          message: loc.common_cancel,
           child: Button(
             onPressed: widget.onCancel,
             child: const Icon(FluentIcons.chrome_close, size: 14),

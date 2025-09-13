@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
@@ -28,7 +29,10 @@ NavigationAppBar buildNavigationAppBar(BuildContext context, WidgetRef ref) {
             fit: BoxFit.contain,
           ),
           Gaps.w8,
-          const Text('Cartridge', style: AppTypography.appBarTitle),
+          Text(
+            AppLocalizations.of(context).app_name,
+            style: AppTypography.appBarTitle,
+          ),
         ],
       ),
     ),
