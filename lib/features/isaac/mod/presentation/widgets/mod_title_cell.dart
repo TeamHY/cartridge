@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:io';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -22,12 +21,11 @@ class ModTitleCell extends ConsumerStatefulWidget {
   final bool showVersionUnderTitle;
   final bool isNarrowVersion;
   final bool isNarrowPreset;
-
-  /// 제목 클릭 동작(예: 워크샵 페이지 열기)
   final OnTapTitle? onTapTitle;
-
-  /// 페이지별 추가 배지(예: Instance에서 Record Mode)
   final ExtraBadgesBuilder? extraBadges;
+
+  /// 프리셋 배지(프리셋 컬럼이 숨김일 때만 일반 배지와 merge해서 노출)
+  final List<BadgeSpec> presetBadges;
 
   /// 플레이스홀더 이니셜 기본값
   final String placeholderFallback;
@@ -46,6 +44,7 @@ class ModTitleCell extends ConsumerStatefulWidget {
     this.prewarmPreview = true,
     this.isNarrowVersion = false,
     this.isNarrowPreset = false,
+    this.presetBadges = const [],
   });
 
   @override
@@ -138,13 +137,20 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
     final preview = previewAsync.maybeWhen(data: (p) => p, orElse: () => null);
     final thumbPath = preview?.imagePath;
 
-    final badges = ModBadgePolicy.build<ModView>(
+    // 1) 일반 배지(항상 제목 영역에서 노출)
+    final baseBadges = ModBadgePolicy.build<ModView>(
       context: context,
       ref: ref,
       row: widget.row,
       nameOf: (ModView m) => m.displayName,
       seed: widget.extraBadges?.call(widget.row, fTheme) ?? const [],
     );
+
+    // 2) 프리셋 배지: 프리셋 컬럼이 숨김일 때만 merge
+    final mergedBadges = widget.isNarrowPreset
+        ? <BadgeSpec>[...baseBadges, ...widget.presetBadges]
+        : baseBadges;
+
     Widget thumbPlaceholder(double size) {
       final bg = fTheme.accentColor.normal.withAlpha(28);
       final border = fTheme.accentColor.normal.withAlpha(90);
@@ -218,7 +224,10 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
             'version: ${widget.row.version}',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 11, color: FluentTheme.of(context).resources.textFillColorSecondary),
+            style: TextStyle(
+              fontSize: 11,
+              color: FluentTheme.of(context).resources.textFillColorSecondary,
+            ),
             textWidthBasis: TextWidthBasis.parent,
           ),
         )
@@ -236,10 +245,10 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     titleWidget(),
-                    if (versionLine() != null) ...[ Gaps.h2, versionLine()! ],
-                    if (badges.isNotEmpty) ...[
+                    if (versionLine() != null) ...[Gaps.h2, versionLine()!],
+                    if (!hideBadgesInline && mergedBadges.isNotEmpty) ...[
                       Gaps.h2,
-                      BadgeStrip(badges: badges),
+                      BadgeStrip(badges: mergedBadges),
                     ],
                   ],
                 ),
@@ -259,12 +268,12 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
                 children: [
                   Row(
                     children: [
-                      if (widget.isNarrowPreset && !hideBadgesInline && badges.isNotEmpty) ...[
+                      if (!hideBadgesInline && mergedBadges.isNotEmpty) ...[
                         Flexible(
                           fit: FlexFit.loose,
                           child: ConstrainedBox(
                             constraints: BoxConstraints(maxWidth: cellW * 0.45),
-                            child: BadgeStrip(badges: badges),
+                            child: BadgeStrip(badges: mergedBadges),
                           ),
                         ),
                         Gaps.w6,
@@ -272,7 +281,7 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
                       Flexible(fit: FlexFit.tight, child: titleWidget()),
                     ],
                   ),
-                  if (versionLine() != null) ...[ Gaps.h2, versionLine()! ],
+                  if (versionLine() != null) ...[Gaps.h2, versionLine()!],
                 ],
               ),
             ),

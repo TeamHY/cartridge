@@ -559,7 +559,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                         // comf.:  숨겨지면 enabledPreset만 제목 아래, version은 숨김
                         // compact:제목만 (둘 다 제목 아래로 X)
                         final showVersionUnderTitle =
-                            isTile && !versionVisible;
+                            (isTile || isComfortable ) && !versionVisible;
 
                         final showEnabledPresetUnderTitle =
                             !enabledPresetVisible && (isTile || isComfortable) && presetBadges.isNotEmpty;

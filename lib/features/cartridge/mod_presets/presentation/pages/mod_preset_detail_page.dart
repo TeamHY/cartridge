@@ -122,11 +122,11 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
       UTColumnSpec(
         id: 'displayName',
         title: loc.mod_table_header_name,
-        width: UTWidth.flex(4),
+        width: UTWidth.flex(3),
         sortable: true,
         minPx: 120,
       ),
-      UTColumnSpec(id: 'version', title: loc.mod_table_header_version, width: UTWidth.px(100), sortable: true, hideBelowPx: AppBreakpoints.md),
+      UTColumnSpec(id: 'version', title: loc.mod_table_header_version, width: UTWidth.px(100), sortable: true, hideBelowPx: AppBreakpoints.sm + 80),
       UTColumnSpec(id: 'enabled', title: loc.mod_table_header_enabled, width: UTWidth.px(100), sortable: true),
       UTColumnSpec(
         id: 'folder',
@@ -351,21 +351,35 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                         ),
                       ),
                       Builder(builder: (ctx) {
-                        final vis = UTColumnVisibility.of(ctx);
-                        final versionVisible = vis?.isVisible('version') ?? true;
-                        final tTheme = UTTableTheme.of(ctx);
-                        final isCompact = tTheme.density == UTTableDensity.compact;
+                        final vis     = UTColumnVisibility.of(ctx);
+                        final tTheme  = UTTableTheme.of(ctx);
+                        final density = tTheme.density;
+
+                        final isTile          = density == UTTableDensity.tile;
+                        final isComfortable   = density == UTTableDensity.comfortable;
+                        final versionVisible  = vis?.isVisible('version') ?? true;
+
+                        final isNarrowVersion = !versionVisible;
+                        const isNarrowPreset  = false; // 프리셋 칼럼 없음
+
                         final nameForRow = nameOf(r);
+
+                        // InstanceDetailPage와 동일 정책:
+                        // 타일 밀도 + version 칼럼 숨김일 때만 제목 아래 버전 한 줄 표시
+                        final showVersionUnderTitle = (isTile || isComfortable) && isNarrowVersion;
+
                         return ModTitleCell(
                           key: ValueKey(r.id),
                           row: r,
                           displayName: nameForRow,
-                          showVersionUnderTitle: !versionVisible && !isCompact,
+                          showVersionUnderTitle: showVersionUnderTitle,
+                          isNarrowVersion: isNarrowVersion,
+                          isNarrowPreset:  isNarrowPreset,
+                          placeholderFallback: 'M',
+                          prewarmPreview: true,
                           onTapTitle: r.modId.isEmpty
                               ? null
                               : () async => ref.read(isaacSteamLinksProvider).openIsaacWorkshopItem(r.modId),
-                          placeholderFallback: 'M',
-                          prewarmPreview: true,
                         );
                       }),
                       Text(r.version),
