@@ -21,33 +21,12 @@ class AppNavigation extends ConsumerStatefulWidget {
 }
 
 class _AppNavigationState extends ConsumerState<AppNavigation> {
-  PaneDisplayMode? _lastMode;
-  bool _suppressExpander = false; // compact→open 전환 프레임 방어
 
   @override
   Widget build(BuildContext context) {
     final index = ref.watch(appNavigationIndexProvider);
     final loc = AppLocalizations.of(context);
     final fTheme = FluentTheme.of(context);
-
-    // auto처럼 동작: <md=minimal, md..lg=compact, lg+=open
-    final paneMode = context.isLgUp
-        ? PaneDisplayMode.open
-        : (context.isMdUp ? PaneDisplayMode.compact : PaneDisplayMode.minimal);
-
-    // compact -> open 전환 ‘그 순간’만 suppress
-    final isCompToOpen =
-        _lastMode == PaneDisplayMode.compact && paneMode == PaneDisplayMode.open;
-    if (isCompToOpen && !_suppressExpander) {
-      // 지금 빌드에서만 적용되게 플래그 올리고, 다음 프레임에 해제
-      _suppressExpander = true; // setState 금지: 현재 빌드에서 바로 반영됨
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
-        setState(() => _suppressExpander = false);
-      });
-    }
-    _lastMode = paneMode;
-
 
     List<NavigationPaneItem> items() => [
       _paneItem(
@@ -58,10 +37,8 @@ class _AppNavigationState extends ConsumerState<AppNavigation> {
       ),
 
       // open 모드 ‘전환 프레임’에만 PaneItem로 대체해 overflow 회피
-      _adaptiveExpanderItem(
+      _paneItemExpander(
         context: context,
-        paneMode: paneMode,
-        suppress: _suppressExpander,
         icon: FluentIcons.server,
         title: loc.navigation_instance,
         body: const InstancePage(),
@@ -118,8 +95,6 @@ class _AppNavigationState extends ConsumerState<AppNavigation> {
       pane: NavigationPane(
         selected: index,
         onChanged: (i) => ref.read(appNavigationIndexProvider.notifier).state = i,
-        displayMode: paneMode,                    // auto 금지: 수동 제어
-        toggleable: paneMode == PaneDisplayMode.compact, // compact에서만 메뉴 버튼 동작
         size: const NavigationPaneSize(openWidth: AppSpacing.navigationPaneSize),
         indicator: null,
         items: items(),
@@ -152,44 +127,19 @@ class _AppNavigationState extends ConsumerState<AppNavigation> {
     );
   }
 
-  NavigationPaneItem _adaptiveExpanderItem({
+  PaneItemExpander _paneItemExpander({
     required BuildContext context,
-    required PaneDisplayMode paneMode,
-    required bool suppress, // open 전환 프레임에만 true
     required IconData icon,
     required String title,
     required Widget body,
     required List<NavigationPaneItem> children,
   }) {
-    final fTheme = FluentTheme.of(context);
-
-    final selectedTile = WidgetStateProperty.resolveWith((states) {
-      final isLight = fTheme.brightness == Brightness.light;
-      final base = fTheme.accentColor.normal;
-      final alpha = isLight ? 36 : 52;
-      return base.withAlpha(alpha);
-    });
-
-    final shouldTemporarilyReplace =
-        paneMode == PaneDisplayMode.open && suppress;
-
-    if (shouldTemporarilyReplace) {
-      // 🔹 이 프레임에만 trailing 없는 PaneItem로 그려 overflow 방지
-      return PaneItem(
-        icon: _icon(context, icon),
-        title: Text(title, style: AppTypography.navigationPane),
-        body: body,
-        selectedTileColor: selectedTile,
-      );
-    }
-
-    // 🔹 그 외엔 항상 Expander 사용 (compact/minimal에선 flyout, open에선 펼침)
     return PaneItemExpander(
       icon: _icon(context, icon),
       title: Text(title, style: AppTypography.navigationPane),
       body: body,
       items: children,
-      selectedTileColor: selectedTile,
+      selectedTileColor: _selectedTile(context),
     );
   }
 }
