@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/core/log.dart';
 import 'package:cartridge/core/result.dart';
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/instances/application/instances_controller.dart';
@@ -72,35 +71,6 @@ class InstanceDetailController
 
   Future<void> refreshInstalled() async {
     await _refresh();
-  }
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // 정렬: 즉시 재정렬 + 저장(영구화)
-  // ───────────────────────────────────────────────────────────────────────────
-
-  /// **토글 정렬**: 같은 키면 방향 토글, 다른 키면 오름차순으로 시작.
-  /// 1) 현재 리스트 즉시 재정렬 → 2) 저장소에 정렬 기준 저장
-  Future<void> toggleSort(InstanceSortKey key) async {
-    final cur = state.valueOrNull;
-    if (cur == null) return;
-
-    final nextAsc = (cur.sortKey == key) ? !(cur.ascending ?? true) : true;
-
-    // ① 즉시 재정렬(화면 반영)
-    state = AsyncData(_resortBy(key, nextAsc, cur));
-
-    // ② 저장(영구화)
-    await _instances.setSort(_instanceId, key, ascending: nextAsc);
-  }
-
-  /// **정렬 기준 명시 설정**:
-  /// 1) 즉시 재정렬 → 2) 저장(영구화)
-  Future<void> setSort(InstanceSortKey key, {required bool ascending}) async {
-    final cur = state.valueOrNull;
-    if (cur == null) return;
-
-    state = AsyncData(_resortBy(key, ascending, cur));
-    await _instances.setSort(_instanceId, key, ascending: ascending);
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -247,51 +217,6 @@ class InstanceDetailController
     if (saved == null) return;
 
     // 프리셋 변경은 items/카운트에 영향 → 재빌드
-    await _refresh();
-  }
-
-  Future<void> addPreset(String presetId) async {
-    if (!state.hasValue) return;
-    final cur = state.requireValue;
-
-    // 이미 적용되어 있으면 no-op
-    if (cur.appliedPresets.any((e) => e.presetId == presetId)) return;
-
-    // 프리셋 추가 (불필요한 inst-enable 델타는 정리하고 싶으면 pruneRedundant: true)
-    final saved = await _instances.addModPresetUsingUseCase(
-      instanceId: cur.id,
-      presetId: presetId,
-      pruneRedundant: true,
-    );
-    if (saved == null) return;
-
-    await _refresh();
-  }
-
-  Future<void> removePreset(String presetId, {bool keepContributions = false}) async {
-    if (!state.hasValue) {
-      logW("InstanceDetailController", "state에 value가 없습니다.");
-      return;
-    }
-    final cur = state.requireValue;
-
-    // 적용 안되어 있으면 no-op
-    if (!cur.appliedPresets.any((e) => e.presetId == presetId)) {
-      logW("InstanceDetailController", "appliedPresets에 preset이 없습니다.");
-      return;
-    }
-
-    // keepContributions=true 이면 UseCase가 overrides 보강해서 동작 유지
-    final saved = await _instances.removeModPresetUsingUseCase(
-      instanceId: cur.id,
-      presetId: presetId,
-      keepContributions: keepContributions,
-    );
-    if (saved == null) {
-      logE("InstanceDetailController", "프리셋 제거를 실패했습니다.");
-      return;
-    }
-    logI("InstanceDetailController", "성공적으로 프리셋을 제거했습니다.");
     await _refresh();
   }
 

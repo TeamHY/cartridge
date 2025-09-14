@@ -191,70 +191,6 @@ class InstancesService {
     return (view, modPresetViews, optionView);
   }
 
-  Future<List<InstanceView>> searchByName(
-      String query, {
-        Map<String, InstalledMod>? installedOverride,
-        String? modsRootOverride,
-      }) async {
-    final q = query.trim().toLowerCase();
-    final all = await _repo.listAll();
-    final base = (q.isEmpty)
-        ? all
-        : all.where((e) => e.name.toLowerCase().contains(q)).toList(growable: false);
-
-    final installedMap  = await _getInstalledModsMap(
-      installedOverride: installedOverride,
-      modsRootOverride : modsRootOverride,
-    );
-    final installedList = installedMap.values.toList(growable: false);
-
-    final wantedPresetIds = <String>{
-      for (final inst in base) ...inst.appliedPresets.map((e) => e.presetId),
-    };
-    final neededPresets = await _modPresets.getRawPresetsByIds(wantedPresetIds);
-    final presetMap = {for (final p in neededPresets) p.id: p};
-
-    final out = <InstanceView>[];
-    for (final inst in base) {
-      final applied = <ModPreset>[
-        for (final r in inst.appliedPresets) if (presetMap[r.presetId] != null) presetMap[r.presetId]!,
-      ];
-
-      final items = _compute(
-        installedMods  : installedList,
-        selectedPresets: applied,
-        instance       : inst,
-      );
-
-      final totalCount   = items.length;
-      final enabledCount = items.where((e) => e.effectiveEnabled).length;
-      final missingCount = items.where((e) => !e.isInstalled).length;
-
-      out.add(InstanceView(
-        id              : inst.id,
-        name            : inst.name,
-        optionPresetId  : inst.optionPresetId,
-        items           : const <ModView>[],
-        totalCount      : totalCount,
-        enabledCount    : enabledCount,
-        missingCount    : missingCount,
-        sortKey         : inst.sortKey,
-        ascending       : inst.ascending,
-        gameMode        : inst.gameMode,
-        updatedAt       : inst.updatedAt,
-        lastSyncAt      : inst.lastSyncAt,
-        group           : inst.group,
-        categories      : inst.categories,
-        appliedPresets  : _buildAppliedLabels(inst.appliedPresets, presetMap),
-        image           : inst.image,
-      ));
-    }
-    return List.unmodifiable(out);
-  }
-
-  Future<List<Instance>> listRawInstances() async => _repo.listAll();
-  Future<Instance?> getRawInstanceById(String id) async => _repo.findById(id);
-
   // ── Commands ─────────────────────────────────────────────────────────
 
   Future<Result<Instance?>> create({
@@ -438,16 +374,6 @@ class InstancesService {
     return const Result.ok(code: 'instance.removeMissingFromAllAppliedPresets.ok');
   }
 
-  Future<Result<void>> removeMissingFromAllAppliedPresetsUsingEnvironment({
-    required String instanceId,
-  }) async {
-    final installedMap = await _getInstalledModsMap();
-    return await removeMissingFromAllAppliedPresets(
-      instanceId       : instanceId,
-      installedOverride: installedMap,
-    );
-  }
-
   Future<Result<void>> reorderInstances(
       List<String> orderedIds, {
         bool strict = true,
@@ -462,33 +388,6 @@ class InstancesService {
       logE(_tag, 'op=reorder fn=reorderInstances msg=unexpected', e, st);
       return Result.failure(code: 'instance.reorder.failure', ctx: {'error': e.toString()});
     }
-  }
-
-  Future<Instance?> setSort(
-      String instanceId,
-      InstanceSortKey key, {
-        required bool ascending,
-      }) async {
-    final src = await _repo.findById(instanceId);
-    if (src == null) {
-      logI(_tag, 'op=update fn=setSort msg=원본 없음 id=$instanceId');
-      return null;
-    }
-    final next = src.copyWith(sortKey: key, ascending: ascending, updatedAt: DateTime.now());
-    await _repo.upsert(next);
-    return next;
-  }
-
-  Future<Instance?> toggleSort(String instanceId, InstanceSortKey key) async {
-    final cur = await _repo.findById(instanceId);
-    if (cur == null) {
-      logI(_tag, 'op=update fn=toggleSort msg=원본 없음 id=$instanceId');
-      return null;
-    }
-    final nextAsc = (cur.sortKey == key) ? !(cur.ascending ?? true) : true;
-    final next = cur.copyWith(sortKey: key, ascending: nextAsc, updatedAt: DateTime.now());
-    await _repo.upsert(next);
-    return next;
   }
 
   Future<Result<Instance?>> setItemState({
@@ -568,7 +467,7 @@ class InstancesService {
         now: now,
       );
       if (next == null) {
-        map.remove(v.id);
+        if (prev != null) map.remove(v.id);
       } else {
         map[v.id] = next;
       }
@@ -625,172 +524,6 @@ class InstancesService {
     return normalized;
   }
 
-  Future<Instance?> addModPresetUsingUseCase({
-    required String instanceId,
-    required String presetId,
-    bool isMandatory = false,
-    bool pruneRedundant = true,
-    Map<String, InstalledMod>? installedOverride,
-    String? modsRootOverride,
-  }) async {
-    final src = await _repo.findById(instanceId);
-    if (src == null) return null;
-    if (src.appliedPresets.any((e) => e.presetId == presetId)) return src;
-
-    final now = DateTime.now();
-    var inst = src.copyWith(
-      appliedPresets: [
-        ...src.appliedPresets,
-        AppliedPresetRef(presetId: presetId, isMandatory: isMandatory),
-      ],
-      updatedAt: now,
-    );
-
-    if (!pruneRedundant) {
-      await _repo.upsert(inst);
-      return inst;
-    }
-
-    final installedMap = await _getInstalledModsMap(
-      installedOverride: installedOverride,
-      modsRootOverride : modsRootOverride,
-    );
-    final installedList = installedMap.values.toList(growable: false);
-
-    final afterPresets = await _getAppliedPresetsByIds(
-        inst.appliedPresets.map((e) => e.presetId).toSet());
-    final viewsAfter = _compute(
-      installedMods  : installedList,
-      selectedPresets: afterPresets,
-      instance       : inst,
-    );
-    final afterMap = {for (final v in viewsAfter) v.id: v};
-
-    final nextOverrides = <ModEntry>[];
-    for (final o in inst.overrides) {
-      final e = o.enabled;
-      if (e == false) {
-        nextOverrides.add(o);
-        continue;
-      }
-      if (e == true) {
-        final v = afterMap[o.key];
-        final coveredByPreset = v != null && v.enabledByPresets.isNotEmpty;
-        if (coveredByPreset) {
-          final hasMeta = (o.favorite == true)
-              || ((o.workshopName ?? '').trim().isNotEmpty)
-              || ((o.workshopId ?? '').trim().isNotEmpty);
-          if (hasMeta) nextOverrides.add(o.copyWith(enabled: null, updatedAt: now));
-        } else {
-          nextOverrides.add(o);
-        }
-        continue;
-      }
-      nextOverrides.add(o);
-    }
-
-    inst = inst.copyWith(overrides: nextOverrides, updatedAt: DateTime.now());
-    await _repo.upsert(inst);
-    return inst;
-  }
-
-  Future<Instance?> removeModPresetUsingUseCase({
-    required String instanceId,
-    required String presetId,
-    bool keepContributions = false,
-    Map<String, InstalledMod>? installedOverride,
-    String? modsRootOverride,
-  }) async {
-    final inst = await _repo.findById(instanceId);
-    if (inst == null) return null;
-
-    final installedMap  = await _getInstalledModsMap(
-      installedOverride: installedOverride,
-      modsRootOverride : modsRootOverride,
-    );
-    final installedList = installedMap.values.toList(growable: false);
-
-    final beforePresets = await _getAppliedPresetsByIds(
-        inst.appliedPresets.map((e) => e.presetId).toSet());
-    final afterPresets  = beforePresets.where((p) => p.id != presetId).toList();
-
-    if (!keepContributions) {
-      final now  = DateTime.now();
-      final next = inst.copyWith(
-        appliedPresets: [
-          for (final r in inst.appliedPresets) if (r.presetId != presetId) r
-        ],
-        updatedAt: now,
-      );
-      await _repo.upsert(next);
-      return next;
-    }
-
-    final beforeViews = _compute(
-      installedMods  : installedList,
-      selectedPresets: beforePresets,
-      instance       : inst,
-    );
-    final afterViews  = _compute(
-      installedMods  : installedList,
-      selectedPresets: afterPresets,
-      instance       : inst,
-    );
-    final beforeMap = {for (final v in beforeViews) v.id: v};
-    final afterMap  = {for (final v in afterViews)  v.id: v};
-
-    final disabledByInstance = <String>{
-      for (final o in inst.overrides) if (o.enabled == false) o.key,
-    };
-    final enabledByInstance = <String>{
-      for (final o in inst.overrides) if (o.enabled == true) o.key,
-    };
-
-    final toKeep = <String>{};
-    for (final id in beforeMap.keys) {
-      final b = beforeMap[id]!;
-      if (!b.enabledByPresets.contains(presetId)) continue;
-      final a = afterMap[id];
-      final afterHasAnyPreset = (a?.enabledByPresets.isNotEmpty ?? false);
-      if (afterHasAnyPreset) continue;
-      if (disabledByInstance.contains(id)) continue;
-      if (enabledByInstance.contains(id)) continue;
-      toKeep.add(id);
-    }
-
-    final now = DateTime.now();
-    final overrides = [...inst.overrides];
-
-    for (final key in toKeep) {
-      final v = beforeMap[key]!;
-      final idx = overrides.indexWhere((e) => e.key == key);
-      if (idx >= 0) {
-        overrides[idx] = overrides[idx].copyWith(enabled: true, updatedAt: now);
-      } else {
-        overrides.add(ModEntry(
-          key         : key,
-          workshopId  : (v.installedRef?.metadata.id.trim().isNotEmpty == true)
-              ? v.installedRef!.metadata.id
-              : null,
-          workshopName: v.displayName,
-          enabled     : true,
-          favorite    : false,
-          updatedAt   : now,
-        ));
-      }
-    }
-
-    final next = inst.copyWith(
-      appliedPresets: [
-        for (final r in inst.appliedPresets) if (r.presetId != presetId) r
-      ],
-      overrides: overrides,
-      updatedAt: now,
-    );
-    await _repo.upsert(next);
-    return next;
-  }
-
   Future<void> deleteItem({
     required String instanceId,
     required String itemId,
@@ -814,26 +547,36 @@ class InstancesService {
     bool? favorite,
     required DateTime now,
   }) {
-    final bool wantClearEnabled = (enabled == null) && (favorite == null) && (prev != null);
+    final bool removeIntent = (enabled == null) && (favorite == null || favorite == false);
+    if (removeIntent) {
+      return null;
+    }
+
+    final bool mustSave = (enabled != null) || (favorite == true);
+
     final String? workshopId =
         prev?.workshopId ??
             ((item.installedRef?.metadata.id.trim().isNotEmpty ?? false)
                 ? item.installedRef!.metadata.id
                 : null);
 
-    final draft = (prev ??
-        ModEntry(
-          key: item.id,
-          workshopId: workshopId,
-          workshopName: item.displayName,
-        )).copyWith(
-      enabled: wantClearEnabled ? null : (enabled ?? prev?.enabled),
-      favorite: favorite ?? prev?.favorite ?? false,
+    if (prev == null) {
+      if (!mustSave) return null;
+      return ModEntry(
+        key: item.id,
+        workshopId: workshopId,
+        workshopName: item.displayName,
+        enabled: enabled,
+        favorite: favorite ?? false,
+        updatedAt: now,
+      );
+    }
+
+    return prev.copyWith(
+      enabled: enabled ?? prev.enabled,
+      favorite: favorite ?? prev.favorite,
       updatedAt: now,
     );
-
-    final keep = (draft.enabled != null) || (draft.favorite == true);
-    return keep ? draft : null;
   }
 
   List<ModEntry> _pruneOverridesCoveredByPresets({
