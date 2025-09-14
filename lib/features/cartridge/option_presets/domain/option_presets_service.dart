@@ -35,11 +35,6 @@ class OptionPresetsService {
     return _repo.findById(id);
   }
 
-  Future<List<OptionPresetView>> searchViews(String query) async {
-    final list = await _searchModelsByName(query);
-    return list.map(OptionPresetView.fromModel).toList(growable: false);
-  }
-
   // ── Commands ────────────────────────────────────────────────────────────────
   Future<Result<void>> deleteView(String id) async {
     logI(_tag, 'op=delete id=$id');
@@ -127,8 +122,6 @@ class OptionPresetsService {
       return const Result<OptionPresetView>.notFound(code: 'optionPreset.update.notFound');
     }
 
-    // ⚠️ copyWith에 null을 넘기면 null로 덮여쓰여 버리므로,
-    //     "넘겨지지 않은 값은 기존 값 유지" 로 새 인스턴스를 조립한다.
     final nextOptions = IsaacOptions(
       windowWidth: windowWidth ?? curr.options.windowWidth,
       windowHeight: windowHeight ?? curr.options.windowHeight,
@@ -221,18 +214,5 @@ class OptionPresetsService {
     final list = await _repo.listAll(); // pos ASC
     logI(_tag, 'op=list count=${list.length}');
     return list;
-  }
-
-  Future<List<OptionPreset>> _searchModelsByName(String query) async {
-    final q = query.trim().toLowerCase();
-    if (q.isEmpty) return _listModels();
-
-    final all = await _repo.listAll(); // pos ASC 유지
-    final filtered = all
-        .where((p) => p.name.toLowerCase().contains(q))
-        .toList(growable: false);
-    // UX: 검색은 이름순으로 보여주고 싶다면 정렬 추가
-    filtered.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    return filtered;
   }
 }

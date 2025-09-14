@@ -51,24 +51,6 @@ void main() {
       expect(no, isNull);
     });
 
-    test('searchViews(): 부분 문자열로 필터, 이름순 정렬(lowercase 기준)', () async {
-      // Given
-      repo.seed([
-        OptionPreset(id: 'a', name: 'delta', useRepentogon: null, options: IsaacOptions.fromJson({})),
-        OptionPreset(id: 'b', name: 'alpha', useRepentogon: null, options: IsaacOptions.fromJson({})),
-        OptionPreset(id: 'c', name: 'Beta', useRepentogon: null, options: IsaacOptions.fromJson({})),
-      ], order: const ['a', 'b', 'c']);
-
-      // When
-      final r1 = await sut.searchViews('e');
-      final r2 = await sut.searchViews('');
-
-      // Then: 'a'를 포함 → Alpha, Gamma (이름순: alpha, Gamma)
-      expect(r1.map((e) => e.name).toList(), ['Beta', 'delta']);
-      // 빈 문자열이면 전체(pos 순서 유지)
-      expect(r2.map((e) => e.id).toList(), ['a', 'b', 'c']);
-    });
-
     // ── Commands: create/update/delete/clone ───────────────────────────────
     test('createView(): 정상 입력 → Result.ok + 저장', () async {
       // When
