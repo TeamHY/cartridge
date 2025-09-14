@@ -54,6 +54,7 @@ class HomePage extends ConsumerWidget {
                   colsMd: 2,
                   colsSm: 1,
                   items: isNarrow ? narrowItems : wideItems,
+                  rowCrossAxisAlignment: CrossAxisAlignment.end,
                 ),
                 Gaps.h16,
               ],

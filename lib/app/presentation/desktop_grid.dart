@@ -31,6 +31,7 @@ class DesktopGrid extends StatelessWidget {
 
   /// true면 화면 폭(context.sizeClass)으로, false면 컨테이너 폭으로 컬럼 계산
   final bool useViewportForBreakpoints;
+  final CrossAxisAlignment rowCrossAxisAlignment;
 
   const DesktopGrid({
     super.key,
@@ -42,6 +43,7 @@ class DesktopGrid extends StatelessWidget {
     this.gapX = AppSpacing.lg,
     this.gapY = AppSpacing.md,
     this.useViewportForBreakpoints = false,
+    this.rowCrossAxisAlignment = CrossAxisAlignment.start,
   });
 
   @override
@@ -77,6 +79,7 @@ class DesktopGrid extends StatelessWidget {
                   available: available,
                   perItem: perItem,
                   gapX: gapX,
+                  crossAxisAlignment: rowCrossAxisAlignment,
                 ),
                 if (r != rows.length - 1) SizedBox(height: gapY),
               ],
@@ -119,12 +122,14 @@ class _GridRow extends StatelessWidget {
   final double available;
   final double perItem;
   final double gapX;
+  final CrossAxisAlignment crossAxisAlignment;
 
   const _GridRow({
     required this.row,
     required this.available,
     required this.perItem,
     required this.gapX,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
   });
 
   @override
@@ -141,7 +146,7 @@ class _GridRow extends StatelessWidget {
     // 일반 행: 아이템 폭 고정(perItem), 좌측 정렬, 아이템 간 gapX
     return Row(
       key: const ValueKey('dg.row'),
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: crossAxisAlignment,
       children: [
         for (var i = 0; i < row.length; i++) ...[
           SizedBox(width: perItem, child: row[i].child),
