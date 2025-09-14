@@ -72,7 +72,7 @@ Provider<AsyncValue<List<OptionPresetView>>>((ref) {
   });
 });
 
-// ADD: 현재 PC의 options.ini로부터 초기 OptionPresetView 생성
+// 현재 PC의 options.ini로부터 초기 OptionPresetView 생성
 final optionPresetInitialFromCurrentProvider =
 FutureProvider<OptionPresetView?>((ref) async {
   // 1) 앱 설정을 읽어서 options.ini 경로 결정(수동 > 자동탐지)
