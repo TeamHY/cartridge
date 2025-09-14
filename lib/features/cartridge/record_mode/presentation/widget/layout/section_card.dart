@@ -15,14 +15,16 @@ class SectionCard extends StatelessWidget {
     this.rowUnit = kPanelRowUnit,
     this.padding = const EdgeInsets.all(AppSpacing.md),
     this.margin,
+    this.decoration,
   });
 
   final int rows;
-  final int gapBelowRows;       // ⟵ 이제 카드 "외부" 간격으로 적용
+  final int gapBelowRows;
   final double rowUnit;
-  final EdgeInsetsGeometry padding;   // ⟵ 내부 패딩
-  final EdgeInsetsGeometry? margin;   // ⟵ 호출측이 준 margin + gapBelowRows 가산
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry? margin;
   final Widget child;
+  final Decoration? decoration;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +39,7 @@ class SectionCard extends StatelessWidget {
 
     return Container(
       margin: effectiveMargin,
-      decoration: BoxDecoration(
+      decoration: decoration ?? BoxDecoration(
         color: t.resources.cardBackgroundFillColorDefault,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
@@ -46,8 +48,9 @@ class SectionCard extends StatelessWidget {
         ),
       ),
       // 행 높이(rows * rowUnit)는 "내부 패딩 포함" 보장
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: rows * rowUnit),
+      child: SizedBox(
+        height: rows * rowUnit,
+        width: double.infinity,
         child: Padding(
           padding: padding,
           child: child,

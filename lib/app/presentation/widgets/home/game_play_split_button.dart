@@ -59,7 +59,7 @@ class GamePlaySplitButton extends ConsumerWidget {
         instances: instances,
         selectedId: selectedId,
         onPick: (id) {
-          ref.read(recentInstanceIdProvider.notifier).state = id; // 선택만 갱신
+          ref.read(recentInstanceIdProvider.notifier).state = id;
         },
         onPlayNow: playSelected, // 패널의 "바로 실행" 버튼
         width: 360,

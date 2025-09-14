@@ -689,6 +689,34 @@
   "@live_status_error": {
     "description": "에러 발생 시 간단 메시지(에러 코드는 숨김)"
   },
+  "youtube_banner_title": "시청자 참여 대회 콘텐츠",
+  "@youtube_banner_title": {
+    "description": "YoutubeBanner 상단 제목. 짧고 명확하게."
+  },
+  "youtube_banner_subtitle": "오헌영의 스피드런 챌린지! 다들 참여해보세요.",
+  "@youtube_banner_subtitle": {
+    "description": "YoutubeBanner 보조 설명. 톤은 부드럽고 가볍게 권유."
+  },
+  "youtube_toast_title": "외부 링크",
+  "@youtube_toast_title": {
+    "description": "외부 브라우저/앱으로 이동할 때 띄우는 토스트의 제목."
+  },
+  "youtube_toast_body": "브라우저를 열 수 없었어요.",
+  "@youtube_toast_body": {
+    "description": "외부 링크 열기에 실패했을 때 사용자에게 보여줄 간단한 안내 문구."
+  },
+  "youtube_banner_thumbnail_semantics": "시청자 참여 대회 썸네일",
+  "@youtube_banner_thumbnail_semantics": {
+    "description": "접근성(스크린리더)용 썸네일 대체 텍스트."
+  },
+  "ranking_empty_title": "이 기간엔 기록이 없어요",
+  "@ranking_empty_title": {
+    "description": "랭킹 비어 있을 때 제목. 부드럽고 담백하게."
+  },
+  "ranking_empty_suggestion": "다른 날짜로 한 번 살펴보세요.",
+  "@ranking_empty_suggestion": {
+    "description": "랭킹 비어 있을 때 행동 제안 문구. 가벼운 권유."
+  },
   "@ranking": {
     "description": "일간 및 주간 챌린지 랭킹 페이지"
   },

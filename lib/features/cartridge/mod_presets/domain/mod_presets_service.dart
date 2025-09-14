@@ -39,26 +39,6 @@ class ModPresetsService {
         .toList(growable: false);
   }
 
-  Future<List<ModPresetView>> getViewsByIds(
-      Set<String> presetIds, {
-        Map<String, InstalledMod>? installedOverride,
-        String? modsRootOverride,
-      }) async {
-    if (presetIds.isEmpty) return const <ModPresetView>[];
-    final models = await getRawPresetsByIds(presetIds);
-    if (models.isEmpty) return const <ModPresetView>[];
-
-    final installed = await _getInstalledModsMap(
-      installedOverride: installedOverride,
-      modsRootOverride : modsRootOverride,
-    );
-    return models
-        .map((p) => _projector.toView(preset: p, installed: installed))
-        .toList(growable: false);
-  }
-
-  Future<List<ModPreset>> listRawPresets() => _repo.listAll();
-
   Future<Result<ModPresetView>> getViewById({
     required String presetId,
     Map<String, InstalledMod>? installedOverride,
@@ -95,23 +75,6 @@ class ModPresetsService {
     return _projector.toView(preset: src, installed: installed);
   }
 
-  Future<List<ModPresetView>> searchViews(
-      String query, {
-        Map<String, InstalledMod>? installedOverride,
-        String? modsRootOverride,
-      }) async {
-    final q    = query.trim().toLowerCase();
-    final all  = await _repo.listAll();
-    final base = q.isEmpty ? all : all.where((p) => p.name.toLowerCase().contains(q));
-
-    final installed = await _getInstalledModsMap(
-      installedOverride: installedOverride,
-      modsRootOverride : modsRootOverride,
-    );
-    return base
-        .map((p) => _projector.toView(preset: p, installed: installed))
-        .toList(growable: false);
-  }
 
   Future<List<ModPreset>> getRawPresetsByIds(Set<String> ids) async {
     if (ids.isEmpty) return const <ModPreset>[];
@@ -319,60 +282,6 @@ class ModPresetsService {
       logE(_tag, 'op=reorder fn=reorderModPresets msg=unexpected', e, st);
       return Result.failure(code: 'modPreset.reorder.failure', ctx: {'error': e.toString()});
     }
-  }
-
-  Future<Result<ModPresetView>> setSort(
-      String presetId,
-      ModSortKey key, {
-        required bool ascending,
-        Map<String, InstalledMod>? installedOverride,
-        String? modsRootOverride,
-      }) async {
-    final src = await _repo.findById(presetId);
-    if (src == null) return const Result.notFound(code: 'modPreset.setSort.notFound');
-
-    final next       = src.copyWith(sortKey: key, ascending: ascending, updatedAt: DateTime.now());
-    final normalized = ModPresetPolicy.normalize(next);
-    final vr         = ModPresetPolicy.validate(normalized);
-    if (!vr.isOk) {
-      return Result<ModPresetView>.invalid(violations: vr.violations, code: 'modPreset.setSort.invalid');
-    }
-
-    await _repo.upsert(normalized);
-    final installed = await _getInstalledModsMap(
-      installedOverride: installedOverride,
-      modsRootOverride : modsRootOverride,
-    );
-    final view = _projector.toView(preset: normalized, installed: installed);
-    return Result.ok(data: view, code: 'modPreset.setSort.ok');
-  }
-
-  Future<Result<ModPresetView>> toggleSort(
-      String presetId,
-      ModSortKey key, {
-        Map<String, InstalledMod>? installedOverride,
-        String? modsRootOverride,
-      }) async {
-    final cur = await _repo.findById(presetId);
-    if (cur == null) return const Result.notFound(code: 'modPreset.toggleSort.notFound');
-
-    final currentAsc = cur.ascending ?? true;
-    final nextAsc    = (cur.sortKey == key) ? !currentAsc : true;
-    final next       = cur.copyWith(sortKey: key, ascending: nextAsc, updatedAt: DateTime.now());
-
-    final normalized = ModPresetPolicy.normalize(next);
-    final vr         = ModPresetPolicy.validate(normalized);
-    if (!vr.isOk) {
-      return Result<ModPresetView>.invalid(violations: vr.violations, code: 'modPreset.toggleSort.invalid');
-    }
-
-    await _repo.upsert(normalized);
-    final installed = await _getInstalledModsMap(
-      installedOverride: installedOverride,
-      modsRootOverride : modsRootOverride,
-    );
-    final view = _projector.toView(preset: next, installed: installed);
-    return Result.ok(data: view, code: 'modPreset.toggleSort.ok');
   }
 
   // ── State Changes(상태 변경) ─────────────────────────────────────────────────

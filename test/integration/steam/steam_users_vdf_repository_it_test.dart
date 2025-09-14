@@ -96,7 +96,7 @@ void main() {
 
           // 자동탐지 모드 설정(override 없음)
           final autoSetting = AppSetting(
-            useAutoDetectSteamPath: true, // ← 자동
+            useAutoDetectSteamPath: true,
           );
           final repo = SteamUsersVdfRepository(
             install: _FakeInstall(base),
@@ -162,8 +162,8 @@ void main() {
 
         // 수동 지정 모드 설정(override = base)
         final manualSetting = AppSetting(
-          useAutoDetectSteamPath: false, // ← 수동
-          steamPath: base,               // ← 폴더 UI 기준
+          useAutoDetectSteamPath: false,
+          steamPath: base,
         );
         final repo = SteamUsersVdfRepository(
           install: _FakeInstall(base),

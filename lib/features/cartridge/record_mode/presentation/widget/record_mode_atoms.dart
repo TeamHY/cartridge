@@ -12,7 +12,7 @@ const double kRightPanelPlaceholderHeight = 400.0;
 const double kHeroCardAspect = 148 / 125; // ≈ 1.184, 타겟 기준
 const double kHeroCardTitleHeight = 48.0;
 const double kHeroCardGap = 16.0;
-
+const bool showClearTime = true;
 
 // ====== TopInfoRow (기간 전환 + 기간/시드 칩) ======
 class TopInfoRow extends StatelessWidget {
@@ -112,7 +112,6 @@ class HeroCardsRow extends StatelessWidget {
           child: GameItemCard(
             title: characterName,
             imageAsset: characterAsset,
-            imageAspect: kHeroCardAspect, // 기존 상수 계속 사용
             badgeText: loc.record_badge_character,
             loading: loading,
             error: error,
@@ -123,7 +122,6 @@ class HeroCardsRow extends StatelessWidget {
           child: GameItemCard(
             title: targetName,
             imageAsset: targetAsset,
-            imageAspect: kHeroCardAspect,
             badgeText: loc.record_badge_target,
             loading: loading,
             error: error,
@@ -135,132 +133,17 @@ class HeroCardsRow extends StatelessWidget {
 }
 
 
-class HeroCardsSkeleton extends StatelessWidget {
-  const HeroCardsSkeleton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final t = FluentTheme.of(context);
-    final stroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
-    final cardBg = t.resources.cardBackgroundFillColorDefault;
-    final imageBg = t.micaBackgroundColor.withAlpha(40);
-
-    Widget skeletonCard() => Container(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: stroke, width: .8),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          // 실제 카드와 동일한 비율의 이미지 영역
-          AspectRatio(
-            aspectRatio: kHeroCardAspect,
-            child: Container(
-              color: imageBg,
-              // 필요하면 안쪽에 더 옅은 바(로딩 느낌) 레이어를 깔아도 됨
-            ),
-          ),
-          // 실제 카드와 동일한 타이틀 높이
-          Container(
-            height: kHeroCardTitleHeight,
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Container(
-              height: 14,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: t.resources.cardBackgroundFillColorSecondary, // 살짝 대비
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    return Row(
-      children: [
-        Expanded(child: skeletonCard()),
-        const SizedBox(width: kHeroCardGap),
-        Expanded(child: skeletonCard()),
-      ],
-    );
-  }
-}
-
-class GoalEmpty extends StatelessWidget {
-  const GoalEmpty({
-    super.key,
-    required this.type,
-    required this.rangeText,
-  });
-
-  final ChallengeType type;   // daily / weekly
-  final String rangeText;     // “YYYY년 MM월 DD일” 또는 “YYYY년 nn주차”, 범위 등
-
-  @override
-  Widget build(BuildContext context) {
-    final t = FluentTheme.of(context);
-    final fill = t.resources.cardBackgroundFillColorDefault;
-    final stroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
-
-    final title = switch (type) {
-      ChallengeType.daily  => '해당 날짜의 일간 목표가 없습니다.',
-      ChallengeType.weekly => '해당 기간의 주간 목표가 없습니다.',
-    };
-
-    final subtitle = '선택된 기간: $rangeText';
-
-    return Container(
-      height: 120,
-      decoration: BoxDecoration(
-        color: fill,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: stroke, width: .8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      child: Row(
-        children: [
-          Container(
-            width: 48, height: 48,
-            decoration: BoxDecoration(
-              color: t.micaBackgroundColor.withAlpha(60),
-              shape: BoxShape.circle,
-            ),
-            child: const Center(child: Icon(FluentIcons.info)),
-          ),
-          Gaps.w12,
-          Gaps.w4,
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                Gaps.h4,
-                Text(subtitle, style: const TextStyle(fontSize: 12)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class RankingEmptyPanelPast extends StatelessWidget {
   const RankingEmptyPanelPast({super.key});
 
   @override
   Widget build(BuildContext context) {
     final t = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
     final fill = t.resources.cardBackgroundFillColorDefault;
     final stroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
 
-    return SizedBox( // ⟵ 고정 높이 적용 (스켈레톤과 동일)
-      height: kRightPanelPlaceholderHeight,
+    return SizedBox.expand( // ⟵ 카드 내부 가용 높이 채움
       child: Container(
         decoration: BoxDecoration(
           color: fill,
@@ -279,15 +162,15 @@ class RankingEmptyPanelPast extends StatelessWidget {
               child: const Center(child: Icon(FluentIcons.info)),
             ),
             Gaps.w12,
-            const Expanded(
+            Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // ⟵ 세로 중앙 정렬
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('해당 기간의 기록이 없습니다.',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                  SizedBox(height: 4),
-                  Text('다른 날짜로 이동해 보세요.', style: TextStyle(fontSize: 12)),
+                  Text(loc.ranking_empty_title,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                  const SizedBox(height: 4),
+                  Text(loc.ranking_empty_suggestion, style: const TextStyle(fontSize: 12)),
                 ],
               ),
             ),
@@ -298,172 +181,260 @@ class RankingEmptyPanelPast extends StatelessWidget {
   }
 }
 
-class RankingSkeleton extends StatelessWidget {
-  const RankingSkeleton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final t = FluentTheme.of(context);
-    final fill = t.resources.cardBackgroundFillColorDefault;
-    final stroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
-
-    Widget bar(double w, double h, [double r = 12]) => Container(
-      width: w, height: h,
-      decoration: BoxDecoration(
-        color: fill,
-        borderRadius: BorderRadius.circular(r),
-        border: Border.all(color: stroke, width: .8),
-      ),
-    );
-
-    return SizedBox( // ⟵ 고정 높이 적용
-      height: kRightPanelPlaceholderHeight,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 12, top: 4),
-              child: bar(520, 72),
-            ),
-          ),
-          Row(children: [
-            Expanded(child: Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: bar(double.infinity, 60),
-            )),
-            Expanded(child: Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: bar(double.infinity, 60),
-            )),
-          ]),
-          Gaps.h12,
-          for (int i = 0; i < 4; i++) ...[
-            bar(double.infinity, 52),
-            Gaps.h8,
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-
 class Podium extends StatelessWidget {
-  const Podium({super.key, required this.entries, required this.isAdmin});
-  final List<LeaderboardEntry> entries; // 상위 3개 기대
-  final bool isAdmin;
-
-  @override
-  Widget build(BuildContext context) {
-    final first  = entries.isNotEmpty ? entries[0] : null;
-    final second = entries.length > 1 ? entries[1] : null;
-    final third  = entries.length > 2 ? entries[2] : null;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (first != null) ...[
-          Align(
-            alignment: Alignment.center,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
-              child: PodiumTile(rank: 1, entry: first, big: true, isAdmin: isAdmin, centered: true),
-            ),
-          ),
-          Gaps.h12,
-        ],
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: second == null ? const SizedBox.shrink() : PodiumTile(rank: 2, entry: second, isAdmin: isAdmin),
-            )),
-            Gaps.w12,
-            Expanded(child: Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: third == null ? const SizedBox.shrink() : PodiumTile(rank: 3, entry: third, isAdmin: isAdmin),
-            )),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class PodiumTile extends StatelessWidget {
-  const PodiumTile({
+  const Podium({
     super.key,
-    required this.rank,
-    required this.entry,
-    this.big = false,
+    required this.entries,
     required this.isAdmin,
-    this.centered = false,
+    this.height = 180,
+    this.loading = false,
   });
 
-  final int rank;
-  final LeaderboardEntry entry;
-  final bool big;
+  final List<LeaderboardEntry> entries;
   final bool isAdmin;
-  final bool centered;
+  final double height;
+  final bool loading;
+
+  @override
+  Widget build(BuildContext context) {
+    final first  = loading ? null : (entries.isNotEmpty ? entries[0] : null);
+    final second = loading ? null : (entries.length > 1 ? entries[1] : null);
+    final third  = loading ? null : (entries.length > 2 ? entries[2] : null);
+
+    const h1 = 1.00, h2 = .72, h3 = .72;
+
+    return SizedBox(
+      height: height,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(child: _Pedestal(entry: second, rank: 2, factor: h2, isAdmin: showClearTime | isAdmin, loading: loading)),
+          const SizedBox(width: 12),
+          Expanded(child: _Pedestal(entry: first,  rank: 1, factor: h1, isAdmin: showClearTime | isAdmin, loading: loading)),
+          const SizedBox(width: 12),
+          Expanded(child: _Pedestal(entry: third,  rank: 3, factor: h3, isAdmin: showClearTime | isAdmin, loading: loading)),
+        ],
+      ),
+    );
+  }
+}
+
+
+class _Pedestal extends StatelessWidget {
+  const _Pedestal({
+    required this.entry,
+    required this.rank,
+    required this.factor,
+    required this.isAdmin,
+    this.loading = false,
+  });
+
+  final LeaderboardEntry? entry;
+  final int rank;
+  final double factor;
+  final bool isAdmin;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
     final t = FluentTheme.of(context);
-    final stroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
-    final bg = t.resources.cardBackgroundFillColorDefault;
+    final textSecondary = t.resources.textFillColorSecondary;
+    final barBg = t.resources.cardBackgroundFillColorSecondary;
 
-    final badgeColor = switch (rank) {
-      1 => t.accentColor,
-      2 => Colors.grey,
-      3 => Colors.orange,
-      _ => t.resources.textFillColorSecondary,
-    };
+    final style = _MedalStyle.of(rank, t.brightness);
 
-    final name = Text(
-      entry.nickname,
-      textAlign: centered ? TextAlign.center : TextAlign.start,
-      style: const TextStyle(fontWeight: FontWeight.w700),
+    return LayoutBuilder(
+      builder: (context, c) {
+        final colH = (c.maxHeight * factor).clamp(120.0, c.maxHeight);
+        final medalSize = rank == 1 ? 48.0 : 40.0;
+
+        return SizedBox(
+          height: colH,
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              // 메달 (크기/위치 동일)
+              Positioned(
+                top: 0,
+                child: loading
+                    ? Container(
+                  width: medalSize, height: medalSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: barBg,
+                    border: Border.all(color: t.resources.controlStrokeColorSecondary.withAlpha(48), width: .8),
+                  ),
+                )
+                    : _MedalChip(rank: rank, style: style),
+              ),
+              // 기둥(닉네임/타임/포인트 바) — 동일 배치
+              Positioned.fill(
+                top: rank == 1 ? 60 : 50,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // 닉네임 자리
+                    loading
+                        ? Container(
+                      height: 14, width: rank == 1 ? 120 : 100,
+                      decoration: BoxDecoration(color: barBg, borderRadius: BorderRadius.circular(6)),
+                    )
+                        : Text(
+                      entry?.nickname ?? '—',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: rank == 1 ? 17 : 15, fontWeight: FontWeight.w800),
+                    ),
+                    // 클리어 타임 자리
+                    if (loading) ...[
+                      Gaps.h10,
+                      Container(
+                        height: 10, width: 80,
+                        decoration: BoxDecoration(color: barBg, borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ] else if (showClearTime | isAdmin && entry?.clearTime != null) ...[
+                      Gaps.h10,
+                      Text(
+                        getTimeString(entry!.clearTime!),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 12, color: textSecondary),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                    Gaps.h6,
+                    // 포인트 바
+                    Container(
+                      height: 4, width: 44,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        gradient: loading ? null : LinearGradient(colors: style.accentBar),
+                        color: loading ? barBg : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
+  }
+}
 
-    final time = (isAdmin && entry.clearTime != null)
-        ? Text(
-      getTimeString(entry.clearTime!),
-      textAlign: centered ? TextAlign.center : TextAlign.start,
-      style: TextStyle(color: t.resources.textFillColorSecondary, fontSize: 12),
-    )
-        : null;
+class _MedalChip extends StatelessWidget {
+  const _MedalChip({required this.rank, required this.style});
+  final int rank;
+  final _MedalStyle style;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = FluentTheme.of(context);
+    final onAccent = t.resources.textOnAccentFillColorPrimary;
+
+    final medalSize = rank == 1 ? 44.0 : 36.0;
 
     return Container(
+      width: medalSize, height: medalSize,
       decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: stroke, width: .8),
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: style.medalFill,
+        ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: big ? 18 : 12),
-      child: Row(
-        children: [
-          Container(
-            width: big ? 36 : 28,
-            height: big ? 36 : 28,
-            decoration: BoxDecoration(color: badgeColor.withAlpha(80), shape: BoxShape.circle),
-            child: Center(child: Text('$rank', style: TextStyle(fontWeight: FontWeight.w800, fontSize: big ? 18 : 14))),
+      child: Center(
+        child: Text(
+          '$rank',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: rank == 1 ? 24 : 18,
+            color: onAccent, // 메달 내부 대비 높은 텍스트
           ),
-          Gaps.w12,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-              children: [
-                name,
-                if (time != null) ...[Gaps.h2, time],
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
+  }
+}
+
+/// 금/은/동 스타일 세트
+class _MedalStyle {
+  final List<Color> medalFill;   // 칩 내부
+  final List<Color> ringSweep;   // 칩 링(스윕)
+  final List<Color> accentBar;   // 기둥 포인트 바
+  final Color gloss;             // 상단 글로시
+  final Color shadow;            // 칩 드롭쉐도
+  final Color base;              // 메탈 베이스톤
+
+  _MedalStyle({
+    required this.medalFill,
+    required this.ringSweep,
+    required this.accentBar,
+    required this.gloss,
+    required this.shadow,
+    required this.base,
+  });
+
+  // 기둥 그라디언트(테마 카드색 위에 메탈 하이라이트를 살짝 섞음)
+  List<Color> pillarGradient(Color cardFill) {
+    return [
+      Color.alphaBlend(base.withAlpha(20), cardFill),
+      cardFill,
+      Color.alphaBlend(base.withAlpha(28), cardFill),
+    ];
+  }
+
+  static _MedalStyle of(int rank, Brightness brightness) {
+    // 메탈 베이스 컬러(톤은 테마 밝기에 살짝 보정)
+    Color metal(int light, int dark) =>
+        brightness == Brightness.dark ? Color(dark) : Color(light);
+
+    // 금/은/동 베이스
+    final gold   = metal(0xFFFACC15, 0xFFEAB308);
+    final silver = metal(0xFFD1D5DB, 0xFF9CA3AF);
+    final bronze = metal(0xFFB45309, 0xFF92400E);
+
+    switch (rank) {
+      case 1: return _MedalStyle(
+        base: gold,
+        medalFill: [gold.withAlpha(230), gold.withAlpha(200)],
+        ringSweep: [
+          gold.withAlpha(220), gold.withAlpha(120),
+          gold.withAlpha(220), gold.withAlpha(120),
+          gold.withAlpha(220),
+        ],
+        accentBar: [gold.withAlpha(220), gold.withAlpha(160)],
+        gloss: Colors.white,
+        shadow: Colors.black.withAlpha(90),
+      );
+      case 2: return _MedalStyle(
+        base: silver,
+        medalFill: [silver.withAlpha(230), silver.withAlpha(200)],
+        ringSweep: [
+          silver.withAlpha(220), silver.withAlpha(120),
+          silver.withAlpha(220), silver.withAlpha(120),
+          silver.withAlpha(220),
+        ],
+        accentBar: [silver.withAlpha(210), silver.withAlpha(150)],
+        gloss: Colors.white,
+        shadow: Colors.black.withAlpha(80),
+      );
+      default: return _MedalStyle(
+        base: bronze,
+        medalFill: [bronze.withAlpha(230), bronze.withAlpha(200)],
+        ringSweep: [
+          bronze.withAlpha(220), bronze.withAlpha(120),
+          bronze.withAlpha(220), bronze.withAlpha(120),
+          bronze.withAlpha(220),
+        ],
+        accentBar: [bronze.withAlpha(210), bronze.withAlpha(150)],
+        gloss: Colors.white,
+        shadow: Colors.black.withAlpha(70),
+      );
+    }
   }
 }
 

@@ -27,7 +27,6 @@ export 'infra/supabase_leaderboard_repository.dart';
 export 'presentation/controllers/record_mode_detail_page_controller.dart';
 export 'presentation/pages/record_mode_detail_page.dart';
 export 'presentation/widget/error_dialog.dart';
-export 'presentation/widget/goal_duo_card.dart';
 export 'presentation/widget/account/nickname_edit_dialog.dart';
 export 'presentation/widget/rank_tile.dart';
 export 'presentation/widget/record_mode_atoms.dart';

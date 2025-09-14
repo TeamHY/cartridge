@@ -11,13 +11,13 @@ class AllowedDashboardStats extends ConsumerWidget {
     required this.allowed,
     required this.enabled,
     required this.installed,
-    this.loading = false, // ⟵ 추가
+    this.loading = false,
   });
 
   final int allowed;
   final int enabled;
   final int installed;
-  final bool loading; // ⟵ 추가
+  final bool loading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,20 +34,34 @@ class AllowedDashboardStats extends ConsumerWidget {
           tone: sem.danger, highlightValue: missing > 0),
     ];
 
-    return Column(
-      children: [
-        Row(children: [
-          Expanded(child: _StatTile(item: items[0], formatter: nf, loading: loading)),
+    return LayoutBuilder(
+      builder: (context, c) {
+        final bounded = c.hasBoundedHeight;
+
+        Widget twoTiles(int i, int j) => Row(children: [
+          Expanded(child: _StatTile(item: items[i], formatter: nf, loading: loading, expandToHeight: bounded)),
           Gaps.w12,
-          Expanded(child: _StatTile(item: items[1], formatter: nf, loading: loading)),
-        ]),
-        Gaps.h12,
-        Row(children: [
-          Expanded(child: _StatTile(item: items[2], formatter: nf, loading: loading)),
-          Gaps.w12,
-          Expanded(child: _StatTile(item: items[3], formatter: nf, loading: loading)),
-        ]),
-      ],
+          Expanded(child: _StatTile(item: items[j], formatter: nf, loading: loading, expandToHeight: bounded)),
+        ]);
+
+        if (bounded) {
+          return Column(
+            children: [
+              Expanded(child: twoTiles(0, 1)),
+              Gaps.h12,
+              Expanded(child: twoTiles(2, 3)),
+            ],
+          );
+        }
+
+        return Column(
+          children: [
+            twoTiles(0, 1),
+            Gaps.h12,
+            twoTiles(2, 3),
+          ],
+        );
+      },
     );
   }
 }
@@ -71,11 +85,13 @@ class _StatTile extends StatefulWidget {
   const _StatTile({
     required this.item,
     required this.formatter,
-    required this.loading, // ⟵ 추가
+    required this.loading,
+    this.expandToHeight = false,
   });
   final _StatItem item;
   final NumberFormat formatter;
-  final bool loading; // ⟵ 추가
+  final bool loading;
+  final bool expandToHeight;
 
   @override
   State<_StatTile> createState() => _StatTileState();
@@ -108,6 +124,9 @@ class _StatTileState extends State<_StatTile> {
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOut,
         padding: const EdgeInsets.all(AppRadius.xl),
+        constraints: widget.expandToHeight
+            ? const BoxConstraints(minHeight: double.infinity)
+            : const BoxConstraints(),
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(12),
@@ -162,7 +181,7 @@ class _StatTileBody extends StatelessWidget {
 
     // 로딩이면 동일 레이아웃에 숫자만 '—'로 노출 (색상은 보조 컬러)
     final valueWidget = Text(
-      loading ? '—' : valueText, // ← 핵심
+      loading ? '—' : valueText,
       style: valueStyle.copyWith(
         color: loading ? t.resources.textFillColorSecondary : null,
       ),

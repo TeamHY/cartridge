@@ -80,8 +80,7 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
               maxContentWidth: AppBreakpoints.lg + 1,
               colsLg: 2,
               colsMd: 2,
-              colsSm: 2,
-              colsXs: 1,
+              colsSm: 1,
               items: const [
                 GridItem(child: RecordModeLeftPanel()),
                 GridItem(child: RecordModeRightPanel()),

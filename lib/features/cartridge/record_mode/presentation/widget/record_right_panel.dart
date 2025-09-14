@@ -1,5 +1,6 @@
 import 'package:cartridge/features/cartridge/record_mode/presentation/widget/allowed_mods/allowed_modes_section.dart';
 import 'package:cartridge/features/cartridge/record_mode/presentation/widget/live_status_tile.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,6 +22,7 @@ class RecordModeRightPanel extends ConsumerWidget {
     final isAdmin = ref.watch(recordModeAuthUserProvider).value?.isAdmin ?? false;
     final temporal = RecordId.temporalOf(ui.gameId);
     final loading  = ui.loadingMore && entries.isEmpty;
+    final loc = AppLocalizations.of(context);
 
     Widget navBar() => Row(
       children: [
@@ -32,7 +34,7 @@ class RecordModeRightPanel extends ConsumerWidget {
         Gaps.w12,
         Expanded(
           child: Text(
-            ui.gameId == null ? '로딩 중...' : RecordId.formatGameLabel(ui.gameId!),
+            ui.gameId == null ? loc.common_loading : RecordId.formatGameLabel(ui.gameId!),
             maxLines: 1, overflow: TextOverflow.ellipsis, softWrap: false,
           ),
         ),
@@ -49,28 +51,51 @@ class RecordModeRightPanel extends ConsumerWidget {
 
       final ranking = SectionCard(
         rows: 40,
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             navBar(),
             Gaps.h8,
-            if (loading) const RankingSkeleton()
-            else if (entries.isEmpty) const RankingEmptyPanelPast()
-            else ...[
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 8, 0, 12),
-                  child: Podium(entries: podium, isAdmin: isAdmin),
-                ),
-                if (rest.isNotEmpty)
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: rest.length,
-                    separatorBuilder: (_, __) => Gaps.h8,
-                    itemBuilder: (_, i) => RankTile(entry: rest[i], isAdmin: isAdmin),
+            Expanded(
+              child: () {
+                if (entries.isEmpty && !loading) return const RankingEmptyPanelPast();
+
+                // 스크롤 + 로딩/데이터 공용 처리
+                return Scrollbar(
+                  thumbVisibility: true,
+                  child: CustomScrollView(
+                    primary: false,
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+                          child: Podium(
+                            entries: podium,
+                            isAdmin: isAdmin,
+                            loading: loading,
+                          ),
+                        ),
+                      ),
+                      if (loading)
+                        SliverList.builder(
+                          itemCount: 8,
+                          itemBuilder: (_, __) => const Padding(
+                            padding: EdgeInsets.only(bottom: 8),
+                            child: RankTile.loading(),
+                          ),
+                        )
+                      else
+                        SliverList.separated(
+                          itemCount: rest.length,
+                          itemBuilder: (_, i) => RankTile(entry: rest[i], isAdmin: isAdmin),
+                          separatorBuilder: (_, __) => Gaps.h8,
+                        ),
+                    ],
                   ),
-              ],
+                );
+              }(),
+            ),
           ],
         ),
       );
@@ -98,6 +123,62 @@ class RecordModeRightPanel extends ConsumerWidget {
   }
 }
 
+class _RankingScroll extends StatefulWidget {
+  const _RankingScroll({
+    required this.podium,
+    required this.rest,
+    required this.isAdmin,
+  });
+
+  final List<LeaderboardEntry> podium;
+  final List<LeaderboardEntry> rest;
+  final bool isAdmin;
+
+  @override
+  State<_RankingScroll> createState() => _RankingScrollState();
+}
+
+class _RankingScrollState extends State<_RankingScroll> {
+  late final ScrollController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scrollbar(
+      controller: _ctrl,
+      thumbVisibility: true,
+      child: CustomScrollView(
+        controller: _ctrl,
+        primary: false,
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+              child: Podium(entries: widget.podium, isAdmin: widget.isAdmin),
+            ),
+          ),
+          SliverList.separated(
+            itemCount: widget.rest.length,
+            itemBuilder: (_, i) => RankTile(entry: widget.rest[i], isAdmin: widget.isAdmin),
+            separatorBuilder: (_, __) => Gaps.h4,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _RightNowBlock extends ConsumerWidget {
   const _RightNowBlock({this.navBarBuilder});
   final Widget Function()? navBarBuilder;
@@ -117,17 +198,27 @@ class _RightNowBlock extends ConsumerWidget {
         .map((e) => e.clearTime!)
         .fold<Duration?>(null, (min, t) => (min == null || t < min) ? t : min);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (navBarBuilder != null) navBarBuilder!(),
-        Gaps.h4,
-        const Divider(
-          style: DividerThemeData(thickness: 1, horizontalMargin: EdgeInsets.zero),
-        ),
-        Gaps.h8,
-        LiveStatusTile(participants: entries.length, myBest: myBestTime),
-      ],
+    final live = LiveStatusTile(participants: entries.length, myBest: myBestTime);
+
+    return LayoutBuilder(
+      builder: (context, c) {
+        final bounded = c.hasBoundedHeight;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (navBarBuilder != null) navBarBuilder!(),
+            Gaps.h4,
+            const Divider(
+              style: DividerThemeData(thickness: 1, horizontalMargin: EdgeInsets.zero),
+            ),
+            Gaps.h12,
+            if (bounded)
+              Expanded(child: live) // ⟵ 섹션의 남는 높이 전부 타일에
+            else
+              live,
+          ],
+        );
+      },
     );
   }
 }

@@ -59,9 +59,6 @@ class SqliteModPresetsRepository implements IModPresetsRepository {
   }
 
 // ── Commands ───────────────────────────────────────────────────────────────
-// 기존: REPLACE 때문에 조인 테이블이 날아감
-// await txn.insert('mod_presets', {...}, conflictAlgorithm: ConflictAlgorithm.replace);
-
   @override
   Future<void> upsert(ModPreset preset) async {
     final db = await _db();

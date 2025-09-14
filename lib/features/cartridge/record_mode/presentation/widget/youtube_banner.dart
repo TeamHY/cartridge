@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -18,6 +19,7 @@ class YoutubeBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
     final base = t.accentColor;
     final baseBg = Color.alphaBlend(base.withAlpha(t.brightness.isDark ? 38 : 48), t.cardColor);
     final hoverBg = Color.alphaBlend(base.withAlpha(t.brightness.isDark ? 64 : 72), t.cardColor);
@@ -25,7 +27,7 @@ class YoutubeBanner extends StatelessWidget {
     Future<void> open() async {
       final ok = await launchUrl(_url, mode: LaunchMode.externalApplication);
       if (!ok && context.mounted) {
-        UiFeedback.info(context, '외부 링크', '브라우저를 열 수 없습니다.');
+        UiFeedback.info(context, loc.youtube_toast_title, loc.youtube_toast_body);
       }
     }
 
@@ -36,7 +38,7 @@ class YoutubeBanner extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: hovered ? hoverBg : baseBg,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppShapes.panel,
           ),
           child: Row(
             children: [
@@ -48,16 +50,18 @@ class YoutubeBanner extends StatelessWidget {
                   width: height != null ? height! * (16/9) : null,
                   height: height, // 16:9
                   fit: BoxFit.cover,
+                  semanticLabel: loc.youtube_banner_thumbnail_semantics,
                 ),
               ),
               Gaps.w16,
               // 타이틀 + 보조 아이콘
               Expanded(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      '시청자 참여 대회 컨텐츠',
+                      loc.youtube_banner_title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
@@ -65,7 +69,7 @@ class YoutubeBanner extends StatelessWidget {
                     ),
                     Gaps.h8,
                     Text(
-                      '오헌영이 내는 미션을 완료해보세요!',
+                      loc.youtube_banner_subtitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,

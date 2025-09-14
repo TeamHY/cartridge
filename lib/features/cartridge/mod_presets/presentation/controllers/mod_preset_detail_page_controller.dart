@@ -61,7 +61,6 @@ class ModPresetDetailPageController
   void cancelEditName() => state = state.copyWith(editingName: false);
   void setSearch(String q) => state = state.copyWith(search: q);
   bool isSelected(String rowKey) => state.selections[rowKey] == true;
-  bool get anySelected => state.selections.values.any((v) => v);
   Iterable<String> get _selectedRowKeys =>
       state.selections.entries.where((e) => e.value).map((e) => e.key);
 

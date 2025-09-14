@@ -1,4 +1,6 @@
+import 'package:cartridge/features/cartridge/record_mode/presentation/widget/record_game_item_card.dart';
 import 'package:cartridge/features/cartridge/record_mode/presentation/widget/record_timer.dart';
+import 'package:cartridge/theme/tokens/spacing.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,7 +24,7 @@ class RecordModeLeftPanel extends ConsumerWidget {
       if (id != null) {
         return RecordId.formatWeeklyRange(id) ?? RecordId.formatGameLabel(id);
       }
-      return (snap?.challengeType ?? ui.challengeType) == ChallengeType.daily ? '오늘' : '이번 주';
+      return '';
     }();
 
     final temporal = RecordId.temporalOf(ui.gameId);
@@ -42,42 +44,58 @@ class RecordModeLeftPanel extends ConsumerWidget {
       ),
     );
 
-    // (2) 히어로 카드 (rows=3) — 카드 높이는 고정, 내부 콘텐츠만 스켈레톤/본문 전환
+    final Widget heroesChild;
+    if (ui.loadingGoal) {
+      // 로딩: 동일 레이아웃 유지(카드 스켈레톤 2개)
+      heroesChild = Row(
+        children: const [
+          Expanded(child: GameItemCard(title: '', imageAsset: null, loading: true)),
+          Gaps.w16,
+          Expanded(child: GameItemCard(title: '', imageAsset: null, loading: true)),
+        ],
+      );
+    } else {
+      final g = ui.goal;
+      if (g == null) return const SizedBox.shrink();
+      heroesChild = Row(
+        children: [
+          Expanded(
+            child: GameItemCard(
+              title: g.character.localizedName(loc),
+              imageAsset: g.character.imageAsset,
+              badgeText: loc.record_badge_character,
+            ),
+          ),
+          Gaps.w16,
+          Expanded(
+            child: GameItemCard(
+              title: g.goal.localizedTitle(loc),
+              imageAsset: g.goal.imageAsset,
+              badgeText: loc.record_badge_target,
+            ),
+          ),
+        ],
+      );
+    }
+
     final heroes = SectionCard(
       rows: 21,
       gapBelowRows: 1,
-      child: LazySwitcher(
-        loading: ui.loadingGoal,
-        skeleton: const HeroCardsSkeleton(),
-        empty: GoalEmpty(type: ui.challengeType, rangeText: challengeTypeText),
-        child: () {
-          final g = ui.goal;
-          if (g == null) return const SizedBox.shrink();
-          return HeroCardsRow(
-            characterName: g.character.localizedName(loc),
-            characterAsset: g.character.imageAsset,
-            targetName: g.goal.localizedTitle(loc),
-            targetAsset: g.goal.imageAsset,
-          );
-        }(),
-      ),
+      padding: EdgeInsets.zero,
+      decoration: BoxDecoration(),
+      child: heroesChild,
     );
 
-
-{
-
-    }
-
     // (3) 하단 타이머/배너 (rows=1)
-    final bottom = (temporal == ContestTemporal.current && ui.goal != null)
-        ? SectionCard(
-      rows: 8,
-      child: RecordTimer(session: ref.read(recordModeSessionProvider)),
-    )
-        : SectionCard(
+    final bottom = SectionCard(
       rows: 8,
       padding: EdgeInsets.zero,
-      child: const YoutubeBanner(height: 8 * kPanelRowUnit),
+      child: (temporal == ContestTemporal.current && ui.goal != null)
+          ? Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: RecordTimer(session: ref.read(recordModeSessionProvider)),
+      )
+          : const YoutubeBanner(height: 8 * kPanelRowUnit),
     );
 
     return RecordLeftPanelGrid(

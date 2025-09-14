@@ -683,6 +683,34 @@
   "@live_status_error": {
     "description": "Shown when an error occurs (generic, no error code)"
   },
+  "youtube_banner_title": "Community challenge playlist",
+  "@youtube_banner_title": {
+    "description": "Main title of YoutubeBanner. Keep it short and clear."
+  },
+  "youtube_banner_subtitle": "Try missions from 아이작 오헌영",
+  "@youtube_banner_subtitle": {
+    "description": "Supportive subtitle. Friendly, light encouragement."
+  },
+  "youtube_toast_title": "External link",
+  "@youtube_toast_title": {
+    "description": "Toast title when opening an external browser/app."
+  },
+  "youtube_toast_body": "Couldn't open your browser.",
+  "@youtube_toast_body": {
+    "description": "Shown when opening the external link fails."
+  },
+  "youtube_banner_thumbnail_semantics": "Thumbnail for the community challenge",
+  "@youtube_banner_thumbnail_semantics": {
+    "description": "Alt text for screen readers."
+  },
+  "ranking_empty_title": "No records for this period",
+  "@ranking_empty_title": {
+    "description": "Title when ranking list is empty. Friendly and concise."
+  },
+  "ranking_empty_suggestion": "Try checking another date.",
+  "@ranking_empty_suggestion": {
+    "description": "Soft suggestion when the list is empty."
+  },
   "@ranking": {
     "description": "Daily and weekly challenge ranking page"
   },

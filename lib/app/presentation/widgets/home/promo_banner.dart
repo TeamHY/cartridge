@@ -26,8 +26,8 @@ class PromoBanner extends StatelessWidget {
         minCols: 2,
         maxCols: 6,
         minCellWidth: 120,
-        gutter: AppSpacing.sm.toDouble(),     // 8
-        rowSpacing: AppSpacing.sm.toDouble(), // 8
+        gutter: AppSpacing.sm,
+        rowSpacing: AppSpacing.sm,
         tileHeight: 120,
       ),
     );

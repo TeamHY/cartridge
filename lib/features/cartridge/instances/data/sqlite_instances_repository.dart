@@ -75,8 +75,77 @@ class SqliteInstancesRepository implements IInstancesRepository {
 
   @override
   Future<Instance?> findById(String id) async {
-    final all = await listAll();
-    return all.firstWhere((e) => e.id == id);
+    final db = await _db();
+
+    // 1) 본체 한 건
+    final rows = await db.query(
+      'instances',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    final r = rows.first;
+
+    // 2) 조인: applied presets (set semantics)
+    final joins = await db.query(
+      'instance_mod_presets',
+      where: 'instance_id = ?',
+      whereArgs: [id],
+    );
+    final applied = [
+      for (final j in joins) AppliedPresetRef(presetId: j['preset_id'] as String),
+    ];
+
+    // 3) overrides (tri-state enabled: NULL/0/1)
+    final ovRows = await db.query(
+      'instance_overrides',
+      where: 'instance_id = ?',
+      whereArgs: [id],
+    );
+    final overrides = [
+      for (final o in ovRows)
+        ModEntry(
+          key: o['mod_key'] as String,
+          enabled: (o['enabled'] as int?) == null ? null : ((o['enabled'] as int) != 0),
+          favorite: ((o['favorite'] as int?) ?? 0) != 0,
+          updatedAt: DateTime.fromMillisecondsSinceEpoch(
+            (o['updated_at_ms'] as int?) ?? 0,
+          ),
+        ),
+    ];
+
+    // 4) categories
+    final cats = await db.query(
+      'instance_categories',
+      where: 'instance_id = ?',
+      whereArgs: [id],
+    );
+
+    // 5) 매핑
+    return Instance(
+      id: id,
+      name: r['name'] as String,
+      optionPresetId: r['option_preset_id'] as String?,
+      appliedPresets: applied,
+      gameMode: GameMode.values[(r['game_mode'] as int?) ?? 0],
+      overrides: overrides,
+      sortKey: (r['sort_key'] as int?) != null
+          ? InstanceSortKey.values[r['sort_key'] as int]
+          : null,
+      ascending: (r['ascending'] as int?) == null
+          ? null
+          : ((r['ascending'] as int) != 0),
+      updatedAt: (r['updated_at_ms'] as int?) != null
+          ? DateTime.fromMillisecondsSinceEpoch(r['updated_at_ms'] as int)
+          : null,
+      lastSyncAt: (r['last_sync_at_ms'] as int?) != null
+          ? DateTime.fromMillisecondsSinceEpoch(r['last_sync_at_ms'] as int)
+          : null,
+      image: _readImage(r),
+      group: r['group_name'] as String?,
+      categories: cats.map((e) => e['category'] as String).toList(growable: false),
+    );
   }
 
   @override
