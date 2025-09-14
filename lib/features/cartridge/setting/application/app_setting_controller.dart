@@ -78,12 +78,6 @@ AsyncNotifierProvider<AppSettingController, AppSetting>(
   AppSettingController.new,
 );
 
-/// 편의: 값만 필요할 때(로드 전이면 null)
-final appSettingValueProvider = Provider<AppSetting?>((ref) {
-  final async = ref.watch(appSettingControllerProvider);
-  return async.valueOrNull;
-});
-
 /// 내부 경량 예외(AsyncError용)
 class _ResultException implements Exception {
   final String code;

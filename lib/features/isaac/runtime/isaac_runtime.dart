@@ -10,3 +10,4 @@ export 'domain/isaac_versions.dart';
 export 'domain/repentogon.dart';
 export 'domain/runtime_args.dart';
 export 'presentation/widgets/isaac_install_detect_card.dart';
+export 'presentation/controllers/isaac_auto_info_provider.dart';

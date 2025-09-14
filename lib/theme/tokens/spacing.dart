@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 /// - 공용 SizedBox/EdgeInsets 헬퍼도 함께 제공합니다.
 class AppSpacing {
   // 기본 간격 스케일 (dp)
+  static const double none = 0;
   static const double xxs = 2;
   static const double xs  = 4;
   static const double sm  = 8;

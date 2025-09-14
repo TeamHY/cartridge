@@ -137,3 +137,13 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
     }
   }
 }
+
+Future<void> runIntegrityCheck(BuildContext context, WidgetRef ref) async {
+  final isaac = ref.read(isaacRuntimeServiceProvider);
+  await isaac.runIntegrityCheck();
+}
+
+Future<void> openGameProperties(BuildContext context, WidgetRef ref) async {
+  final isaac = ref.read(isaacRuntimeServiceProvider);
+  await isaac.openGameProperties();
+}

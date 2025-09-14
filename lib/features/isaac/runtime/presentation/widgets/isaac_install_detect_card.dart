@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/app/presentation/widgets/badge/badge.dart';
 import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/app/presentation/widgets/ut/ut_header_refresh_button.dart';
-import 'package:cartridge/features/cartridge/setting/setting.dart';
 import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';

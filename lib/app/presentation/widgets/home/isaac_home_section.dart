@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/app/presentation/controllers/home_controller.dart';
 import 'package:cartridge/app/presentation/widgets/home/home_card.dart';
-import 'package:cartridge/features/cartridge/setting/setting.dart';
 import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
 import 'package:cartridge/features/isaac/save/isaac_save.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -21,9 +20,9 @@ class IsaacHomeSection extends ConsumerWidget {
     autoInfo.maybeWhen(data: (info) => info.edition, orElse: () => null);
 
     Future<void> openProps() async =>
-        ref.read(appSettingPageControllerProvider).openGameProperties();
+        openGameProperties(context, ref);
     Future<void> verify() async =>
-        ref.read(appSettingPageControllerProvider).runIntegrityCheck();
+        runIntegrityCheck(context, ref);
 
     return HomeCard(
       child: Column(
@@ -34,8 +33,8 @@ class IsaacHomeSection extends ConsumerWidget {
           Gaps.h12,
           // 액션 타일들
           Wrap(
-            spacing: AppSpacing.xs,
-            runSpacing: AppSpacing.xs,
+            spacing: AppSpacing.md,
+            runSpacing: AppSpacing.sm,
             children: [
               _buildActionTile(
                 context,
@@ -95,7 +94,7 @@ Widget _buildActionTile(
     }) {
   return LayoutBuilder(
     builder: (context, constraints) {
-      final itemWidth = (constraints.maxWidth - AppSpacing.xs) / 2;
+      final itemWidth = (constraints.maxWidth - AppSpacing.md) / 2;
       return SizedBox(
         width: itemWidth,
         child: _ActionTile(
