@@ -1,3 +1,5 @@
+import 'package:cartridge/features/cartridge/record_mode/presentation/widget/account/account_tiny.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,41 +23,30 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
     final userAsync = ref.watch(recordModeAuthUserProvider);
     final user      = userAsync.value;
     final fTheme    = FluentTheme.of(context);
-
-    Widget accountTiny() {
-      if (user?.nickname == null) {
-        return Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 6,
-          children: [
-            HyperlinkButton(onPressed: () => showDialog(context: context, builder: (_) => const SignInDialog()), child: const Text('로그인')),
-            Text('/', style: TextStyle(color: Colors.grey[120])),
-            HyperlinkButton(onPressed: () => showDialog(context: context, builder: (_) => const SignUpDialog()), child: const Text('회원가입')),
-          ],
-        );
-      }
-      return _AccountFlyoutSmall(
-        displayName: user!.nickname,
-        isAdmin: user.isAdmin,
-        onEditNickname: () => showDialog(context: context, builder: (_) => const NicknameEditDialog()),
-        onSignOut: () async {
-          try {
-            await ref.read(recordModeAuthProvider).signOut();
-            if (!context.mounted) return;
-            UiFeedback.success(context, '로그아웃', '정상적으로 로그아웃되었습니다.');
-          } catch (e) {
-            UiFeedback.error(context, '로그아웃 실패', e.toString());
-          }
-        },
-      );
-    }
+    final loc = AppLocalizations.of(context);
 
     return ScaffoldPage(
       header: ContentHeaderBar.backText(
         onBack: widget.onClose,
         title: '시참대회',
         actions: [
-          accountTiny(),
+          AccountTiny(
+            displayName: user?.nickname,
+            isAdmin: user?.isAdmin ?? false,
+            loading: userAsync.isLoading,
+            error: userAsync.hasError,
+            onSignIn: () => showDialog(context: context, builder: (_) => const SignInDialog()),
+            onEditNickname: () => showDialog(context: context, builder: (_) => const NicknameEditDialog()),
+            onSignOut: () async {
+              try {
+                await ref.read(recordModeAuthProvider).signOut();
+                if (!context.mounted) return;
+                UiFeedback.success(context, loc.account_signed_out_title, loc.account_signed_out_body);
+              } catch (_) {
+                UiFeedback.error(context, loc.common_error, loc.account_sign_out_failed);
+              }
+            },
+          ),
           Gaps.w12,
           FilledButton(
             style: ButtonStyle(
@@ -102,60 +93,6 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _AccountFlyoutSmall extends StatefulWidget {
-  const _AccountFlyoutSmall({
-    required this.displayName,
-    required this.isAdmin,
-    this.onEditNickname,
-    this.onSignOut,
-  });
-
-  final String displayName;
-  final bool isAdmin;
-  final VoidCallback? onEditNickname;
-  final Future<void> Function()? onSignOut;
-
-  @override
-  State<_AccountFlyoutSmall> createState() => _AccountFlyoutSmallState();
-}
-
-class _AccountFlyoutSmallState extends State<_AccountFlyoutSmall> {
-  final _flyout = FlyoutController();
-  @override
-  void dispose() { _flyout.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) {
-    return FlyoutTarget(
-      controller: _flyout,
-      child: Button(
-        onPressed: () => _flyout.showFlyout(
-          barrierDismissible: true,
-          builder: (ctx) => MenuFlyout(items: [
-            MenuFlyoutItem(leading: const Icon(FluentIcons.edit), text: const Text('닉네임 변경'), onPressed: widget.onEditNickname),
-            const MenuFlyoutSeparator(),
-            MenuFlyoutItem(leading: const Icon(FluentIcons.sign_out), text: const Text('로그아웃'),
-                onPressed: () async => await widget.onSignOut?.call()),
-          ]),
-        ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 160),
-            child: Text(widget.displayName, maxLines: 1, overflow: TextOverflow.ellipsis, softWrap: false,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-          ),
-          if (widget.isAdmin) ...[
-            Gaps.w6,
-            InfoBadge(color: Colors.green, source: const Text('운영자')),
-          ],
-          Gaps.w6,
-          const Icon(FluentIcons.chevron_down, size: 12),
-        ]),
       ),
     );
   }

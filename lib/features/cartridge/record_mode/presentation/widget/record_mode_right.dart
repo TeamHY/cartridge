@@ -1,3 +1,5 @@
+import 'package:cartridge/features/cartridge/record_mode/presentation/widget/allowed_mods/allowed_modes_section.dart';
+import 'package:cartridge/features/cartridge/record_mode/presentation/widget/live_status_tile.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -133,7 +135,14 @@ class _RightNowBlock extends ConsumerWidget {
             ),
           ],
         ),
-        const Divider(),
+        Gaps.h4,
+        const Divider(
+          style: DividerThemeData(
+            thickness: 1,
+            horizontalMargin: EdgeInsets.zero,
+          ),
+        ),
+        Gaps.h8,
         LiveStatusTile(
           participants: entries.length,
           myBest: myBestTime,

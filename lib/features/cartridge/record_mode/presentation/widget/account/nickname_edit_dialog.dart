@@ -1,3 +1,4 @@
+import 'package:cartridge/theme/tokens/spacing.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,6 +44,8 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final t   = FluentTheme.of(context);
+    final accent = t.accentColor.normal;
 
     final userAsync = ref.watch(recordModeAuthUserProvider);
     final currentNickname = userAsync.value?.nickname ?? '';
@@ -52,7 +55,13 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
     }
 
     return ContentDialog(
-      title: Text(loc.nickname_dialog_title),
+      title: Row(
+        children: [
+          Icon(FluentIcons.edit, size: 18, color: accent),
+          Gaps.w4,
+          Text(loc.nickname_dialog_title),
+        ],
+      ),
       content: Form(
         key: _formKey,
         child: Column(

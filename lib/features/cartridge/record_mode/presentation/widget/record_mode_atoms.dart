@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:cartridge/features/cartridge/record_mode/presentation/widget/record_game_item_card.dart';
+import 'package:cartridge/features/cartridge/record_mode/presentation/widget/record_info_chips.dart';
+import 'package:cartridge/features/cartridge/record_mode/presentation/widget/record_period_switcher.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
-import 'package:flutter/scheduler.dart';
 
 import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 import 'package:cartridge/theme/theme.dart';
@@ -42,6 +44,8 @@ class TopInfoRow extends StatelessWidget {
     required this.challengeTypeText,
     this.seedText,
     this.showSeed = true,
+    this.loading = false,
+    this.error = false,
   });
 
   final ChallengeType challengeType;
@@ -49,6 +53,8 @@ class TopInfoRow extends StatelessWidget {
   final String challengeTypeText;
   final String? seedText;
   final bool showSeed;
+  final bool loading;
+  final bool error;
 
   @override
   Widget build(BuildContext context) {
@@ -56,31 +62,27 @@ class TopInfoRow extends StatelessWidget {
       builder: (context, c) {
         final isCompact = c.maxWidth < 640;
 
-        final seg = material.SegmentedButton<ChallengeType>(
-          segments: const [
-            material.ButtonSegment(value: ChallengeType.daily,  label: Text('일간 목표')),
-            material.ButtonSegment(value: ChallengeType.weekly, label: Text('주간 목표')),
-          ],
-          selected: {challengeType},
-          onSelectionChanged: (s) => onChallengeTypeChanged(s.first),
+        final seg = RecordPeriodSwitcher(
+          selected: challengeType,
+          onChanged: onChallengeTypeChanged,
+          loading: loading,
+          error:   error,
         );
-
-        final chips = _InfoChips(
-          challengeTypeText: challengeTypeText,
+        final chips = RecordInfoChips(
+          challengeText: challengeTypeText,
           seedText: seedText,
           showSeed: showSeed,
+          loading: loading,
+          error:   error,
         );
 
         if (!isCompact) {
-          // 넓은 화면: 한 줄에 모두 배치
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               seg,
               Gaps.w12,
-              Flexible(child: chips.challengeTypePill()), // 폭 부족 시만 살짝 줄어듦
-              Gaps.w8,
-              Flexible(child: chips.seedPill()),
+              Flexible(child: chips),
             ],
           );
         }
@@ -94,15 +96,7 @@ class TopInfoRow extends StatelessWidget {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              child: Row(
-                children: [
-                  chips.challengeTypePill(),
-                  if (showSeed && (seedText?.isNotEmpty ?? false)) ...[
-                    Gaps.w8,
-                    chips.seedPill(),
-                  ],
-                ],
-              ),
+              child: Row(children: [chips]),
             ),
           ],
         );
@@ -111,134 +105,6 @@ class TopInfoRow extends StatelessWidget {
   }
 }
 
-class _InfoChips {
-  _InfoChips({
-    required this.challengeTypeText,
-    required this.seedText,
-    required this.showSeed,
-  });
-
-  final String challengeTypeText;
-  final String? seedText;
-  final bool showSeed;
-
-  Widget _pill(BuildContext context, IconData icon, String text) {
-    final t = FluentTheme.of(context);
-    final stroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
-    final fill = t.resources.cardBackgroundFillColorDefault;
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 28),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: fill,
-          borderRadius: AppShapes.pill,
-          border: Border.all(color: stroke, width: .8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min, // ← 칩이 내용 길이만큼만 차지 (가로 스크롤 친화적)
-          children: [
-            Icon(icon, size: 14),
-            Gaps.w6,
-            // 가로 스크롤 안에서 잘리지 않도록 한 줄 고정 (필요시 끝까지 스크롤)
-            Text(text, softWrap: false),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget challengeTypePill() => Builder(
-    builder: (ctx) => _pill(ctx, FluentIcons.date_time2, challengeTypeText),
-  );
-
-  Widget seedPill() => Builder(
-    builder: (ctx) => (showSeed && (seedText?.isNotEmpty ?? false))
-        ? _pill(ctx, FluentIcons.map_pin, seedText!)
-        : const SizedBox.shrink(),
-  );
-}
-
-
-// ====== 히어로 카드(캐릭터/타겟) ======
-class GameItemCard extends StatelessWidget {
-  const GameItemCard({
-    super.key,
-    required this.title,
-    required this.imageAsset,
-    this.imageAspect = kHeroCardAspect, // ⟵ 기본 비율 상수 사용
-    this.badge,
-  });
-
-  final String title;
-  final String imageAsset;
-  final double imageAspect;
-  final String? badge;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = FluentTheme.of(context);
-    final stroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
-    final cardBg = t.resources.cardBackgroundFillColorDefault;
-    final imageBg = t.micaBackgroundColor.withAlpha(40);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: stroke, width: .8),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          AspectRatio(
-            aspectRatio: imageAspect,
-            child: Container(
-              color: imageBg,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: SizedBox(), // 자리 보정 (스켈레톤과 동일 구조 유지용)
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Image.asset(imageAsset, fit: BoxFit.contain),
-                  ),
-                  if (badge != null && badge!.isNotEmpty)
-                    Positioned(
-                      top: 8, right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: t.accentColor.withAlpha(190),
-                          borderRadius: AppShapes.pill,
-                        ),
-                        child: Text(badge!, style: const TextStyle(color: Colors.white)),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          Container(
-            height: kHeroCardTitleHeight, // ⟵ 공용 상수
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class HeroCardsRow extends StatelessWidget {
   const HeroCardsRow({
@@ -247,32 +113,41 @@ class HeroCardsRow extends StatelessWidget {
     required this.characterAsset,
     required this.targetName,
     required this.targetAsset,
+    this.loading = false,
+    this.error = false,
   });
 
   final String characterName;
   final String characterAsset;
   final String targetName;
   final String targetAsset;
+  final bool loading;
+  final bool error;
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(
           child: GameItemCard(
             title: characterName,
             imageAsset: characterAsset,
-            imageAspect: kHeroCardAspect, // ⟵ 공용 상수
-            badge: '캐릭터',
+            imageAspect: kHeroCardAspect, // 기존 상수 계속 사용
+            badgeText: loc.record_badge_character,
+            loading: loading,
+            error: error,
           ),
         ),
-        const SizedBox(width: kHeroCardGap), // ⟵ 공용 상수
+        const SizedBox(width: kHeroCardGap),
         Expanded(
           child: GameItemCard(
             title: targetName,
             imageAsset: targetAsset,
-            imageAspect: kHeroCardAspect, // ⟵ 공용 상수
-            badge: '타겟',
+            imageAspect: kHeroCardAspect,
+            badgeText: loc.record_badge_target,
+            loading: loading,
+            error: error,
           ),
         ),
       ],
@@ -395,93 +270,6 @@ class GoalEmpty extends StatelessWidget {
     );
   }
 }
-
-// ====== 타이머 ======
-class Timer64 extends StatefulWidget {
-  const Timer64({super.key, required this.session});
-  final GameSessionService session;
-
-  @override
-  State<Timer64> createState() => _Timer64State();
-}
-
-class _Timer64State extends State<Timer64> with SingleTickerProviderStateMixin {
-  late final Ticker _ticker;
-  StreamSubscription<Duration>? _sub;
-
-  Duration _serverElapsed = Duration.zero;
-  Duration _displayElapsed = Duration.zero;
-  DateTime _lastSync = DateTime.now();
-  bool _running = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _ticker = createTicker((_) {
-      if (!_running) return;
-      final now = DateTime.now();
-      final dt = now.difference(_lastSync);
-      final newDisplay = _serverElapsed + dt;
-      // 너무 자주 setState 하지 않도록 8ms 이상 차이 날 때만 갱신 (선택)
-      if ((newDisplay - _displayElapsed).inMilliseconds >= 8) {
-        setState(() => _displayElapsed = newDisplay);
-      }
-    });
-
-    _bindStream();
-  }
-
-  void _bindStream() {
-    _sub?.cancel();
-    _sub = widget.session.elapsed().listen((d) {
-      _serverElapsed = d;
-      _lastSync = DateTime.now();
-      _running = d > Duration.zero;
-
-      // 즉시 반영(점프 프레임 방지)
-      setState(() => _displayElapsed = d);
-
-      // 프레임 틱 on/off
-      if (_running) {
-        if (!_ticker.isActive) _ticker.start();
-      } else {
-        if (_ticker.isActive) _ticker.stop();
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(covariant Timer64 oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.session != widget.session) {
-      _bindStream();
-    }
-  }
-
-  @override
-  void dispose() {
-    _sub?.cancel();
-    _ticker.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(
-          getTimeString(_displayElapsed),
-          style: const TextStyle(
-            fontSize: 64,
-            fontFeatures: [FontFeature.tabularFigures()],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 
 class RankingEmptyPanelPast extends StatelessWidget {
   const RankingEmptyPanelPast({super.key});
@@ -700,36 +488,6 @@ class PodiumTile extends StatelessWidget {
   }
 }
 
-// 참가자/허용모드 플레이스홀더
-class ParticipantsBanner extends StatelessWidget {
-  const ParticipantsBanner({super.key, required this.count});
-  final int count;
-  @override
-  Widget build(BuildContext context) {
-    final t = FluentTheme.of(context);
-    final bg = t.micaBackgroundColor.withAlpha(100);
-    return Container(
-      decoration: BoxDecoration(
-        color: t.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: t.resources.cardStrokeColorDefault, width: .8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-            child: const Center(child: Icon(FluentIcons.group, size: 18)),
-          ),
-          Gaps.w12,
-          Expanded(child: Text('현재 $count명 참가 중', style: const TextStyle(fontWeight: FontWeight.w600))),
-        ],
-      ),
-    );
-  }
-}
-
 // 스켈레톤 스위처 (최소 노출 시간)
 class LazySwitcher extends StatefulWidget {
   const LazySwitcher({
@@ -794,106 +552,3 @@ class _LazySwitcherState extends State<LazySwitcher> {
   }
 }
 
-class MyBestRecordBanner extends StatelessWidget {
-  const MyBestRecordBanner({super.key, required this.time});
-  final Duration time;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = FluentTheme.of(context);
-    final bg = t.micaBackgroundColor.withAlpha(90);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: t.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: t.resources.cardStrokeColorDefault, width: .8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-            child: const Center(child: Icon(FluentIcons.trophy, size: 18)),
-          ),
-          Gaps.w12,
-          const Expanded(
-            child: Text('내 최고기록', style: TextStyle(fontWeight: FontWeight.w700)),
-          ),
-          // getTimeString 은 기존에 사용하던 포맷터(이미 import 되어 있음)
-          Text(getTimeString(time),
-              style: const TextStyle(fontWeight: FontWeight.w800)),
-        ],
-      ),
-    );
-  }
-}
-
-class LiveStatusTile extends StatelessWidget {
-  const LiveStatusTile({
-    super.key,
-    required this.participants,
-    required this.myBest,
-  });
-
-  final int participants;
-  final Duration? myBest;
-
-  @override
-  Widget build(BuildContext context) {
-    final t  = FluentTheme.of(context);
-    final bg = t.micaBackgroundColor.withAlpha(100);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: t.cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: t.resources.cardStrokeColorDefault, width: .8),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          // 왼쪽: 참가자 수
-          Container(
-            width: 36, height: 36,
-            decoration: BoxDecoration(color: bg, shape: BoxShape.circle),
-            child: const Center(child: Icon(FluentIcons.group, size: 18)),
-          ),
-          Gaps.w12,
-          Expanded(
-            child: Text('현재 $participants명 참가 중',
-                style: const TextStyle(fontWeight: FontWeight.w600)),
-          ),
-
-          // 가운데 가는 구분선(옵션)
-          Container(
-            width: 1,
-            height: 24,
-            margin: const EdgeInsets.symmetric(horizontal: 12),
-            color: t.resources.controlStrokeColorSecondary.withAlpha(40),
-          ),
-
-          // 오른쪽: 내 최고기록 or 유도 멘트
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                myBest != null ? FluentIcons.trophy : FluentIcons.play,
-                size: 16,
-                color: myBest != null ? t.accentColor : t.resources.textFillColorSecondary,
-              ),
-              Gaps.w8,
-              if (myBest != null)
-                Text('내 최고기록: ${getTimeString(myBest!)}',
-                    style: const TextStyle(fontWeight: FontWeight.w700))
-              else
-                const Text('아직 참여하시지 않았습니다',
-                    style: TextStyle(color: Color(0xFF7A7A7A))),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}

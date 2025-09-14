@@ -339,12 +339,19 @@
   "instance_create_validate_required": "Please enter a name.",
 
   "instance_sidebar_all": "All mods",
+  "@instance_sidebar_all": {"description": "Sidebar top: A filter to show all mods."},
   "instance_sidebar_with_preset": "In presets",
+  "@instance_sidebar_with_preset": {"description": "Sidebar top: A filter to show only mods that are in presets."},
   "instance_sidebar_no_preset": "Not in any preset",
+  "@instance_sidebar_no_preset": {"description": "Sidebar top: A filter to show only mods that are not in any presets."},
   "instance_sidebar_presets": "Presets",
+  "@instance_sidebar_presets": {"description": "Sidebar preset section header."},
   "instance_sidebar_edit_tooltip": "Add or remove presets",
+  "@instance_sidebar_edit_tooltip": {"description": "Tooltip for the edit presets button."},
   "instance_sidebar_loading": "Loading…",
+  "@instance_sidebar_loading": {"description": "Message indicating that the sidebar is loading."},
   "instance_sidebar_load_failed": "Couldn't load the list",
+  "@instance_sidebar_load_failed": {"description": "Error message shown when the sidebar fails to load the list."},
 
   "home_preset_placeholder": "New preset",
   "home_button_preset": "Preset",
@@ -568,6 +575,8 @@
   "record_login_required": "Login is required",
   "record_signin": "Sign In",
   "record_signup": "Sign Up",
+  "signin_no_account": "New here? Create your account.",
+  "@signin_no_account": { "description": "Sign-in dialog helper" },
   "record_nickname_edit": "Edit Nickname",
   "record_signout": "Sign Out",
   "record_check_rules": "View Rules",
@@ -579,7 +588,101 @@
   "record_daily_ranking": "Daily Ranking",
   "record_weekly_ranking": "Weekly Ranking",
   "record_stage_entry": "Entered Stage {stage}.{substage}",
+  "record_chip_period_tooltip": "Period",
+  "@record_chip_period_tooltip": { "description": "Tooltip for period info chip" },
 
+  "record_chip_seed_tooltip": "Seed",
+  "@record_chip_seed_tooltip": { "description": "Tooltip for seed info chip" },
+
+  "record_chip_seed_empty": "No seed",
+  "@record_chip_seed_empty": { "description": "Shown when seed is not set" },
+
+  "record_chip_unavailable": "Not available right now",
+  "@record_chip_unavailable": { "description": "Simple fallback text for error state" },
+
+  "record_badge_character": "Character",
+  "@record_badge_character": { "description": "Badge text on GameItemCard - character" },
+
+  "record_badge_target": "Target",
+  "@record_badge_target": { "description": "Badge text on GameItemCard - target" },
+
+  "record_card_unavailable": "Not available right now",
+  "@record_card_unavailable": { "description": "Fallback text for GameItemCard image area when error" },
+
+  "account_button_label": "Account",
+  "@account_button_label": { "description": "Default label for disabled button on error" },
+
+  "account_sign_in": "Sign in",
+  "@account_sign_in": { "description": "Header account - sign in" },
+
+  "account_sign_up": "Sign up",
+  "@account_sign_up": { "description": "Header account - sign up" },
+
+  "account_sign_out": "Sign out",
+  "@account_sign_out": { "description": "Header account - sign out" },
+
+  "account_change_nickname": "Change nickname",
+  "@account_change_nickname": { "description": "Header account - change nickname" },
+
+  "account_admin_badge": "Admin",
+  "@account_admin_badge": { "description": "Admin badge label" },
+
+  "account_signed_out_title": "Signed out",
+  "@account_signed_out_title": { "description": "Toast title on sign out success" },
+
+  "account_signed_out_body": "You’ve been signed out.",
+  "@account_signed_out_body": { "description": "Toast body on sign out success" },
+
+  "account_sign_out_failed": "Couldn’t sign out. Please try again in a moment.",
+  "@account_sign_out_failed": { "description": "Toast body on sign out failure" },
+
+  "signup_notice_title": "A quick note about sign-up",
+  "@signup_notice_title": { "description": "Sign-up dialog notice title" },
+
+  "signup_notice_body": "We use sign-in only to verify records and contact winners. Please don’t use a password you use anywhere else.",
+  "@signup_notice_body": { "description": "Sign-up dialog notice body (friendly tone)" },
+
+  "auth_error_body": "We couldn’t complete your request. Please try again in a moment.",
+  "@auth_error_body": { "description": "Auth failure message (no error codes)" },
+
+  "allowed_title": "Allowed Mods",
+  "allowed_list_button": "View List",
+  "allowed_dialog_title": "Allowed Mods",
+  "allowed_col_installed": "Installed",
+  "allowed_col_enabled": "Enabled",
+  "allowed_search_hint": "Search mods",
+  "allowed_always_on_tooltip": "Required for event — always on",
+  "allowed_stats_allowed": "Allowed",
+  "allowed_stats_enabled": "Enabled",
+  "allowed_stats_installed": "Installed",
+  "allowed_stats_missing": "Missing",
+  "common_name": "Name",
+  "live_status_participants": "{count, plural, =0 {No one is playing now} one {{count} person is playing} other {{count} people are playing}}",
+  "@live_status_participants": {
+    "description": "Center text: number of current participants",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "live_status_my_best": "My best: {time}",
+  "@live_status_my_best": {
+    "description": "Right text when user has a best record",
+    "placeholders": { "time": { "type": "String" } }
+  },
+
+  "live_status_not_participated": "You haven’t joined yet",
+  "@live_status_not_participated": {
+    "description": "Right text when user has no record yet"
+  },
+
+  "live_status_loading": "Loading…",
+  "@live_status_loading": {
+    "description": "Shown while loading live status"
+  },
+
+  "live_status_error": "Temporarily unavailable",
+  "@live_status_error": {
+    "description": "Shown when an error occurs (generic, no error code)"
+  },
   "@ranking": {
     "description": "Daily and weekly challenge ranking page"
   },

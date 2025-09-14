@@ -200,10 +200,9 @@ class _ResponsiveCards extends StatelessWidget {
 
   int _calcColumns(double w) {
     // 최소 2열 유지
-    if (w < AppBreakpoints.md) return 2;
-    if (w < AppBreakpoints.lg) return 3;
-    if (w < AppBreakpoints.xl) return 4;
-    return 5;
+    if (w < AppBreakpoints.sm) return 2;
+    if (w < AppBreakpoints.md) return 3;
+    return 4;
   }
 
   @override

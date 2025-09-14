@@ -581,6 +581,8 @@
   "record_login_required": "로그인이 필요합니다",
   "record_signin": "로그인",
   "record_signup": "회원가입",
+  "signin_no_account": "처음 오셨나요? 계정을 만들어 보세요.",
+  "@signin_no_account": { "description": "로그인 다이얼로그 하단 안내" },
   "record_nickname_edit": "닉네임 변경",
   "record_signout": "로그아웃",
   "record_check_rules": "규칙 확인",
@@ -592,7 +594,101 @@
   "record_daily_ranking": "일간 랭킹",
   "record_weekly_ranking": "주간 랭킹",
   "record_stage_entry": "스테이지 {stage}.{substage} 입장",
+  "record_chip_period_tooltip": "기간",
+  "@record_chip_period_tooltip": { "description": "레코드 상단 기간 칩 툴팁" },
 
+  "record_chip_seed_tooltip": "시드",
+  "@record_chip_seed_tooltip": { "description": "레코드 상단 시드 칩 툴팁" },
+
+  "record_chip_seed_empty": "시드 없음",
+  "@record_chip_seed_empty": { "description": "시드가 없을 때 칩에 표시할 문구" },
+
+  "record_chip_unavailable": "지금은 확인할 수 없어요",
+  "@record_chip_unavailable": { "description": "에러 상태에서 간단히 보여주는 대체 문구" },
+
+  "record_badge_character": "캐릭터",
+  "@record_badge_character": { "description": "GameItemCard 우측 상단 배지 - 캐릭터" },
+
+  "record_badge_target": "타겟",
+  "@record_badge_target": { "description": "GameItemCard 우측 상단 배지 - 타겟" },
+
+  "record_card_unavailable": "지금은 표시할 수 없어요",
+  "@record_card_unavailable": { "description": "GameItemCard 이미지 영역 에러 상태 대체 문구" },
+
+  "account_button_label": "계정",
+  "@account_button_label": { "description": "에러 시 비활성 버튼의 기본 레이블" },
+
+  "account_sign_in": "로그인",
+  "@account_sign_in": { "description": "헤더 계정 섹션 - 로그인" },
+
+  "account_sign_up": "회원가입",
+  "@account_sign_up": { "description": "헤더 계정 섹션 - 회원가입" },
+
+  "account_sign_out": "로그아웃",
+  "@account_sign_out": { "description": "헤더 계정 섹션 - 로그아웃" },
+
+  "account_change_nickname": "닉네임 변경",
+  "@account_change_nickname": { "description": "헤더 계정 섹션 - 닉네임 변경" },
+
+  "account_admin_badge": "운영자",
+  "@account_admin_badge": { "description": "계정 섹션의 운영자 배지" },
+
+  "account_signed_out_title": "로그아웃",
+  "@account_signed_out_title": { "description": "로그아웃 성공 토스트 제목" },
+
+  "account_signed_out_body": "정상적으로 로그아웃됐어요.",
+  "@account_signed_out_body": { "description": "로그아웃 성공 토스트 본문" },
+
+  "account_sign_out_failed": "로그아웃에 실패했어요. 잠시 후 다시 시도해 주세요.",
+  "@account_sign_out_failed": { "description": "로그아웃 실패 안내" },
+
+  "signup_notice_title": "간단한 로그인 안내",
+  "@signup_notice_title": { "description": "회원가입 다이얼로그 상단 안내 타이틀" },
+
+  "signup_notice_body": "이 로그인은 대회 기록 확인과 연락을 위한 용도로만 사용돼요. 다른 서비스에서 쓰는 비밀번호는 사용하지 말아 주세요.",
+  "@signup_notice_body": { "description": "회원가입 다이얼로그 상단 안내 본문(부드러운 톤)" },
+
+  "auth_error_body": "요청을 처리하지 못했어요. 잠시 후 다시 시도해 주세요.",
+  "@auth_error_body": { "description": "인증 실패 안내(에러 코드는 노출하지 않음)" },
+
+  "allowed_title": "허용 모드",
+  "allowed_list_button": "목록 보기",
+  "allowed_dialog_title": "허용 모드 목록",
+  "allowed_col_installed": "설치됨",
+  "allowed_col_enabled": "활성",
+  "allowed_search_hint": "모드 검색",
+  "allowed_always_on_tooltip": "대회 필수 모드 — 항상 활성화",
+  "allowed_stats_allowed": "허용 모드",
+  "allowed_stats_enabled": "활성",
+  "allowed_stats_installed": "설치됨",
+  "allowed_stats_missing": "미설치",
+  "common_name": "이름",
+  "live_status_participants": "{count, plural, =0 {지금 참여한 사람이 없어요} one {지금 {count}명 함께하고 있어요} other {지금 {count}명 함께하고 있어요}}",
+  "@live_status_participants": {
+    "description": "가운데 문구: 현재 참가자 수",
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "live_status_my_best": "내 최고기록: {time}",
+  "@live_status_my_best": {
+    "description": "오른쪽 문구: 내 최고 기록",
+    "placeholders": { "time": { "type": "String" } }
+  },
+
+  "live_status_not_participated": "아직 참여하지 않았어요",
+  "@live_status_not_participated": {
+    "description": "오른쪽 문구: 아직 기록이 없을 때"
+  },
+
+  "live_status_loading": "불러오는 중…",
+  "@live_status_loading": {
+    "description": "라이브 상태 로딩 중 표시"
+  },
+
+  "live_status_error": "지금은 정보를 불러올 수 없어요",
+  "@live_status_error": {
+    "description": "에러 발생 시 간단 메시지(에러 코드는 숨김)"
+  },
   "@ranking": {
     "description": "일간 및 주간 챌린지 랭킹 페이지"
   },

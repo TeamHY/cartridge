@@ -1,3 +1,4 @@
+import 'package:cartridge/features/cartridge/record_mode/presentation/widget/record_timer.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -70,7 +71,14 @@ class RecordModeLeftPanel extends ConsumerWidget {
         if (temporal == ContestTemporal.current && ui.goal != null)
           sectionCard(
             context,
-            child: Timer64(session: ref.watch(recordModeSessionProvider)),
+            child: RecordTimer(
+              session: ref.read(recordModeSessionProvider),
+              // loading: ui.isLoadingTimer,
+              // error: ui.timerHasError,
+              // loadingText: '00:00:00.00',
+              // errorText: '--:--:--.--',
+              // fontSize: 64,
+            ),
           )
         else
           const YoutubeBanner(),

@@ -80,7 +80,21 @@ class SupabaseAuthService implements AuthService {
   @override
   Future<void> signUpWithPassword(String email, String password) async {
     logI(_tag, 'signUp start | email=$email');
-    await _sp.auth.signUp(email: email, password: password);
+
+    // 1) 회원가입 시도
+    final res = await _sp.auth.signUp(email: email, password: password);
+
+    // 2) 세션이 없다면(프로젝트 설정에 따라 이메일 확인 등으로 세션이 없을 수 있음)
+    //    바로 비밀번호 로그인 시도 → 자동 로그인 보장
+    if (_sp.auth.currentUser == null || res.session == null) {
+      try {
+        logI(_tag, 'signUp done. session missing → signIn fallback | email=$email');
+        await _sp.auth.signInWithPassword(email: email, password: password);
+      } catch (e, st) {
+        logE(_tag, 'auto signIn after signUp failed', e, st);
+        rethrow; // UI에서 안내 다이얼로그를 띄울 수 있도록 그대로 던짐
+      }
+    }
   }
 
   @override

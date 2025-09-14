@@ -1,9 +1,12 @@
+// lib/app/presentation/auth/sign_in_dialog.dart
+import 'package:cartridge/theme/tokens/spacing.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
+
 
 class SignInDialog extends ConsumerStatefulWidget {
   const SignInDialog({super.key});
@@ -33,23 +36,33 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
 
   Future<void> _onSubmit(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
-
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
       await ref.read(recordModeAuthProvider).signInWithPassword(email, password);
       if (context.mounted) Navigator.pop(context);
-    } catch (e) {
-      if (context.mounted) showErrorDialog(context, e.toString());
+    } catch (_) {
+      if (context.mounted) {
+        final loc = AppLocalizations.of(context);
+        showErrorDialog(context, loc.auth_error_body); // 에러 코드 노출 금지
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final t   = FluentTheme.of(context);
+    final accent = t.accentColor.normal;
 
     return ContentDialog(
-      title: Text(loc.signin_dialog_title),
+      title: Row(
+        children: [
+          Icon(FluentIcons.signin, size: 18, color: accent),
+          Gaps.w4,
+          Text(loc.signin_dialog_title),
+        ],
+      ),
       content: Form(
         key: _formKey,
         child: Column(
@@ -71,6 +84,37 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
                 validator: (v) => (v == null || v.isEmpty) ? loc.signin_password_hint : null,
                 onFieldSubmitted: (_) => _onSubmit(context),
               ),
+            ),
+            const SizedBox(height: 16.0),
+
+            Divider(style: const DividerThemeData(horizontalMargin: EdgeInsets.zero)),
+
+            const SizedBox(height: 10.0),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    loc.signin_no_account, // "처음 오셨나요? 계정을 만들어 보세요."
+                    style: TextStyle(color: t.resources.textFillColorSecondary),
+                  ),
+                ),
+                HyperlinkButton(
+                  onPressed: () {
+                    // 1) 지금 떠있는 로그인 다이얼로그 닫기 (루트 네비게이터 기준)
+                    final rootNav = Navigator.of(context, rootNavigator: true);
+                    rootNav.pop();
+
+                    // 2) 다음 프레임에 회원가입 다이얼로그 열기
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      showDialog(
+                        context: rootNav.context, // 루트 컨텍스트 사용 → 안전
+                        builder: (_) => const SignUpDialog(),
+                      );
+                    });
+                  },
+                  child: Text(loc.record_signup), // "회원가입"
+                ),
+              ],
             ),
           ],
         ),

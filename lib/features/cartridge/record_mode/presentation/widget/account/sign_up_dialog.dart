@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:cartridge/theme/theme.dart';
 
 class SignUpDialog extends ConsumerStatefulWidget {
   const SignUpDialog({super.key});
@@ -50,15 +51,62 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final t   = FluentTheme.of(context);
+    final accent = t.accentColor.normal;
+    final noticeBg     = t.resources.cardBackgroundFillColorSecondary;
+    final noticeStroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
 
     return ContentDialog(
-      title: Text(loc.signup_dialog_title),
+      title: Row(
+        children: [
+          Icon(FluentIcons.add_friend, size: 18, color: accent),
+          Gaps.w4,
+          Text(loc.signup_dialog_title),
+        ],
+      ),
+      constraints: const BoxConstraints(maxWidth: 460, maxHeight: 560),
       content: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              decoration: BoxDecoration(
+                color: noticeBg,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                border: Border.all(color: noticeStroke, width: .8),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 2),
+                    child: Icon(FluentIcons.info, size: 14),
+                  ),
+                  Gaps.w8,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(loc.signup_notice_title,
+                            style: const TextStyle(fontWeight: FontWeight.w700)),
+                        Gaps.h4,
+                        Text(
+                          loc.signup_notice_body,
+                          style: TextStyle(
+                            color: t.resources.textFillColorSecondary,
+                            height: 1.25,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Gaps.h12,
             InfoLabel(
               label: loc.signup_email_label,
               child: TextFormBox(
@@ -66,7 +114,7 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
                 validator: (v) => (v == null || v.trim().isEmpty) ? loc.signup_email_hint : null,
               ),
             ),
-            const SizedBox(height: 16.0),
+            Gaps.h16,
             InfoLabel(
               label: loc.signup_password_label,
               child: PasswordFormBox(
@@ -78,7 +126,7 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
                 },
               ),
             ),
-            const SizedBox(height: 16.0),
+            Gaps.h16,
             InfoLabel(
               label: loc.signup_password_confirm_label,
               child: PasswordFormBox(
