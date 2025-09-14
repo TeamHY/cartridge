@@ -112,9 +112,9 @@ class SettingService {
       logI(_tag, 'op=update fn=update msg=설정 업데이트');
       return Result.ok(data: next, code: 'setting.update.ok');
     } on SettingDomainException catch (e) {
-    return Result.invalid(violations: e.violations, code: e.code);
+      return Result.invalid(violations: e.violations, code: e.code);
     } catch (_) {
-    return const Result.failure(code: 'setting.update.fail');
+      return const Result.failure(code: 'setting.update.fail');
     }
   }
 
