@@ -5,8 +5,9 @@ import 'package:flutter/widgets.dart';
 /// - 스타일 이름은 용도 중심으로 간결하게 유지합니다.
 class AppTypography {
   // 기본 폰트 패밀리(없으면 시스템 기본 사용)
-  static const String fontSans = 'Pretendard';
-  static const String? fontMono = null; // 예: 'JetBrainsMono'
+  static const String fontSans  = 'Pretendard';
+  static const String fontMono  = 'D2Coding';      // 코드/마크다운
+  static const String fontTimer = 'DSEG7Classic';  // 7세그 타이머
 
   /// 내비게이션 패널 아이템(좌측 사이드바)용
   static const TextStyle navigationPane = TextStyle(
@@ -71,6 +72,33 @@ class AppTypography {
     fontSize: 13,
     fontWeight: FontWeight.w400,
     height: 1.35,
+  );
+
+  /// 타이머(중)
+  static const TextStyle timer = TextStyle(
+    fontFamily: fontTimer,
+    fontSize: 36,
+    fontWeight: FontWeight.w600,
+    height: 1.00,
+    fontFeatures: [FontFeature.tabularFigures()],
+  );
+
+  /// 타이머(소)
+  static const TextStyle timerItalic = TextStyle(
+    fontFamily: fontTimer,
+    fontSize: 36,
+    fontWeight: FontWeight.w600,
+    fontStyle: FontStyle.italic,
+    height: 1.00,
+    fontFeatures: [FontFeature.tabularFigures()],
+  );
+
+  static const TextStyle codeInline = TextStyle(
+    fontFamily: fontMono,
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    height: 1.30,
+    fontFeatures: [FontFeature.tabularFigures()],
   );
 
   /// 슬롯머신

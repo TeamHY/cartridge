@@ -1,8 +1,5 @@
-import 'package:cartridge/theme/tokens/radius.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-
-import 'tokens/colors.dart';
-import 'tokens/spacing.dart';
+import 'package:cartridge/theme/theme.dart';
 
 class ResolvedFluentTheme {
   final ThemeMode mode;
@@ -12,7 +9,7 @@ class ResolvedFluentTheme {
 }
 
 class AppTheme {
-  static const String _font = 'Pretendard';
+  static const String _font = AppTypography.fontSans;
 
   // ------ 단일 ThemeData 팩토리들 ------
   static FluentThemeData _light() => FluentThemeData(

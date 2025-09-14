@@ -2,7 +2,7 @@ import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-import 'package:cartridge/app/presentation/app_markdown.dart';
+import 'package:cartridge/app/presentation/widgets/markdown/app_markdown.dart';
 import 'package:cartridge/app/presentation/content_scaffold.dart';
 import 'package:cartridge/app/presentation/desktop_grid.dart';
 import 'package:cartridge/app/presentation/empty_state.dart';
