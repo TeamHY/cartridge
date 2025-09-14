@@ -74,24 +74,21 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
         ],
       ),
       content: ContentShell(
-        child: LayoutBuilder(
-          builder: (_, c) {
-            return Column(
-              children: [
-                DesktopGrid(
-                  maxContentWidth: AppBreakpoints.lg + 1,
-                  colsLg: 2,
-                  colsMd: 2,
-                  colsSm: 1,
-                  items: const [
-                    GridItem(child: RecordModeLeftPanel()),
-                    GridItem(child: RecordModeRightPanel()),
-                  ],
-                ),
-                Gaps.h16,
+        child: Column(
+          children: [
+            DesktopGrid(
+              maxContentWidth: AppBreakpoints.lg + 1,
+              colsLg: 2,
+              colsMd: 2,
+              colsSm: 2,
+              colsXs: 1,
+              items: const [
+                GridItem(child: RecordModeLeftPanel()),
+                GridItem(child: RecordModeRightPanel()),
               ],
-            );
-          },
+            ),
+            Gaps.h16,
+          ],
         ),
       ),
     );

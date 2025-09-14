@@ -13,27 +13,6 @@ const double kHeroCardAspect = 148 / 125; // ≈ 1.184, 타겟 기준
 const double kHeroCardTitleHeight = 48.0;
 const double kHeroCardGap = 16.0;
 
-// ====== 공용 섹션 카드 ======
-Widget sectionCard(
-    BuildContext context, {
-      required Widget child,
-      EdgeInsetsGeometry padding = const EdgeInsets.all(14),
-      EdgeInsetsGeometry? margin,
-    }) {
-  final theme = FluentTheme.of(context);
-  return Container(
-    margin: margin,
-    padding: padding,
-    decoration: BoxDecoration(
-      color: theme.resources.cardBackgroundFillColorDefault,
-      borderRadius: BorderRadius.circular(12),
-      border: Border.all(
-        color: theme.resources.controlStrokeColorSecondary.withAlpha(32),
-      ),
-    ),
-    child: child,
-  );
-}
 
 // ====== TopInfoRow (기간 전환 + 기간/시드 칩) ======
 class TopInfoRow extends StatelessWidget {

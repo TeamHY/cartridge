@@ -1,3 +1,4 @@
+// allowed_dashboard_stats.dart
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -10,46 +11,42 @@ class AllowedDashboardStats extends ConsumerWidget {
     required this.allowed,
     required this.enabled,
     required this.installed,
+    this.loading = false, // ⟵ 추가
   });
 
   final int allowed;
   final int enabled;
   final int installed;
+  final bool loading; // ⟵ 추가
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context);
-    final nf  = NumberFormat.decimalPattern(); // 1,234 포맷
+    final nf  = NumberFormat.decimalPattern();
     final missing = (allowed - installed).clamp(0, allowed);
     final sem = ref.watch(themeSemanticsProvider);
-    final acc2 = accent2StatusOf(context, ref);
 
-    // 각 항목 정의
     final items = <_StatItem>[
       _StatItem(label: loc.allowed_stats_allowed,   value: allowed,   icon: FluentIcons.check_list),
-      _StatItem(label: loc.allowed_stats_enabled,   value: enabled,   icon: FluentIcons.power_button, tone: acc2),
-      _StatItem(label: loc.allowed_stats_installed, value: installed, icon: FluentIcons.accept),
+      _StatItem(label: loc.allowed_stats_enabled,   value: enabled,   icon: FluentIcons.power_button, tone: sem.info),
+      _StatItem(label: loc.allowed_stats_installed, value: installed, icon: FluentIcons.accept, tone: sem.success),
       _StatItem(label: loc.allowed_stats_missing,   value: missing,   icon: FluentIcons.cancel,
           tone: sem.danger, highlightValue: missing > 0),
     ];
 
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(child: _StatTile(item: items[0], formatter: nf)),
-            Gaps.w12,
-            Expanded(child: _StatTile(item: items[1], formatter: nf)),
-          ],
-        ),
+        Row(children: [
+          Expanded(child: _StatTile(item: items[0], formatter: nf, loading: loading)),
+          Gaps.w12,
+          Expanded(child: _StatTile(item: items[1], formatter: nf, loading: loading)),
+        ]),
         Gaps.h12,
-        Row(
-          children: [
-            Expanded(child: _StatTile(item: items[2], formatter: nf)),
-            Gaps.w12,
-            Expanded(child: _StatTile(item: items[3], formatter: nf)),
-          ],
-        ),
+        Row(children: [
+          Expanded(child: _StatTile(item: items[2], formatter: nf, loading: loading)),
+          Gaps.w12,
+          Expanded(child: _StatTile(item: items[3], formatter: nf, loading: loading)),
+        ]),
       ],
     );
   }
@@ -71,9 +68,14 @@ class _StatItem {
 }
 
 class _StatTile extends StatefulWidget {
-  const _StatTile({required this.item, required this.formatter});
+  const _StatTile({
+    required this.item,
+    required this.formatter,
+    required this.loading, // ⟵ 추가
+  });
   final _StatItem item;
   final NumberFormat formatter;
+  final bool loading; // ⟵ 추가
 
   @override
   State<_StatTile> createState() => _StatTileState();
@@ -89,11 +91,7 @@ class _StatTileState extends State<_StatTile> {
     final dark  = theme.brightness == Brightness.dark;
     final bgA   = dark ? 36 : 28;
     final bdA   = dark ? 140 : 120;
-    return StatusColor(
-      fg: base,
-      bg: base.withAlpha(bgA),
-      border: base.withAlpha(bdA),
-    );
+    return StatusColor(fg: base, bg: base.withAlpha(bgA), border: base.withAlpha(bdA));
   }
 
   @override
@@ -102,7 +100,6 @@ class _StatTileState extends State<_StatTile> {
     final tone   = _toneOrAccent(context, widget.item.tone);
     final bg     = t.resources.cardBackgroundFillColorDefault;
     final stroke = t.resources.controlStrokeColorSecondary.withAlpha(32);
-
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hover = true),
@@ -114,10 +111,7 @@ class _StatTileState extends State<_StatTile> {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: _hover ? tone.border : stroke,
-            width: _hover ? 1.2 : .8,
-          ),
+          border: Border.all(color: _hover ? tone.border : stroke, width: _hover ? 1.2 : .8),
         ),
         child: _StatTileBody(
           icon: widget.item.icon,
@@ -125,6 +119,7 @@ class _StatTileState extends State<_StatTile> {
           valueText: widget.formatter.format(widget.item.value),
           tone: tone,
           highlightValue: widget.item.highlightValue,
+          loading: widget.loading, // ⟵ 전달
         ),
       ),
     );
@@ -138,6 +133,7 @@ class _StatTileBody extends StatelessWidget {
     required this.valueText,
     required this.tone,
     required this.highlightValue,
+    required this.loading, // ⟵ 추가
   });
 
   final IconData icon;
@@ -145,57 +141,55 @@ class _StatTileBody extends StatelessWidget {
   final String valueText;
   final StatusColor tone;
   final bool highlightValue;
+  final bool loading; // ⟵ 추가
 
   @override
   Widget build(BuildContext context) {
     final t = FluentTheme.of(context);
 
-    // 아이콘 배지 (엣지 둥근 원형 배경)
     final iconBadge = Container(
       width: 32, height: 32,
-      decoration: BoxDecoration(
-        color: tone.bg,
-        shape: BoxShape.rectangle,
-        borderRadius: AppShapes.chip,
-      ),
+      decoration: BoxDecoration(color: tone.bg, borderRadius: AppShapes.chip),
       child: Icon(icon, size: 20, color: tone.fg),
+    );
+
+    final valueStyle = const TextStyle(
+      fontSize: 32,
+      fontWeight: FontWeight.w800,
+      letterSpacing: -0.5,
+      fontFeatures: [FontFeature.tabularFigures()],
+    );
+
+    // 로딩이면 동일 레이아웃에 숫자만 '—'로 노출 (색상은 보조 컬러)
+    final valueWidget = Text(
+      loading ? '—' : valueText, // ← 핵심
+      style: valueStyle.copyWith(
+        color: loading ? t.resources.textFillColorSecondary : null,
+      ),
     );
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.caption.merge(
-                TextStyle(
-                  color: t.resources.textFillColorSecondary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.caption.merge(
+              TextStyle(color: t.resources.textFillColorSecondary, fontWeight: FontWeight.w600),
             ),
-            Gaps.h12,
-            TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOut,
-              tween: Tween<double>(begin: 0, end: 1),
-              builder: (_, __, child) => child!,
-              child: Text(
-                valueText,
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
-                  fontFeatures: [FontFeature.tabularFigures()],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+          Gaps.h12,
+          // 값 애니메이션은 로딩 해제 후 한 번만 부드럽게
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            tween: Tween<double>(begin: 0, end: 1),
+            builder: (_, __, child) => child!,
+            child: valueWidget,
+          ),
+        ]),
         const Spacer(),
         iconBadge,
       ],

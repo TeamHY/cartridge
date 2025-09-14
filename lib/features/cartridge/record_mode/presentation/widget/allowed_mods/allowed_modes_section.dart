@@ -8,7 +8,6 @@ import 'package:cartridge/app/presentation/widgets/ut/ut_table.dart';
 
 import 'allowed_dashboard_stats.dart';
 import 'allowed_mods_dialog.dart';
-import 'allowed_mods_skeleton.dart';
 
 class AllowedModsSection extends ConsumerStatefulWidget {
   const AllowedModsSection({super.key});
@@ -41,47 +40,35 @@ class _AllowedModsSectionState extends ConsumerState<AllowedModsSection> {
     final installed= view?.items.where((e) => e.installed).length ?? 0;
     final enabled  = view?.items.where((e) => e.enabled).length ?? 0;
 
-    return sectionCard(
-      context,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // header
-          Row(
-            children: [
-              Text(loc.allowed_title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(FluentIcons.refresh),
-                onPressed: loading ? null : () => uiCtl.refreshAllowedPreset(),
-              ),
-              Gaps.w8,
-              FilledButton(
-                onPressed: (loading || view == null || view.items.isEmpty)
-                    ? null
-                    : () => showAllowedModsDialog(context, ref, controller: _tableCtrl, rows: view.items),
-                child: Text(loc.allowed_list_button),
-              ),
-            ],
-          ),
-          Gaps.h8,
-          LazySwitcher(
-            loading: loading,
-            skeleton: const AllowedModsSkeleton(),
-            empty: const SizedBox.shrink(),
-            child: (view == null)
-                ? const SizedBox.shrink()
-                : SizedBox(
-              child: AllowedDashboardStats(
-                allowed: allowed,
-                enabled: enabled,
-                installed: installed,
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // header
+        Row(
+          children: [
+            Text(loc.allowed_title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+            const Spacer(),
+            IconButton(
+              icon: const Icon(FluentIcons.refresh),
+              onPressed: loading ? null : () => uiCtl.refreshAllowedPreset(),
             ),
-          ),
-        ],
-      ),
+            Gaps.w8,
+            FilledButton(
+              onPressed: (loading || view == null || view.items.isEmpty)
+                  ? null
+                  : () => showAllowedModsDialog(context, ref, controller: _tableCtrl, rows: view.items),
+              child: Text(loc.allowed_list_button),
+            ),
+          ],
+        ),
+        Gaps.h8,
+        AllowedDashboardStats(
+          loading: loading || view == null,
+          allowed: allowed,
+          enabled: enabled,
+          installed: installed,
+        ),
+      ],
     );
   }
 }

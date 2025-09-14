@@ -5,7 +5,11 @@ import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/theme/theme.dart';
 
 class YoutubeBanner extends StatelessWidget {
-  const YoutubeBanner({super.key});
+  final double? height;
+  const YoutubeBanner({
+    super.key,
+    this.height,
+  });
 
   static final Uri _url = Uri.parse(
     'https://youtube.com/playlist?list=PLFacqh_WLjxRbAeiwDtJRB8nfI4QxgJBI&si=rRGS-vJEKU3QcjHJ',
@@ -41,8 +45,8 @@ class YoutubeBanner extends StatelessWidget {
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10)),
                 child: Image.asset(
                   'assets/content/시참대회.png',
-                  width: 192,
-                  height: 108, // 16:9
+                  width: height != null ? height! * (16/9) : null,
+                  height: height, // 16:9
                   fit: BoxFit.cover,
                 ),
               ),
@@ -57,14 +61,15 @@ class YoutubeBanner extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                     ),
+                    Gaps.h8,
                     Text(
                       '오헌영이 내는 미션을 완료해보세요!',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
                     ),
                   ],
                 ),

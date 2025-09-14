@@ -87,6 +87,12 @@ StateNotifierProvider.autoDispose<RecordModeUiController, RecordModeUiState>((re
   return c;
 });
 
+final recordModeIsPastProvider = Provider.autoDispose<bool>((ref) {
+  final ui = ref.watch(recordModeUiControllerProvider);
+  final id = ui.gameId;
+  return id != null && RecordId.temporalOf(id) == ContestTemporal.past;
+});
+
 class RecordModeUiController extends StateNotifier<RecordModeUiState> {
   final Ref ref;
   StreamSubscription<String>? _sub;

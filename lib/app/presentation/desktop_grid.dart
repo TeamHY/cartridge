@@ -20,10 +20,11 @@ class DesktopGrid extends StatelessWidget {
   /// 최대 콘텐츠 폭(컨테이너 클램프). 기본은 XL 브레이크포인트.
   final double maxContentWidth;
 
-  /// 반응형 컬럼 수: lg(넓은 화면) / md(중간 화면) / sm(좁은 화면)
+  /// 반응형 컬럼 수: xl/lg/md/sm/xs
   final int colsLg;
   final int colsMd;
   final int colsSm;
+  final int colsXs;
 
   /// 아이템 간 가로/세로 간격(AppSpacing 토큰 사용 권장)
   final double gapX;
@@ -31,6 +32,8 @@ class DesktopGrid extends StatelessWidget {
 
   /// true면 화면 폭(context.sizeClass)으로, false면 컨테이너 폭으로 컬럼 계산
   final bool useViewportForBreakpoints;
+
+  /// 각 행의 crossAxis 정렬
   final CrossAxisAlignment rowCrossAxisAlignment;
 
   const DesktopGrid({
@@ -40,6 +43,7 @@ class DesktopGrid extends StatelessWidget {
     this.colsLg = 3,
     this.colsMd = 2,
     this.colsSm = 1,
+    this.colsXs = 1,
     this.gapX = AppSpacing.lg,
     this.gapY = AppSpacing.md,
     this.useViewportForBreakpoints = false,
@@ -58,10 +62,13 @@ class DesktopGrid extends StatelessWidget {
             ? context.sizeClass
             : sizeClassFor(available);
 
-        // 의미 기반 컬럼 매핑
-        final int cols = (bpClass == SizeClass.lg || bpClass == SizeClass.xl)
-            ? colsLg
-            : (bpClass == SizeClass.md ? colsMd : colsSm);
+        // 의미 기반 컬럼 매핑 (xs 포함)
+        final int cols = switch (bpClass) {
+          SizeClass.xl || SizeClass.lg  => colsLg,
+          SizeClass.md                  => colsMd,
+          SizeClass.sm                  => colsSm,
+          SizeClass.xs || SizeClass.xxs => colsXs,
+        };
 
         final usable = available - gapX * (cols - 1);
         final perItem = (cols <= 1) ? available : (usable / cols);
