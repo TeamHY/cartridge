@@ -5,7 +5,6 @@ import 'package:cartridge/app/presentation/widgets/ut/ut_table.dart';
 import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
-import 'allowed_mods_table.dart';
 
 Future<void> showAllowedModsDialog(
     BuildContext context,

@@ -4,7 +4,6 @@ import 'package:cartridge/features/cartridge/slot_machine/data/i_slot_machine_re
 import 'package:cartridge/features/cartridge/slot_machine/domain/models/slot.dart';
 
 
-
 class SqliteSlotMachineRepository implements ISlotMachineRepository {
   final Future<Database> Function() _db;
 

@@ -73,7 +73,7 @@ class ContentPage extends ConsumerWidget {
       }
       return detail;
     }
-    // 로딩/에러 처리 (레이아웃 단순 유지)
+    // loadin/에러 처리 (레이아웃 단순 유지)
     if (indexAsync.isLoading) {
       return const ScaffoldPage(header: ContentHeaderBar.none(), content: Center(child: ProgressRing()));
     }
@@ -311,7 +311,6 @@ class _ContentCard extends StatelessWidget {
     );
   }
 }
-
 
 
 class _ImageFallback extends StatelessWidget {

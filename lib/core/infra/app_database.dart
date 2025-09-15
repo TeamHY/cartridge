@@ -187,8 +187,7 @@ Future<Database> appDatabase() {
 }
 
 
-
-String _systemLanguageCode() {                 
+String _systemLanguageCode() {
   final raw = (io.Platform.localeName).toLowerCase();
   final code = raw.split(RegExp(r'[_\-.]')).first;
   const supported = {'ko', 'en'};

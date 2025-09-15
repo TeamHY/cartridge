@@ -81,7 +81,7 @@ class RecordModePresetServiceImpl implements RecordModePresetService {
     );
   }
 
-  // --- 내부: 서버에서 프리셋 JSON 가져오기 ---
+  // ── 내부: 서버에서 프리셋 JSON 가져오기 ───────────────────────────────────────────────────────────
   Future<Preset> _fetchRecordPreset() async {
     final url = dotenv.env['RECORD_PRESET_URL'] ?? '';
     final res = await http.get(Uri.parse(url));

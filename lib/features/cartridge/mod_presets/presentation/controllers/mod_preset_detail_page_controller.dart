@@ -69,7 +69,7 @@ class ModPresetDetailPageController
     state = state.copyWith(selections: m);
   }
 
-  // ── Application 유스케이스 호출 래퍼 ─────────────────────────────────────────────
+  // ── Application 유스케이스 호출 래퍼 ───────────────────────────────────────────────────────────
 
   Future<void> saveName(String name) async {
     await ref
@@ -164,7 +164,7 @@ class ModPresetDetailPageController
         .deletePreset();
   }
 
-  // ───────── 공유(클립보드) ─────────
+  // ── 공유(클립보드) ───────────────────────────────────────────────────────────
 
   /// 선택된 행의 이름을 **plain + HTML 링크 리스트**로 복사.
   /// - HTML은 `<ul><li>` 형태, 링크는 `steam://` 우선 URL 사용

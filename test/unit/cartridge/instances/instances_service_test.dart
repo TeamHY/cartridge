@@ -276,9 +276,7 @@ void main() {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers & Stubs
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Helpers & Stubs ───────────────────────────────────────────────────────────
 Instance _mkInstance(String id, {required String name, List<String> applied = const []}) {
   return Instance(
     id: id,

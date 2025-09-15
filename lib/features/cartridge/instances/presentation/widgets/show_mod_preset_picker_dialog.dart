@@ -27,7 +27,7 @@ Future<Set<String>?> showModPresetPickerDialog(
   bool downInSweepZone = false;
 
 
-  // ── 드래그 스윕 동작 파라미터 ──────────────────────────────────────────
+  // ── 드래그 스윕 동작 파라미터 ───────────────────────────────────────────────────────────
   const double kSweepDistance = 6.0;     // 임계 이동거리
   const int    kHoldToSweepMs = 160;     // 홀드 임계시간
   const double kSweepStartWidthPx = 56;

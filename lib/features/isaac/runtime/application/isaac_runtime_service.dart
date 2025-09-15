@@ -26,7 +26,7 @@ class IsaacRuntimeService {
     required this.library,
   });
 
-  // ── Steam/설치/에디션 ────────────────────────────────────────────────────────
+  // ── Steam/설치/에디션 ───────────────────────────────────────────────────────────
 
   Future<String?> findIsaacInstallPath({String? steamBaseOverride}) =>
       library.findGameInstallPath(
@@ -44,7 +44,7 @@ class IsaacRuntimeService {
     return edition;
   }
 
-  // ── 딥링크/스팀 액션 ─────────────────────────────────────────────────────────
+  // ── 딥링크/스팀 액션 ───────────────────────────────────────────────────────────
 
   Future<void> openWorkshopItem(String workshopId) =>
       links.openUri(SteamUris.workshopItem(workshopId));
@@ -61,7 +61,7 @@ class IsaacRuntimeService {
   Future<void> openPreferSteamClient(String webUrl) =>
       links.openUri(SteamLinkBuilder.preferSteamClientIfPossible(webUrl));
 
-  // ── 실행 ────────────────────────────────────────────────────────────────────
+  // ── 실행 ───────────────────────────────────────────────────────────
 
   Future<Process?> startIsaac({
     required String installPath,
@@ -81,7 +81,7 @@ class IsaacRuntimeService {
       autoPath = null;
     }
 
-    // ── 규칙 ────────────────────────────────────────────────────────────────
+    // ── 규칙 ───────────────────────────────────────────────────────────
     // 1) 사용자 경로 + 인자 없음 → 직접 실행
     // 2) 사용자 경로 + 인자 있음 + 사용자경로 == 자동탐지경로 → Steam 경유 실행(경고 회피)
     // 3) 사용자 경로 + 인자 있음 + 경로 다름 → 직접 실행
@@ -110,7 +110,7 @@ class IsaacRuntimeService {
       logW(_tag, 'viaSteam 파라미터는 호환용이며, 내부 규칙이 우선 적용됩니다. viaSteam=$viaSteam → 결정=${shouldRunViaSteam ? 'Steam' : 'Direct'}');
     }
 
-    // ── 실행 ────────────────────────────────────────────────────────────────
+    // ── 실행 ───────────────────────────────────────────────────────────
     if (shouldRunViaSteam) {
       final proc = await _startViaSteam(
         extraArgs: extraArgs,

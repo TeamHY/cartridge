@@ -77,7 +77,6 @@ sealed class InstanceView with _$InstanceView {
   List<ModView> sortedItems({InstanceSortKey? key, bool? asc}) {
     final k = key ?? sortKey ?? InstanceSortKey.name;
     final a = asc ?? ascending ?? true;
-    // 공용 비교 로직 재사용
     final out = [...items];
     out.sort((x, y) => compareInstanceModView(k, a, x, y));
     return out;

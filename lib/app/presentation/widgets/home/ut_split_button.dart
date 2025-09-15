@@ -80,7 +80,6 @@ class _UtSplitButtonState extends State<UtSplitButton> {
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
 
-    // 📌 semantic tokens
     final Color strokeColor = theme.resources.controlStrokeColorDefault;
     final Color textOnAccent = theme.resources.textOnAccentFillColorSelectedText;
     final Color textDisabled = theme.inactiveColor;

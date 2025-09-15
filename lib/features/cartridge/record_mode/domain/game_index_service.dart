@@ -10,7 +10,7 @@ class DefaultGameIndexService implements GameIndexService {
     yield await currentFor(ChallengeType.weekly);
   }
 
-  // ── GameIndexService 구현 ────────────────────────────────────────────────
+  // ── GameIndexService 구현 ───────────────────────────────────────────────────────────
   @override
   Future<({String? prev, String? next})> neighbors(String id) async {
     return RecordId.neighbors(id);

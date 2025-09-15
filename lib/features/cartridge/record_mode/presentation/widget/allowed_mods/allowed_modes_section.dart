@@ -6,8 +6,6 @@ import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 import 'package:cartridge/app/presentation/widgets/ut/ut_table.dart';
 
-import 'allowed_dashboard_stats.dart';
-import 'allowed_mods_dialog.dart';
 
 class AllowedModsSection extends ConsumerStatefulWidget {
   const AllowedModsSection({super.key});
@@ -33,18 +31,15 @@ class _AllowedModsSectionState extends ConsumerState<AllowedModsSection> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final ui = ref.watch(recordModeUiControllerProvider);
-    final uiCtl = ref.read(recordModeUiControllerProvider.notifier);
+    final (view, loading) = ref.watch(
+      recordModeUiControllerProvider.select((s) => (s.preset, s.loadingPreset)),
+    );
 
-    final view = ui.preset;
-    final loading = ui.loadingPreset;
     final allowed = view?.allowedCount ?? 0;
-    final installed = view?.items
-        .where((e) => e.installed)
-        .length ?? 0;
-    final enabled = view?.items
-        .where((e) => e.enabled)
-        .length ?? 0;
+    final installed = view?.items.where((e) => e.installed).length ?? 0;
+    final enabled   = view?.items.where((e) => e.enabled).length ?? 0;
+
+    final uiCtl = ref.read(recordModeUiControllerProvider.notifier);
 
     final header = Row(
       children: [

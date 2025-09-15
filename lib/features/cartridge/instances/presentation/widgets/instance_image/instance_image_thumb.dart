@@ -100,9 +100,9 @@ class InstanceImageThumb extends StatelessWidget {
     Widget sprite(int index) => RepaintBoundary(
       // 레이어 고정으로 드롭/픽업 깜박임 방지
       child: SpriteTile(
-        key: ValueKey('sprite:$index'), // 동일 조각 재사용 힌트
+        key: ValueKey('sprite:$index'),
         asset: 'assets/images/instance_thumbs.png',
-        grid: grid, // sprite_sheet.dart 내 정의
+        grid: grid,
         index: index,
         width: size,
         height: size,

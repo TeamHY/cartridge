@@ -14,7 +14,7 @@ sealed class OptionPresetView with _$OptionPresetView {
   const OptionPresetView._(); // 커스텀 getter/메서드용
 
     factory OptionPresetView({
-    // ---- Domain 그대로 (nullable 허용) ----
+    // ── Domain 그대로 (nullable 허용) ───────────────────────────────────────────────────────────
     required String id,
     required String name,
 

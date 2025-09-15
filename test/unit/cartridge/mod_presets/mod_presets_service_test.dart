@@ -19,7 +19,7 @@ void main() {
       );
     });
 
-    // ── Queries ────────────────────────────────────────────────────────────
+    // ── Queries ───────────────────────────────────────────────────────────
     test('listAllViews(): pos ASC 순서 유지', () async {
       // Given
       final a = ModPreset(id: 'a', name: 'Alpha', entries: const []);
@@ -282,9 +282,7 @@ void main() {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Test Doubles
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Test Doubles ───────────────────────────────────────────────────────────
 class _MemRepo implements IModPresetsRepository {
   final Map<String, ModPreset> items = {};
   final List<String> order = [];

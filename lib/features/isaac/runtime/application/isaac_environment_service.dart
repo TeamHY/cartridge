@@ -46,7 +46,7 @@ class IsaacEnvironmentService {
     return await exe.exists();
   }
 
-  // ── installPath 결정 ────────────────────────────────────────────────────────
+  // ── installPath 결정 ───────────────────────────────────────────────────────────
   // Settings → steamBaseOverride 유틸
   Future<String?> _steamBaseOverrideFromSettings() async {
     final s = await _settings.getNormalized();
@@ -123,7 +123,7 @@ class IsaacEnvironmentService {
     return r.isValid ? r.path : null;
   }
 
-  // ── options.ini 후보 탐색 ───────────────────────────────────────────────────
+  // ── options.ini 후보 탐색 ───────────────────────────────────────────────────────────
   Future<String?> detectOptionsIniPathAuto({
     List<String> fallbackCandidates = const [],
   }) async {
@@ -165,7 +165,7 @@ class IsaacEnvironmentService {
     return null;
   }
 
-  // ── 환경 번들 ───────────────────────────────────────────────────────────────
+  // ── 환경 번들 ───────────────────────────────────────────────────────────
   Future<LaunchEnvironment?> resolveEnvironment({
     String? optionsIniPathOverride,
     List<String> fallbackIniCandidates = const [],

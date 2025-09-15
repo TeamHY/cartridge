@@ -149,7 +149,7 @@ extension InstanceRuntime on Instance {
       }
       final next = cur.copyWith(enabled: nextEnabled, updatedAt: now);
 
-      // 프루닝: enabled=null && favorite=false → 엔트리 제거
+      // Pruning: enabled=null && favorite=false → 엔트리 제거
       if (next.enabled == null && !next.favorite) {
         final list = overrides.where((x) => x.key != key).toList();
         return copyWith(overrides: list, updatedAt: now);
@@ -182,7 +182,7 @@ extension InstanceRuntime on Instance {
       return copyWith(overrides: [...overrides, e], updatedAt: now);
     } else {
       final next = cur.copyWith(enabled: on, updatedAt: now);
-      // 프루닝: enabled=null && favorite=false → 엔트리 제거
+      // Pruning: enabled=null && favorite=false → 엔트리 제거
       if (next.enabled == null && !next.favorite) {
         final list = overrides.where((e) => e.key != key).toList();
         return copyWith(overrides: list, updatedAt: now);

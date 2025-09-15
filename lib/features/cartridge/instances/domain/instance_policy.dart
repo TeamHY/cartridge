@@ -117,7 +117,7 @@ class InstancePolicy {
     return out;
   }
 
-  // ---- 파일명/경로 점검 보조 (Windows 호환) ----
+  // ── 파일명/경로 점검 보조 (Windows 호환) ───────────────────────────────────────────────────────────
 
   static String _basename(String path) {
     final parts = path.split(RegExp(r'[\\/]+'));

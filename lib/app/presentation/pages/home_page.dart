@@ -10,12 +10,7 @@ import 'package:cartridge/app/presentation/widgets/home/steam_news_section.dart'
 import 'package:cartridge/theme/theme.dart';
 
 
-/// ─────────────────────────────────────────────────────────────────────────────
-/// HomePage
-/// ─────────────────────────────────────────────────────────────────────────────
-
-
-
+// ── HomePage ───────────────────────────────────────────────────────────
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
 

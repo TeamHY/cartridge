@@ -174,7 +174,7 @@ class InstanceDetailController
     return _refreshWhenOk(res);
   }
 
-  // ───────── 속성/프리셋/정렬 ─────────
+  // ── 속성/프리셋/정렬 ───────────────────────────────────────────────────────────
   Future<void> setOptionPreset(String? optionPresetId) async {
     if (!state.hasValue) return;
     final curView = state.requireValue;        // InstanceView

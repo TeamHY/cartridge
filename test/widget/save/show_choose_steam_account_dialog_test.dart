@@ -8,9 +8,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/features/steam/domain/models/steam_account_profile.dart';
 import 'package:cartridge/features/isaac/save/presentation/widgets/show_choose_steam_account_dialog.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Test Doubles
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Test Doubles ───────────────────────────────────────────────────────────
 class _FakeProfile implements SteamAccountProfile {
   @override
   final String? personaName;

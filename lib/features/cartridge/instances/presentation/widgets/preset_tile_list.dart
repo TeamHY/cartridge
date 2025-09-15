@@ -31,7 +31,7 @@ class PresetTileList extends ConsumerStatefulWidget {
 
 class _PresetTileListState extends ConsumerState<PresetTileList> {
 
-  // ── 스윕 상태 ─────────────────────────────────────────────────────────
+  // ── 스윕 상태 ───────────────────────────────────────────────────────────
   bool _sweeping = false;        // 현재 스윕 중?
   bool? _sweepSelect;            // 스윕 목표 상태(true=선택, false=해제)
   Offset? _downPos;              // 타일 기준 첫 눌림 위치

@@ -1,13 +1,9 @@
-import 'package:cartridge/features/cartridge/record_mode/presentation/widget/record_game_item_card.dart';
-import 'package:cartridge/features/cartridge/record_mode/presentation/widget/record_timer.dart';
-import 'package:cartridge/theme/tokens/spacing.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'layout/record_panels.dart';
-import 'layout/section_card.dart';
+import 'package:cartridge/theme/theme.dart';
 
 class RecordModeLeftPanel extends ConsumerWidget {
   const RecordModeLeftPanel({super.key});
@@ -22,7 +18,7 @@ class RecordModeLeftPanel extends ConsumerWidget {
     final challengeTypeText = () {
       final id = ui.gameId;
       if (id != null) {
-        return RecordId.formatWeeklyRange(id) ?? RecordId.formatGameLabel(id);
+        return RecordId.formatWeeklyRange(loc, id) ?? RecordId.formatGameLabel(loc, id);
       }
       return '';
     }();
@@ -31,8 +27,10 @@ class RecordModeLeftPanel extends ConsumerWidget {
 
     // (1) 상단 정보 블록 (rows=2)
     final topInfo = SectionCard(
-      rows: 9,
+      rows: 7,
       gapBelowRows: 1,
+      decoration: BoxDecoration(),
+      padding: EdgeInsets.zero,
       child: TopInfoRow(
         challengeType: ui.challengeType,
         onChallengeTypeChanged: (p) => uiCtrl.setChallengeType(p),
@@ -79,7 +77,7 @@ class RecordModeLeftPanel extends ConsumerWidget {
     }
 
     final heroes = SectionCard(
-      rows: 21,
+      rows: 20,
       gapBelowRows: 1,
       padding: EdgeInsets.zero,
       decoration: BoxDecoration(),
@@ -87,15 +85,16 @@ class RecordModeLeftPanel extends ConsumerWidget {
     );
 
     // (3) 하단 타이머/배너 (rows=1)
+    final kBannerHeight = 9;
     final bottom = SectionCard(
-      rows: 8,
+      rows: kBannerHeight,
       padding: EdgeInsets.zero,
       child: (temporal == ContestTemporal.current && ui.goal != null)
           ? Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: RecordTimer(session: ref.read(recordModeSessionProvider)),
       )
-          : const YoutubeBanner(height: 8 * kPanelRowUnit),
+          : YoutubeBanner(height: kBannerHeight * kPanelRowUnit),
     );
 
     return RecordLeftPanelGrid(

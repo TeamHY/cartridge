@@ -11,7 +11,7 @@ class ResolvedFluentTheme {
 class AppTheme {
   static const String _font = AppTypography.fontSans;
 
-  // ------ 단일 ThemeData 팩토리들 ------
+  // ── 단일 ThemeData 팩토리들 ───────────────────────────────────────────────────────────
   static FluentThemeData _light() => FluentThemeData(
     brightness: Brightness.light,
     fontFamily: _font,
@@ -150,7 +150,7 @@ class AppTheme {
   static final FluentThemeData tangerine = _tangerine();
   static final FluentThemeData claude    = _claude();
 
-  // ------ ThemeMode/Light/Dark 묶음 해석 ------
+  // ── ThemeMode/Light/Dark 묶음 해석 ───────────────────────────────────────────────────────────
   static ResolvedFluentTheme resolve(AppThemeKey key) {
     switch (key) {
       case AppThemeKey.system:
@@ -171,7 +171,7 @@ class AppTheme {
     }
   }
 
-  // ------ ButtonTheme 유틸 ------
+  // ── ButtonTheme 유틸 ───────────────────────────────────────────────────────────
   static ButtonThemeData _buildButtonTheme(AccentColor accent, {required bool isDark}) {
     final rest = accent.normal, hover = accent.light, press = accent.dark;
     final disableBg = (isDark ? Colors.white : Colors.black).withAlpha(25);

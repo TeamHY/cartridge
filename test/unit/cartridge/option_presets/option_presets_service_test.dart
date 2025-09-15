@@ -263,9 +263,7 @@ void main() {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Test Doubles (in-memory)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Test Doubles (in-memory) ───────────────────────────────────────────────────────────
 class _MemRepo implements IOptionPresetsRepository {
   final Map<String, OptionPreset> items = {};
   final List<String> order = [];

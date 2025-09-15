@@ -4,7 +4,7 @@ import 'package:cartridge/core/validation.dart';
 import 'package:cartridge/features/isaac/options/domain/models/isaac_options.dart';
 import 'package:cartridge/features/isaac/options/domain/models/isaac_options_schema.dart';
 
-// ---- sane defaults (모델 내부에서만 사용) ----
+// ── sane defaults (모델 내부에서만 사용) ───────────────────────────────────────────────────────────
 const kDefaultWindowWidth = 960;
 const kDefaultWindowHeight = 540;
 const kDefaultWindowPosX = 100;

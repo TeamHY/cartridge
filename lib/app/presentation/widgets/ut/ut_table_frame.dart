@@ -283,7 +283,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
     super.dispose();
   }
 
-  // ---------- Selection ----------
+  // ── Selection ───────────────────────────────────────────────────────────
   List<T> _selectedRows(Iterable<T> all) {
     final out = <T>[];
     for (final r in all) {
@@ -362,7 +362,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
     return null;
   }
 
-  // ---------- Sorting ----------
+  // ── Sorting ───────────────────────────────────────────────────────────
   List<T> _sorted(List<T> src) {
     final columnId = _ctrl.sortColumnId;
     if (columnId == null) return src;
@@ -388,7 +388,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
     widget.onSortChanged?.call(_ctrl.sortColumnId, _ctrl.ascending);
   }
 
-  // ---------- Resize ----------
+  // ── Resize ───────────────────────────────────────────────────────────
   void _onResizeColumn(String id, double newWidth) {
     final spec = widget.columns.firstWhere((c) => c.id == id);
     final min = spec.minPx ?? 40;
@@ -401,7 +401,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
     _ctrl.clearPxOverride(id);
   }
 
-  // ---------- Responsive: 숨김 ----------
+  // ── Responsive: 숨김 ───────────────────────────────────────────────────────────
   List<UTColumnSpec> _visibleColumnsForWidth(double availColsWidth) {
     final vis = <UTColumnSpec>[
       for (final c in widget.columns)
@@ -420,7 +420,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
     return [for (final c in visible) allCells[indexById[c.id]!]];
   }
 
-// ---------- Search & Filters ----------
+// ── Search & Filters ───────────────────────────────────────────────────────────
   bool _defaultIsPresetId(String id) => id.startsWith('mp_');
 
   List<T> _applyQuickFilters(List<T> src) {
@@ -476,7 +476,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
     return [for (final r in src) if (matcher(r, q)) r];
   }
 
-  // ---------- Focus utils ----------
+  // ── Focus utils ───────────────────────────────────────────────────────────
   void _requestTableFocus() {
     _searchFocus.unfocus();
     FocusScope.of(context).requestFocus(_focusNode);
@@ -529,7 +529,7 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
     );
   }
 
-  // ---------- Keyboard ----------
+  // ── Keyboard ───────────────────────────────────────────────────────────
   KeyEventResult _handleKey(FocusNode node, KeyEvent event, List<T> view) {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;

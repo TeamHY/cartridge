@@ -137,7 +137,7 @@ class SpriteTile extends StatelessWidget {
       builder: (context, snap) {
         final image = snap.data;
         if (image == null) {
-          // 로딩 중에도 사이즈는 유지해 레이아웃 점프/깜박임 방지
+          // loadin 중에도 사이즈는 유지해 레이아웃 점프/깜박임 방지
           return SizedBox(width: dstW, height: dstH);
         }
         return RepaintBoundary(

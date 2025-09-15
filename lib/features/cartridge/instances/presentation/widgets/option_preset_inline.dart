@@ -127,7 +127,7 @@ class OptionPresetInlineControl extends ConsumerWidget {
   }
 }
 
-// ────────────────────────────── Flyout Panel ──────────────────────────────
+// ── Flyout Panel ───────────────────────────────────────────────────────────
 class _OptionPresetFlyoutPanel extends StatefulWidget {
   const _OptionPresetFlyoutPanel({
     required this.options,
@@ -338,7 +338,7 @@ class _OptionPresetTile extends StatelessWidget {
   }
 }
 
-// ── 요약/툴팁/서브타이틀 ────────────────────────────────────────────────
+// ── 요약/툴팁/서브타이틀 ───────────────────────────────────────────────────────────
 String _truncate(String s, {required int keep}) =>
     (s.length <= keep) ? s : '${s.substring(0, keep)}…';
 
@@ -393,7 +393,7 @@ String _subtitle(AppLocalizations loc, OptionPresetView o) {
   return parts.join(' · ');
 }
 
-// ── Chip-like 버튼(호버 기어 + 툴팁) ────────────────────────────────────
+// ── Chip-like 버튼(호버 기어 + 툴팁) ───────────────────────────────────────────────────────────
 class _ChipLikeHoverable extends StatefulWidget {
   const _ChipLikeHoverable({
     required this.icon,

@@ -18,7 +18,6 @@ import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
 
-
 class InstanceDetailPage extends ConsumerStatefulWidget {
   final String instanceId;
   final String instanceName;
@@ -554,7 +553,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                           return BadgeSpec(label, accent2StatusOf(context, ref));
                         }).toList(growable: false);
 
-                        // ── 밀도별 정책 ───────────────────────────────────────────
+                        // ── 밀도별 정책 ───────────────────────────────────────────────────────────
                         // tile:   숨겨지면 version + enabledPreset 모두 제목 아래
                         // comf.:  숨겨지면 enabledPreset만 제목 아래, version은 숨김
                         // compact:제목만 (둘 다 제목 아래로 X)

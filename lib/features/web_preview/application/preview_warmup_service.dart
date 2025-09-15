@@ -87,12 +87,6 @@ class _ThrottlePool {
 
 /// 백그라운드 워밍업 서비스
 class PreviewWarmupService<T> {
-  final WebPreviewCache cache;
-  final Future<List<T>> Function() loadInstalledMods;
-  final String Function(T item) workshopIdOf;
-  final String Function(String workshopId) workshopUrlOf;
-  final StreamController<WarmupProgress> _progress = StreamController.broadcast();
-
   PreviewWarmupService({
     required this.cache,
     required this.loadInstalledMods,
@@ -100,11 +94,24 @@ class PreviewWarmupService<T> {
     required this.workshopUrlOf,
   });
 
+  final WebPreviewCache cache;
+  final Future<List<T>> Function() loadInstalledMods;
+  final String Function(T item) workshopIdOf;
+  final String Function(String workshopId) workshopUrlOf;
+
+  final StreamController<WarmupProgress> _progress = StreamController.broadcast();
   Stream<WarmupProgress> get progress => _progress.stream;
 
   bool _running = false;
   bool _paused  = false;
   bool _cancel  = false;
+
+  void _emit(WarmupProgress p) {
+    if (_progress.isClosed) return;
+    try {
+      _progress.add(p);
+    } catch (_) {}
+  }
 
   Future<void> start({int? maxItems}) async {
     if (_running) return;
@@ -133,7 +140,7 @@ class PreviewWarmupService<T> {
       total: jobs.length, done: 0, skipped: 0, failed: 0,
       running: true, paused: false,
     );
-    _progress.add(prog);
+    _emit(prog);
 
     // 4) 스로틀/병렬 풀 (네트워크·디스크 부담 낮춤)
     final pool = _ThrottlePool(
@@ -151,6 +158,7 @@ class PreviewWarmupService<T> {
       }
       if (_cancel) break;
 
+      // 병렬 슬롯에서 개별 작업
       unawaited(pool.schedule(() async {
         try {
           // 이미 캐시가 있고 만료 X면 skip
@@ -158,11 +166,11 @@ class PreviewWarmupService<T> {
           final expired = prior?.isExpired ?? true;
           if (prior != null && !expired && prior.imagePath != null && prior.title.isNotEmpty) {
             prog = prog.copy(skipped: prog.skipped + 1);
-            _progress.add(prog);
+            _emit(prog);
             return;
           }
 
-          // TTL로 부드럽게 (변경 가능)
+          // TTL로 부드럽게
           await cache.getOrFetch(
             j.url,
             policy: const RefreshPolicy.ttl(Duration(hours: 24)),
@@ -173,10 +181,10 @@ class PreviewWarmupService<T> {
             jpegQuality: 85,
           );
           prog = prog.copy(done: prog.done + 1);
-          _progress.add(prog);
+          _emit(prog);
         } catch (_) {
           prog = prog.copy(failed: prog.failed + 1);
-          _progress.add(prog);
+          _emit(prog);
         }
       }));
     }
@@ -187,19 +195,19 @@ class PreviewWarmupService<T> {
     await cache.sweep();
 
     _running = false;
-    _progress.add(prog.copy(running: false, paused: false));
+    _emit(prog.copy(running: false, paused: false));
   }
 
   void pause() {
     if (!_running) return;
     _paused = true;
-    _progress.add(WarmupProgress.empty.copy(paused: true, running: true));
+    _emit(WarmupProgress.empty.copy(paused: true, running: true));
   }
 
   void resume() {
     if (!_running) return;
     _paused = false;
-    _progress.add(WarmupProgress.empty.copy(paused: false, running: true));
+    _emit(WarmupProgress.empty.copy(paused: false, running: true));
   }
 
   void cancel() {
@@ -214,6 +222,10 @@ class PreviewWarmupService<T> {
   }
 
   void dispose() {
-    _progress.close();
+    _cancel = true;
+    _paused = false;
+    if (!_progress.isClosed) {
+      _progress.close();
+    }
   }
 }

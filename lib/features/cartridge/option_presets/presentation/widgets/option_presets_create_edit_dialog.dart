@@ -11,7 +11,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
       OptionPresetView? initial,
       bool repentogonInstalled = false,
     }) async {
-  // ---- 초기값/컨트롤러 -------------------------------------------------
+  // ── 초기값/컨트롤러 ───────────────────────────────────────────────────────────
   var data = initial ?? OptionPresetView(id: '', name: '');
   final isEditing = data.id.trim().isNotEmpty;
 
@@ -289,7 +289,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
     },
   );
 
-  // ---- 정리/반환 -------------------------------------------------------
+  // ── 정리/반환 ───────────────────────────────────────────────────────────
   scrollCtl.dispose();
   nameCtl.dispose(); widthCtl.dispose(); heightCtl.dispose(); xCtl.dispose(); yCtl.dispose();
   gammaCtl.dispose();

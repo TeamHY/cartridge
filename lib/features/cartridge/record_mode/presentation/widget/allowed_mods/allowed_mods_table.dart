@@ -9,7 +9,6 @@ import 'package:cartridge/features/steam/steam.dart';
 import 'package:cartridge/features/web_preview/web_preview.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
-import 'allowed_mods_title_cell.dart';
 
 class AllowedModsTable extends ConsumerWidget {
   const AllowedModsTable({

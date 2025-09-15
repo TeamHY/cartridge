@@ -18,7 +18,7 @@ class OptionPresetsService {
   final IOptionPresetsRepository _repo;
   OptionPresetsService({required IOptionPresetsRepository repo}) : _repo = repo;
 
-  // ── Queries (View) ──────────────────────────────────────────────────────────
+  // ── Queries (View) ───────────────────────────────────────────────────────────
   Future<List<OptionPresetView>> listAllViews() async {
     final list = await _listModels();
     return list.map(OptionPresetView.fromModel).toList(growable: false);
@@ -35,7 +35,7 @@ class OptionPresetsService {
     return _repo.findById(id);
   }
 
-  // ── Commands ────────────────────────────────────────────────────────────────
+  // ── Commands ───────────────────────────────────────────────────────────
   Future<Result<void>> deleteView(String id) async {
     logI(_tag, 'op=delete id=$id');
     final curr = await _repo.findById(id);
@@ -192,7 +192,7 @@ class OptionPresetsService {
     );
   }
 
-  // ── Sorting ────────────────────────────────────────────────────────────────
+  // ── Sorting ───────────────────────────────────────────────────────────
   Future<Result<void>> reorderOptionPresets(
       List<String> orderedIds, {
         bool strict = true,
@@ -209,7 +209,7 @@ class OptionPresetsService {
     }
   }
 
-  // ── Internals (model fetchers) ─────────────────────────────────────────────
+  // ── Internals (model fetchers) ───────────────────────────────────────────────────────────
   Future<List<OptionPreset>> _listModels() async {
     final list = await _repo.listAll(); // pos ASC
     logI(_tag, 'op=list count=${list.length}');

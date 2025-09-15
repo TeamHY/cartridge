@@ -1,8 +1,8 @@
+import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/core/service_providers.dart';
-import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
@@ -42,9 +42,13 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
       await ref.read(recordModeAuthProvider).signUpWithPassword(email, password);
-      if (context.mounted) Navigator.pop(context);
     } catch (e) {
-      if (context.mounted) showErrorDialog(context, e.toString());
+      if (context.mounted) {
+        final loc = AppLocalizations.of(context);
+        UiFeedback.error(context, loc.common_error, loc.auth_error_body);
+      }
+    } finally {
+      if (context.mounted) Navigator.pop(context);
     }
   }
 

@@ -1,4 +1,3 @@
-import 'package:cartridge/features/cartridge/record_mode/presentation/widget/account/account_tiny.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +27,7 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
     return ScaffoldPage(
       header: ContentHeaderBar.backText(
         onBack: widget.onClose,
-        title: '시참대회',
+        title: loc.record_mode_title,
         actions: [
           AccountTiny(
             displayName: user?.nickname,
@@ -58,16 +57,20 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
               try {
                 await ref.read(recordModeSessionProvider).start();
                 if (!context.mounted) return;
-                UiFeedback.info(context, '실행', '게임 실행을 시작합니다.');
+                UiFeedback.info(
+                  context,
+                  loc.play_instance_toast_title,
+                  loc.play_instance_toast_body,
+                );
               } catch (e) {
-                UiFeedback.error(context, '실행 실패', e.toString());
+                UiFeedback.error(context, loc.instance_play_failed_title, loc.instance_play_failed_body);
               }
             } : null,
-            child: const Row(
+            child: Row(
               children: [
                 Icon(FluentIcons.play_solid),
                 Gaps.w6,
-                Text('게임 실행'),
+                Text(loc.play_instance_button_title),
               ],
             ),
           ),

@@ -13,7 +13,7 @@ class SqliteOptionPresetsRepository implements IOptionPresetsRepository {
 
   SqliteOptionPresetsRepository({required Future<Database> Function() dbOpener}) : _db = dbOpener;
 
-// ── Queries ────────────────────────────────────────────────────────────────
+// ── Queries ───────────────────────────────────────────────────────────
   @override
   Future<List<OptionPreset>> listAll() async {
     final db = await _db();
@@ -37,7 +37,7 @@ class SqliteOptionPresetsRepository implements IOptionPresetsRepository {
     return _fromRow(rows.first);
   }
 
-// ── Commands ───────────────────────────────────────────────────────────────
+// ── Commands ───────────────────────────────────────────────────────────
   @override
   Future<void> upsert(OptionPreset preset) async {
     final db = await _db();
@@ -113,7 +113,7 @@ class SqliteOptionPresetsRepository implements IOptionPresetsRepository {
     });
   }
 
-// ── Mapping ────────────────────────────────────────────────────────────────
+// ── Mapping ───────────────────────────────────────────────────────────
   // ignore: unused_element
   Map<String, Object?> _toRow(OptionPreset p, {required int pos}) => {
     'id': p.id,

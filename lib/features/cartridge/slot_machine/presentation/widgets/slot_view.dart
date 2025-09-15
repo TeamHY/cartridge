@@ -110,7 +110,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
 
     final sem = ref.watch(themeSemanticsProvider);
 
-    // ── 토큰 기반 치수 계산 ─────────────────────────────────────────
+    // ── 토큰 기반 치수 계산 ───────────────────────────────────────────────────────────
     const double unit = AppSpacing.lg;
     final sizeClass = context.sizeClass;
 
@@ -149,7 +149,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
         },
         child: Stack(
           children: [
-            // ── Wheel ────────────────────────────────────────────────────────
+            // ── Wheel ───────────────────────────────────────────────────────────
             ListWheelScrollView.useDelegate(
               controller: _wheel,
               itemExtent: itemExtent,
@@ -171,7 +171,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
               ),
             ),
 
-            // ── Overlay + Controls ───────────────────────────────────────────
+            // ── Overlay + Controls ───────────────────────────────────────────────────────────
             Center(
               child: SizedBox(
                 width: contentWidth,

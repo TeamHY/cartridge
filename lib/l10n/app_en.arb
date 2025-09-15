@@ -588,11 +588,6 @@
   "record_daily_ranking": "Daily Ranking",
   "record_weekly_ranking": "Weekly Ranking",
   "record_stage_entry": "Entered Stage {stage}.{substage}",
-  "record_chip_period_tooltip": "Period",
-  "@record_chip_period_tooltip": { "description": "Tooltip for period info chip" },
-
-  "record_chip_seed_tooltip": "Seed",
-  "@record_chip_seed_tooltip": { "description": "Tooltip for seed info chip" },
 
   "record_chip_seed_empty": "No seed",
   "@record_chip_seed_empty": { "description": "Shown when seed is not set" },
@@ -608,7 +603,47 @@
 
   "record_card_unavailable": "Not available right now",
   "@record_card_unavailable": { "description": "Fallback text for GameItemCard image area when error" },
+  "record_mode_title": "Custom Speedrun Championship",
+  "@record_mode_title": {
+    "description": "Record mode details page title."
+  },
+  "play_instance_toast_title": "Launching",
+  "@play_instance_toast_title": {
+    "description": "Toast title when starting the game."
+  },
+  "play_instance_toast_body": "Starting the game.",
+  "@play_instance_toast_body": {
+    "description": "Toast body for starting the game. Friendly tone."
+  },
+  "record_label_week": "Week {week} of {year}",
+  "@record_label_week": {
+    "description": "Weekly label. 'week' should be 2-digit zero-padded (01–53).",
+    "placeholders": {
+      "year": {"type": "int"},
+      "week": {"type": "String"}
+    }
+  },
 
+  "record_label_day": "{year}-{month}-{day}",
+  "@record_label_day": {
+    "description": "Daily label in numeric format.",
+    "placeholders": {
+      "year": {"type": "int"},
+      "month": {"type": "int"},
+      "day": {"type": "int"}
+    }
+  },
+
+  "record_label_week_range": "{startMonth}/{startDay} – {endMonth}/{endDay}",
+  "@record_label_week_range": {
+    "description": "Weekly range (M/D – M/D).",
+    "placeholders": {
+      "startMonth": {"type": "int"},
+      "startDay": {"type": "int"},
+      "endMonth": {"type": "int"},
+      "endDay": {"type": "int"}
+    }
+  },
   "account_button_label": "Account",
   "@account_button_label": { "description": "Default label for disabled button on error" },
 

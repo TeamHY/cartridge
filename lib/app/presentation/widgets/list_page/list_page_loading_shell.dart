@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/theme/theme.dart';
 
 /// 툴바 영역은 그대로 두고, 본문에 중앙 로더를 배치하는 공용 위젯.
-/// - 레이아웃 변형 없이 로딩 상태만 교체할 때 사용.
+/// - 레이아웃 변형 없이 loadin 상태만 교체할 때 사용.
 /// - 프로젝트 테마 토큰만 사용(고정 색상 없음).
 class ListPageLoadingShell extends StatelessWidget {
   /// 상단 툴바(검색바/액션바 등). 보통 SearchToolbar 또는 그 래퍼 위젯.

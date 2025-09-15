@@ -34,7 +34,7 @@ class InstancesService {
         _compute       = computeModViewsUseCase ?? ComputeModViewsUseCase();
 
 
-  // ── Queries ──────────────────────────────────────────────────
+  // ── Queries ───────────────────────────────────────────────────────────
 
   Future<List<InstanceView>> listAllViews({
     Map<String, InstalledMod>? installedOverride,
@@ -191,7 +191,7 @@ class InstancesService {
     return (view, modPresetViews, optionView);
   }
 
-  // ── Commands ─────────────────────────────────────────────────────────
+  // ── Commands ───────────────────────────────────────────────────────────
 
   Future<Result<Instance?>> create({
     required String name,
@@ -538,7 +538,7 @@ class InstancesService {
     await _repo.upsert(next);
   }
 
-  // ── Internals (로직 유틸) ─────────────────────────────────────────────
+  // ── Internals (로직 유틸) ───────────────────────────────────────────────────────────
 
   ModEntry? _deriveOverride({
     required ModView item,

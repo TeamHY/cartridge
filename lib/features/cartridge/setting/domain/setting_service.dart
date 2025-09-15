@@ -41,7 +41,7 @@ class SettingService {
 
   SettingService({required ISettingRepository repo}) : _repo = repo;
 
-  // ── Queries(조회) ──────────────────────────────────────────────────────────────
+  // ── Queries(조회) ───────────────────────────────────────────────────────────
 
   /// 설정을 로드한 뒤 **정규화(normalize)** 합니다.
   /// 원본과 달라지면 자동으로 교정본을 저장합니다.
@@ -71,7 +71,7 @@ class SettingService {
     return normalized;
   }
 
-  // ── Commands(생성/수정/삭제) ───────────────────────────────────────────────────
+  // ── Commands(생성/수정/삭제) ───────────────────────────────────────────────────────────
 
   /// 개별 필드 업데이트(부분 업데이트). 내부에서 정규화 후 저장합니다.
   Future<Result<AppSetting>> update({
@@ -118,7 +118,7 @@ class SettingService {
     }
   }
 
-  // ── Internals(내부 유틸) ──────────────────────────────────────────────────────
+  // ── Internals(내부 유틸) ───────────────────────────────────────────────────────────
   void _throwIfInvalid(ValidationResult vr, {required String code}) {
     if (!vr.isOk) {
       throw SettingDomainException(code: code, violations: vr.violations);

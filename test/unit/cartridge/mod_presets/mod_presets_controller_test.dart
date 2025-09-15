@@ -208,9 +208,7 @@ void main() {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Stub Service
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Stub Service ───────────────────────────────────────────────────────────
 class _StubService extends ModPresetsService {
   _StubService() : super(repository: _NoopRepo(), envService: _NoEnv());
 

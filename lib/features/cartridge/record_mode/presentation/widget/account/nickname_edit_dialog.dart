@@ -1,9 +1,9 @@
+import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/theme/tokens/spacing.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/core/service_providers.dart';
-import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
 class NicknameEditDialog extends ConsumerStatefulWidget {
@@ -37,7 +37,12 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
       await ref.read(recordModeAuthProvider).changeNickname(nickname);
       if (context.mounted) Navigator.pop(context);
     } catch (e) {
-      if (context.mounted) showErrorDialog(context, e.toString());
+      if (context.mounted) {
+        final loc = AppLocalizations.of(context);
+        UiFeedback.error(context, loc.common_error, loc.auth_error_body);
+      }
+    } finally {
+      if (context.mounted) Navigator.pop(context);
     }
   }
 

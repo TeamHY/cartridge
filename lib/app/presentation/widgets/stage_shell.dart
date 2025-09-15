@@ -88,7 +88,7 @@ class _StageShellState extends ConsumerState<StageShell>
         );
         break;
       case AppStage.splash:
-      // 로딩 중엔 배경만(테마 색) 깔아두면 전환 시 깜빡임 방지
+      // loadin 중엔 배경만(테마 색) 깔아두면 전환 시 깜빡임 방지
         base = Container(color: FluentTheme.of(context).scaffoldBackgroundColor);
         break;
     }

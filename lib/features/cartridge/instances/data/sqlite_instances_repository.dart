@@ -231,7 +231,7 @@ class SqliteInstancesRepository implements IInstancesRepository {
     });
   }
 
-  // ── image packing helpers ──
+  // ── image packing helpers ───────────────────────────────────────────────────────────
   Map<String, Object?> _writeImage(InstanceImage? img) {
     if (img is InstanceSprite) {
       return {

@@ -39,7 +39,7 @@ class SqliteSettingRepository implements ISettingRepository {
     );
   }
 
-  // ── Mapping ────────────────────────────────────────────────────────────────
+  // ── Mapping ───────────────────────────────────────────────────────────
   Map<String, Object?> _toMap(AppSetting s) => {
     'steam_path': s.steamPath,
     'isaac_path': s.isaacPath,

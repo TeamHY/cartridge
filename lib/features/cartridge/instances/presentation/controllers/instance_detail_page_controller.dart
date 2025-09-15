@@ -11,7 +11,7 @@ import 'package:cartridge/features/isaac/mod/domain/models/mod_view.dart';
 class InstanceDetailUiState {
   final bool editingName;
 
-  /// 헤더/썸네일에 쓰일 이미지 (nullable: 로딩 전/스켈레톤)
+  /// 헤더/썸네일에 쓰일 이미지 (nullable: loadin 전/스켈레톤)
   final InstanceImage? image;
 
   /// 헤더 타이틀 편집에 쓰일 현재 표시 이름(UI 캐시)
@@ -91,7 +91,7 @@ class InstanceDetailPageController
     return InstanceDetailUiState.initial();
   }
 
-  // ───────── UI 메타 상태 ─────────
+  // ── UI 메타 상태 ───────────────────────────────────────────────────────────
   void startEditName() => state = state.copyWith(editingName: true);
   void cancelEditName() => state = state.copyWith(editingName: false);
   void setSearch(String q) => state = state.copyWith(search: q);
@@ -113,7 +113,7 @@ class InstanceDetailPageController
     state = state.copyWith(selections: m);
   }
 
-  // ───────── Application 위임 ─────────
+  // ── Application 위임 ───────────────────────────────────────────────────────────
   Future<void> saveName(String name) async {
     await ref.read(instanceDetailControllerProvider(_instanceId).notifier).rename(name);
     state = state.copyWith(editingName: false, displayName: name);
@@ -183,7 +183,7 @@ class InstanceDetailPageController
     await ref.read(instanceDetailControllerProvider(_instanceId).notifier).deleteInstance();
   }
 
-  // ---- Instance attributes (option preset, applied mod presets) ----
+  // ── Instance attributes (option preset, applied mod presets) ───────────────────────────────────────────────────────────
   Future<void> setOptionPreset(String? optionPresetId) async {
     await ref.read(instanceDetailControllerProvider(_instanceId).notifier)
         .setOptionPreset(optionPresetId);

@@ -594,11 +594,6 @@
   "record_daily_ranking": "일간 랭킹",
   "record_weekly_ranking": "주간 랭킹",
   "record_stage_entry": "스테이지 {stage}.{substage} 입장",
-  "record_chip_period_tooltip": "기간",
-  "@record_chip_period_tooltip": { "description": "레코드 상단 기간 칩 툴팁" },
-
-  "record_chip_seed_tooltip": "시드",
-  "@record_chip_seed_tooltip": { "description": "레코드 상단 시드 칩 툴팁" },
 
   "record_chip_seed_empty": "시드 없음",
   "@record_chip_seed_empty": { "description": "시드가 없을 때 칩에 표시할 문구" },
@@ -614,7 +609,47 @@
 
   "record_card_unavailable": "지금은 표시할 수 없어요",
   "@record_card_unavailable": { "description": "GameItemCard 이미지 영역 에러 상태 대체 문구" },
+  "record_mode_title": "시참대회",
+  "@record_mode_title": {
+    "description": "레코드 모드 상세 페이지 상단 타이틀. 담백한 명칭."
+  },
+  "play_instance_toast_title": "게임 실행",
+  "@play_instance_toast_title": {
+    "description": "게임 실행 시작 알림 제목."
+  },
+  "play_instance_toast_body": "게임 실행을 시작했어요.",
+  "@play_instance_toast_body": {
+    "description": "게임 실행 시작 알림 본문. 토스 톤으로 부드럽게."
+  },
+  "record_label_week": "{year}년 {week}주차",
+  "@record_label_week": {
+    "description": "주간 라벨. week는 2자리 0패딩된 문자열 권장(01~53).",
+    "placeholders": {
+      "year": {"type": "int"},
+      "week": {"type": "String"}
+    }
+  },
 
+  "record_label_day": "{year}년 {month}월 {day}일",
+  "@record_label_day": {
+    "description": "일간 라벨. 자연수 표기(패딩 없음).",
+    "placeholders": {
+      "year": {"type": "int"},
+      "month": {"type": "int"},
+      "day": {"type": "int"}
+    }
+  },
+
+  "record_label_week_range": "{startMonth}/{startDay} – {endMonth}/{endDay}",
+  "@record_label_week_range": {
+    "description": "주간 범위(M/D – M/D). 월/일 순서 그대로 사용.",
+    "placeholders": {
+      "startMonth": {"type": "int"},
+      "startDay": {"type": "int"},
+      "endMonth": {"type": "int"},
+      "endDay": {"type": "int"}
+    }
+  },
   "account_button_label": "계정",
   "@account_button_label": { "description": "에러 시 비활성 버튼의 기본 레이블" },
 

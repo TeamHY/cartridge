@@ -24,7 +24,7 @@ class AppSpacing {
   /// AppBar, Caption 등 공용 높이
   static const double appBarHeight = 50;
 
-  // ---- EdgeInsets 헬퍼 ----
+  // ── EdgeInsets 헬퍼 ───────────────────────────────────────────────────────────
   static EdgeInsets all(double v) => EdgeInsets.all(v);
   static EdgeInsets sym({double h = 0, double v = 0}) =>
       EdgeInsets.symmetric(horizontal: h, vertical: v);

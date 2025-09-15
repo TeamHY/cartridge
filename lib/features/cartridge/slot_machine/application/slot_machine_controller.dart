@@ -35,7 +35,7 @@ class SlotMachineController extends AsyncNotifier<List<Slot>> {
   /// 수동 새로고침.
   Future<void> refresh() => _apply(() => _service.listAll());
 
-  // ───────────── 슬롯 CRUD ─────────────
+  // ── 슬롯 CRUD ───────────────────────────────────────────────────────────
 
   /// 왼쪽(인덱스 0)에 슬롯 추가.
   Future<void> addLeft({String defaultText = 'Item'}) =>
@@ -54,7 +54,7 @@ class SlotMachineController extends AsyncNotifier<List<Slot>> {
   Future<void> setSlotItems(String slotId, List<String> items) =>
       _apply(() => _service.setItems(slotId, items));
 
-  // ───────────── 아이템 CRUD ─────────────
+  // ── 아이템 CRUD ───────────────────────────────────────────────────────────
 
   /// 아이템 추가(맨 끝).
   Future<void> addItem(String slotId, String text) =>

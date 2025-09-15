@@ -93,7 +93,7 @@ class SteamUsersVdfRepository implements SteamUsersPort {
     return result;
   }
 
-  // ── 내부: loginusers.vdf 파싱(경고/에러만 남김) ─────────────────────────────
+  // ── 내부: loginusers.vdf 파싱(경고/에러만 남김) ───────────────────────────────────────────────────────────
   Future<_LoginUserMap> _readLoginUsers(String steamBase) async {
     const op = 'readLoginusers';
     final f = File(p.join(steamBase, 'config', 'loginusers.vdf'));

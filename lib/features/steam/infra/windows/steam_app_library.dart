@@ -112,7 +112,7 @@ class SteamAppLibrary implements SteamLibraryPort {
     return ids;
   }
 
-  // ── 내부 ────────────────────────────────────────────────────────────────
+  // ── 내부 ───────────────────────────────────────────────────────────
   Future<File?> _locateAppManifest(int appId, String? override) async {
     final base = await install.resolveBaseDir(override: override);
     if (base == null) {

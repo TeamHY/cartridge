@@ -38,13 +38,13 @@ class SlotMachineService {
 
   SlotMachineService({required this.repo});
 
-  // ── Queries(조회) ──────────────────────────────────────────────────────────────
+  // ── Queries(조회) ───────────────────────────────────────────────────────────
 
   /// 전체 슬롯머신(슬롯 리스트) 반환.
   Future<List<Slot>> listAll() => repo.listAll();
   Future<Slot?> getById(String id) => repo.findById(id);
 
-  // ── Commands(생성/수정/삭제) ───────────────────────────────────────────────────
+  // ── Commands(생성/수정/삭제) ───────────────────────────────────────────────────────────
 
   /// 좌측(인덱스 0)에 신규 슬롯 추가.
   ///
@@ -78,7 +78,7 @@ class SlotMachineService {
     return repo.listAll();
   }
 
-  // ── State Changes(상태 변경) ───────────────────────────────────────────────────
+  // ── State Changes(상태 변경) ───────────────────────────────────────────────────────────
 
   /// 슬롯 전체 아이템 교체(슬롯 편집 화면의 일괄 저장).
   ///
@@ -122,7 +122,7 @@ class SlotMachineService {
     return repo.reorderByIds(orderedIds, strict: strict);
   }
 
-  // ── View Helpers(뷰 유틸) ─────────────────────────────────────────────────────
+  // ── View Helpers(뷰 유틸) ───────────────────────────────────────────────────────────
 
   /// 슬롯 하나 스핀 → `(선택 인덱스, 값)`. 저장하지 않습니다.
   (int index, String value)? spinOne(Slot slot, {Random? rng}) {

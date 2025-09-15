@@ -9,7 +9,7 @@ class SqliteModPresetsRepository implements IModPresetsRepository {
   final Future<Database> Function() _db;
   SqliteModPresetsRepository({required Future<Database> Function() dbOpener}) : _db = dbOpener;
 
-// ── Queries ────────────────────────────────────────────────────────────────
+// ── Queries ───────────────────────────────────────────────────────────
   @override
   Future<List<ModPreset>> listAll() async {
     final db = await _db();
@@ -58,7 +58,7 @@ class SqliteModPresetsRepository implements IModPresetsRepository {
     );
   }
 
-// ── Commands ───────────────────────────────────────────────────────────────
+// ── Commands ───────────────────────────────────────────────────────────
   @override
   Future<void> upsert(ModPreset preset) async {
     final db = await _db();
@@ -137,7 +137,7 @@ class SqliteModPresetsRepository implements IModPresetsRepository {
     });
   }
 
-  // ── Commands (엔트리 단건 최적화) ─────────────────────────────────────────────
+  // ── Commands (엔트리 단건 최적화) ───────────────────────────────────────────────────────────
   @override
   Future<void> upsertEntry(String presetId, ModEntry entry) async {
     final db = await _db();
@@ -218,7 +218,7 @@ class SqliteModPresetsRepository implements IModPresetsRepository {
     );
   }
 
-  // ── Internals ──────────────────────────────────────────────────────────────
+  // ── Internals ───────────────────────────────────────────────────────────
   Future<List<ModEntry>> _loadEntries(Database db, String presetId) async {
     final rows = await db.query(
       'mod_preset_entries',
@@ -247,7 +247,7 @@ class SqliteModPresetsRepository implements IModPresetsRepository {
     workshopName: null,
   );
 
-// ── helpers ────────────────────────────────────────────────────────────────
+// ── helpers ───────────────────────────────────────────────────────────
   int? _boolToInt(bool? v) => v == null ? null : (v ? 1 : 0);
   bool? _intToBoolNullable(Object? v) =>
       v == null ? null : ((v as int) != 0);

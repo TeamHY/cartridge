@@ -233,7 +233,7 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
         )
             : null;
 
-        // ── tile + (version 또는 preset 숨김) → 세로 스택: 제목 → (버전) → 배지 ──
+        // ── tile + (version 또는 preset 숨김) → 세로 스택: 제목 → (버전) → 배지 ───────────────────────────────────────────────────────────
         if (useVerticalStackForTile) {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.center,

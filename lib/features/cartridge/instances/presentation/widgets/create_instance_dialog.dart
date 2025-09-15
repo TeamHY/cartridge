@@ -271,7 +271,7 @@ Future<EditInstanceResult?> showEditInstanceDialog(
   );
 }
 
-/// 옵션 프리셋 콤보: 로딩/에러도 동일 레이아웃 유지
+/// 옵션 프리셋 콤보: loadin/에러도 동일 레이아웃 유지
 class _OptionPresetComboField extends ConsumerWidget {
   final String? selectedOptionId;
   final ValueChanged<String?> onChanged;

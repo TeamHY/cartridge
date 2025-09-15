@@ -1,4 +1,5 @@
 // lib/app/presentation/auth/sign_in_dialog.dart
+import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/theme/tokens/spacing.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -40,12 +41,13 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
       await ref.read(recordModeAuthProvider).signInWithPassword(email, password);
-      if (context.mounted) Navigator.pop(context);
     } catch (_) {
       if (context.mounted) {
         final loc = AppLocalizations.of(context);
-        showErrorDialog(context, loc.auth_error_body); // 에러 코드 노출 금지
+        UiFeedback.error(context, loc.common_error, loc.auth_error_body);
       }
+    } finally {
+      if (context.mounted) Navigator.pop(context);
     }
   }
 
@@ -94,7 +96,7 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
               children: [
                 Expanded(
                   child: Text(
-                    loc.signin_no_account, // "처음 오셨나요? 계정을 만들어 보세요."
+                    loc.signin_no_account,
                     style: TextStyle(color: t.resources.textFillColorSecondary),
                   ),
                 ),
@@ -112,7 +114,7 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
                       );
                     });
                   },
-                  child: Text(loc.record_signup), // "회원가입"
+                  child: Text(loc.record_signup),
                 ),
               ],
             ),

@@ -1,13 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
-
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 
-/// 레코드 페이지 상단의 일간/주간 전환 세그먼트 컨트롤.
-/// - 테마: FluentTheme에서 파생(고정색 사용 X)
-/// - 다국어: AppLocalizations 사용
-/// - 로딩/에러: 레이아웃 유지(고정 높이), 상호작용 비활성화
+/// 일간/주간 전환 컨트롤(Fluent 전용)
+/// - 선택된 항목은 FilledButton, 비선택은 기본 Button
 class RecordPeriodSwitcher extends StatelessWidget {
   const RecordPeriodSwitcher({
     super.key,
@@ -19,11 +15,7 @@ class RecordPeriodSwitcher extends StatelessWidget {
 
   final ChallengeType selected;
   final ValueChanged<ChallengeType> onChanged;
-
-  /// true면 스켈레톤 형태로 렌더링(클릭 비활성)
   final bool loading;
-
-  /// true면 동일 레이아웃을 유지하면서 상호작용만 막음
   final bool error;
 
   bool get _disabled => loading || error;
@@ -31,37 +23,75 @@ class RecordPeriodSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    const kHeight = 36.0;
 
-    // Segmented 높이를 안정적으로 맞춰 레이아웃 불안정 방지
-    const double kHeight = 36;
+    Widget buildBtn({
+      required bool isSelected,
+      required String label,
+      required VoidCallback onTap,
+      required BorderRadiusGeometry radius,
+    }) {
+      final child = Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
 
-    // ── 실제 SegmentedButton ─────────────────────────────────────────────
-    return SizedBox(
-      height: kHeight,
-      child: Center(
-        child: material.SegmentedButton<ChallengeType>(
-          style: material.ButtonStyle(
-
-          ),
-          segments: [
-            material.ButtonSegment<ChallengeType>(
-              value: ChallengeType.daily,
-              label: Text(loc.record_daily_target),
-              enabled: !_disabled,
-            ),
-            material.ButtonSegment<ChallengeType>(
-              value: ChallengeType.weekly,
-              label: Text(loc.record_weekly_target),
-              enabled: !_disabled,
-            ),
-          ],
-          selected: {selected},
-          onSelectionChanged: (set) {
-            if (_disabled) return;
-            if (set.isNotEmpty) onChanged(set.first);
-          },
+      final style = ButtonStyle(
+        // 좌/우 버튼이 맞닿을 때 깔끔하게 보이도록 모서리 제어
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: radius),
         ),
-      ),
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(horizontal: 12),
+        ),
+      );
+
+      return SizedBox(
+        height: kHeight,
+        child: isSelected
+            ? FilledButton(
+          style: style,
+          onPressed: _disabled ? null : onTap,
+          child: child,
+        )
+            : Button(
+          style: style,
+          onPressed: _disabled ? null : onTap,
+          child: child,
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: buildBtn(
+            isSelected: selected == ChallengeType.daily,
+            label: loc.record_daily_target,
+            onTap: () {
+              if (selected != ChallengeType.daily) onChanged(ChallengeType.daily);
+            },
+            radius: const BorderRadius.only(
+              topLeft: Radius.circular(8),
+              bottomLeft: Radius.circular(8),
+            ),
+          ),
+        ),
+        Expanded(
+          child: buildBtn(
+            isSelected: selected == ChallengeType.weekly,
+            label: loc.record_weekly_target,
+            onTap: () {
+              if (selected != ChallengeType.weekly) onChanged(ChallengeType.weekly);
+            },
+            radius: const BorderRadius.only(
+              topRight: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

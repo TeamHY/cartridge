@@ -3,20 +3,20 @@ import 'package:flutter/foundation.dart';
 /// UTTable의 상태를 외부에서 제어/구독할 수 있는 컨트롤러.
 /// - 정렬, 포커스, 리사이즈(px override), 검색/필터, 선택 상태를 보관
 class UTTableController<T> extends ChangeNotifier {
-  // ---- 정렬 ----
+  // ── 정렬 ───────────────────────────────────────────────────────────
   String? sortColumnId;
   bool ascending;
 
-  // ---- 선택(내부 선택을 쓰는 경우에만 사용) ----
+  // ── 선택(내부 선택을 쓰는 경우에만 사용) ───────────────────────────────────────────────────────────
   final Set<T> selected = <T>{};
 
-  // ---- 리사이즈(px overrides) ----
+  // ── 리사이즈(px overrides) ───────────────────────────────────────────────────────────
   final Map<String, double> pxOverrides = <String, double>{};
 
-  // ---- 포커스 ----
+  // ── 포커스 ───────────────────────────────────────────────────────────
   int focusIndex = 0;
 
-  // ---- 검색/필터 ----
+  // ── 검색/필터 ───────────────────────────────────────────────────────────
   String query;
   final Set<String> activeFilterIds = <String>{};
 
@@ -26,7 +26,7 @@ class UTTableController<T> extends ChangeNotifier {
     String? initialQuery,
   }) : query = initialQuery ?? '';
 
-  // ---------- selection ----------
+  // ── selection ───────────────────────────────────────────────────────────
   bool isSelected(T row) => selected.contains(row);
   void setSelected(T row, bool value) {
     if (value ? selected.add(row) : selected.remove(row)) {
@@ -48,14 +48,14 @@ class UTTableController<T> extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ---------- sort ----------
+  // ── sort ───────────────────────────────────────────────────────────
   void setSort(String? columnId, bool asc) {
     sortColumnId = columnId;
     ascending = asc;
     notifyListeners();
   }
 
-  // ---------- resize ----------
+  // ── resize ───────────────────────────────────────────────────────────
   void setPxOverride(String colId, double px) {
     if (pxOverrides[colId] != px) {
       pxOverrides[colId] = px;
@@ -69,7 +69,7 @@ class UTTableController<T> extends ChangeNotifier {
     }
   }
 
-  // ---------- focus ----------
+  // ── focus ───────────────────────────────────────────────────────────
   void setFocusIndex(int i) {
     if (focusIndex != i) {
       focusIndex = i;
@@ -77,7 +77,7 @@ class UTTableController<T> extends ChangeNotifier {
     }
   }
 
-  // ---------- search / filter ----------
+  // ── search / filter ───────────────────────────────────────────────────────────
   void setQuery(String q) {
     if (query != q) {
       query = q;
@@ -91,7 +91,7 @@ class UTTableController<T> extends ChangeNotifier {
     if (changed) notifyListeners();
   }
 
-  // ---------- (옵션) 직렬화 ----------
+  // ── (옵션) 직렬화 ───────────────────────────────────────────────────────────
   Map<String, dynamic> toMap() => {
     'sortColumnId': sortColumnId,
     'ascending': ascending,

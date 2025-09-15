@@ -52,7 +52,7 @@ class AppMarkdown extends StatelessWidget {
       linkHoverColor: f.accentColor.darker,
     );
 
-    // ── 링크 색상 이슈(#78) 워크어라운드: ATag만 교체 ──
+    // ── 링크 색상 이슈(#78) 워크어라운드: ATag만 교체 ───────────────────────────────────────────────────────────
     final inline = List<MarkdownComponent>.from(MarkdownComponent.inlineComponents);
     final idx = inline.indexWhere((c) => c is ATagMd);
     if (idx >= 0) inline[idx] = AccentATagMd();

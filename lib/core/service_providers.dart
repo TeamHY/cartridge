@@ -20,16 +20,12 @@ import 'package:cartridge/features/web_preview/web_preview.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 0) App-wide Database (SQLite)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 0) App-wide Database (SQLite) ───────────────────────────────────────────────────────────
 final appDatabaseProvider =
 Provider<Future<Database> Function()>((ref) => appDatabase);
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 1) Steam Layer (Ports & Adapters)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 1) Steam Layer (Ports & Adapters) ───────────────────────────────────────────────────────────
 // Links (url_launcher 단독)
 final steamLinksPortProvider = Provider<SteamLinksPort>((ref) {
   return SteamUrlLauncherAdapter();
@@ -58,10 +54,7 @@ final steamUsersPortProvider = Provider<SteamUsersPort>((ref) {
 });
 
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 2) Isaac Runtime & Environment
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 2) Isaac Runtime & Environment ───────────────────────────────────────────────────────────
 final isaacRuntimeServiceProvider = Provider<IsaacRuntimeService>((ref) {
   final links = ref.read(steamLinksPortProvider);
   final library = ref.read(steamLibraryPortProvider);
@@ -141,9 +134,7 @@ final editionAndSlotsProvider = FutureProvider.family<EditionSlots, EditionSlots
   return (edition: target, slots: List<int>.from(slots)..sort());
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 3) Core Domain Services (App-wide)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 3) Core Domain Services (App-wide) ───────────────────────────────────────────────────────────
 // Settings (SQLite)
 final settingRepositoryProvider = Provider<ISettingRepository>(
       (ref) => SqliteSettingRepository(dbOpener: ref.read(appDatabaseProvider)),
@@ -195,9 +186,7 @@ final instancesServiceProvider = Provider<InstancesService>((ref) {
   );
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 4) Feature: Slot Machine (SQLite)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 4) Feature: Slot Machine (SQLite) ───────────────────────────────────────────────────────────
 final slotMachineRepositoryProvider = Provider<ISlotMachineRepository>(
       (ref) => SqliteSlotMachineRepository(
     dbOpener: ref.read(appDatabaseProvider),
@@ -211,9 +200,7 @@ final slotMachineServiceProvider = Provider<SlotMachineService>(
 );
 
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 5) Application Services (Launch/Play)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 5) Application Services (Launch/Play) ───────────────────────────────────────────────────────────
 final isaacLauncherServiceProvider = Provider<IsaacLauncherService>((ref) {
   return IsaacLauncherService(
     runtime: ref.read(isaacRuntimeServiceProvider),
@@ -232,10 +219,7 @@ final instancePlayServiceProvider = Provider<InstancePlayService>((ref) {
 });
 
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// 6) UI Controllers / ViewModel-ish Providers
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 6) UI Controllers / ViewModel-ish Providers ───────────────────────────────────────────────────────────
 final optionPresetsControllerProvider =
 AsyncNotifierProvider<OptionPresetsController, List<OptionPresetView>>(
   OptionPresetsController.new,
@@ -247,9 +231,7 @@ final repentogonInstalledProvider = FutureProvider<bool>((ref) async {
   return path != null && await Repentogon.isInstalled(path);
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 7) Record Mode (Supabase-backed)
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 7) Record Mode (Supabase-backed) ───────────────────────────────────────────────────────────
 final recordModeGoalReadServiceProvider = Provider<GoalReadService>((ref) {
   final sp = Supabase.instance.client;
   return SupabaseGoalReadService(sp);
@@ -316,9 +298,7 @@ final recordModePresetServiceProvider = Provider<RecordModePresetService>((ref) 
   return RecordModePresetServiceImpl(env, prefs);
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// 8) Steam News
-// ─────────────────────────────────────────────────────────────────────────────
+// ── 8) Steam News ───────────────────────────────────────────────────────────
 final steamNewsServiceProvider = Provider<SteamNewsService>((ref) {
   return SteamNewsService(
     repo: SteamNewsRepository(),

@@ -24,7 +24,7 @@ class ModPresetsService {
         _env         = envService,
         _projector   = projector ?? const ModPresetProjector();
 
-  // ── Queries(조회) [View 반환] ────────────────────────────────────────────────
+  // ── Queries(조회) [View 반환] ───────────────────────────────────────────────────────────
   Future<List<ModPresetView>> listAllViews({
     Map<String, InstalledMod>? installedOverride,
     String? modsRootOverride,
@@ -83,7 +83,7 @@ class ModPresetsService {
     return hits.whereType<ModPreset>().toList(growable: false);
   }
 
-  // ── Commands(생성/수정/삭제/복제) ──────────────────────────────────────────────
+  // ── Commands(생성/수정/삭제/복제) ───────────────────────────────────────────────────────────
   Future<Result<ModPresetView>> create({
     required String name,
     required SeedMode seedMode,
@@ -267,7 +267,7 @@ class ModPresetsService {
     );
   }
 
-  // ── Sorting(정렬) ────────────────────────────────────────────────────────────
+  // ── Sorting(정렬) ───────────────────────────────────────────────────────────
   Future<Result<void>> reorderModPresets(
       List<String> orderedIds, {
         bool strict = true,
@@ -284,7 +284,7 @@ class ModPresetsService {
     }
   }
 
-  // ── State Changes(상태 변경) ─────────────────────────────────────────────────
+  // ── State Changes(상태 변경) ───────────────────────────────────────────────────────────
   Future<Result<ModPresetView>> setItemState({
     required String presetId,
     required ModView item,
@@ -476,7 +476,7 @@ class ModPresetsService {
     return const Result<void>.ok(code: 'modPreset.item.delete.ok');
   }
 
-  // ── Internals ───────────────────────────────────────────────────────────────
+  // ── Internals ───────────────────────────────────────────────────────────
   Future<Map<String, InstalledMod>> _getInstalledModsMap({
     Map<String, InstalledMod>? installedOverride,
     String? modsRootOverride,

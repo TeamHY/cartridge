@@ -87,12 +87,6 @@ StateNotifierProvider.autoDispose<RecordModeUiController, RecordModeUiState>((re
   return c;
 });
 
-final recordModeIsPastProvider = Provider.autoDispose<bool>((ref) {
-  final ui = ref.watch(recordModeUiControllerProvider);
-  final id = ui.gameId;
-  return id != null && RecordId.temporalOf(id) == ContestTemporal.past;
-});
-
 class RecordModeUiController extends StateNotifier<RecordModeUiState> {
   final Ref ref;
   StreamSubscription<String>? _sub;
@@ -116,8 +110,9 @@ class RecordModeUiController extends StateNotifier<RecordModeUiState> {
     await _fetchMoreGuarded(reset: true, expectId: id, seq: seq);
   }
 
-  Future<void> _loadAllowedPreset() async {
-    state = state.copyWith(loadingPreset: true, preset: null);
+  Future<void> _loadAllowedPreset({bool force = false}) async {
+    if (!force && (state.preset != null || state.loadingPreset)) return;
+    state = state.copyWith(loadingPreset: true, preset: force ? null : state.preset);
     try {
       final svc = ref.read(recordModePresetServiceProvider);
       final view = await svc.loadAllowedPresetView();
@@ -125,7 +120,7 @@ class RecordModeUiController extends StateNotifier<RecordModeUiState> {
       state = state.copyWith(loadingPreset: false, preset: view);
     } catch (_) {
       if (!mounted) return;
-      state = state.copyWith(loadingPreset: false, preset: null);
+      state = state.copyWith(loadingPreset: false);
     }
   }
 
@@ -187,7 +182,7 @@ class RecordModeUiController extends StateNotifier<RecordModeUiState> {
     await _fetchMoreGuarded(reset: reset, expectId: g, seq: _seq);
   }
 
-  Future<void> refreshAllowedPreset() => _loadAllowedPreset();
+  Future<void> refreshAllowedPreset() => _loadAllowedPreset(force: true);
 }
 
 

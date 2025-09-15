@@ -44,7 +44,7 @@ class ModPresetDetailController
     );
   }
 
-  // ── Internals(내부 유틸) ──────────────────────────────────────────────────────
+  // ── Internals(내부 유틸) ───────────────────────────────────────────────────────────
 
   /// Service에서 최신 View를 받아와 **현재 정렬 기준**으로 재정렬 후 상태 반영.
   Future<void> _reload() async {
@@ -59,7 +59,7 @@ class ModPresetDetailController
     await _reload();
   }
 
-  // ── 편집/상호작용(모두 Service 경유) ─────────────────────────────────────────────
+  // ── 편집/상호작용(모두 Service 경유) ───────────────────────────────────────────────────────────
 
   /// 프리셋 이름 변경 후, 최신 View를 현재 정렬 기준으로 재적용.
   Future<void> rename(String name) async {

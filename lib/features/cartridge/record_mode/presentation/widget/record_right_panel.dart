@@ -1,15 +1,11 @@
-import 'package:cartridge/features/cartridge/record_mode/presentation/widget/allowed_mods/allowed_modes_section.dart';
-import 'package:cartridge/features/cartridge/record_mode/presentation/widget/live_status_tile.dart';
-import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
-import 'layout/record_panels.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
-import 'layout/section_card.dart';
 
 class RecordModeRightPanel extends ConsumerWidget {
   const RecordModeRightPanel({super.key});
@@ -24,6 +20,14 @@ class RecordModeRightPanel extends ConsumerWidget {
     final loading  = ui.loadingMore && entries.isEmpty;
     final loc = AppLocalizations.of(context);
 
+    final challengeTypeText = () {
+      final id = ui.gameId;
+      if (id != null) {
+        return RecordId.formatWeeklyRange(loc, id) ?? RecordId.formatGameLabel(loc, id);
+      }
+      return '';
+    }();
+
     Widget navBar() => Row(
       children: [
         IconButton(icon: const Icon(FluentIcons.chevron_left),
@@ -32,9 +36,14 @@ class RecordModeRightPanel extends ConsumerWidget {
         IconButton(icon: const Icon(FluentIcons.chevron_right),
             onPressed: ui.neighbors?.next == null ? null : uiCtrl.navNext),
         Gaps.w12,
+        if (ui.gameId != null)
+          Padding(
+            padding: EdgeInsets.all(AppSpacing.sm),
+            child: Icon(FluentIcons.date_time2, size: 15),
+          ),
         Expanded(
           child: Text(
-            ui.gameId == null ? loc.common_loading : RecordId.formatGameLabel(ui.gameId!),
+            ui.gameId == null ? loc.common_loading : challengeTypeText,
             maxLines: 1, overflow: TextOverflow.ellipsis, softWrap: false,
           ),
         ),
@@ -50,7 +59,7 @@ class RecordModeRightPanel extends ConsumerWidget {
       final rest   = entries.length > 3 ? entries.sublist(3) : const <LeaderboardEntry>[];
 
       final ranking = SectionCard(
-        rows: 40,
+        rows: 38,
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -112,7 +121,7 @@ class RecordModeRightPanel extends ConsumerWidget {
     // AllowedModsSection 내부에서 이미 SectionCard를 감싸고 있다면
     // 여기서 rows를 보장하고 싶으면 AllowedModsSection 쪽도 SectionCard(rows:4)로 바꿔줘.
     final allowed = SectionCard(
-      rows: 26,
+      rows: 24,
       child: const AllowedModsSection(),
     );
 

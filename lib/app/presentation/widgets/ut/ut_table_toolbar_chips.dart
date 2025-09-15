@@ -6,9 +6,7 @@ import 'package:cartridge/theme/theme.dart';
 
 import 'ut_table.dart';
 
-// ─────────────────────────────────────────────────────────
-// UTTableToolbarChips (1행 툴바: Compact ▸ Filter ▸ Preset ▸ Search  |  Info chips)
-// ─────────────────────────────────────────────────────────
+// ── 1행 툴바: Compact ▸ Filter ▸ Preset ▸ Search  |  Info chips ───────────────────────────────────────────────────────────
 class UTTableToolbarChips<T> extends StatefulWidget {
   const UTTableToolbarChips({
     super.key,
@@ -322,9 +320,7 @@ class _UTTableToolbarChipsState<T> extends State<UTTableToolbarChips<T>> {
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// Compact Flyout Button (Comfortable / Compact 선택)
-// ─────────────────────────────────────────────────────────
+// ── Comfortable / Compact 선택 ───────────────────────────────────────────────────────────
 class _DensityFlyoutButton extends StatefulWidget {
   const _DensityFlyoutButton({
     required this.density,
@@ -427,9 +423,7 @@ class _DensityFlyoutButtonState extends State<_DensityFlyoutButton> {
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// Adaptive Search (좁은 화면: 아이콘 → 펼치면 오른쪽으로 슬라이드)
-// ─────────────────────────────────────────────────────────
+// ── 좁은 화면: 아이콘 → 펼치면 오른쪽으로 슬라이드 ───────────────────────────────────────────────────────────
 class _AdaptiveSearch extends StatefulWidget {
   const _AdaptiveSearch({
     required this.controller,
@@ -576,9 +570,7 @@ class _AdaptiveSearchState extends State<_AdaptiveSearch>
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// 그룹 필터 Flyout (이전 답변에서 제시했던 것 재사용)
-// ─────────────────────────────────────────────────────────
+// ── 그룹 필터 Flyout ───────────────────────────────────────────────────────────
 class _GroupItem {
   const _GroupItem({required this.id, required this.label, required this.icon});
   final String id;
@@ -773,9 +765,7 @@ class _GroupFlyoutBodyState extends State<_GroupFlyoutBody> {
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// Info 요약 칩(좁은 화면)
-// ─────────────────────────────────────────────────────────
+// ── Info 요약 칩(좁은 화면) ───────────────────────────────────────────────────────────
 class _SummaryChip extends StatelessWidget {
   const _SummaryChip({
     required this.total,
@@ -822,9 +812,7 @@ class _SummaryChip extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// 필터 아이콘 매핑
-// ─────────────────────────────────────────────────────────
+// ── 필터 아이콘 매핑 ───────────────────────────────────────────────────────────
 IconData _iconForBaseFilter(String id) {
   switch (id) {
     case 'favorite':

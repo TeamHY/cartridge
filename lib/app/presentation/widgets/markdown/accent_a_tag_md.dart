@@ -12,7 +12,7 @@ class AccentATagMd extends ATagMd {
       String text,
       final GptMarkdownConfig config,
       ) {
-    // ── 기본 ATagMd의 괄호/대괄호 밸런스 파싱 그대로 ───────────────
+    // ── 기본 ATagMd의 괄호/대괄호 밸런스 파싱 그대로 ───────────────────────────────────────────────────────────
     var bracketCount = 0;
     var start = 1;
     var end = 0;
@@ -56,7 +56,7 @@ class AccentATagMd extends ATagMd {
       context, ending, config, false,
     );
 
-    // ── 여기서만 색상/호버색을 Fluent accent로 강제 ────────────────
+    // ── 여기서만 색상/호버색을 Fluent accent로 강제 ───────────────────────────────────────────────────────────
     final accent = FluentTheme.of(context).accentColor;
     final baseColor  = accent.normal;
     final hoverColor = accent.darker;

@@ -9,9 +9,7 @@ import 'package:cartridge/features/cartridge/option_presets/option_presets.dart'
 import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
 import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tests
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Tests ───────────────────────────────────────────────────────────
 void main() {
   group('InstancesController', () {
     late ProviderContainer container;
@@ -161,9 +159,7 @@ void main() {
   });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Stubs & helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// ── Stubs & helpers ───────────────────────────────────────────────────────────
 InstanceView _v(String id, {int enabledCount = 0, String? name}) => InstanceView(
   id: id,
   name: name ?? id,

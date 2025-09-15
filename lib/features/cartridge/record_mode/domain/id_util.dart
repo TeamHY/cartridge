@@ -1,3 +1,4 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:week_of_year/week_of_year.dart';
 
 class RecordId {
@@ -83,32 +84,26 @@ class RecordId {
   }
 
 
-  static String formatGameLabel(String id) {
+  static String formatGameLabel(AppLocalizations loc, String id) {
     if (isWeekly(id)) {
       final (y, w) = parseWeekly(id);
-      return '$y년 ${w.toString().padLeft(2, '0')}주차';
-    } else {
-      final date = parseDailyDate(id);
-      final s = id.substring(2);
-      if (s.length == 8) {
-        final y = date.year;
-        final m = date.month;
-        final d = date.day;
-        return '$y년 $m월 $d일';
-      }
-      return id;
+      final ww = w.toString().padLeft(2, '0');
+      return loc.record_label_week(y, ww);
+    } else if (isDaily(id)) {
+      final d = parseDailyDate(id);
+      return loc.record_label_day(d.year, d.month, d.day);
     }
+    return id;
   }
 
-  static String? formatWeeklyRange(String id) {
-    if (!isWeekly(id)) {
-      return null;
-    }
+  static String? formatWeeklyRange(AppLocalizations loc, String id) {
+    if (!isWeekly(id)) return null;
     final (y, w) = parseWeekly(id);
     final start = _isoWeekStart(y, w);
     final end = start.add(const Duration(days: 6));
-    String fmt(DateTime d) => '${d.month}/${d.day}';
-    return '${fmt(start)} – ${fmt(end)}';
+    return loc.record_label_week_range(
+      start.month, start.day, end.month, end.day,
+    );
   }
 }
 

@@ -50,7 +50,7 @@ sealed class ModView with _$ModView {
   /// 상태만 변경(헬퍼)
   ModView withStatus(ModRowStatus next) => copyWith(status: next);
 
-  // ───────── empty/sentinel ─────────
+  // ── empty/sentinel ───────────────────────────────────────────────────────────
 
   /// 비어있는(플레이스홀더) ModView.
   /// - 영속/저장 금지, 비교/초기값/가드용으로만 사용
