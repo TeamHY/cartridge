@@ -7,6 +7,7 @@ import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
 import 'package:cartridge/features/isaac/save/isaac_save.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
+import 'package:cartridge/theme/brand_accents.dart';
 
 class IsaacHomeSection extends ConsumerWidget {
   const IsaacHomeSection({super.key});
@@ -14,6 +15,7 @@ class IsaacHomeSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context);
+    final fTheme = FluentTheme.of(context);
 
     final autoInfo = ref.watch(isaacAutoInfoProvider);
     final IsaacEdition? detectedEdition =
@@ -65,7 +67,7 @@ class IsaacHomeSection extends ConsumerWidget {
                 loc.isaac_action_steam_verify_integrity,
                 FluentIcons.shield,
                 verify,
-                primary: true,
+                accent: fTheme.accentColor,
               ),
               _buildActionTile(
                 context,
@@ -73,6 +75,7 @@ class IsaacHomeSection extends ConsumerWidget {
                 FluentIcons.pro_hockey,
                     () =>
                     openEdenTokenEditor(context, ref, detectedEdition: detectedEdition),
+                accent: accent2Of(context, ref),
               ),
             ],
           ),
@@ -89,8 +92,8 @@ Widget _buildActionTile(
     String label,
     IconData icon,
     VoidCallback? onPressed, {
-      bool primary = false,
       String? tooltip,
+      AccentColor? accent,
     }) {
   return LayoutBuilder(
     builder: (context, constraints) {
@@ -101,8 +104,8 @@ Widget _buildActionTile(
           label: label,
           icon: icon,
           onPressed: onPressed,
-          primary: primary,
           tooltip: tooltip,
+          accent: accent,
         ),
       );
     },
@@ -113,15 +116,15 @@ class _ActionTile extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback? onPressed;
-  final bool primary;
   final String? tooltip;
+  final AccentColor? accent;
 
   const _ActionTile({
     required this.label,
     required this.icon,
     required this.onPressed,
-    this.primary = false,
     this.tooltip,
+    this.accent,
   });
 
   @override
@@ -135,8 +138,15 @@ class _ActionTile extends StatelessWidget {
         final hovered = states.isHovered && enabled;
         final pressed = states.isPressed && enabled;
 
-        // 기본 배경
-        final base = primary ? _primaryTint(fTheme) : fTheme.cardColor;
+        // 기본 배경: 제공된 accent가 있으면 내부에서 alpha blend, 없으면 카드 기본색
+        final Color base = (accent != null)
+            ? Color.alphaBlend(
+                accent!.normal.withAlpha(
+                  fTheme.brightness == Brightness.dark ? 84 : 48,
+                ),
+                fTheme.cardColor,
+              )
+            : fTheme.cardColor;
         final overlay = _tileOverlay(
           brightness: fTheme.brightness,
           hovered: hovered,
@@ -188,13 +198,6 @@ class _ActionTile extends StatelessWidget {
   }
 }
 
-Color _primaryTint(FluentThemeData fTheme) {
-  final base = fTheme.cardColor; // 불투명 서피스
-  final overlay = fTheme.accentColor.normal.withAlpha(
-    fTheme.brightness == Brightness.dark ? 84 : 48,
-  );
-  return Color.alphaBlend(overlay, base);
-}
 
 Color _tileOverlay({
   required Brightness brightness,
