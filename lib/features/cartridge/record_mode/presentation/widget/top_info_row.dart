@@ -114,7 +114,7 @@ class TopInfoRow extends StatelessWidget {
           ],
         ),
         Gaps.h8,
-        Text(loc.record_top_info_subtitle),
+        Padding(padding: EdgeInsets.symmetric(horizontal: 4), child: Text(loc.record_top_info_subtitle),),
       ],
     );
   }

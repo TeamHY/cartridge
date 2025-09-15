@@ -34,9 +34,3 @@ final previewWarmupServiceProvider = Provider<PreviewWarmupService>((ref) {
     workshopUrlOf: urlOf,                  // String -> String
   );
 });
-
-/// 진행률 노출용
-final previewWarmupProgressProvider = StreamProvider<WarmupProgress>((ref) {
-  final svc = ref.watch(previewWarmupServiceProvider);
-  return svc.progress;
-});

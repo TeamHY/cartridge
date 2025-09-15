@@ -1,4 +1,6 @@
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // 프로덕션 코드
@@ -7,14 +9,21 @@ import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 /// Overlay가 반드시 존재하도록, FluentApp 홈에 Overlay를 '명시'로 깐 테스트 호스트
 class _Host extends StatelessWidget {
   final void Function(BuildContext) onPressed;
-  const _Host({required this.onPressed});
+  const _Host({required this.onPressed, this.locale = const Locale('ko')});
+  final Locale locale;
 
   @override
   Widget build(BuildContext context) {
     return FluentApp(
-      localizationsDelegates: const [FluentLocalizations.delegate],
-      supportedLocales: const [Locale('en')],
-      locale: const Locale('en'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('ko')],
+      locale: locale,
       home: Overlay(
         initialEntries: [
           OverlayEntry(
@@ -41,7 +50,7 @@ Future<void> _pumpAndTrigger(
     WidgetTester tester, {
       required void Function(BuildContext) call,
     }) async {
-  await tester.pumpWidget(_Host(onPressed: call));
+  await tester.pumpWidget(_Host(onPressed: call, locale: Locale('ko')));
   await tester.tap(find.text('TRIGGER'));  // InfoBar 표시 트리거
   await tester.pump();                     // 스케줄링 반영
   await tester.pumpAndSettle();            // 애니메이션/마이크로태스크 정착

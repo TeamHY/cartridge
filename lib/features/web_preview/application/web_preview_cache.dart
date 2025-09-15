@@ -296,22 +296,58 @@ class WebPreviewCache {
   }
 
   String? _extractTitle(dynamic doc) {
-    final og = doc.querySelector('meta[property="og:title"]')?.attributes['content'];
-    if (og != null && og.trim().isNotEmpty) return og.trim();
-    final tw = doc.querySelector('meta[name="twitter:title"]')?.attributes['content'];
-    if (tw != null && tw.trim().isNotEmpty) return tw.trim();
+    // 1) 메타(og/twitter)에서 case-insensitive로 우선 추출
+    final meta = _getMetaContentCI(doc, targets: const ['og:title', 'twitter:title']);
+    if (meta != null && meta.isNotEmpty) return meta;
+
+    // 2) <title>
     final t = doc.querySelector('title')?.text;
     if (t != null && t.trim().isNotEmpty) return t.trim();
+
     return null;
   }
 
   String? _extractImageUrl(dynamic doc) {
-    final og = doc.querySelector('meta[property="og:image"]')?.attributes['content'];
-    if (og != null && og.trim().isNotEmpty) return og.trim();
-    final tw = doc.querySelector('meta[name="twitter:image"]')?.attributes['content'];
-    if (tw != null && tw.trim().isNotEmpty) return tw.trim();
+    // 메타(og/twitter)에서 case-insensitive 탐색
+    final meta = _getMetaContentCI(doc, targets: const ['og:image', 'twitter:image']);
+    if (meta != null && meta.isNotEmpty) return meta;
+
+    // 첫번째 <img src>
     final firstImg = doc.querySelector('img')?.attributes['src'];
     return (firstImg != null && firstImg.trim().isNotEmpty) ? firstImg.trim() : null;
+  }
+
+  String? _getMetaContentCI(dynamic doc, {required List<String> targets}) {
+    // targets는 소문자 기대치로
+    final wanted = targets.map((e) => e.toLowerCase()).toSet();
+
+    for (final el in doc.querySelectorAll('meta')) {
+      String? attrValueLower;
+
+      // property / name 아무거나 존재하면 그 값으로 비교 (대소문자 무시)
+      for (final entry in el.attributes.entries) {
+        final k = entry.key.toLowerCase();
+        if (k == 'property' || k == 'name') {
+          attrValueLower = entry.value.toLowerCase();
+          break;
+        }
+      }
+
+      if (attrValueLower != null && wanted.contains(attrValueLower)) {
+        // content도 대소문자 무시로 찾음
+        String? content;
+        for (final entry in el.attributes.entries) {
+          if (entry.key.toLowerCase() == 'content') {
+            content = entry.value;
+            break;
+          }
+        }
+        if (content != null && content.trim().isNotEmpty) {
+          return content.trim();
+        }
+      }
+    }
+    return null;
   }
 
   DateTime? _calcExpiry(Map<String, String> headers, RefreshPolicy policy, DateTime now) {

@@ -1,1 +1,0 @@
-enum GoalPeriod { daily, weekly }
