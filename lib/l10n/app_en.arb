@@ -615,6 +615,7 @@
   "@record_top_info_subtitle": {
     "description": "Friendly blurb under the record page header. Works for both daily and weekly modes; invites light participation."
   },
+  "allowed_mod_refresh": "Your mod list is now up to date.",
   "account_button_label": "Account",
   "@account_button_label": { "description": "Default label for disabled button on error" },
 
@@ -656,6 +657,7 @@
   "allowed_dialog_title": "Allowed Mods",
   "allowed_col_installed": "Installed",
   "allowed_col_enabled": "Enabled",
+  "allowed_col_missing": "Missing",
   "allowed_search_hint": "Search mods",
   "allowed_always_on_tooltip": "Required for event — always on",
   "allowed_stats_allowed": "Allowed",

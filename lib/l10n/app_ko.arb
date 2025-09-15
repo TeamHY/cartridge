@@ -620,10 +620,11 @@
       "endDay": {"type": "int"}
     }
   },
-  "record_top_info_subtitle": "이번 미션이에요. 일간·주간 중 선택한 기간에 맞춰 진행돼요. 편하게 시작하고 기록만 남겨보세요.",
+  "record_top_info_subtitle": "일간·주간 중 선택한 기간에 맞춰 진행돼요. 편하게 시작하고 기록만 남겨보세요.",
   "@record_top_info_subtitle": {
     "description": "레코드 페이지 상단 안내 문구. 기간(일간/주간)에 맞춰 진행됨을 알리고 가벼운 참여를 유도하는 톤."
   },
+  "allowed_mod_refresh": "모드 목록을 최신 상태로 업데이트했어요.",
   "account_button_label": "계정",
   "@account_button_label": { "description": "에러 시 비활성 버튼의 기본 레이블" },
 
@@ -665,6 +666,7 @@
   "allowed_dialog_title": "허용 모드 목록",
   "allowed_col_installed": "설치됨",
   "allowed_col_enabled": "활성",
+  "allowed_col_missing": "미설치",
   "allowed_search_hint": "모드 검색",
   "allowed_always_on_tooltip": "대회 필수 모드 — 항상 활성화",
   "allowed_stats_allowed": "허용 모드",

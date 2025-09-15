@@ -30,8 +30,8 @@ class OptionPresetInlineControl extends ConsumerWidget {
     return ConstrainedBox(
       constraints: const BoxConstraints(minHeight: _kMinHeight),
       child: optionsAsync.when(
-        loading: () => const _Skeleton(),
-        error: (e, _) => _ErrorChip(message: 'Option presets error'),
+        loading: () => const _InlinePlaceholder(),
+        error: (_, __) => const _InlinePlaceholder(),
         data: (list) {
           // 선택지 없음 → 옵션 프리셋 탭으로 이동 Chip
           if (list.isEmpty) {
@@ -169,6 +169,7 @@ class _OptionPresetFlyoutPanelState extends State<_OptionPresetFlyoutPanel> {
   @override
   Widget build(BuildContext context) {
     final fTheme = FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
 
     return Container(
       width: 380,
@@ -205,7 +206,7 @@ class _OptionPresetFlyoutPanelState extends State<_OptionPresetFlyoutPanel> {
               Gaps.w6,
               HyperlinkButton(
                 onPressed: widget.onManage,
-                child: const Text('관리'),
+                child: Text(loc.common_edit),
               ),
             ],
           ),
@@ -245,16 +246,14 @@ class _OptionPresetFlyoutPanelState extends State<_OptionPresetFlyoutPanel> {
             ),
           ),
           Gaps.h8,
-
           // 푸터
           Row(
             children: [
               Button(
                 onPressed: widget.onClear,
-                child: const Text('없음'),
+                child: Text(loc.common_clear_selection),
               ),
               const Spacer(),
-              // 여유공간: 향후 "새로 만들기" 등 액션 추가 가능
             ],
           ),
         ],
@@ -343,7 +342,7 @@ String _truncate(String s, {required int keep}) =>
     (s.length <= keep) ? s : '${s.substring(0, keep)}…';
 
 String _inlineSummary(AppLocalizations loc, OptionPresetView? o) {
-  if (o == null) return '없음';
+  if (o == null) return  loc.instance_option_preset_add_label;
   final parts = <String>[];
   parts.add(_truncate(o.name, keep: 17));
   if (o.fullscreen == true) {
@@ -432,7 +431,7 @@ class _ChipLikeHoverableState extends State<_ChipLikeHoverable> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(widget.icon, size: 10, color: _hovered ? hoverTextColor : fTheme.inactiveColor),
+                Icon(widget.icon, size: 14, color: _hovered ? hoverTextColor : fTheme.inactiveColor),
                 Gaps.w6,
                 Flexible(
                   fit: FlexFit.loose,
@@ -469,51 +468,45 @@ class _ChipLikeHoverableState extends State<_ChipLikeHoverable> {
 }
 
 // ── 로딩/에러 ───────────────────────────────────────────────────────────
-class _Skeleton extends StatelessWidget {
-  const _Skeleton();
+class _InlinePlaceholder extends StatelessWidget {
+  const _InlinePlaceholder();
 
   @override
   Widget build(BuildContext context) {
     final fTheme = FluentTheme.of(context);
+    final textColor = fTheme.resources.textFillColorSecondary;
+    final iconColor = fTheme.inactiveColor;
+
     return SizedBox(
       height: 28,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: fTheme.cardColor,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: (fTheme.dividerColor).withAlpha(120)),
-        ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            width: 120, height: 8, margin: const EdgeInsets.symmetric(horizontal: 8),
-            decoration: BoxDecoration(
-              color: fTheme.inactiveColor.withAlpha(60),
-              borderRadius: BorderRadius.circular(4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(FluentIcons.toolbox, size: 14, color: iconColor),
+            Gaps.w6,
+            // ‘—’ 로 조용히 표시 (클릭 불가)
+            const Text(
+              '—',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                decoration: TextDecoration.none,
+              ),
             ),
-          ),
+          ].map((w) {
+            // 텍스트 색만 토큰으로 맞춰서 살짝 죽임
+            if (w is Text) {
+              return DefaultTextStyle(
+                style: TextStyle(color: textColor),
+                child: w,
+              );
+            }
+            return w;
+          }).toList(),
         ),
       ),
-    );
-  }
-}
-class _ErrorChip extends ConsumerWidget {
-  const _ErrorChip({required this.message});
-  final String message;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final sem = ref.watch(themeSemanticsProvider);
-
-    return Container(
-      height: 28,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: sem.danger.bg,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      alignment: Alignment.centerLeft,
-      child: Text(message, style: const TextStyle(fontSize: 12)),
     );
   }
 }
