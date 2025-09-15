@@ -45,11 +45,11 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
         final loc = AppLocalizations.of(context);
         final result = await ref.read(modPresetsControllerProvider.notifier).reorderModPresets(ids);
         await result.when(
-          ok:       (_, __, ___) async => UiFeedback.success(context, loc.mod_preset_reorder_saved_title,     loc.mod_preset_reorder_saved_desc),
-          notFound: (_, __)      async => UiFeedback.warn(context,    loc.mod_preset_reorder_not_found_title,  loc.mod_preset_reorder_not_found_desc),
-          invalid:  (_, __, ___) async => UiFeedback.error(context,   loc.mod_preset_reorder_invalid_title,    loc.mod_preset_reorder_invalid_desc),
-          conflict: (_, __)      async => UiFeedback.warn(context,    loc.mod_preset_reorder_conflict_title,   loc.mod_preset_reorder_conflict_desc),
-          failure:  (_, __, ___) async => UiFeedback.error(context,   loc.mod_preset_reorder_failure_title,    loc.mod_preset_reorder_failure_desc),
+          ok:       (_, __, ___) async => UiFeedback.success(context, title: loc.common_saved,        content: loc.mod_preset_reorder_saved_desc),
+          notFound: (_, __)      async => UiFeedback.warn(context,    title: loc.common_not_found,    content: loc.mod_preset_reorder_not_found_desc),
+          invalid:  (_, __, ___) async => UiFeedback.error(context,   title: loc.common_save_fail,    content: loc.mod_preset_reorder_invalid_desc),
+          conflict: (_, __)      async => UiFeedback.warn(context, content: loc.mod_preset_reorder_conflict_desc),
+          failure:  (_, __, ___) async => UiFeedback.error(context, content: loc.mod_preset_reorder_failure_desc),
         );
       },
       resetAfterSave: () {
@@ -113,7 +113,7 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
     final q = ref.read(modPresetsQueryProvider).trim();
     final loc = AppLocalizations.of(context);
     if (q.isNotEmpty) {
-      UiFeedback.warn(context, loc.mod_preset_reorder_unavailable_title, loc.mod_preset_reorder_unavailable_desc);
+      UiFeedback.warn(context, content: loc.mod_preset_reorder_unavailable_desc);
       return;
     }
     ref.read(modPresetsReorderModeProvider.notifier).state  = true;
@@ -161,13 +161,13 @@ class _ModPresetListPageState extends ConsumerState<ModPresetsListPage> {
                 ok:       (_, __, ___) async {
                   ref.read(modPresetsReorderModeProvider.notifier).state  = false;
                   ref.read(modPresetsReorderDirtyProvider.notifier).state = false;
-                  UiFeedback.success(context, loc.mod_preset_reorder_saved_title, loc.mod_preset_reorder_saved_desc);
+                  UiFeedback.success(context, title: loc.common_saved, content: loc.mod_preset_reorder_saved_desc);
                   _dragReportedDirty = false;
                 },
-                notFound: (_, __)      async => UiFeedback.warn(context,  loc.mod_preset_reorder_not_found_title, loc.mod_preset_reorder_not_found_desc),
-                invalid:  (_, __, ___) async => UiFeedback.error(context, loc.mod_preset_reorder_invalid_title,   loc.mod_preset_reorder_invalid_desc),
-                conflict: (_, __)      async => UiFeedback.warn(context,  loc.mod_preset_reorder_conflict_title,  loc.mod_preset_reorder_conflict_desc),
-                failure:  (_, __, ___) async => UiFeedback.error(context, loc.mod_preset_reorder_failure_title,   loc.mod_preset_reorder_failure_desc),
+                notFound: (_, __)      async => UiFeedback.warn(context,  title: loc.common_not_found,                   content: loc.mod_preset_reorder_not_found_desc),
+                invalid:  (_, __, ___) async => UiFeedback.error(context, title: loc.common_save_fail,   content: loc.mod_preset_reorder_invalid_desc),
+                conflict: (_, __)      async => UiFeedback.warn(context, content: loc.mod_preset_reorder_conflict_desc),
+                failure:  (_, __, ___) async => UiFeedback.error(context, content: loc.mod_preset_reorder_failure_desc),
               );
               _autosave.cancel();
             }

@@ -264,7 +264,8 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                                 yText: yCtl.text,
                               );
                               if (err != null) {
-                                UiFeedback.error(ctx, AppLocalizations.of(ctx).common_error, err);
+                                UiFeedback.error(ctx, title: AppLocalizations.of(ctx).common_save_fail, content: loc.option_preset_save_failed);
+                                Navigator.pop(ctx, false);
                                 return;
                               }
                               Navigator.pop(ctx, true);

@@ -39,7 +39,7 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
     } catch (e) {
       if (context.mounted) {
         final loc = AppLocalizations.of(context);
-        UiFeedback.error(context, loc.common_error, loc.auth_error_body);
+        UiFeedback.error(context, content: loc.auth_error_body);
       }
     } finally {
       if (context.mounted) Navigator.pop(context);

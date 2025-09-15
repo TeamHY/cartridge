@@ -95,12 +95,7 @@
     "description": "Generic error message without exposing codes"
   },
 
-  "eden_err_accounts_title": "Couldn’t load accounts",
-  "@eden_err_accounts_title": {
-    "description": "Toast/feedback title when loading steam accounts failed"
-  },
-
-  "eden_err_accounts_desc": "We couldn't fetch your save folders.",
+  "eden_err_accounts_desc": "Couldn’t load accounts",
   "@eden_err_accounts_desc": {
     "description": "Toast/feedback description for account loading failure"
   },
@@ -113,11 +108,6 @@
   "eden_warn_no_accounts_desc": "Please sign in to Steam or check Steam Cloud settings.",
   "@eden_warn_no_accounts_desc": {
     "description": "Toast/feedback description when accounts empty"
-  },
-
-  "eden_warn_no_saves_title": "No save files",
-  "@eden_warn_no_saves_title": {
-    "description": "Toast/feedback title when no edition/slot save files found"
   },
 
   "eden_warn_no_saves_desc": "We couldn’t find any save files for your game.",
@@ -195,16 +185,10 @@
 
   "instance_error_title": "Failed to load instances.",
   "instance_menu_reorder": "Edit order",
-
-  "instance_reorder_saved_title": "Saved",
   "instance_reorder_saved_desc": "Your changes have been saved.",
-  "instance_reorder_not_found_title": "Nothing to save",
   "instance_reorder_not_found_desc": "No instances were found to save.",
-  "instance_reorder_invalid_title": "Save failed",
   "instance_reorder_invalid_desc": "The sort data is invalid.",
-  "instance_reorder_conflict_title": "Conflict",
   "instance_reorder_conflict_desc": "There was a conflict with other changes. Please try again.",
-  "instance_reorder_failure_title": "Error",
   "instance_reorder_failure_desc": "An error occurred while saving the order.",
 
   "instance_reorder_unavailable_title": "Cannot edit order",
@@ -215,8 +199,6 @@
   "instance_table_header_enabled_preset": "Presets",
 
   "instance_load_failed": "Couldn't load the instance",
-
-  "instance_play_failed_title": "Couldn't start",
   "instance_play_failed_body": "Couldn't start. Something went wrong",
   "common_changes_applied": "Changes applied.",
 
@@ -225,8 +207,7 @@
   "instance_image_picker_tab_image": "Image",
 
   "instance_image_preview_title": "Preview",
-  "instance_image_error_not_found_title": "We couldn’t load the image",
-  "instance_image_error_not_found_body": "Pick another file or use the sprite tab.",
+  "instance_image_error_not_found_body": "We couldn’t load the image. Pick another file or use the sprite tab.",
 
   "common_image": "Image",
   "instance_image_pick_file": "Choose image file",
@@ -253,18 +234,12 @@
 
   "mod_preset_menu_reorder": "Edit order",
 
-  "mod_preset_reorder_saved_title": "Saved",
   "mod_preset_reorder_saved_desc": "Your changes have been saved.",
-  "mod_preset_reorder_not_found_title": "Nothing to save",
   "mod_preset_reorder_not_found_desc": "No presets were found to save.",
-  "mod_preset_reorder_invalid_title": "Save failed",
   "mod_preset_reorder_invalid_desc": "The sort data is invalid.",
-  "mod_preset_reorder_conflict_title": "Conflict",
   "mod_preset_reorder_conflict_desc": "There was a conflict with other changes. Please try again.",
-  "mod_preset_reorder_failure_title": "Error",
   "mod_preset_reorder_failure_desc": "An error occurred while saving the order.",
 
-  "mod_preset_reorder_unavailable_title": "Cannot edit order",
   "mod_preset_reorder_unavailable_desc": "You can’t start editing while searching.",
 
   "mod_preset_enabled_mods": "{mod, plural, =0 {0 MOD} one {1 MOD} other {{mod} MODS}}",
@@ -304,15 +279,10 @@
 
   "option_menu_reorder": "Edit order",
 
-  "option_reorder_saved_title": "Saved",
   "option_reorder_saved_desc": "Your changes have been saved.",
-  "option_reorder_not_found_title": "Nothing to save",
   "option_reorder_not_found_desc": "No option presets were found to save.",
-  "option_reorder_invalid_title": "Save failed",
   "option_reorder_invalid_desc": "The sort data is invalid.",
-  "option_reorder_conflict_title": "Conflict",
   "option_reorder_conflict_desc": "There was a conflict with other changes. Please try again.",
-  "option_reorder_failure_title": "Error",
   "option_reorder_failure_desc": "An error occurred while saving the order.",
 
   "option_reorder_unavailable_title": "Cannot edit order",
@@ -424,11 +394,8 @@
   "setting_validate_min_zero": "Must be 0 or greater.",
   "setting_validate_max_60s": "Maximum is 60000 ms.",
 
-  "setting_detect_path_fail_title": "Install folder not found",
   "setting_detect_path_fail_desc": "Couldn’t detect the install path. Please set it manually.",
-  "setting_detect_path_success_title": "Install folder detected",
-
-  "setting_detect_options_ini_fail_title": "options.ini not found",
+  "setting_detect_path_success_title": "Path detected",
   "setting_detect_options_ini_fail_desc": "Couldn’t detect options.ini. Please select the file manually.",
   "path_mode_auto": "Auto-detect",
   "path_mode_manual": "Choose manually",
@@ -538,7 +505,7 @@
   "option_position_label": "Position",
   "option_repentogon_label": "Repentogon",
   "option_search_placeholder": "Search presets",
-
+  "option_preset_save_failed": "Couldn't save changes. Please try again in a moment.",
   "@nickname": {
     "description": "Nickname edit dialog"
   },
@@ -644,6 +611,10 @@
       "endDay": {"type": "int"}
     }
   },
+  "record_top_info_subtitle": "This mission adapts to the period you choose—daily or weekly. Start when you’re ready and log your time.",
+  "@record_top_info_subtitle": {
+    "description": "Friendly blurb under the record page header. Works for both daily and weekly modes; invites light participation."
+  },
   "account_button_label": "Account",
   "@account_button_label": { "description": "Default label for disabled button on error" },
 
@@ -726,10 +697,6 @@
   "@youtube_banner_subtitle": {
     "description": "Supportive subtitle. Friendly, light encouragement."
   },
-  "youtube_toast_title": "External link",
-  "@youtube_toast_title": {
-    "description": "Toast title when opening an external browser/app."
-  },
   "youtube_toast_body": "Couldn't open your browser.",
   "@youtube_toast_body": {
     "description": "Shown when opening the external link fails."
@@ -809,11 +776,11 @@
   "common_duplicate_suffix": "(copy)",
   "common_edit": "Edit",
   "common_enable_mod": "Enable",
-  "common_error": "Error",
   "common_items_copied": " items copied.",
   "common_loading": "Loading…",
   "common_none_label": "(NONE)",
   "common_nothing_selected": "No items selected.",
+  "common_not_found": "Not found",
   "common_notice": "Notice",
   "common_off": "OFF",
   "common_on": "ON",
@@ -823,6 +790,7 @@
   "common_reset": "Reset",
   "common_retry": "Retry",
   "common_save": "Save",
+  "common_save_fail": "Save failed",
   "common_saved": "Saved",
   "common_search_placeholder": "Search",
   "common_select": "Select",
@@ -830,6 +798,10 @@
   "common_untitled": "Untitled",
   "common_update": "Update",
   "common_export": "Export",
+  "common_info": "Info",
+  "common_warning": "Warning",
+  "common_success": "Success",
+  "common_error": "Error",
 
   "@mod": {
     "description": "Mod related strings"
@@ -944,14 +916,7 @@
   "content_category_hyzone": "Play with 아이작 오헌영",
   "content_category_info": "Info",
   "content_external_link_tooltip": "External link",
-  "content_open_link_fail_title": "We couldn't open the link",
-  "content_open_link_fail_desc": "We couldn't open '{title}' in your browser.",
-  "@content_open_link_fail_desc": {
-    "description": "content title",
-    "placeholders": {
-      "title": { "type": "String", "example": "Repentogon" }
-    }
-  },
+  "content_open_link_fail_desc": "Can’t open the link.",
   "content_open_link_error_title": "Couldn't open",
   "content_open_link_error_desc": "We can't open the link right now. Please try again in a moment.",
   "content_custom_unavailable_title": "Coming soon",
@@ -963,15 +928,7 @@
   "@content_list_load_fail_title": { "description": "Content index load failure - title" },
   "content_list_load_fail_desc": "Please try again in a moment.",
   "@content_list_load_fail_desc": { "description": "Content index load failure - description" },
-
-  "content_open_link_empty_title": "Can’t open the link",
-  "@content_open_link_empty_title": { "description": "When external link URL is missing - title" },
-  "content_open_link_empty_desc": "There’s no URL.",
-  "@content_open_link_empty_desc": { "description": "When external link URL is missing - description" },
-
-  "doc_load_fail_title": "We couldn’t load the document",
-  "@doc_load_fail_title": { "description": "Markdown load failure - title" },
-  "doc_load_fail_desc": "Please try again in a moment.",
+  "doc_load_fail_desc": "We couldn’t load the document. Please try again in a moment.",
   "@doc_load_fail_desc": { "description": "Markdown load failure - description" },
 
   "selection_share": "Share",
@@ -1067,24 +1024,22 @@
   "editable_title_hint": "Enter a name",
   "@editable_title_hint": { "description": "Inline header title edit placeholder" },
 
-  "home_open_install_fail_title": "Couldn't find the install folder",
+  "home_open_install_fail_title": "Not found",
   "@home_open_install_fail_title": { "description": "Install path auto-detection failed - title" },
   "home_open_install_fail_desc": "We couldn't detect it automatically. Please set it once in Settings.",
   "@home_open_install_fail_desc": { "description": "Install path auto-detection failed - body" },
 
-  "home_open_options_fail_title": "Couldn't find options.ini",
+  "home_open_options_fail_title": "Not found",
   "@home_open_options_fail_title": { "description": "options.ini auto-detection failed - title" },
   "home_open_options_fail_desc": "We couldn't detect the file automatically. Please check the path in Settings.",
   "@home_open_options_fail_desc": { "description": "options.ini auto-detection failed - body" },
 
-  "home_save_candidates_fail_title": "Couldn't check your saves",
+  "home_save_candidates_fail_title": "Not found",
   "@home_save_candidates_fail_title": { "description": "Save candidates query failed - title" },
   "home_save_candidates_fail_desc": "We ran into a problem while looking for your save location. Please try again in a moment.",
   "@home_save_candidates_fail_desc": { "description": "Save candidates query failed - body" },
 
-  "home_save_not_found_title": "No saves found",
-  "@home_save_not_found_title": { "description": "No save candidates - title" },
-  "home_save_not_found_desc": "We couldn't detect Steam Cloud or a local save.",
+  "home_save_not_found_desc": "We couldn't detect saves.",
   "@home_save_not_found_desc": { "description": "No save candidates - body" },
 
   "common_open_folder_fail_title": "Couldn't open",

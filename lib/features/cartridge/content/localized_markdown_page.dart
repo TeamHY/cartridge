@@ -75,14 +75,10 @@ class _LocalizedMarkdownPageState extends State<LocalizedMarkdownPage> {
                     if (snap.hasError) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         if (!context.mounted) return;
-                        UiFeedback.error(
-                          context,
-                          loc.doc_load_fail_title,
-                          loc.doc_load_fail_desc,
-                        );
+                        UiFeedback.error(context, content: loc.doc_load_fail_desc);
                       });
                       return EmptyState.withDefault404(
-                        title: loc.doc_load_fail_title,
+                        title: loc.doc_load_fail_desc,
                       );
                     }
                     final md = snap.data ?? '';

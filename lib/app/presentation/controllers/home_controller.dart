@@ -27,8 +27,8 @@ Future<void> openInstallFolder(BuildContext context, WidgetRef ref) async {
     if (context.mounted) {
       UiFeedback.warn(
         context,
-        loc.home_open_install_fail_title,
-        loc.home_open_install_fail_desc,
+        title: loc.home_open_install_fail_title,
+        content: loc.home_open_install_fail_desc,
       );
     }
     return;
@@ -46,8 +46,8 @@ Future<void> openOptionsFolder(BuildContext context, WidgetRef ref) async {
     if (context.mounted) {
       UiFeedback.warn(
         context,
-        loc.home_open_options_fail_title,
-        loc.home_open_options_fail_desc,
+        title: loc.home_open_options_fail_title,
+        content: loc.home_open_options_fail_desc,
       );
     }
     return;
@@ -74,8 +74,8 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
     if (context.mounted) {
       UiFeedback.error(
         context,
-        loc.home_save_candidates_fail_title,
-        loc.home_save_candidates_fail_desc,
+        title: loc.home_save_candidates_fail_title,
+        content: loc.home_save_candidates_fail_desc,
       );
     }
     return;
@@ -86,8 +86,8 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
     if (context.mounted) {
       UiFeedback.warn(
         context,
-        loc.home_save_not_found_title,
-        loc.home_save_not_found_desc,
+        title: loc.common_not_found,
+        content: loc.home_save_not_found_desc,
       );
     }
     return;
@@ -103,11 +103,7 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
     } catch (e, st) {
       logE(tag, 'op=$op fn=openSaveFolder msg=openFolder failed path=${c.savePath}', e, st);
       if (context.mounted) {
-        UiFeedback.error(
-          context,
-          loc.common_open_folder_fail_title,
-          loc.common_open_folder_fail_desc,
-        );
+        UiFeedback.error(context, content: loc.common_open_folder_fail_desc);
       }
     }
     return;
@@ -129,11 +125,7 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
   } catch (e, st) {
     logE(tag, 'op=$op fn=openSaveFolder msg=openFolder failed path=${chosen.savePath}', e, st);
     if (context.mounted) {
-      UiFeedback.error(
-        context,
-        loc.common_open_folder_fail_title,
-        loc.common_open_folder_fail_desc,
-      );
+      UiFeedback.error(context, content: loc.common_open_folder_fail_desc);
     }
   }
 }

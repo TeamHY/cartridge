@@ -57,7 +57,7 @@ void main() {
   testWidgets('UiFeedback.success: InfoBar가 뜨고 닫히면 사라진다', (tester) async {
     await _pumpAndTrigger(
       tester,
-      call: (ctx) => UiFeedback.success(ctx, '저장 완료', '변경한 값이 적용되었어요.'),
+      call: (ctx) => UiFeedback.success(ctx, title: '저장 완료', content: '변경한 값이 적용되었어요.'),
     );
 
     final infoFinder = find.byType(InfoBar);
@@ -84,7 +84,7 @@ void main() {
   testWidgets('UiFeedback.error: 에러 InfoBar가 표시된다', (tester) async {
     await _pumpAndTrigger(
       tester,
-      call: (ctx) => UiFeedback.error(ctx, '실패', '처리 중 오류가 발생했습니다.'),
+      call: (ctx) => UiFeedback.error(ctx, title: '실패', content: '처리 중 오류가 발생했습니다.'),
     );
 
     final info = tester.widget<InfoBar>(find.byType(InfoBar));
@@ -99,7 +99,7 @@ void main() {
   testWidgets('UiFeedback.warn: 경고 InfoBar가 표시된다', (tester) async {
     await _pumpAndTrigger(
       tester,
-      call: (ctx) => UiFeedback.warn(ctx, '주의', '조건을 확인하세요.'),
+      call: (ctx) => UiFeedback.warn(ctx, title: '주의', content: '조건을 확인하세요.'),
     );
 
     final info = tester.widget<InfoBar>(find.byType(InfoBar));
@@ -113,7 +113,7 @@ void main() {
   testWidgets('UiFeedback.info: 정보 InfoBar가 표시된다', (tester) async {
     await _pumpAndTrigger(
       tester,
-      call: (ctx) => UiFeedback.info(ctx, '안내', '처리가 시작되었습니다.'),
+      call: (ctx) => UiFeedback.info(ctx, title: '안내', content: '처리가 시작되었습니다.'),
     );
 
     final info = tester.widget<InfoBar>(find.byType(InfoBar));

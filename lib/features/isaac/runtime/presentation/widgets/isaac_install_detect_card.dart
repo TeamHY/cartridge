@@ -116,13 +116,13 @@ class IsaacInstallDetectCard extends ConsumerWidget {
                         if (!context.mounted) return;
                         final msg = statusMessage(refreshed.installStatus, refreshed.installSource, refreshed.installPath);
                         if (refreshed.installStatus == InstallPathStatus.ok) {
-                          UiFeedback.success(context, loc.common_refresh, msg);
+                          UiFeedback.success(context, title: loc.common_refresh, content: msg);
                         } else {
-                          UiFeedback.warn(context, loc.install_detect_install_path_attention, msg);
+                          UiFeedback.warn(context, title: loc.install_detect_install_path_attention, content: msg);
                         }
                       } catch (_) {
                         if (!context.mounted) return;
-                        UiFeedback.error(context, loc.common_error, loc.install_detect_refresh_failed);
+                        UiFeedback.error(context, content: loc.install_detect_refresh_failed);
                       }
                     },
                   ),

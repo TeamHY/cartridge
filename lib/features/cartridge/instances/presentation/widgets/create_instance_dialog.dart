@@ -140,7 +140,7 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
             onPressed: () {
               final name = nameController.text.trim();
               if (name.isEmpty) {
-                UiFeedback.error(ctx, loc.common_error, loc.instance_create_validate_required);
+                UiFeedback.error(ctx, content: loc.instance_create_validate_required);
                 return;
               }
               Navigator.of(ctx).pop(
@@ -253,7 +253,7 @@ Future<EditInstanceResult?> showEditInstanceDialog(
             onPressed: () {
               final name = nameController.text.trim();
               if (name.isEmpty) {
-                UiFeedback.error(ctx, loc.common_error, loc.instance_create_validate_required);
+                UiFeedback.error(ctx, content: loc.instance_create_validate_required);
                 return;
               }
               Navigator.of(ctx).pop(
@@ -271,7 +271,7 @@ Future<EditInstanceResult?> showEditInstanceDialog(
   );
 }
 
-/// 옵션 프리셋 콤보: loadin/에러도 동일 레이아웃 유지
+/// 옵션 프리셋 콤보: loading/에러도 동일 레이아웃 유지
 class _OptionPresetComboField extends ConsumerWidget {
   final String? selectedOptionId;
   final ValueChanged<String?> onChanged;

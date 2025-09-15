@@ -212,18 +212,19 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                               if (!context.mounted) return;
                               UiFeedback.success(
                                 context,
-                                loc.common_saved,
-                                loc.mod_preset_rename_success_body,
+                                title: loc.common_saved,
+                                content: loc.mod_preset_rename_success_body,
                               );
                             },
                           ),
                           MenuFlyoutItem(
                             leading: const Icon(FluentIcons.download),
                             text: Text(loc.common_export),
+                            // TODO
                             onPressed: () => UiFeedback.info(
                               context,
-                              loc.common_export,
-                              loc.common_coming_soon,
+                              title: loc.common_export,
+                              content: loc.common_coming_soon,
                             ),
                           ),
                           const MenuFlyoutSeparator(),
@@ -294,8 +295,8 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                         if (!context.mounted) return;
                         UiFeedback.success(
                           context,
-                          loc.common_refresh,
-                          loc.mod_table_reloaded,
+                          title: loc.common_refresh,
+                          content: loc.mod_table_reloaded,
                         );
                       },
                     ),
@@ -429,33 +430,33 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                       final n = await uiCtrl.copySelectedNamesPlain();
                       if (!context.mounted) return;
                       if (n > 0) {
-                        UiFeedback.success(context, loc.common_copied, '$n${loc.common_items_copied}');
+                        UiFeedback.success(context, title: loc.common_copied, content: '$n${loc.common_items_copied}');
                       } else if (n == 0) {
-                        UiFeedback.warn(context, loc.common_copied, loc.common_nothing_selected);
+                        UiFeedback.warn(context, title: loc.common_copied, content: loc.common_nothing_selected);
                       } else {
-                        UiFeedback.error(context, loc.common_error, loc.common_copy_failed);
+                        UiFeedback.error(context, content: loc.common_copy_failed);
                       }
                     },
                     onShareMarkdownSelected: (_) async {
                       final n = await uiCtrl.copySelectedNamesMarkdown();
                       if (!context.mounted) return;
                       if (n > 0) {
-                        UiFeedback.success(context, loc.common_copied, '$n${loc.common_items_copied}');
+                        UiFeedback.success(context, title: loc.common_copied, content: '$n${loc.common_items_copied}');
                       } else if (n == 0) {
-                        UiFeedback.warn(context, loc.common_copied, loc.common_nothing_selected);
+                        UiFeedback.warn(context, title: loc.common_copied, content: loc.common_nothing_selected);
                       } else {
-                        UiFeedback.error(context, loc.common_error, loc.common_copy_failed);
+                        UiFeedback.error(context, content: loc.common_copy_failed);
                       }
                     },
                     onShareRichSelected: (_) async {
                       final n = await uiCtrl.copySelectedNamesRich();
                       if (!context.mounted) return;
                       if (n > 0) {
-                        UiFeedback.success(context, loc.common_copied, '$n${loc.common_items_copied}');
+                        UiFeedback.success(context, title: loc.common_copied, content: '$n${loc.common_items_copied}');
                       } else if (n == 0) {
-                        UiFeedback.warn(context, loc.common_copied, loc.common_nothing_selected);
+                        UiFeedback.warn(context, title: loc.common_copied, content: loc.common_nothing_selected);
                       } else {
-                        UiFeedback.error(context, loc.common_error, loc.common_copy_failed);
+                        UiFeedback.error(context, content: loc.common_copy_failed);
                       }
                     },
                   );

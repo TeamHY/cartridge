@@ -48,11 +48,11 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
         final loc = AppLocalizations.of(context);
         final result = await ref.read(instancesControllerProvider.notifier).reorderInstances(ids);
         await result.when(
-          ok:       (_, __, ___) async => UiFeedback.success(context, loc.instance_reorder_saved_title,     loc.instance_reorder_saved_desc),
-          notFound: (_, __)      async => UiFeedback.warn(context,    loc.instance_reorder_not_found_title,  loc.instance_reorder_not_found_desc),
-          invalid:  (_, __, ___) async => UiFeedback.error(context,   loc.instance_reorder_invalid_title,    loc.instance_reorder_invalid_desc),
-          conflict: (_, __)      async => UiFeedback.warn(context,    loc.instance_reorder_conflict_title,   loc.instance_reorder_conflict_desc),
-          failure:  (_, __, ___) async => UiFeedback.error(context,   loc.instance_reorder_failure_title,    loc.instance_reorder_failure_desc),
+          ok:       (_, __, ___) async => UiFeedback.success(context, title: loc.common_saved,     content: loc.instance_reorder_saved_desc),
+          notFound: (_, __)      async => UiFeedback.warn(context,    title: loc.common_not_found,  content: loc.instance_reorder_not_found_desc),
+          invalid:  (_, __, ___) async => UiFeedback.error(context,   title: loc.common_save_fail,    content: loc.instance_reorder_invalid_desc),
+          conflict: (_, __)      async => UiFeedback.warn(context, content: loc.instance_reorder_conflict_desc),
+          failure:  (_, __, ___) async => UiFeedback.error(context, content: loc.instance_reorder_failure_desc),
         );
       },
       resetAfterSave: () {
@@ -109,7 +109,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
     final q = ref.read(instancesQueryProvider).trim();
     final loc = AppLocalizations.of(context);
     if (q.isNotEmpty) {
-      UiFeedback.warn(context, loc.instance_reorder_unavailable_title, loc.instance_reorder_unavailable_desc);
+      UiFeedback.warn(context, title: loc.instance_reorder_unavailable_title, content: loc.instance_reorder_unavailable_desc);
       return;
     }
     ref.read(instancesReorderModeProvider.notifier).state  = true;
@@ -163,13 +163,13 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                 ok:       (_, __, ___) async {
                   ref.read(instancesReorderModeProvider.notifier).state  = false;
                   ref.read(instancesReorderDirtyProvider.notifier).state = false;
-                  UiFeedback.success(context, loc.instance_reorder_saved_title, loc.instance_reorder_saved_desc);
+                  UiFeedback.success(context, title: loc.common_saved, content: loc.instance_reorder_saved_desc);
                   _dragReportedDirty = false;
                 },
-                notFound: (_, __)      async => UiFeedback.warn(context, loc.instance_reorder_not_found_title, loc.instance_reorder_not_found_desc),
-                invalid:  (_, __, ___) async => UiFeedback.error(context, loc.instance_reorder_invalid_title, loc.instance_reorder_invalid_desc),
-                conflict: (_, __)      async => UiFeedback.warn(context, loc.instance_reorder_conflict_title, loc.instance_reorder_conflict_desc),
-                failure:  (_, __, ___) async => UiFeedback.error(context, loc.instance_reorder_failure_title, loc.instance_reorder_failure_desc),
+                notFound: (_, __)      async => UiFeedback.warn(context, title: loc.common_not_found, content: loc.instance_reorder_not_found_desc),
+                invalid:  (_, __, ___) async => UiFeedback.error(context, title: loc.common_saved, content: loc.instance_reorder_invalid_desc),
+                conflict: (_, __)      async => UiFeedback.warn(context, content: loc.instance_reorder_conflict_desc),
+                failure:  (_, __, ___) async => UiFeedback.error(context, content: loc.instance_reorder_failure_desc),
               );
               _autosave.cancel();
             }

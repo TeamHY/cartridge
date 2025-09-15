@@ -27,7 +27,7 @@ class YoutubeBanner extends StatelessWidget {
     Future<void> open() async {
       final ok = await launchUrl(_url, mode: LaunchMode.externalApplication);
       if (!ok && context.mounted) {
-        UiFeedback.info(context, loc.youtube_toast_title, loc.youtube_toast_body);
+        UiFeedback.warn(context, content: loc.youtube_toast_body);
       }
     }
 

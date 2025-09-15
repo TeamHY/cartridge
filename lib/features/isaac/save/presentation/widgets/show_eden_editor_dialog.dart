@@ -24,13 +24,17 @@ Future<void> openEdenTokenEditor(
     accounts = await ref.read(steamAccountsProvider.future);
   } catch (_) {
     if (context.mounted) {
-      UiFeedback.error(context, loc.eden_err_accounts_title, loc.eden_err_accounts_desc);
+      UiFeedback.error(context, content: loc.eden_err_accounts_desc);
     }
     return;
   }
   if (accounts.isEmpty) {
     if (context.mounted) {
-      UiFeedback.warn(context, loc.eden_warn_no_accounts_title, loc.eden_warn_no_accounts_desc);
+      UiFeedback.warn(
+        context,
+        title: loc.eden_warn_no_accounts_title,
+        content: loc.eden_warn_no_accounts_desc,
+      );
     }
     return;
   }
@@ -47,7 +51,7 @@ Future<void> openEdenTokenEditor(
   );
   if (res.slots.isEmpty) {
     if (context.mounted) {
-      UiFeedback.warn(context, loc.eden_warn_no_saves_title, loc.eden_warn_no_saves_desc);
+      UiFeedback.warn(context, content: loc.eden_warn_no_saves_desc);
     }
     return;
   }
@@ -391,14 +395,10 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
 
                 final after = ref.read(edenEditorControllerProvider(widget.args)).value;
                 if (after?.error == null && context.mounted) {
-                  UiFeedback.success(
-                    context,
-                    loc.eden_saved_title,
-                    loc.eden_saved_desc,
-                  );
+                  UiFeedback.success(context, content: loc.eden_saved_desc);
                   setState(() => newValue = after?.currentValue ?? newValue);
                 } else if (context.mounted) {
-                  UiFeedback.error(context, loc.common_error, loc.eden_err_generic);
+                  UiFeedback.error(context, content: loc.eden_err_generic);
                 }
               }
                   : null,

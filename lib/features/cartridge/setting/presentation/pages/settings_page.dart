@@ -102,11 +102,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     if (!mounted) return;
     final loc = AppLocalizations.of(context);
     if (found == null) {
-      UiFeedback.warn(context, loc.setting_detect_path_fail_title, loc.setting_detect_path_fail_desc);
+      UiFeedback.warn(context, title: loc.common_not_found, content: loc.setting_detect_path_fail_desc);
       return;
     }
     setState(() { _steamPathController.text = found; _isChanged = true; });
-    UiFeedback.success(context, loc.setting_detect_path_success_title, found);
+    UiFeedback.success(context, title: loc.setting_detect_path_success_title, content: found);
     FocusScope.of(context).unfocus();
   }
 
@@ -116,11 +116,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     if (!mounted) return;
     final loc = AppLocalizations.of(context);
     if (found == null) {
-      UiFeedback.warn(context, loc.setting_detect_path_fail_title, loc.setting_detect_path_fail_desc);
+      UiFeedback.warn(context, title: loc.common_not_found, content: loc.setting_detect_path_fail_desc);
       return;
     }
     setState(() { _isaacPathController.text = found; _isChanged = true; });
-    UiFeedback.success(context, loc.setting_detect_path_success_title, found);
+    UiFeedback.success(context, title: loc.setting_detect_path_success_title, content: found);
     FocusScope.of(context).unfocus();
   }
 
@@ -132,13 +132,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     if (found == null) {
       UiFeedback.warn(
         context,
-        loc.setting_detect_options_ini_fail_title,
-        loc.setting_detect_options_ini_fail_desc,
+        title: loc.common_not_found,
+        content: loc.setting_detect_options_ini_fail_desc,
       );
       return;
     }
     setState(() { _optionIniController.text = found; _isChanged = true; });
-    UiFeedback.success(context, loc.setting_detect_path_success_title, found);
+    UiFeedback.success(context, title: loc.setting_detect_path_success_title, content: found);
   }
 
   // 되돌리기(현재 보유 상태로)
@@ -224,10 +224,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       if (!mounted) return;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        UiFeedback.success(context, loc.common_saved, loc.setting_saved_desc);
+        UiFeedback.success(context, title: loc.common_saved, content: loc.setting_saved_desc);
       });
     } else {
-      UiFeedback.success(context, loc.common_saved, loc.setting_saved_desc);
+      UiFeedback.success(context, title: loc.common_saved, content: loc.setting_saved_desc);
     }
     FocusScope.of(context).unfocus();
   }

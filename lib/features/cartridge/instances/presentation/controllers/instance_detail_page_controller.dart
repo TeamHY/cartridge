@@ -11,7 +11,7 @@ import 'package:cartridge/features/isaac/mod/domain/models/mod_view.dart';
 class InstanceDetailUiState {
   final bool editingName;
 
-  /// 헤더/썸네일에 쓰일 이미지 (nullable: loadin 전/스켈레톤)
+  /// 헤더/썸네일에 쓰일 이미지 (nullable: loading 전/스켈레톤)
   final InstanceImage? image;
 
   /// 헤더 타이틀 편집에 쓰일 현재 표시 이름(UI 캐시)

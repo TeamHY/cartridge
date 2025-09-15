@@ -274,7 +274,7 @@ class _NewsCard extends ConsumerWidget {
   }
 }
 
-/// 스켈레톤 카드(loadin)
+/// 스켈레톤 카드(loading)
 class _NewsSkeletonCard extends StatelessWidget {
   const _NewsSkeletonCard();
 

@@ -40,9 +40,9 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
               try {
                 await ref.read(recordModeAuthProvider).signOut();
                 if (!context.mounted) return;
-                UiFeedback.success(context, loc.account_signed_out_title, loc.account_signed_out_body);
+                UiFeedback.success(context, title: loc.account_signed_out_title, content: loc.account_signed_out_body);
               } catch (_) {
-                UiFeedback.error(context, loc.common_error, loc.account_sign_out_failed);
+                UiFeedback.error(context, content: loc.account_sign_out_failed);
               }
             },
           ),
@@ -59,11 +59,11 @@ class _RecordModeDetailPageState extends ConsumerState<RecordModeDetailPage>{
                 if (!context.mounted) return;
                 UiFeedback.info(
                   context,
-                  loc.play_instance_toast_title,
-                  loc.play_instance_toast_body,
+                  title: loc.play_instance_toast_title,
+                  content: loc.play_instance_toast_body,
                 );
               } catch (e) {
-                UiFeedback.error(context, loc.instance_play_failed_title, loc.instance_play_failed_body);
+                UiFeedback.error(context, content: loc.instance_play_failed_body);
               }
             } : null,
             child: Row(

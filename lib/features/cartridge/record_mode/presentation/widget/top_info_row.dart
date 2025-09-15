@@ -114,7 +114,7 @@ class TopInfoRow extends StatelessWidget {
           ],
         ),
         Gaps.h8,
-        const Text("유튜버 아이작 오헌영과 함께하는 시청자 참여 스피드런!"),
+        Text(loc.record_top_info_subtitle),
       ],
     );
   }

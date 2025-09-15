@@ -103,7 +103,7 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
             onPressed: () {
               final name = nameController.text.trim();
               if (name.isEmpty) {
-                UiFeedback.error(ctx, loc.common_error, loc.mod_preset_create_validate_required);
+                UiFeedback.error(ctx, content: loc.mod_preset_create_validate_required);
                 return;
               }
               Navigator.of(ctx).pop(CreatePresetResult(name, mode));
@@ -211,7 +211,7 @@ Future<String?> showEditPresetNameDialog(
                     onSubmitted: (_) {
                       final name = nameController.text.trim();
                       if (name.isEmpty) {
-                        UiFeedback.error(ctx, loc.common_error, loc.mod_preset_create_validate_required);
+                        UiFeedback.error(ctx, content: loc.mod_preset_create_validate_required);
                         return;
                       }
                       Navigator.of(ctx).pop(name);
@@ -233,7 +233,7 @@ Future<String?> showEditPresetNameDialog(
           onPressed: () {
             final name = nameController.text.trim();
             if (name.isEmpty) {
-              UiFeedback.error(ctx, loc.common_error, loc.mod_preset_create_validate_required);
+              UiFeedback.error(ctx, content: loc.mod_preset_create_validate_required);
               return;
             }
             Navigator.of(ctx).pop(name);

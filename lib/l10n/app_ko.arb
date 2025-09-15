@@ -95,29 +95,19 @@
     "description": "에러 코드를 숨기고 보여주는 일반적인 오류 메시지"
   },
 
-  "eden_err_accounts_title": "계정을 불러올 수 없어요",
-  "@eden_err_accounts_title": {
-    "description": "스팀 계정(세이브 폴더) 조회 실패 시 토스트/피드백 제목"
-  },
-
-  "eden_err_accounts_desc": "세이브 폴더를 가져오지 못했어요.",
+  "eden_err_accounts_desc": "계정을 불러올 수 없어요.",
   "@eden_err_accounts_desc": {
     "description": "계정 조회 실패 시 상세 설명"
   },
 
-  "eden_warn_no_accounts_title": "계정이 감지되지 않았어요",
+  "eden_warn_no_accounts_title": "계정 찾기 실패",
   "@eden_warn_no_accounts_title": {
     "description": "스팀 계정이 하나도 없을 때 토스트/피드백 제목"
   },
 
-  "eden_warn_no_accounts_desc": "스팀에 로그인했는지, 스팀 Cloud 설정을 확인해 주세요.",
+  "eden_warn_no_accounts_desc": "계정이 감지되지 않았어요.",
   "@eden_warn_no_accounts_desc": {
     "description": "계정 없음일 때 상세 설명"
-  },
-
-  "eden_warn_no_saves_title": "세이브 파일이 없어요",
-  "@eden_warn_no_saves_title": {
-    "description": "에디션/슬롯별 세이브 파일이 없을 때 토스트/피드백 제목"
   },
 
   "eden_warn_no_saves_desc": "게임의 세이브 파일을 찾지 못했어요.",
@@ -195,16 +185,10 @@
 
   "instance_error_title": "인스턴스를 불러오는 데 실패했어요",
   "instance_menu_reorder": "순서 바꾸기",
-
-  "instance_reorder_saved_title": "저장",
   "instance_reorder_saved_desc": "변경한 내용을 저장했어요.",
-  "instance_reorder_not_found_title": "대상 없음",
   "instance_reorder_not_found_desc": "저장할 인스턴스를 찾지 못했어요.",
-  "instance_reorder_invalid_title": "저장 실패",
   "instance_reorder_invalid_desc": "순서 정보가 올바르지 않아요.",
-  "instance_reorder_conflict_title": "충돌",
   "instance_reorder_conflict_desc": "다른 변경과 충돌했어요. 다시 시도해 주세요.",
-  "instance_reorder_failure_title": "오류",
   "instance_reorder_failure_desc": "오류가 생겨서 저장하지 못했어요.",
 
   "instance_reorder_unavailable_title": "순서 바꾸기 불가",
@@ -213,10 +197,7 @@
   "instance_quickfilter_no_preset": "프리셋 없음",
 
   "instance_table_header_enabled_preset": "프리셋",
-
   "instance_load_failed": "인스턴스를 불러오지 못했어요",
-
-  "instance_play_failed_title": "실행이 안 됐어요",
   "instance_play_failed_body": "문제가 있었어서 실행이 안 됐어요",
   "common_changes_applied": "변경을 적용했어요.",
 
@@ -225,8 +206,7 @@
   "instance_image_picker_tab_image": "이미지",
 
   "instance_image_preview_title": "미리보기",
-  "instance_image_error_not_found_title": "이미지를 불러올 수 없어요",
-  "instance_image_error_not_found_body": "다시 선택하거나 스프라이트 탭을 사용해 주세요.",
+  "instance_image_error_not_found_body": "이미지를 불러올 수 없어요. 다시 선택하거나 스프라이트 탭을 사용해 주세요.",
 
   "common_image": "이미지",
   "instance_image_pick_file": "이미지 파일 선택",
@@ -253,18 +233,12 @@
 
   "mod_preset_menu_reorder": "순서 바꾸기",
 
-  "mod_preset_reorder_saved_title": "저장",
   "mod_preset_reorder_saved_desc": "변경한 내용을 저장했어요.",
-  "mod_preset_reorder_not_found_title": "대상 없음",
   "mod_preset_reorder_not_found_desc": "저장할 프리셋을 찾지 못했어요.",
-  "mod_preset_reorder_invalid_title": "저장 실패",
   "mod_preset_reorder_invalid_desc": "순서 정보가 올바르지 않아요.",
-  "mod_preset_reorder_conflict_title": "충돌",
   "mod_preset_reorder_conflict_desc": "다른 변경과 충돌했어요. 다시 시도해 주세요.",
-  "mod_preset_reorder_failure_title": "오류",
   "mod_preset_reorder_failure_desc": "오류가 생겨서 저장하지 못했어요.",
 
-  "mod_preset_reorder_unavailable_title": "순서 바꾸기 불가",
   "mod_preset_reorder_unavailable_desc": "검색 중에는 순서를 바꿀 수 없어요. 검색을 먼저 끝내주세요.",
 
   "mod_preset_enabled_mods": "모드 {mod}",
@@ -304,15 +278,10 @@
 
   "option_menu_reorder": "순서 바꾸기",
 
-  "option_reorder_saved_title": "저장",
   "option_reorder_saved_desc": "변경한 내용을 저장했어요.",
-  "option_reorder_not_found_title": "대상 없음",
   "option_reorder_not_found_desc": "저장할 프리셋을 찾지 못했어요.",
-  "option_reorder_invalid_title": "저장 실패",
   "option_reorder_invalid_desc": "순서 정보가 올바르지 않아요.",
-  "option_reorder_conflict_title": "충돌",
   "option_reorder_conflict_desc": "다른 변경과 충돌했어요. 다시 시도해 주세요.",
-  "option_reorder_failure_title": "오류",
   "option_reorder_failure_desc": "오류가 생겨서 저장하지 못했어요.",
 
   "option_reorder_unavailable_title": "순서 바꾸기 불가",
@@ -430,11 +399,8 @@
   "setting_validate_min_zero": "0ms 이상이어야 합니다.",
   "setting_validate_max_60s": "최대 60000ms 입니다.",
 
-  "setting_detect_path_fail_title": "설치 폴더를 찾지 못했어요",
   "setting_detect_path_fail_desc": "설치 경로를 감지하지 못했습니다. 직접 설정해 주세요.",
-  "setting_detect_path_success_title": "설치 폴더를 찾았습니다",
-
-  "setting_detect_options_ini_fail_title": "options.ini를 찾지 못했어요",
+  "setting_detect_path_success_title": "경로 찾기 성공",
   "setting_detect_options_ini_fail_desc": "options.ini 경로를 감지하지 못했습니다. 파일을 직접 선택해 주세요.",
   "path_mode_auto": "자동 탐지",
   "path_mode_manual": "직접 지정",
@@ -544,6 +510,10 @@
   "option_position_label": "위치",
   "option_repentogon_label": "Repentogon",
   "option_search_placeholder": "프리셋 검색",
+  "option_preset_save_failed": "저장하지 못 했어요. 잠시 뒤 다시 시도해 주세요.",
+  "@option_preset_save_failed": {
+    "description": "저장 실패의 기본 안내 문구(원인 모를 일반 실패)"
+  },
 
   "@nickname": {
     "description": "닉네임 변경 다이얼로그"
@@ -650,6 +620,10 @@
       "endDay": {"type": "int"}
     }
   },
+  "record_top_info_subtitle": "이번 미션이에요. 일간·주간 중 선택한 기간에 맞춰 진행돼요. 편하게 시작하고 기록만 남겨보세요.",
+  "@record_top_info_subtitle": {
+    "description": "레코드 페이지 상단 안내 문구. 기간(일간/주간)에 맞춰 진행됨을 알리고 가벼운 참여를 유도하는 톤."
+  },
   "account_button_label": "계정",
   "@account_button_label": { "description": "에러 시 비활성 버튼의 기본 레이블" },
 
@@ -732,10 +706,6 @@
   "@youtube_banner_subtitle": {
     "description": "YoutubeBanner 보조 설명. 톤은 부드럽고 가볍게 권유."
   },
-  "youtube_toast_title": "외부 링크",
-  "@youtube_toast_title": {
-    "description": "외부 브라우저/앱으로 이동할 때 띄우는 토스트의 제목."
-  },
   "youtube_toast_body": "브라우저를 열 수 없었어요.",
   "@youtube_toast_body": {
     "description": "외부 링크 열기에 실패했을 때 사용자에게 보여줄 간단한 안내 문구."
@@ -815,11 +785,11 @@
   "common_duplicate_suffix": "(사본)",
   "common_edit": "수정",
   "common_enable_mod": "모드 활성화",
-  "common_error": "오류",
   "common_items_copied": " 개 항목을 복사했습니다.",
   "common_loading": "로딩 중…",
   "common_none_label": "(없음)",
   "common_nothing_selected": "선택된 항목이 없습니다.",
+  "common_not_found": "찾을 수 없음",
   "common_notice": "알림",
   "common_off": "OFF",
   "common_on": "ON",
@@ -829,6 +799,7 @@
   "common_reset": "되돌리기",
   "common_retry": "다시 시도",
   "common_save": "저장",
+  "common_save_fail": "저장 실패",
   "common_saved": "저장 완료",
   "common_search_placeholder": "검색",
   "common_select": "선택",
@@ -836,7 +807,10 @@
   "common_untitled": "제목 없음",
   "common_update": "변경",
   "common_export": "내보내기",
-
+  "common_info": "안내",
+  "common_warning": "주의",
+  "common_success": "성공",
+  "common_error": "오류",
   "@mod": {
     "description": "모드 관련 문자열"
   },
@@ -951,14 +925,7 @@
   "content_category_hyzone": "헌영이와 아이작 같이 즐기기",
   "content_category_info": "정보",
   "content_external_link_tooltip": "외부 링크",
-  "content_open_link_fail_title": "링크를 열 수 없어요",
-  "content_open_link_fail_desc": "'{title}'을 열지 못했어요.",
-  "@content_open_link_fail_desc": {
-    "description": "컨텐츠 타이틀",
-    "placeholders": {
-      "title": { "type": "String", "example": "Repentogon" }
-    }
-  },
+  "content_open_link_fail_desc": "링크를 열 수 없어요.",
   "content_open_link_error_title": "열기 실패",
   "content_open_link_error_desc": "지금은 링크를 열 수 없어요. 잠시 후 다시 시도해 주세요.",
   "content_custom_unavailable_title": "준비 중이에요",
@@ -970,15 +937,7 @@
   "@content_list_load_fail_title": { "description": "컨텐츠 인덱스 로드 실패-타이틀" },
   "content_list_load_fail_desc": "잠시 후 다시 시도해 주세요.",
   "@content_list_load_fail_desc": { "description": "컨텐츠 인덱스 로드 실패-설명" },
-
-  "content_open_link_empty_title": "링크를 열 수 없어요",
-  "@content_open_link_empty_title": { "description": "외부 링크 URL이 비었을 때 타이틀" },
-  "content_open_link_empty_desc": "주소가 비어 있어요.",
-  "@content_open_link_empty_desc": { "description": "외부 링크 URL 없음 안내" },
-
-  "doc_load_fail_title": "문서를 불러오지 못했어요",
-  "@doc_load_fail_title": { "description": "마크다운 문서 로드 실패-타이틀" },
-  "doc_load_fail_desc": "잠시 후 다시 시도해 주세요.",
+  "doc_load_fail_desc": "문서를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
   "@doc_load_fail_desc": { "description": "마크다운 문서 로드 실패-설명" },
 
   "selection_share": "공유",
@@ -1074,24 +1033,22 @@
   "editable_title_hint": "이름을 입력해 주세요",
   "@editable_title_hint": { "description": "헤더 타이틀 인라인 편집 입력 힌트" },
 
-  "home_open_install_fail_title": "설치 경로를 찾지 못했어요",
+  "home_open_install_fail_title": "경로 찾기 실패",
   "@home_open_install_fail_title": { "description": "설치 경로 자동 탐지 실패 - 제목" },
   "home_open_install_fail_desc": "자동으로 경로를 찾지 못했어요. 설정에서 한 번만 지정해 주시면 바로 열어 드릴게요.",
   "@home_open_install_fail_desc": { "description": "설치 경로 자동 탐지 실패 - 안내" },
 
-  "home_open_options_fail_title": "options.ini 경로를 찾지 못했어요",
+  "home_open_options_fail_title": "경로 찾기 실패",
   "@home_open_options_fail_title": { "description": "options.ini 자동 탐지 실패 - 제목" },
   "home_open_options_fail_desc": "자동으로 경로를 찾지 못했어요. 설정에서 경로를 확인해 주세요.",
   "@home_open_options_fail_desc": { "description": "options.ini 자동 탐지 실패 - 안내" },
 
-  "home_save_candidates_fail_title": "조회에 실패했어요",
+  "home_save_candidates_fail_title": "찾기 실패",
   "@home_save_candidates_fail_title": { "description": "세이브 후보 조회 실패 - 제목" },
   "home_save_candidates_fail_desc": "세이브 위치를 찾는 중 문제가 있었어요. 잠시 뒤 다시 시도해 주세요.",
   "@home_save_candidates_fail_desc": { "description": "세이브 후보 조회 실패 - 안내" },
 
-  "home_save_not_found_title": "세이브를 찾지 못했어요",
-  "@home_save_not_found_title": { "description": "세이브 후보 없음 - 제목" },
-  "home_save_not_found_desc": "Steam Cloud 또는 로컬 세이브가 보이지 않아요.",
+  "home_save_not_found_desc": "세이브 파일이 보이지 않아요.",
   "@home_save_not_found_desc": { "description": "세이브 후보 없음 - 안내" },
 
   "common_open_folder_fail_title": "열 수 없어요",

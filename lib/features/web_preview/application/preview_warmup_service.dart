@@ -13,7 +13,7 @@ class _WarmupJob {
   _WarmupJob(this.source, this.sourceId, this.url);
 }
 
-/// 진행 상태(간단 버전)
+/// 진행 상태
 class WarmupProgress {
   final int total;
   final int done;
@@ -121,23 +121,24 @@ class PreviewWarmupService<T> {
 
     // 1) 설치 모드 스냅샷
     final mods = await loadInstalledMods();
-    // 필요 시 상한(예: 최초 실행 성능 보호용) 적용
-    final targets = (maxItems != null && mods.length > maxItems)
-        ? mods.take(maxItems).toList(growable: false)
-        : mods;
 
     // 2) URL 큐 구성 (이미 캐시 OK면 건너뛰기 위해 탐색)
     final jobs = <_WarmupJob>[];
-    for (final it in targets) {
+    for (final it in mods) {
       final modId = (workshopIdOf(it)).trim();
       if (modId.isEmpty) continue;
       final url = workshopUrlOf(modId);
       jobs.add(_WarmupJob('workshop_mod', modId, url));
     }
 
+    // 상한 적용: 유효 작업에서 N개만
+    final cappedJobs = (maxItems != null && jobs.length > maxItems)
+        ? jobs.take(maxItems).toList(growable: false)
+        : jobs;
+
     // 3) 진행 상태 초기화
     var prog = WarmupProgress(
-      total: jobs.length, done: 0, skipped: 0, failed: 0,
+      total: cappedJobs.length, done: 0, skipped: 0, failed: 0,
       running: true, paused: false,
     );
     _emit(prog);
@@ -147,9 +148,11 @@ class PreviewWarmupService<T> {
       concurrency: _pickConcurrency(),
       minGap: const Duration(milliseconds: 200), // 각 요청 사이 최소 간격
     );
+    // 4-1 작업 대기
+    final pending = <Future<void>>[];
 
     // 5) 작업 실행
-    for (final j in jobs) {
+    for (final j in cappedJobs) {
       if (_cancel) break;
 
       // 일시정지
@@ -159,9 +162,8 @@ class PreviewWarmupService<T> {
       if (_cancel) break;
 
       // 병렬 슬롯에서 개별 작업
-      unawaited(pool.schedule(() async {
+      pending.add(pool.schedule(() async {
         try {
-          // 이미 캐시가 있고 만료 X면 skip
           final prior = await cache.repo.find(j.url);
           final expired = prior?.isExpired ?? true;
           if (prior != null && !expired && prior.imagePath != null && prior.title.isNotEmpty) {
@@ -170,7 +172,6 @@ class PreviewWarmupService<T> {
             return;
           }
 
-          // TTL로 부드럽게
           await cache.getOrFetch(
             j.url,
             policy: const RefreshPolicy.ttl(Duration(hours: 24)),
@@ -189,13 +190,16 @@ class PreviewWarmupService<T> {
       }));
     }
 
-    await pool.drain();
+    // 모든 스케줄된 작업이 완료될 때까지 대기
+    await Future.wait(pending);
 
-    // 종료 정리 + 고아/만료 청소(가볍게)
+    // 종료 정리 + orphan/expired cleanup
     await cache.sweep();
 
     _running = false;
     _emit(prog.copy(running: false, paused: false));
+
+    await Future<void>.delayed(Duration.zero);
   }
 
   void pause() {

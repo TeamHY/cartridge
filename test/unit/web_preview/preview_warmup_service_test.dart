@@ -106,7 +106,7 @@ void main() {
       expect(events.last.running, isFalse);
     });
 
-    test('maxItems: 상한만큼만 처리', () async {
+    test('maxItems: 상한 개수 만큼만 처리', () async {
       final events = <WarmupProgress>[];
       final sub = svc.progress.listen(events.add);
 
@@ -120,10 +120,6 @@ void main() {
 
       // skip이 그 3개 안에 포함되면 done+skipped 합이 3이 된다.
       expect(last.done + last.skipped + last.failed, 3);
-
-      // 성공 fetch 수는 최대 3(실제 skip/failed 비율에 따라 다름)이지만,
-      // 여기 입력에서는 skip(사전 캐시) + bad(실패) + 1(or 2) 중 일부만 포함될 수 있음.
-      // 핵심은 “상한을 초과하지 않는다”.
       expect(last.total, lessThanOrEqualTo(3));
     });
 

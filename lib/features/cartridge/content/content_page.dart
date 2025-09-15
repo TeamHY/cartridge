@@ -57,11 +57,11 @@ class ContentPage extends ConsumerWidget {
             // 안전망: 아직 미구현 커스텀은 안내
             UiFeedback.warn(
               context,
-              loc.content_custom_unavailable_title,
-              loc.content_custom_unavailable_desc,
+              title: loc.content_custom_unavailable_title,
+              content: loc.content_custom_unavailable_desc,
             );
             return EmptyState.withDefault404(
-              title: loc.doc_load_fail_title,
+              title: loc.doc_load_fail_desc,
             );
         }
       } else if (selected.type == ContentType.detail) {
@@ -73,7 +73,7 @@ class ContentPage extends ConsumerWidget {
       }
       return detail;
     }
-    // loadin/에러 처리 (레이아웃 단순 유지)
+    // loading /에러 처리 (레이아웃 단순 유지)
     if (indexAsync.isLoading) {
       return const ScaffoldPage(header: ContentHeaderBar.none(), content: Center(child: ProgressRing()));
     }
@@ -124,11 +124,7 @@ class ContentPage extends ConsumerWidget {
                         try {
                           final urlStr = it.urlFor(lang) ?? it.urlFor('ko') ?? it.urlFor('en');
                           if (urlStr == null) {
-                            UiFeedback.warn(
-                              context,
-                              loc.content_open_link_empty_title,
-                              loc.content_open_link_empty_desc,
-                            );
+                            UiFeedback.warn(context, content: loc.content_open_link_fail_desc);
                             return;
                           }
                           final ok = await launchUrl(
@@ -136,19 +132,11 @@ class ContentPage extends ConsumerWidget {
                             mode: LaunchMode.externalApplication,
                           );
                           if (!ok && context.mounted) {
-                            UiFeedback.warn(
-                              context,
-                              loc.content_open_link_fail_title,
-                              loc.content_open_link_fail_desc(it.titleFor(lang)),
-                            );
+                            UiFeedback.warn(context, content: loc.content_open_link_fail_desc);
                           }
                         } catch (_) {
                           if (context.mounted) {
-                            UiFeedback.error(
-                              context,
-                              loc.content_open_link_error_title,
-                              loc.content_open_link_error_desc,
-                            );
+                            UiFeedback.error(context, content: loc.content_open_link_error_desc);
                           }
                         }
                         return; // 외부 링크는 상세로 진입하지 않음

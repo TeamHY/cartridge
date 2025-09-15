@@ -223,7 +223,7 @@ class _PromoIntro extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // 브랜드 아이콘(loadin/에러에도 고정 크기)
+          // 브랜드 아이콘(loading/에러에도 고정 크기)
           Container(
             width: 64,
             height: 64,

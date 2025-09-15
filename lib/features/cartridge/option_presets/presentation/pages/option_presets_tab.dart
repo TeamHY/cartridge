@@ -45,11 +45,11 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
         final loc = AppLocalizations.of(context);
         final result = await ref.read(optionPresetsControllerProvider.notifier).reorderOptionPresets(ids);
         await result.when(
-          ok:       (_, __, ___) async => UiFeedback.success(context, loc.option_reorder_saved_title,     loc.option_reorder_saved_desc),
-          notFound: (_, __)      async => UiFeedback.warn(context,    loc.option_reorder_not_found_title,  loc.option_reorder_not_found_desc),
-          invalid:  (_, __, ___) async => UiFeedback.error(context,   loc.option_reorder_invalid_title,    loc.option_reorder_invalid_desc),
-          conflict: (_, __)      async => UiFeedback.warn(context,    loc.option_reorder_conflict_title,   loc.option_reorder_conflict_desc),
-          failure:  (_, __, ___) async => UiFeedback.error(context,   loc.option_reorder_failure_title,    loc.option_reorder_failure_desc),
+          ok:       (_, __, ___) async => UiFeedback.success(context, title: loc.common_saved,      content: loc.option_reorder_saved_desc),
+          notFound: (_, __)      async => UiFeedback.warn(context,    title: loc.common_not_found,  content: loc.option_reorder_not_found_desc),
+          invalid:  (_, __, ___) async => UiFeedback.error(context,   title: loc.common_save_fail,  content: loc.option_reorder_invalid_desc),
+          conflict: (_, __)      async => UiFeedback.warn(context, content: loc.option_reorder_conflict_desc),
+          failure:  (_, __, ___) async => UiFeedback.error(context, content: loc.option_reorder_failure_desc),
         );
       },
       resetAfterSave: () {
@@ -112,7 +112,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
     final q = ref.read(optionPresetsQueryProvider).trim();
     final loc = AppLocalizations.of(context);
     if (q.isNotEmpty) {
-      UiFeedback.warn(context, loc.option_reorder_unavailable_title, loc.option_reorder_unavailable_desc);
+      UiFeedback.warn(context, title: loc.option_reorder_unavailable_title, content: loc.option_reorder_unavailable_desc);
       return;
     }
     ref.read(optionPresetsReorderModeProvider.notifier).state  = true;
@@ -166,13 +166,13 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                 ok:       (_, __, ___) async {
                   ref.read(optionPresetsReorderModeProvider.notifier).state  = false;
                   ref.read(optionPresetsReorderDirtyProvider.notifier).state = false;
-                  UiFeedback.success(context, loc.option_reorder_saved_title, loc.option_reorder_saved_desc);
+                  UiFeedback.success(context, title: loc.common_saved, content: loc.option_reorder_saved_desc);
                   _dragReportedDirty = false;
                 },
-                notFound: (_, __)      async => UiFeedback.warn(context,  loc.option_reorder_not_found_title, loc.option_reorder_not_found_desc),
-                invalid:  (_, __, ___) async => UiFeedback.error(context, loc.option_reorder_invalid_title,    loc.option_reorder_invalid_desc),
-                conflict: (_, __)      async => UiFeedback.warn(context,  loc.option_reorder_conflict_title,   loc.option_reorder_conflict_desc),
-                failure:  (_, __, ___) async => UiFeedback.error(context, loc.option_reorder_failure_title,    loc.option_reorder_failure_desc),
+                notFound: (_, __)      async => UiFeedback.warn(context,  title: loc.common_not_found, content: loc.option_reorder_not_found_desc),
+                invalid:  (_, __, ___) async => UiFeedback.error(context, title: loc.common_save_fail,    content: loc.option_reorder_invalid_desc),
+                conflict: (_, __)      async => UiFeedback.warn(context,  content: loc.option_reorder_conflict_desc),
+                failure:  (_, __, ___) async => UiFeedback.error(context, content: loc.option_reorder_failure_desc),
               );
               _autosave.cancel();
             }
