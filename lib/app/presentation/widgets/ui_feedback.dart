@@ -32,6 +32,8 @@ class UiFeedback {
       InfoBarSeverity severity,
       ) {
     final loc = AppLocalizations.of(context);
+    final ft  = FluentTheme.of(context);
+
     final fallbackTitle = switch (severity) {
       InfoBarSeverity.info    => loc.common_info,
       InfoBarSeverity.warning => loc.common_warning,
@@ -43,13 +45,30 @@ class UiFeedback {
     displayInfoBar(
       context,
       builder: (ctx, close) {
-        return InfoBar(
-          title: Text(resolvedTitle),
-          content: Text(content),
-          severity: severity,
-          action: IconButton(
-            icon: const Icon(FluentIcons.clear),
-            onPressed: close,
+        // 기본 InfoBar 테마(현재 컨텍스트 기준)
+        final base = InfoBarTheme.of(ctx);
+
+        final solidInfoDecoration = BoxDecoration(
+          color: ft.cardColor,
+          borderRadius: BorderRadius.circular(4.0),
+          border: Border.all(color: ft.resources.cardStrokeColorDefault),
+        );
+
+        return InfoBarTheme.merge(
+          data: InfoBarThemeData(
+            // info면 불투명, 아니면 기존 데코레이션 유지
+            decoration: (sev) => (sev == InfoBarSeverity.info)
+                ? solidInfoDecoration
+                : base.decoration?.call(sev),
+          ),
+          child: InfoBar(
+            title: Text(resolvedTitle),
+            content: Text(content),
+            severity: severity,
+            action: IconButton(
+              icon: const Icon(FluentIcons.clear),
+              onPressed: close,
+            ),
           ),
         );
       },

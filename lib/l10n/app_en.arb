@@ -611,6 +611,54 @@
       "endDay": {"type": "int"}
     }
   },
+  "record_mode_result_title_success": "Run Finished",
+  "@record_mode_result_title_success": {
+    "description": "Dialog title shown when a run finishes."
+  },
+
+  "record_mode_result_dody_submitted": "Time: {time}\nYour run has been submitted to the leaderboard.",
+  "@record_mode_result_dody_submitted": {
+    "description": "Body shown when a run finishes and submission succeeded.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "00:12:34.56"
+      }
+    }
+  },
+
+  "record_mode_result_dody_not_submitted": "Time: {time}\nFailed to submit your run.",
+  "@record_mode_result_dody_not_submitted": {
+    "description": "Body shown when a run finishes but submission failed.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "00:12:34.56"
+      }
+    }
+  },
+
+  "record_mode_result_title_disallowed": "Disallowed Mods Detected",
+  "@record_mode_result_title_disallowed": {
+    "description": "Dialog title when the run ended due to disallowed mods."
+  },
+
+  "record_mode_result_body_disallowed": "{moreCount, plural, =0{Detected mods that are not allowed. The game was terminated.\nE.g., {sample}} one{Detected mods that are not allowed. The game was terminated.\nE.g., {sample}} other{Detected mods that are not allowed. The game was terminated.\nE.g., {sample} (+{moreCount} more)}}",
+  "@record_mode_result_body_disallowed": {
+    "description": "Body when the run ended due to disallowed mods. 'sample' is one example name; 'moreCount' is the additional count beyond the sample.",
+    "placeholders": {
+      "sample": {
+        "type": "String",
+        "example": "Example Mod"
+      },
+      "moreCount": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "record_no_challenge_title": "Looks like there's no challenge yet.",
+  "record_no_challenge_body": "We'll let you know when new ones are available.",
   "record_top_info_subtitle": "This mission adapts to the period you choose—daily or weekly. Start when you’re ready and log your time.",
   "@record_top_info_subtitle": {
     "description": "Friendly blurb under the record page header. Works for both daily and weekly modes; invites light participation."
@@ -804,6 +852,7 @@
   "common_warning": "Warning",
   "common_success": "Success",
   "common_error": "Error",
+  "common_back": "Back",
 
   "@mod": {
     "description": "Mod related strings"
@@ -926,10 +975,8 @@
   "content_custom_unavailable_desc": "This content isn’t available yet.",
   "@content_custom_unavailable_desc": { "description": "Custom type not supported - description" },
 
-  "content_list_load_fail_title": "We couldn’t load the list",
+  "content_list_load_fail_title": "We couldn’t load the list. Please try again in a moment.",
   "@content_list_load_fail_title": { "description": "Content index load failure - title" },
-  "content_list_load_fail_desc": "Please try again in a moment.",
-  "@content_list_load_fail_desc": { "description": "Content index load failure - description" },
   "doc_load_fail_desc": "We couldn’t load the document. Please try again in a moment.",
   "@doc_load_fail_desc": { "description": "Markdown load failure - description" },
 

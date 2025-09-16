@@ -40,7 +40,7 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
-      await ref.read(recordModeAuthProvider).signInWithPassword(email, password);
+      await ref.read(recordModeAuthServiceProvider).signInWithPassword(email, password);
     } catch (_) {
       if (context.mounted) {
         final loc = AppLocalizations.of(context);

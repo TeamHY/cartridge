@@ -69,7 +69,7 @@ class _LocalizedMarkdownPageState extends State<LocalizedMarkdownPage> {
                     if (snap.connectionState == ConnectionState.waiting) {
                       return const Padding(
                         padding: EdgeInsets.all(16),
-                        child: ProgressBar(),
+                        child: SizedBox(height: 360, child: Center(child: ProgressRing(),),),
                       );
                     }
                     if (snap.hasError) {

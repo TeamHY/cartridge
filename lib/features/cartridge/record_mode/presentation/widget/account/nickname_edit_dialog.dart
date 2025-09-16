@@ -34,7 +34,7 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
 
     try {
       final nickname = _nicknameController.text.trim();
-      await ref.read(recordModeAuthProvider).changeNickname(nickname);
+      await ref.read(recordModeAuthServiceProvider).changeNickname(nickname);
       if (context.mounted) Navigator.pop(context);
     } catch (e) {
       if (context.mounted) {

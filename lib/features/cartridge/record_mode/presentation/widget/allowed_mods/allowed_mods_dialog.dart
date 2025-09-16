@@ -1,3 +1,4 @@
+import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,32 +11,40 @@ Future<void> showAllowedModsDialog(
     BuildContext context,
     WidgetRef ref, {
       required UTTableController<AllowedModRow> controller,
-      required List<AllowedModRow> rows,
     }) async {
   final uiCtl = ref.read(recordModeUiControllerProvider.notifier);
   final loc = AppLocalizations.of(context);
 
   await showDialog(
     context: context,
-    builder: (ctx) => ContentDialog(
-      constraints: const BoxConstraints(maxWidth: 980),
-      title: Text(loc.allowed_dialog_title),
-      content: SizedBox(
-        width: 940,
-        height: 560,
-        child: AllowedModsTable(controller: controller, rows: rows),
-      ),
-      actions: [
-        Button(
-          child: Text(loc.common_refresh),
-          onPressed: () async {
-            await uiCtl.refreshAllowedPreset();
-            if (!ctx.mounted) return;
-            Navigator.of(ctx).pop(); // 간단히 닫았다가 다시 열 수 있게
-          },
-        ),
-        Button(child: Text(loc.common_close), onPressed: () => Navigator.of(ctx).pop()),
-      ],
-    ),
+    builder: (ctx) {
+      return Consumer(
+        builder: (ctx, ref, _) {
+          final ui = ref.watch(recordModeUiControllerProvider);
+          final rows = ui.preset?.items ?? const <AllowedModRow>[];
+
+          return ContentDialog(
+            title: Text(loc.allowed_dialog_title),
+            constraints: const BoxConstraints(maxWidth: 780, maxHeight: 640),
+            content: SizedBox(
+              width: double.infinity,
+              child: AllowedModsTable(controller: controller, rows: rows),
+            ),
+            actions: [
+              Button(
+                child: Text(loc.common_refresh),
+                onPressed: () async {
+                  await uiCtl.refreshAllowedPreset();
+                  if (!ctx.mounted) return;
+                  UiFeedback.info(ctx, title: loc.common_refresh, content: loc.allowed_mod_refresh);
+                },
+              ),
+              Button(child: Text(loc.common_close),
+                  onPressed: () => Navigator.of(ctx).pop()),
+            ],
+          );
+        },
+      );
+    },
   );
 }

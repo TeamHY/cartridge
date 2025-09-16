@@ -167,6 +167,7 @@ class PreviewWarmupService<T> {
           final prior = await cache.repo.find(j.url);
           final expired = prior?.isExpired ?? true;
           if (prior != null && !expired && prior.imagePath != null && prior.title.isNotEmpty) {
+            await cache.repo.link(j.source, j.sourceId, j.url);
             prog = prog.copy(skipped: prog.skipped + 1);
             _emit(prog);
             return;

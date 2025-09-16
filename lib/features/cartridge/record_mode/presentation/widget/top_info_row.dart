@@ -14,6 +14,7 @@ class TopInfoRow extends StatelessWidget {
     this.showSeed = true,
     this.loading = false,
     this.error = false,
+    this.disableButtons = false,
   });
 
   final ChallengeType challengeType;
@@ -23,8 +24,9 @@ class TopInfoRow extends StatelessWidget {
   final bool showSeed;
   final bool loading;
   final bool error;
+  final bool disableButtons;
 
-  bool get _disabled => loading || error;
+  bool get _disabled => loading || error || disableButtons;
 
   @override
   Widget build(BuildContext context) {

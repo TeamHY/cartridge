@@ -40,7 +40,7 @@ class SupabaseGoalReadService implements GoalReadService {
         challengeType: ChallengeType.daily,
         goal: RecordGoal(boss),
         seed: d['seed'] ?? '',
-        character: GameCharacter(d['character'] ?? 0),
+        character: GameCharacter(d['character'] ?? IsaacCharacter.eden.index),
       );
     } else {
       final now = DateTime.now();
@@ -85,7 +85,7 @@ class SupabaseGoalReadService implements GoalReadService {
         challengeType: ChallengeType.daily,
         seed: d['seed'] as String,
         goal: RecordGoal(d['boss'] as String),
-        character: GameCharacter(d['character'] ?? -1),
+        character: GameCharacter(d['character'] ?? IsaacCharacter.eden.index),
       );
     }
 

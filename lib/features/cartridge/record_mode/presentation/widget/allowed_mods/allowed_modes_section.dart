@@ -56,7 +56,7 @@ class _AllowedModsSectionState extends ConsumerState<AllowedModsSection> {
               ? null
               : () =>
               showAllowedModsDialog(
-                  context, ref, controller: _tableCtrl, rows: view.items),
+                  context, ref, controller: _tableCtrl),
           child: Text(loc.allowed_list_button),
         ),
       ],

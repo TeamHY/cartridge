@@ -2,7 +2,6 @@ export 'domain/models/auth_user.dart';
 export 'domain/models/challenge_type.dart';
 export 'domain/models/game_character.dart';
 export 'domain/models/game_preset_view.dart';
-export 'domain/models/goal_period.dart';
 export 'domain/models/goal_snapshot.dart';
 export 'domain/models/leaderboard_entry.dart';
 export 'domain/models/mod.dart';

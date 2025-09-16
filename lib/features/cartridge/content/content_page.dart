@@ -75,17 +75,16 @@ class ContentPage extends ConsumerWidget {
     }
     // loading /에러 처리 (레이아웃 단순 유지)
     if (indexAsync.isLoading) {
-      return const ScaffoldPage(header: ContentHeaderBar.none(), content: Center(child: ProgressRing()));
+      return const ScaffoldPage(
+        header: ContentHeaderBar.none(),
+        content: Center(child: ProgressRing()),
+      );
     }
     if (indexAsync.hasError) {
       return ScaffoldPage(
         header: const ContentHeaderBar.none(),
-        content: Center(
-          child: InfoBar(
-            title: Text(loc.content_list_load_fail_title),
-            content: Text(loc.content_list_load_fail_desc),
-            severity: InfoBarSeverity.error,
-          ),
+        content: EmptyState.withDefault404(
+          title: loc.content_list_load_fail_title,
         ),
       );
     }

@@ -620,6 +620,54 @@
       "endDay": {"type": "int"}
     }
   },
+  "record_mode_result_title_success": "기록 완료",
+  "@record_mode_result_title_success": {
+    "description": "러닝이 종료되었을 때의 다이얼로그 제목"
+  },
+
+  "record_mode_result_dody_submitted": "시간: {time}\n리더보드에 기록이 업로드되었습니다.",
+  "@record_mode_result_dody_submitted": {
+    "description": "러닝 종료 + 업로드 성공 본문",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "00:12:34.56"
+      }
+    }
+  },
+
+  "record_mode_result_dody_not_submitted": "시간: {time}\n기록 업로드에 실패했습니다.",
+  "@record_mode_result_dody_not_submitted": {
+    "description": "러닝 종료 + 업로드 실패 본문",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "00:12:34.56"
+      }
+    }
+  },
+
+  "record_mode_result_title_disallowed": "허용되지 않은 모드",
+  "@record_mode_result_title_disallowed": {
+    "description": "허용 외 모드로 종료 시 다이얼로그 제목"
+  },
+
+  "record_mode_result_body_disallowed": "{moreCount, plural, =0{허용 목록에 없는 모드가 활성화되어 게임을 종료했습니다.\n예: {sample}} other{허용 목록에 없는 모드가 활성화되어 게임을 종료했습니다.\n예: {sample} 외 {moreCount}개}}",
+  "@record_mode_result_body_disallowed": {
+    "description": "허용 외 모드로 종료 시 본문. `sample`은 예시 모드명, `moreCount`는 추가 개수.",
+    "placeholders": {
+      "sample": {
+        "type": "String",
+        "example": "예시 모드"
+      },
+      "moreCount": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "record_no_challenge_title": "해당 기간에 챌린지가 없어요.",
+  "record_no_challenge_body": "조금만 기다리면 새로운 챌린지가 열릴 거예요.",
   "record_top_info_subtitle": "일간·주간 중 선택한 기간에 맞춰 진행돼요. 편하게 시작하고 기록만 남겨보세요.",
   "@record_top_info_subtitle": {
     "description": "레코드 페이지 상단 안내 문구. 기간(일간/주간)에 맞춰 진행됨을 알리고 가벼운 참여를 유도하는 톤."
@@ -813,6 +861,7 @@
   "common_warning": "주의",
   "common_success": "성공",
   "common_error": "오류",
+  "common_back": "뒤로 가기",
   "@mod": {
     "description": "모드 관련 문자열"
   },
@@ -935,10 +984,8 @@
   "content_custom_unavailable_desc": "아직 열 수 없는 콘텐츠예요.",
   "@content_custom_unavailable_desc": { "description": "커스텀 타입 미지원 상세 설명" },
 
-  "content_list_load_fail_title": "목록을 불러오지 못했어요",
+  "content_list_load_fail_title": "목록을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
   "@content_list_load_fail_title": { "description": "컨텐츠 인덱스 로드 실패-타이틀" },
-  "content_list_load_fail_desc": "잠시 후 다시 시도해 주세요.",
-  "@content_list_load_fail_desc": { "description": "컨텐츠 인덱스 로드 실패-설명" },
   "doc_load_fail_desc": "문서를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.",
   "@doc_load_fail_desc": { "description": "마크다운 문서 로드 실패-설명" },
 

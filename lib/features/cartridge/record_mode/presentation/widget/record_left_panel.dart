@@ -14,6 +14,7 @@ class RecordModeLeftPanel extends ConsumerWidget {
     final uiCtrl = ref.read(recordModeUiControllerProvider.notifier);
     final loc    = AppLocalizations.of(context);
     final snap   = ui.goal;
+    final hasGoal = snap != null;
 
     final challengeTypeText = () {
       final id = ui.gameId;
@@ -35,8 +36,8 @@ class RecordModeLeftPanel extends ConsumerWidget {
         challengeType: ui.challengeType,
         onChallengeTypeChanged: (p) => uiCtrl.setChallengeType(p),
         challengeTypeText: challengeTypeText,
-        seedText: snap?.seed,
-        showSeed: snap != null,
+        seedText: hasGoal ? snap.seed : null,
+        showSeed: hasGoal,
         loading: ui.loadingGoal,
         error: false,
       ),
@@ -53,8 +54,31 @@ class RecordModeLeftPanel extends ConsumerWidget {
         ],
       );
     } else {
-      final g = ui.goal;
-      if (g == null) return const SizedBox.shrink();
+    final g = ui.goal;
+    if (g == null) {
+      // 챌린지 없음: 안내 문구(기본 SectionCard 스타일과 어울리게)
+      heroesChild = Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              loc.record_no_challenge_title, // 예: "해당 기간에 챌린지가 없어요."
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center,
+            ),
+            Gaps.h6,
+            Text(
+              loc.record_no_challenge_body,  // 예: "조금만 기다리면 새로운 챌린지가 열릴 거예요."
+              style: TextStyle(
+                color: FluentTheme.of(context).resources.textFillColorSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    } else {
       heroesChild = Row(
         children: [
           Expanded(
@@ -75,14 +99,24 @@ class RecordModeLeftPanel extends ConsumerWidget {
         ],
       );
     }
+    }
 
-    final heroes = SectionCard(
-      rows: 20,
-      gapBelowRows: 1,
-      padding: EdgeInsets.zero,
-      decoration: BoxDecoration(),
-      child: heroesChild,
-    );
+    SectionCard heroes;
+    if (ui.goal == null) {
+      heroes = SectionCard(
+        rows: 20,
+        gapBelowRows: 1,
+        child: heroesChild,
+      );
+    } else {
+      heroes = SectionCard(
+        rows: 20,
+        gapBelowRows: 1,
+        padding: EdgeInsets.zero,
+        decoration: BoxDecoration(),
+        child: heroesChild,
+      );
+    }
 
     // (3) 하단 타이머/배너 (rows=1)
     final kBannerHeight = 9;
@@ -92,7 +126,7 @@ class RecordModeLeftPanel extends ConsumerWidget {
       child: (temporal == ContestTemporal.current && ui.goal != null)
           ? Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
-        child: RecordTimer(session: ref.read(recordModeSessionProvider)),
+        child: const RecordTimer(),
       )
           : YoutubeBanner(height: kBannerHeight * kPanelRowUnit),
     );

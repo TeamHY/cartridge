@@ -41,7 +41,7 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
     try {
       final email = _emailController.text.trim();
       final password = _passwordController.text;
-      await ref.read(recordModeAuthProvider).signUpWithPassword(email, password);
+      await ref.read(recordModeAuthServiceProvider).signUpWithPassword(email, password);
     } catch (e) {
       if (context.mounted) {
         final loc = AppLocalizations.of(context);

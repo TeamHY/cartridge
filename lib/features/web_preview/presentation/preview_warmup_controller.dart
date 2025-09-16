@@ -25,7 +25,7 @@ final previewWarmupServiceProvider = Provider<PreviewWarmupService>((ref) {
   String workshopIdOf(InstalledMod m) => m.metadata.id;
 
   String urlOf(String modId) =>
-      SteamUris.workshopItem(modId);
+      SteamUrls.workshopItem(modId);
 
   return ModWarmupService(
     cache: cache,

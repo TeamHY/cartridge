@@ -1,5 +1,6 @@
 import 'models/auth_user.dart';
 import 'models/challenge_type.dart';
+import 'models/game_session_events.dart';
 import 'models/goal_snapshot.dart';
 import 'models/leaderboard_entry.dart';
 
@@ -26,8 +27,12 @@ abstract class GameIndexService {
   Future<({String? prev, String? next})> neighbors(String gameId);
   Future<String> currentFor(ChallengeType challengeType);
 }
+
 abstract class GameSessionService {
   Stream<Duration> elapsed();
-  Future<void> start();
-  Future<void> stop({required bool cleared});
+  Stream<GameSessionEvent> events();
+  Future<void> startSession();
+  Future<void> cancelSession({bool killGame = false});
+  Future<void> finishSession(EndReason reason);
+  void dispose();
 }

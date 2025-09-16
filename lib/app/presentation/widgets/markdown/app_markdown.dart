@@ -6,6 +6,7 @@ import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'accent_a_tag_md.dart';
+import 'asset_image_md.dart';
 
 /// 앱 공용 마크다운 렌더러.
 ///
@@ -56,6 +57,9 @@ class AppMarkdown extends StatelessWidget {
     final inline = List<MarkdownComponent>.from(MarkdownComponent.inlineComponents);
     final idx = inline.indexWhere((c) => c is ATagMd);
     if (idx >= 0) inline[idx] = AccentATagMd();
+
+    final idxImg = inline.indexWhere((c) => c is ImageMd);
+    if (idxImg >= 0) inline[idxImg] = AssetOrNetworkImageMd();
 
     return material.Material(
       color: Colors.transparent,

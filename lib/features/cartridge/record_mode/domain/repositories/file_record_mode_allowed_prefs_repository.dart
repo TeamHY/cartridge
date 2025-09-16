@@ -1,41 +1,21 @@
 import 'dart:convert';
-import 'dart:io';
 
+import 'package:cartridge/core/infra/file_io.dart' as fio;
 import 'package:cartridge/features/cartridge/record_mode/domain/repositories/record_mode_allowed_prefs_repository.dart';
 
 
 class FileRecordModeAllowedPrefsRepository implements RecordModeAllowedPrefsRepository {
-  final String appFolderName;
-  final String fileName;
+  final String relativePath;
 
   FileRecordModeAllowedPrefsRepository({
-    this.appFolderName = 'Cartridge',
-    this.fileName = 'allowed_mod_prefs.json',
+    this.relativePath = 'allowed_mod_prefs.json',
   });
 
-  Future<Directory> _baseDir() async {
-    if (Platform.isWindows) {
-      final base = Platform.environment['APPDATA'] ?? Directory.current.path;
-      return Directory('$base\\$appFolderName');
-    } else if (Platform.isMacOS) {
-      final home = Platform.environment['HOME'] ?? '';
-      return Directory('$home/Library/Application Support/$appFolderName');
-    } else {
-      final home = Platform.environment['HOME'] ?? '';
-      return Directory('$home/.config/$appFolderName');
-    }
-  }
-
-  Future<File> _file() async {
-    final dir = await _baseDir();
-    if (!await dir.exists()) await dir.create(recursive: true);
-    return File('${dir.path}/$fileName');
-  }
 
   @override
   Future<Map<String, bool>> readAll() async {
     try {
-      final f = await _file();
+      final f = await fio.ensureDataFile(relativePath);
       if (!await f.exists()) return {};
       final txt = await f.readAsString();
       final raw = jsonDecode(txt);
@@ -53,8 +33,8 @@ class FileRecordModeAllowedPrefsRepository implements RecordModeAllowedPrefsRepo
 
   @override
   Future<void> writeAll(Map<String, bool> map) async {
-    final f = await _file();
+    final f = await fio.ensureDataFile(relativePath);
     final s = const JsonEncoder.withIndent('  ').convert(map);
-    await f.writeAsString(s);
+    await fio.writeBytes(f.path, utf8.encode(s), atomic: true, flush: true);
   }
 }

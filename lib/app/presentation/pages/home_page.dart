@@ -17,6 +17,7 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ScaffoldPage(
+      padding: EdgeInsets.only(top: AppSpacing.sm),
       header: const ContentHeaderBar.none(),
       content: ContentShell(
         child: LayoutBuilder(

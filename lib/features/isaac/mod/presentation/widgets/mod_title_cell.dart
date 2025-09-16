@@ -108,9 +108,10 @@ class _ModTitleCellState extends ConsumerState<ModTitleCell> {
           url,
           policy: const RefreshPolicy.ttl(Duration(hours: 72)),
           source: 'workshop_mod',
-          sourceId: url,
+          sourceId: modId,
           targetMaxWidth: 128,
           targetMaxHeight: 128,
+          acceptLanguage: langCode,
         );
       } catch (e, st) {
         logE('WebPreviewCell', 'key=$key prewarm fail url=$url', e, st);

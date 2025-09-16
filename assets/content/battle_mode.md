@@ -1,4 +1,5 @@
 <!-- lang:ko -->
+![200x140 대결모드](/assets/content/대결모드.png)
 ## 1) 방송 세팅
 
 1. 위 플랫폼 중 하나를 선택해 채널을 준비합니다.
@@ -107,7 +108,7 @@
 > **Just so you know:**
 > Our streamer, 아이작 오헌영, is from Korea and doesn't speak much English. 
 > This guide is here to help, but you might need a translator for direct communication during the stream.
-
+![200x140 Battle with 오헌영](/assets/content/대결모드.png)
 ## 1) Streaming setup
 
 1. Pick one of the platforms and prepare your channel.

@@ -4,11 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/features/cartridge/record_mode/record_mode.dart';
 import 'package:cartridge/core/service_providers.dart';
 
-// Delegate Record Mode UI providers to app-wide DI providers
-final recordModeGoalReadProvider = Provider<GoalReadService>((ref) => ref.read(recordModeGoalReadServiceProvider));
-final recordModeLeaderboardProvider = Provider<LeaderboardService>((ref) => ref.read(recordModeLeaderboardServiceProvider));
-final recordModeGameIndexProvider = Provider<GameIndexService>((ref) => ref.read(recordModeGameIndexServiceProvider));
-final recordModeSessionProvider = Provider<GameSessionService>((ref) => ref.read(recordModeSessionServiceProvider));
 
 const _unset = Object();
 
@@ -82,7 +77,7 @@ class RecordModeUiState {
 final recordModeUiControllerProvider =
 StateNotifierProvider.autoDispose<RecordModeUiController, RecordModeUiState>((ref) {
   final c = RecordModeUiController(ref);
-  c._sub = ref.read(recordModeGameIndexProvider).currentGameId().listen(c._setGame);
+  c._sub = ref.read(recordModeGameIndexServiceProvider).currentGameId().listen(c._setGame);
   ref.onDispose(() => c._sub?.cancel());
   return c;
 });
@@ -109,6 +104,35 @@ class RecordModeUiController extends StateNotifier<RecordModeUiState> {
     unawaited(_loadAllowedPreset());
     await _fetchMoreGuarded(reset: true, expectId: id, seq: seq);
   }
+  // 🔹 키 비교 헬퍼(설치키>워크샵ID>이름)
+  bool _sameRow(AllowedModRow a, AllowedModRow b) {
+    if (a.key != null && b.key != null) return a.key == b.key;
+    if (a.workshopId != null && b.workshopId != null) return a.workshopId == b.workshopId;
+    return a.name == b.name;
+  }
+
+  /// 단건 로컬 반영(optimistic)
+  void setAllowedEnabledLocal(AllowedModRow row, bool enabled) {
+    final cur = state.preset;
+    if (cur == null) return;
+    final next = [
+      for (final it in cur.items)
+        _sameRow(it, row) ? it.copyWith(enabled: enabled) : it
+    ];
+    state = state.copyWith(preset: cur.copyWith(items: next));
+  }
+
+  /// 다건 로컬 반영(optimistic)
+  void setAllowedEnabledManyLocal(Iterable<AllowedModRow> rows, bool enabled) {
+    final cur = state.preset;
+    if (cur == null) return;
+    final list = rows.toList(growable: false);
+    final next = [
+      for (final it in cur.items)
+        list.any((r) => _sameRow(r, it)) ? it.copyWith(enabled: enabled) : it
+    ];
+    state = state.copyWith(preset: cur.copyWith(items: next));
+  }
 
   Future<void> _loadAllowedPreset({bool force = false}) async {
     if (!force && (state.preset != null || state.loadingPreset)) return;
@@ -127,7 +151,7 @@ class RecordModeUiController extends StateNotifier<RecordModeUiState> {
   Future<void> setChallengeType(ChallengeType p) async {
     if (state.challengeType == p) return;
     // 선택된 기간의 "현재" gameId 획득
-    final id = await ref.read(recordModeGameIndexProvider).currentFor(p);
+    final id = await ref.read(recordModeGameIndexServiceProvider).currentFor(p);
     // gameId 세팅 및 neighbors/goal/entries 재로딩
     await _setGame(id);
   }
@@ -145,7 +169,7 @@ class RecordModeUiController extends StateNotifier<RecordModeUiState> {
   }
 
   Future<void> _loadNeighbors(String id, int seq) async {
-    final ns = await ref.read(recordModeGameIndexProvider).neighbors(id);
+    final ns = await ref.read(recordModeGameIndexServiceProvider).neighbors(id);
     if (!mounted || seq != _seq || state.gameId != id) return;
     state = state.copyWith(neighbors: ns);
   }
@@ -155,7 +179,7 @@ class RecordModeUiController extends StateNotifier<RecordModeUiState> {
       RecordId.isWeekly(id) ? ChallengeType.weekly : ChallengeType.daily;
 
   Future<void> _loadGoalFor(String id, int seq) async {
-    final snap = await ref.read(recordModeGoalReadProvider).byGameId(id);
+    final snap = await ref.read(recordModeGoalReadServiceProvider).byGameId(id);
     if (!mounted || seq != _seq || state.gameId != id) return;
     state = state.copyWith(loadingGoal: false, goal: snap);
   }
@@ -165,7 +189,7 @@ class RecordModeUiController extends StateNotifier<RecordModeUiState> {
     if (g == null || state.loadingMore || state.loadedAll) return;
 
     state = state.copyWith(loadingMore: true);
-    final all = await ref.read(recordModeLeaderboardProvider).fetchAll(gameId: g);
+    final all = await ref.read(recordModeLeaderboardServiceProvider).fetchAll(gameId: g);
     if (!mounted || seq != _seq || state.gameId != expectId) return; // ⬅ 가드
 
     state = state.copyWith(

@@ -217,16 +217,6 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                               );
                             },
                           ),
-                          MenuFlyoutItem(
-                            leading: const Icon(FluentIcons.download),
-                            text: Text(loc.common_export),
-                            // TODO
-                            onPressed: () => UiFeedback.info(
-                              context,
-                              title: loc.common_export,
-                              content: loc.common_coming_soon,
-                            ),
-                          ),
                           const MenuFlyoutSeparator(),
                           MenuFlyoutItem(
                             leading: const Icon(FluentIcons.delete),

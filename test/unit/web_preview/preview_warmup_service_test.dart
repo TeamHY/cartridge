@@ -152,6 +152,22 @@ void main() {
       // 두 URL 모두 다시 fetch 되었어야 한다.
       expect(cache.fetchedUrls.toSet().containsAll({urlOf('1'), urlOf('2')}), isTrue);
     });
+
+    test('link는 sourceId=워크샵ID로 통일되고, skip 경로도 링크된다', () async {
+      // 실행
+      await svc.start(); // 1,2,bad,skip
+
+      // 성공한 1,2 는 link 호출됨
+      expect(repo.links[('workshop_mod','1')], urlOf('1'));
+      expect(repo.links[('workshop_mod','2')], urlOf('2'));
+
+      // 실패한 bad는 link 안 걸릴 수 있음
+      expect(repo.links.containsKey(('workshop_mod','bad')), isFalse);
+
+      // 캐시 유효로 skip된 항목도 link가 걸려야 한다.
+      expect(repo.links[('workshop_mod','skip')], urlOf('skip'));
+    });
+
   });
 }
 

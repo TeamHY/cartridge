@@ -262,7 +262,7 @@ final recordModeSessionServiceProvider = Provider<GameSessionService>((ref) {
 
 final recordModeAuthUserProvider =
 StreamProvider.autoDispose<cartridge.AuthUser?>((ref) {
-  final auth = ref.read(recordModeAuthProvider);
+  final auth = ref.read(recordModeAuthServiceProvider);
   return auth.authStateChanges();
 });
 
@@ -276,9 +276,6 @@ final recordModeAuthServiceProvider = Provider<AuthService>((ref) {
   final repo = ref.read(recordModeAuthRepositoryProvider);
   return SupabaseAuthService(sp, repo);
 });
-
-final recordModeAuthProvider =
-Provider<AuthService>((ref) => ref.read(recordModeAuthServiceProvider));
 
 final recordModeAllowedPrefsRepositoryProvider =
 Provider<RecordModeAllowedPrefsRepository>(
@@ -298,6 +295,21 @@ final recordModePresetServiceProvider = Provider<RecordModePresetService>((ref) 
   return RecordModePresetServiceImpl(env, prefs);
 });
 
+final recordModeSessionProvider = Provider<GameSessionService>((ref) {
+  final sp        = Supabase.instance.client;
+  final env       = ref.read(isaacEnvironmentServiceProvider);
+  final launcher  = ref.read(isaacLauncherServiceProvider);
+  final presetSvc = ref.read(recordModePresetServiceProvider);
+  final allowed   = ref.read(recordModeAllowedPrefsServiceProvider);
+
+  final svc = GameSessionServiceImpl(
+    sp, env, launcher,
+    presetService: presetSvc,
+    allowedPrefs: allowed,
+  );
+  ref.onDispose(svc.dispose);
+  return svc;
+});
 // ── 8) Steam News ───────────────────────────────────────────────────────────
 final steamNewsServiceProvider = Provider<SteamNewsService>((ref) {
   return SteamNewsService(
