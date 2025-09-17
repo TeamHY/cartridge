@@ -7,7 +7,6 @@ import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
 import 'package:cartridge/features/isaac/save/isaac_save.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
-import 'package:cartridge/theme/brand_accents.dart';
 
 class IsaacHomeSection extends ConsumerWidget {
   const IsaacHomeSection({super.key});

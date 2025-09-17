@@ -117,7 +117,8 @@ class ModsRepository {
           );
 
           final key = path.basename(d.path);
-          if (mod.folderName != key) {logI(_tag,
+          if (mod.folderName != key) {
+            logI(_tag,
               'op=list fn=_scanInstalled msg=폴더명 불일치 actual="$key" derived="${mod.folderName}" hint=metadata.directory/id가 실제 폴더와 다를 수 있습니다 path=${d.path}');
           }
           if (map.containsKey(key)) {

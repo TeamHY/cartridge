@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
+import 'package:path/path.dart' as p;
 
 part 'installed_mod.freezed.dart';
 
@@ -26,6 +27,10 @@ sealed class InstalledMod with _$InstalledMod {
   bool get isEnabled => !disabled;
   bool get isDisabled => disabled;
   String get folderName {
+    if (installPath.isNotEmpty) {
+      return p.basename(installPath);
+    }
+    // Fallback when installPath is not provided (legacy behavior)
     final base = metadata.directory;
     final suffix = metadata.id.isNotEmpty ? '_${metadata.id}' : '';
     return '$base$suffix';
