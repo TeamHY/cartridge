@@ -209,6 +209,10 @@ class IsaacEnvironmentService {
     );
     logI(_tag, 'infer Isaac Edition: $preferred');
 
+    if (preferred == null) {
+      logW(_tag, 'edition not inferred → skip options.ini auto-detect');
+      return null;
+    }
     final candidates = await _pathResolver.listCandidateOptionsIniPaths(
       preferredEdition: preferred,
     );

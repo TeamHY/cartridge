@@ -49,7 +49,7 @@
   "install_detect_load_failed": "Failed to load info.",
   "install_detect_refresh_failed": "Refresh failed.",
   "install_detect_install_path_attention": "Install path needs attention",
-  "install_detect_edition_unknown": "Not detected",
+  "install_detect_edition_unknown": "Not detected Binding of Isaac",
   "install_detect_badge_manual_path": "Manual path",
   "install_detect_badge_auto_detected": "Auto-detected",
   "install_detect_path_not_found": "Couldn’t find the install path.",

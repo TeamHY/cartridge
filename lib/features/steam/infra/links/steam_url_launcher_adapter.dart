@@ -1,16 +1,27 @@
+import 'package:cartridge/core/log.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:cartridge/features/steam/domain/steam_links_port.dart';
 import 'package:cartridge/features/steam/domain/steam_app_urls.dart';
 import 'package:cartridge/features/steam/domain/steam_link_builder.dart';
 
 class SteamUrlLauncherAdapter implements SteamLinksPort {
+  static const _tag = 'SteamUrlLauncherAdapter';
+
   @override
   Future<void> openUri(String target) async {
-    // 외부 앱(스팀 클라이언트 / 기본 브라우저)로 여는 것이 의도에 부합
-    await launchUrlString(
-      target,
-      mode: LaunchMode.externalApplication,
-    );
+    logI(_tag, 'launch target=$target');
+    try {
+      final ok = await launchUrlString(
+        target,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!ok) {
+        logW(_tag, 'launch failed target=$target');
+      }
+    } catch (e, st) {
+      logE(_tag, 'launch exception target=$target', e, st);
+      rethrow;
+    }
   }
 
   @override
