@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:cartridge/core/infra/file_io.dart' as fio;
 import 'package:fluent_ui/fluent_ui.dart';
 
 import 'package:cartridge/core/log.dart';
@@ -8,9 +11,13 @@ import 'package:cartridge/features/cartridge/mod_presets/mod_presets.dart';
 import 'package:cartridge/features/cartridge/option_presets/option_presets.dart';
 import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
 import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
+import 'package:path/path.dart' as p;
 
-class InstancesService {
+import 'i_instances_service.dart';
+
+class InstancesService implements IInstancesService {
   static const _tag = 'InstancesService';
+  static const _kImageDir = 'instance_images';
 
   final IInstancesRepository _repo;
   final OptionPresetsService _optionPresets;
@@ -36,6 +43,7 @@ class InstancesService {
 
   // ── Queries ───────────────────────────────────────────────────────────
 
+  @override
   Future<List<InstanceView>> listAllViews({
     Map<String, InstalledMod>? installedOverride,
     String? modsRootOverride,
@@ -101,6 +109,7 @@ class InstancesService {
     return List.unmodifiable(out);
   }
 
+  @override
   Future<InstanceView?> getViewById(
       String id, {
         Map<String, InstalledMod>? installedOverride,
@@ -149,6 +158,7 @@ class InstancesService {
     );
   }
 
+  @override
   Future<(InstanceView, List<ModPresetView>, OptionPresetView?)?> getViewWithRelated(
       String id, {
         Map<String, InstalledMod>? installedOverride,
@@ -193,6 +203,7 @@ class InstancesService {
 
   // ── Commands ───────────────────────────────────────────────────────────
 
+  @override
   Future<Result<Instance?>> create({
     required String name,
     required SeedMode seedMode,
@@ -260,6 +271,7 @@ class InstancesService {
     return Result.ok(data: normalized, code: 'instance.create.ok');
   }
 
+  @override
   Future<Result<Instance>> rename(String id, String newName) async {
     final cur = await _repo.findById(id);
     if (cur == null) return const Result.notFound(code: 'instance.rename.notFound');
@@ -277,13 +289,16 @@ class InstancesService {
     return Result.ok(data: normalized, code: 'instance.rename.ok', ctx: {'name': normalized.name});
   }
 
+  @override
   Future<Result<void>> delete(String instanceId) async {
     final cur = await _repo.findById(instanceId);
     if (cur == null) return const Result.notFound(code: 'instance.delete.notFound');
+    await _deleteManagedImageIfAny(cur.image);
     await _repo.removeById(instanceId);
     return Result.ok(code: 'instance.delete.ok', ctx: {'name': cur.name});
   }
 
+  @override
   Future<Result<Instance?>> clone({
     required String sourceId,
     required String duplicateSuffix,
@@ -297,7 +312,24 @@ class InstancesService {
     final effectiveSuffix = suffix.isEmpty ? '(사본)' : suffix;
     final newName = base.isEmpty ? effectiveBase : '$effectiveBase $effectiveSuffix';
 
-    final next = src.duplicated(newName);
+    var next = src.duplicated(newName);
+    if (src.image is InstanceUserFile) {
+      final srcImg = src.image as InstanceUserFile;
+      try {
+        final baseDir = await _imageBaseDir();
+        final ext = (p.extension(srcImg.path).trim().isEmpty) ? '.png' : p.extension(srcImg.path);
+        final target = p.join(baseDir, '${next.id}$ext');
+
+        final bytes = await File(srcImg.path).readAsBytes();
+        await fio.writeBytes(target, bytes, atomic: true, flush: true);
+
+        next = next.copyWith(
+          image: InstanceImage.userFile(path: p.normalize(target), fit: srcImg.fit),
+        );
+      } catch (_, __) {
+        logW(_tag, 'op=clone fn=clone msg=image-copy-failed src=${srcImg.path}');
+      }
+    }
     final normalized = InstancePolicy.normalize(next);
     final vr = InstancePolicy.validate(normalized);
     if (!vr.isOk) {
@@ -308,12 +340,15 @@ class InstancesService {
     return Result.ok(data: normalized, code: 'instance.clone.ok', ctx: {'name': normalized.name});
   }
 
+  @override
   Future<Result<Instance?>> setImageToSprite({
     required String instanceId,
     required int index,
   }) async {
     final cur = await _repo.findById(instanceId);
     if (cur == null) return const Result.notFound(code: 'instance.image.set.notFound');
+
+    await _deleteManagedImageIfAny(cur.image);
 
     final next = cur.copyWith(image: InstanceImage.sprite(index: index), updatedAt: DateTime.now());
     final vr = InstancePolicy.validate(next);
@@ -324,6 +359,7 @@ class InstancesService {
     return Result.ok(data: next, code: 'instance.image.set.ok');
   }
 
+  @override
   Future<Result<Instance?>> setImageToUserFile({
     required String instanceId,
     required String path,
@@ -332,7 +368,21 @@ class InstancesService {
     final cur = await _repo.findById(instanceId);
     if (cur == null) return const Result.notFound(code: 'instance.image.set.notFound');
 
-    final next = cur.copyWith(image: InstanceImage.userFile(path: path, fit: fit), updatedAt: DateTime.now());
+    final baseDir = await _imageBaseDir();
+    final ext = (p.extension(path).trim().isEmpty) ? '.png' : p.extension(path);
+    final target = p.join(baseDir, '${cur.id}$ext');
+
+    try {
+      final src = File(path);
+      final bytes = await src.readAsBytes();
+      await fio.writeBytes(target, bytes, atomic: true, flush: true);
+      await _deleteManagedImageIfAny(cur.image);
+    } catch (e, st) {
+      logE(_tag, 'op=image fn=setImageToUserFile msg=copy-failed path=$path', e, st);
+      return Result.failure(code: 'instance.image.set.copyFailed', ctx: {'path': path, 'error': e.toString()});
+    }
+
+    final next = cur.copyWith(image: InstanceImage.userFile(path: p.normalize(target), fit: fit), updatedAt: DateTime.now());
     final vr = InstancePolicy.validate(next);
     if (!vr.isOk) {
       return Result.invalid(violations: vr.violations, code: 'instance.image.set.invalid');
@@ -341,6 +391,7 @@ class InstancesService {
     return Result.ok(data: next, code: 'instance.image.set.ok');
   }
 
+  @override
   Future<Result<Instance?>> setImageToRandomSprite({
     required String instanceId,
     int? seed,
@@ -349,15 +400,17 @@ class InstancesService {
     return setImageToSprite(instanceId: instanceId, index: idx);
   }
 
+  @override
   Future<Result<Instance?>> clearImage(String instanceId) async {
     final cur = await _repo.findById(instanceId);
     if (cur == null) return const Result.notFound(code: 'instance.image.clear.notFound');
-
+    await _deleteManagedImageIfAny(cur.image);
     final next = cur.copyWith(image: null, updatedAt: DateTime.now());
     await _repo.upsert(next);
     return Result.ok(data: next, code: 'instance.image.clear.ok');
   }
 
+  @override
   Future<Result<void>> removeMissingFromAllAppliedPresets({
     required String instanceId,
     required Map<String, InstalledMod>? installedOverride,
@@ -374,6 +427,7 @@ class InstancesService {
     return const Result.ok(code: 'instance.removeMissingFromAllAppliedPresets.ok');
   }
 
+  @override
   Future<Result<void>> reorderInstances(
       List<String> orderedIds, {
         bool strict = true,
@@ -390,6 +444,7 @@ class InstancesService {
     }
   }
 
+  @override
   Future<Result<Instance?>> setItemState({
     required String instanceId,
     required ModView item,
@@ -405,6 +460,7 @@ class InstancesService {
     return Result.ok(data: res, code: 'instance.item.setState.ok', ctx: {'key': res?.id});
   }
 
+  @override
   Future<Instance?> setModelState({
     required String instanceId,
     required ModView item,
@@ -443,6 +499,7 @@ class InstancesService {
     return res;
   }
 
+  @override
   Future<Result<Instance?>> bulkSetItemState({
     required String instanceId,
     required Iterable<ModView> items,
@@ -482,6 +539,7 @@ class InstancesService {
     return Result.ok(data: cur, code: 'instance.item.bulk.ok', ctx: {'name': cur.name});
   }
 
+  @override
   Future<Result<Instance?>> setOptionPreset(String instanceId, String? optionPresetId) async {
     final src = await _repo.findById(instanceId);
     if (src == null) return const Result.notFound(code: 'instance.setOptionPreset.notFound');
@@ -496,6 +554,7 @@ class InstancesService {
     return Result.ok(data: normalized, code: 'instance.setOptionPreset.ok', ctx: {'optionPresetId': optionPresetId});
   }
 
+  @override
   Future<Instance?> replaceAppliedPresets({
     required String instanceId,
     required List<AppliedPresetRef> refs,
@@ -524,6 +583,7 @@ class InstancesService {
     return normalized;
   }
 
+  @override
   Future<void> deleteItem({
     required String instanceId,
     required String itemId,
@@ -656,5 +716,19 @@ class InstancesService {
       ));
     }
     return labels;
+  }
+
+  Future<String> _imageBaseDir() async {
+    final dir = await fio.ensureAppSupportSubDir(_kImageDir);
+    return dir.path;
+  }
+
+  Future<void> _deleteManagedImageIfAny(InstanceImage? img) async {
+    if (img is! InstanceUserFile) return;
+    final base = await _imageBaseDir();
+    final oldPath = p.normalize(img.path);
+    if (p.isWithin(base, oldPath)) {
+      await fio.deleteFileIfExists(oldPath);
+    }
   }
 }

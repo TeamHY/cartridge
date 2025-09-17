@@ -1,4 +1,8 @@
 // test/instances/instances_service_test.dart
+import 'dart:io';
+import 'package:cartridge/core/infra/file_io.dart' show setAppSupportDirProvider;
+import 'package:path/path.dart' as p;
+
 import 'package:cartridge/features/isaac/runtime/application/install_path_result.dart';
 import 'package:cartridge/features/isaac/runtime/application/isaac_environment_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,7 +20,11 @@ void main() {
     late _StubOptionPresets optionPresets;
     late InstancesService svc;
 
+    late Directory tmpAppSupport;
     setUp(() async {
+      tmpAppSupport = await Directory.systemTemp.createTemp('cartridge_appsupport_');
+      setAppSupportDirProvider(() async => tmpAppSupport);
+
       repo = _MemRepo();
       modPresets = _StubModPresets();
       optionPresets = _StubOptionPresets();
@@ -34,6 +42,14 @@ void main() {
         modPresetsService: modPresets,
         // computeModViewsUseCase: 기본 구현 사용(테스트는 카운트에 의존하지 않음)
       );
+    });
+
+    tearDown(() async {
+      try {
+        if (await tmpAppSupport.exists()) {
+          await tmpAppSupport.delete(recursive: true);
+        }
+      } catch (_) {}
     });
 
     test('listAllViews(): pos ASC 순서 + applied 라벨 구성', () async {
@@ -124,28 +140,79 @@ void main() {
       );
     });
 
-    test('이미지 설정/해제: sprite / userFile / clear', () async {
+    test('이미지 설정/해제: userFile→sprite→userFile→clear (복사·삭제 동작 검증)', () async {
       final id = (await svc.create(name: 'I', seedMode: SeedMode.allOff, installedOverride: const {}))
           .maybeWhen(ok: (d, _, __) => d!.id, orElse: () => '');
 
+      // 1) 소스 파일 준비
+      final src1 = File(p.join(tmpAppSupport.path, 'src1.png'));
+      await src1.writeAsBytes([1, 2, 3], flush: true);
+
+      // 2) userFile 설정 → 앱 관리 경로로 복사되었는지
+      final u1 = await svc.setImageToUserFile(instanceId: id, path: src1.path);
+      u1.maybeMap(
+        ok: (r) {
+          final saved = r.data!;
+          final savedPath = saved.image!.map(
+            userFile: (f) => f.path,
+            sprite: (_) => 'SPRITE',
+          );
+          final expected = p.join(tmpAppSupport.path, 'instance_images', '$id.png');
+          expect(savedPath, expected);
+          expect(File(expected).existsSync(), isTrue);
+        },
+        orElse: () => fail('expected ok'),
+      );
+
+      // 3) sprite로 변경 → 이전 관리 파일 삭제
       final s = await svc.setImageToSprite(instanceId: id, index: 0);
-      s.maybeMap(ok: (r) => expect(r.data!.image?.map(sprite: (_) => true, userFile: (_) => false), isTrue), orElse: () => fail('expected ok'));
+      s.maybeMap(
+        ok: (r) {
+          final expected = p.join(tmpAppSupport.path, 'instance_images', '$id.png');
+          expect(File(expected).existsSync(), isFalse, reason: 'sprite로 바꾸면 기존 userFile 삭제');
+          expect(r.data!.image!.map(sprite: (_) => true, userFile: (_) => false), isTrue);
+        },
+        orElse: () => fail('expected ok'),
+      );
 
-      final u = await svc.setImageToUserFile(instanceId: id, path: '/tmp/p.png');
-      u.maybeMap(ok: (r) => expect(r.data!.image?.map(userFile: (_) => true, sprite: (_) => false), isTrue), orElse: () => fail('expected ok'));
+      // 4) 다시 userFile
+      final src2 = File(p.join(tmpAppSupport.path, 'another.jpeg'));
+      await src2.writeAsBytes([4, 5, 6, 7], flush: true);
+      final u2 = await svc.setImageToUserFile(instanceId: id, path: src2.path);
+      u2.maybeMap(
+        ok: (r) {
+          final expected = p.join(tmpAppSupport.path, 'instance_images', '$id.jpeg');
+          expect(File(expected).existsSync(), isTrue);
+          expect(r.data!.image!.map(userFile: (_) => true, sprite: (_) => false), isTrue);
+        },
+        orElse: () => fail('expected ok'),
+      );
 
+      // 5) clear → 관리 파일 삭제
       final c = await svc.clearImage(id);
-      c.maybeMap(ok: (r) => expect(r.data!.image, isNull), orElse: () => fail('expected ok'));
+      c.maybeMap(
+        ok: (r) {
+          final expected1 = p.join(tmpAppSupport.path, 'instance_images', '$id.png');
+          final expected2 = p.join(tmpAppSupport.path, 'instance_images', '$id.jpeg');
+          expect(File(expected1).existsSync(), isFalse);
+          expect(File(expected2).existsSync(), isFalse);
+          expect(r.data!.image, isNull);
+        },
+        orElse: () => fail('expected ok'),
+      );
     });
 
-    test('이미지 유효성: Windows 예약 파일명 → invalid', () async {
-      final id = (await svc.create(name: 'I', seedMode: SeedMode.allOff, installedOverride: const {}))
+    test('이미지 설정 실패: 존재하지 않는 소스 파일 → 실패(or invalid)', () async {
+      final id = (await svc.create(name: 'I2', seedMode: SeedMode.allOff, installedOverride: const {}))
           .maybeWhen(ok: (d, _, __) => d!.id, orElse: () => '');
 
-      final bad = await svc.setImageToUserFile(instanceId: id, path: '/tmp/CON.jpg');
-      bad.maybeMap(invalid: (_) => expect(true, isTrue), orElse: () => fail('expected invalid'));
+      final bad = await svc.setImageToUserFile(instanceId: id, path: p.join(tmpAppSupport.path, 'no_such_file.png'));
+      expect(
+        bad.maybeWhen(failure: (_, __, ___) => true, invalid: (_, __, ___) => true, orElse: () => false),
+        isTrue,
+        reason: '소스 파일이 없으면 실패/invalid 여야 한다',
+      );
     });
-
 
     test('setItemState()/bulkSetItemState(): override 추가/갱신/제거', () async {
       final id = (await svc.create(name: 'E', seedMode: SeedMode.allOff, installedOverride: const {}))
@@ -453,43 +520,36 @@ class _NoEnv implements IsaacEnvironmentService {
 
   @override
   Future<String?> detectOptionsIniPathAuto({List<String> fallbackCandidates = const []}) {
-    // TODO: implement detectOptionsIniPathAuto
     throw UnimplementedError();
   }
 
   @override
   Future<bool> isValidInstallDir(String? dir) {
-    // TODO: implement isValidInstallDir
     throw UnimplementedError();
   }
 
   @override
   Future<LaunchEnvironment?> resolveEnvironment({String? optionsIniPathOverride, List<String> fallbackIniCandidates = const []}) {
-    // TODO: implement resolveEnvironment
     throw UnimplementedError();
   }
 
   @override
   Future<String?> resolveInstallPath() {
-    // TODO: implement resolveInstallPath
     throw UnimplementedError();
   }
 
   @override
   Future<InstallPathResolution> resolveInstallPathDetailed({String? installPathOverride}) {
-    // TODO: implement resolveInstallPathDetailed
     throw UnimplementedError();
   }
 
   @override
   Future<String?> resolveModsRoot() {
-    // TODO: implement resolveModsRoot
     throw UnimplementedError();
   }
 
   @override
   Future<String?> resolveOptionsIniPath({String? override, List<String> fallbackCandidates = const []}) {
-    // TODO: implement resolveOptionsIniPath
     throw UnimplementedError();
   }
 }

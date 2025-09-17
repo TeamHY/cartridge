@@ -1,3 +1,4 @@
+import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_export_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -387,8 +388,13 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                           MenuFlyoutItem(
                             leading: const Icon(FluentIcons.download),
                             text: Text(loc.common_export),
-                            // TODO
-                            onPressed: () => UiFeedback.info(context, title: loc.common_export, content: loc.common_coming_soon),
+                            onPressed: () {
+                              Flyout.of(ctx).close();
+                              final app = ref.read(instanceDetailControllerProvider(widget.instanceId));
+                              if (!app.hasValue) return;
+                              showExportInstanceDialog(
+                                  context, instanceView: app.requireValue);
+                            },
                           ),
                           const MenuFlyoutSeparator(),
                           MenuFlyoutItem(

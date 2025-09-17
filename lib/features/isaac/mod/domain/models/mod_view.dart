@@ -31,6 +31,7 @@ sealed class ModView with _$ModView {
 
     InstalledMod? installedRef,
 
+    // TODO status 사용해서 mod 상태를 전달할 수 있도록 리팩토링 필요. 확장 필요. 안쓸거 같으면 그냥 제거.
     /// 상태: ok / warning / error
     required ModRowStatus status,
 

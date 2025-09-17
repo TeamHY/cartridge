@@ -13,6 +13,7 @@ export 'domain/instance_mod_sort_key.dart';
 export 'domain/instance_mod_view_sort.dart';
 export 'domain/instance_policy.dart';
 export 'domain/instances_service.dart';
+export 'domain/instance_pack_service.dart';
 export 'presentation/controllers/instance_detail_page_controller.dart';
 export 'presentation/controllers/repentogon_selectors.dart';
 export 'presentation/controllers/instances_page_controller.dart';

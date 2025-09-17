@@ -848,6 +848,7 @@
   "common_untitled": "Untitled",
   "common_update": "Update",
   "common_export": "Export",
+  "common_import": "Import",
   "common_info": "Info",
   "common_warning": "Warning",
   "common_success": "Success",

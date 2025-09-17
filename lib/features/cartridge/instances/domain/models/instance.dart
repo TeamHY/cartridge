@@ -36,6 +36,10 @@ sealed class Instance with _$Instance {
     /// 적용한 모드 프리셋들(0~N). 모드 프리셋의 entries는 '의도'로만 사용.
     @Default(<AppliedPresetRef>[]) List<AppliedPresetRef> appliedPresets,
 
+    // TODO Game 모드로 인스턴스 단위로 게임 플레이 할때 hook에 활용하도록 확장 필요.
+    // Record 모드는 레거시에 의존하고 있어서 합치지 못했음.
+    // battle 모드는 변경 사항이 너무 많아서 생략함.
+    // 필요 없으면 제거 고려.
     /// 게임 모드 (예: 'normal', 'battle', 'record', 'vanilla')
     @Default(GameMode.normal)
     GameMode gameMode,
@@ -57,7 +61,7 @@ sealed class Instance with _$Instance {
 
     InstanceImage? image,
 
-    // 확장 여지(그룹/카테고리)
+    // TODO 확장 여지(그룹/카테고리)
     String? group,
     @Default(<String>[]) List<String> categories,
   }) = _Instance;

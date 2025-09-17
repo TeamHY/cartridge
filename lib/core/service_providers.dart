@@ -185,7 +185,14 @@ final instancesServiceProvider = Provider<InstancesService>((ref) {
     envService: ref.read(isaacEnvironmentServiceProvider),
   );
 });
-
+// instances pack (export/import)
+final instancePackServiceProvider = Provider<InstancePackService>((ref) {
+  return InstancePackService(
+    instancesRepo: ref.read(instancesRepositoryProvider),
+    modPresetsRepo: ref.read(modPresetsRepositoryProvider),
+    env: ref.read(isaacEnvironmentServiceProvider),
+  );
+});
 // ── 4) Feature: Slot Machine (SQLite) ───────────────────────────────────────────────────────────
 final slotMachineRepositoryProvider = Provider<ISlotMachineRepository>(
       (ref) => SqliteSlotMachineRepository(

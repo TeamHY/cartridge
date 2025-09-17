@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_import_dialog.dart';
+import 'package:cartridge/features/cartridge/mod_presets/application/mod_presets_controller.dart';
 import 'package:collection/collection.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,6 +32,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
   final _searchCtrl = TextEditingController();
   final _normalScroll = ScrollController();
   final _editScroll   = ScrollController();
+  final _headerMoreFlyout = FlyoutController();
   Timer? _debounce;
   late final ReorderAutosave _autosave;
   bool _dragReportedDirty = false;
@@ -70,6 +73,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
     _editScroll.dispose();
     _searchCtrl.dispose();
     _autosave.cancel();
+    _headerMoreFlyout.dispose();
     super.dispose();
   }
 
@@ -141,8 +145,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
         placeholder: loc.instance_search_placeholder,
         onChanged: _onSearchChanged,
         enabled: !inReorder,
-        actions: inReorder
-            ? [
+        actions: inReorder ? <Widget>[
           Button(
             onPressed: () {
               ref.read(instancesReorderModeProvider.notifier).state  = false;
@@ -177,7 +180,7 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
             child: Text(loc.common_save),
           ),
         ]
-            : [
+            : <Widget>[
           Button(
             onPressed: createFlow,
             child: Row(
@@ -189,14 +192,45 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
             ),
           ),
           Gaps.w6,
-          Button(
-            onPressed: () => _enterReorder(currentList),
-            child: Row(
-              children: [
-                const Icon(FluentIcons.edit, size: 12),
-                Gaps.w4,
-                Text(loc.common_edit),
-              ],
+          FlyoutTarget(
+            controller: _headerMoreFlyout,
+            child: IconButton(
+              icon: const Icon(FluentIcons.more),
+              onPressed: () {
+                _headerMoreFlyout.showFlyout(
+                  placementMode: FlyoutPlacementMode.bottomRight,
+                  builder: (ctx) => MenuFlyout(
+                    color: FluentTheme.of(context).scaffoldBackgroundColor,
+                    items: [
+                      MenuFlyoutItem(
+                        leading: const Icon(FluentIcons.edit),
+                        text: Text(loc.common_edit),
+                        onPressed: () => _enterReorder(currentList),
+                      ),
+                      MenuFlyoutItem(
+                        leading: const Icon(FluentIcons.upload),
+                        text: Text(loc.common_import),
+                        onPressed: () async {
+                          Flyout.of(ctx).close();
+                          final newId = await showImportInstanceDialog(context);
+                          if (newId != null) {
+                            ref.invalidate(instancesControllerProvider);
+                            ref.invalidate(orderedInstancesForUiProvider);
+                            ref.invalidate(modPresetsControllerProvider);
+                            if (_normalScroll.hasClients) {
+                              _normalScroll.animateTo(
+                                0,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.decelerate,
+                              );
+                            }
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],
