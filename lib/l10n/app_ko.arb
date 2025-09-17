@@ -75,6 +75,10 @@
   "isaac_action_steam_game_options": "스팀 게임 옵션 열기",
   "isaac_action_steam_verify_integrity": "스팀 무결성 검사하기",
   "isaac_action_eden_token": "에덴 토큰",
+  "steam_action_fail_desc": "스팀이 열리지 않았어요. 스팀 클라이언트가 설치되어 있고 로그인되어 있는지 확인해 주세요. 네트워크 연결을 확인한 뒤, 스팀을 먼저 켠 다음 다시 시도해 주세요.",
+  "@steam_action_fail_desc": {
+    "description": "스팀 속성 열기/무결성 검사 등 스팀 동작 실행이 실패했을 때 보여주는 안내 문구"
+  },
 
   "badge_cartridge_recorder": "Cartridge",
   "badge_repentogon": "Repentogon",

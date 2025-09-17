@@ -4,6 +4,14 @@ import 'package:cartridge/features/steam/domain/steam_links_port.dart';
 import 'package:cartridge/features/steam/domain/steam_app_urls.dart';
 import 'package:cartridge/features/steam/domain/steam_link_builder.dart';
 
+// 스팀 클라이언트가 없거나 제대로 동작 안할때 Exception 발생
+class SteamLaunchException implements Exception {
+  final String target;
+  SteamLaunchException(this.target);
+  @override
+  String toString() => 'SteamLaunchException(target=$target)';
+}
+
 class SteamUrlLauncherAdapter implements SteamLinksPort {
   static const _tag = 'SteamUrlLauncherAdapter';
 
@@ -17,6 +25,7 @@ class SteamUrlLauncherAdapter implements SteamLinksPort {
       );
       if (!ok) {
         logW(_tag, 'launch failed target=$target');
+        throw SteamLaunchException(target);
       }
     } catch (e, st) {
       logE(_tag, 'launch exception target=$target', e, st);

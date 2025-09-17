@@ -12,6 +12,7 @@ import 'package:cartridge/features/steam/steam.dart';
 
 final vanillaPresetIdProvider = StateProvider<String?>((ref) => null);
 final recentInstanceIdProvider = StateProvider<String?>((ref) => null);
+const _tag = 'HomeController';
 
 
 Future<bool> isRepentogonInstalled(WidgetRef ref) async {
@@ -58,10 +59,9 @@ Future<void> openOptionsFolder(BuildContext context, WidgetRef ref) async {
 }
 
 Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
-  const tag = 'HomeController';
   const op = 'openSaveFolder';
 
-  logI(tag, 'op=$op fn=openSaveFolder msg=start');
+  logI(_tag, 'op=$op fn=openSaveFolder msg=start');
   final svc = ref.read(isaacSaveServiceProvider);
   if (!context.mounted) return;
   final loc = AppLocalizations.of(context);
@@ -70,7 +70,7 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
   try {
     candidates = await svc.findSaveCandidates();
   } catch (e, st) {
-    logE(tag, 'op=$op fn=openSaveFolder msg=candidate fetch failed', e, st);
+    logE(_tag, 'op=$op fn=openSaveFolder msg=candidate fetch failed', e, st);
     if (context.mounted) {
       UiFeedback.error(
         context,
@@ -82,7 +82,7 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
   }
 
   if (candidates.isEmpty) {
-    logW(tag, 'op=$op fn=openSaveFolder msg=no candidates');
+    logW(_tag, 'op=$op fn=openSaveFolder msg=no candidates');
     if (context.mounted) {
       UiFeedback.warn(
         context,
@@ -95,13 +95,13 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
 
   if (candidates.length == 1) {
     final c = candidates.first;
-    logI(tag, 'op=$op fn=openSaveFolder msg=auto open '
+    logI(_tag, 'op=$op fn=openSaveFolder msg=auto open '
         'accountId=${c.accountId} sid64_tail=${c.steamId64.substring(c.steamId64.length-6)} '
         'path=${c.savePath}');
     try {
       await openFolder(c.savePath);
     } catch (e, st) {
-      logE(tag, 'op=$op fn=openSaveFolder msg=openFolder failed path=${c.savePath}', e, st);
+      logE(_tag, 'op=$op fn=openSaveFolder msg=openFolder failed path=${c.savePath}', e, st);
       if (context.mounted) {
         UiFeedback.error(context, content: loc.common_open_folder_fail_desc);
       }
@@ -109,33 +109,58 @@ Future<void> openSaveFolder(BuildContext context, WidgetRef ref) async {
     return;
   }
 
-  logI(tag, 'op=$op fn=openSaveFolder msg=multi candidates count=${candidates.length} showDialog=1');
+  logI(_tag, 'op=$op fn=openSaveFolder msg=multi candidates count=${candidates.length} showDialog=1');
   if (!context.mounted) return;
   final chosen = await showChooseSteamAccountDialog(context, items: candidates);
   if (chosen == null) {
-    logW(tag, 'op=$op fn=openSaveFolder msg=user cancelled dialog=1');
+    logW(_tag, 'op=$op fn=openSaveFolder msg=user cancelled dialog=1');
     return;
   }
 
-  logI(tag, 'op=$op fn=openSaveFolder msg=user selected '
+  logI(_tag, 'op=$op fn=openSaveFolder msg=user selected '
       'accountId=${chosen.accountId} sid64_tail=${chosen.steamId64.substring(chosen.steamId64.length-6)} '
       'path=${chosen.savePath}');
   try {
     await openFolder(chosen.savePath);
   } catch (e, st) {
-    logE(tag, 'op=$op fn=openSaveFolder msg=openFolder failed path=${chosen.savePath}', e, st);
+    logE(_tag, 'op=$op fn=openSaveFolder msg=openFolder failed path=${chosen.savePath}', e, st);
     if (context.mounted) {
       UiFeedback.error(context, content: loc.common_open_folder_fail_desc);
     }
   }
 }
 
+Future<void> _showSteamClientError(BuildContext context) async {
+  final loc = AppLocalizations.of(context);
+  UiFeedback.error(
+    context,
+    content: loc.steam_action_fail_desc,
+  );
+}
+
+
 Future<void> runIntegrityCheck(BuildContext context, WidgetRef ref) async {
+  const op = 'runIntegrityCheck';
+
   final isaac = ref.read(isaacRuntimeServiceProvider);
-  await isaac.runIntegrityCheck();
+  try {
+    await isaac.runIntegrityCheck();
+    logI(_tag, 'op=$op msg=deeplink_sent');
+  } catch (e, st) {
+    logE(_tag, 'op=$op msg=deeplink_failed', e, st);
+    if (context.mounted) await _showSteamClientError(context);
+  }
 }
 
 Future<void> openGameProperties(BuildContext context, WidgetRef ref) async {
+  const op = 'openGameProperties';
+
   final isaac = ref.read(isaacRuntimeServiceProvider);
-  await isaac.openGameProperties();
+  try {
+    await isaac.openGameProperties();
+    logI(_tag, 'op=$op msg=deeplink_sent');
+  } catch (e, st) {
+    logE(_tag, 'op=$op msg=deeplink_failed', e, st);
+    if (context.mounted) await _showSteamClientError(context);
+  }
 }

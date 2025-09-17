@@ -52,11 +52,17 @@ class IsaacRuntimeService {
   Future<void> openWorkshopHome() =>
       links.openUri(SteamUris.workshopApp(IsaacSteamIds.appId));
 
-  Future<void> openGameProperties() =>
-      links.openUri(SteamUris.gameProperties(IsaacSteamIds.appId));
+  Future<void> openGameProperties() async {
+    final target = SteamUris.gameProperties(IsaacSteamIds.appId);
+    logI(_tag, 'openGameProperties target=$target');
+    await links.openUri(target);
+  }
 
-  Future<void> runIntegrityCheck() =>
-      links.openUri(SteamUris.validate(IsaacSteamIds.appId));
+  Future<void> runIntegrityCheck() async {
+    final target = SteamUris.validate(IsaacSteamIds.appId);
+    logI(_tag, 'runIntegrityCheck target=$target');
+    await links.openUri(target);
+  }
 
   Future<void> openPreferSteamClient(String webUrl) =>
       links.openUri(SteamLinkBuilder.preferSteamClientIfPossible(webUrl));

@@ -84,6 +84,10 @@
   "choose_steam_empty_title": "No accounts found",
   "choose_steam_empty_desc": "Please make sure you're signed in to Steam.",
   "choose_steam_name_unset": "Unknown",
+  "steam_action_fail_desc": "We couldn’t open Steam. Make sure the Steam client is installed and you’re signed in. Check your network, then open Steam first and try again.",
+  "@steam_action_fail_desc": {
+    "description": "Shown when opening Steam actions (properties, integrity check) fails."
+  },
 
   "eden_title": "Eden Token",
   "@eden_title": {
