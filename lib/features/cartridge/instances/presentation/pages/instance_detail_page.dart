@@ -405,6 +405,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                             leading: const Icon(FluentIcons.delete),
                             text: Text(loc.common_delete),
                             onPressed: () async {
+                              Flyout.of(ctx).close();
                               final ok = await _confirmDelete(context);
                               if (!ok) return;
                               await ref.read(instanceDetailPageControllerProvider(widget.instanceId).notifier).deleteInstance();

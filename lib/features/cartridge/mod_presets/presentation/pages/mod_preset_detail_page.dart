@@ -222,6 +222,7 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                             leading: const Icon(FluentIcons.delete),
                             text: Text(loc.common_delete),
                             onPressed: () async {
+                              Flyout.of(ctx).close();
                               final ok = await _confirmDelete(context);
                               if (!ok) return;
                               await ref.read(modPresetDetailPageControllerProvider(widget.presetId).notifier).deletePreset();

@@ -151,7 +151,10 @@ class InstanceDetailController
   /// 프리셋 삭제(라우팅은 호출자에서 처리).
   Future<void> deleteInstance() async {
     await _instances.delete(_instanceId);
+    _touchList();
   }
+
+  void _touchList() => ref.invalidate(instancesControllerProvider);
 
 
   Future<Result<Instance?>> setImageToSprite(String instanceId, int index) async {
@@ -230,8 +233,6 @@ class InstanceDetailController
     if (checked) return true;
     return presetEnabled ? false : null;
   }
-
-  void _touchList() => ref.invalidate(instancesControllerProvider);
 }
 
 
