@@ -908,6 +908,7 @@
     "description": "모드 관련 문자열"
   },
   "mod_open_folder": "모드 폴더 열기",
+  "mod_open_workshop": "창작마당 열기",
   "mod_move_to_group": "그룹으로 이동",
   "mod_remove_from_group": "그룹에서 제거",
   "mod_drag_here": "모드를 여기로 드래그하세요",
