@@ -53,3 +53,6 @@ coverage/*
 # freezed
 *.g.dart
 *.freezed.dart
+
+# inno setup
+installer/Output/*
