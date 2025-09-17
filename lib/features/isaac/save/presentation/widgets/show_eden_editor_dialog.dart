@@ -114,7 +114,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
       final controlsEnabled = !isLoading && !isSaving && selectedSlot != 0;
 
       // 초기 값 고정(로딩에서도 동일한 높이 확보)
-      newValue ??= currentValue ?? 0;
+      final effectiveValue = newValue ?? currentValue;
 
       return SingleChildScrollView(
         padding: const EdgeInsets.only(right: AppSpacing.xs),
@@ -242,7 +242,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                           child: Opacity(
                             opacity: controlsEnabled ? 1.0 : 0.6,
                             child: NumberBox(
-                              value: newValue,
+                              value: effectiveValue,
                               min: 0,
                               max: kEdenMax,
                               smallChange: 1,
