@@ -24,6 +24,10 @@ class UTDataRow extends StatefulWidget {
     this.onDragEnterLeading,
     this.rowIndex,
     this.baseBackground,
+    this.overlayMode = RowOverlayMode.blend,
+    this.hoverOverlayAlpha = 45,
+    this.pressOverlayAlpha = 60,
+    this.selectedOverlayAlpha = 50,
   }) : assert(columnWidths.length == cells.length,
   'columnWidths.length must equal cells.length');
 
@@ -48,8 +52,12 @@ class UTDataRow extends StatefulWidget {
   final VoidCallback? onEndDragSelect;
   final VoidCallback? onDragEnterLeading;
 
-  final int? rowIndex; // ★
-  final Color? baseBackground; // ★
+  final int? rowIndex;
+  final Color? baseBackground;
+  final RowOverlayMode overlayMode;
+  final int hoverOverlayAlpha;
+  final int pressOverlayAlpha;
+  final int selectedOverlayAlpha;
 
   @override
   State<UTDataRow> createState() => _UTDataRowState();
@@ -72,6 +80,8 @@ class _UTDataRowState extends State<UTDataRow> {
     scaled[scaled.length - 1] = (avail - acc).clamp(0, avail);
     return scaled;
   }
+  Color _blendOn(Color top, Color base, int alpha) =>
+      Color.alphaBlend(top.withAlpha(alpha), base);
 
   @override
   Widget build(BuildContext context) {
@@ -88,13 +98,37 @@ class _UTDataRowState extends State<UTDataRow> {
       baseBg = tt.zebraColor(fTheme);
     }
 
-    Color? bg = baseBg;
-    if (widget.selected) {
-      bg = selBg;
-    } else if (_pressed) {
-      bg = pressBg;
-    } else if (_hover) {
-      bg = hoverBg;
+    final base = baseBg ?? fTheme.resources.cardBackgroundFillColorDefault;
+    Color bg;
+
+    switch (widget.overlayMode) {
+      case RowOverlayMode.none:
+        bg = base;
+        break;
+
+      case RowOverlayMode.replace:
+        if (widget.selected) {
+          bg = selBg;
+        } else if (_pressed) {
+          bg = pressBg;
+        } else if (_hover) {
+          bg = hoverBg;
+        } else {
+          bg = base;
+        }
+        break;
+
+      case RowOverlayMode.blend:
+        if (widget.selected) {
+          bg = _blendOn(selBg,   base, widget.selectedOverlayAlpha);
+        } else if (_pressed) {
+          bg = _blendOn(pressBg, base, widget.pressOverlayAlpha);
+        } else if (_hover) {
+          bg = _blendOn(hoverBg, base, widget.hoverOverlayAlpha);
+        } else {
+          bg = base;
+        }
+        break;
     }
 
     final focusBorder = widget.focused

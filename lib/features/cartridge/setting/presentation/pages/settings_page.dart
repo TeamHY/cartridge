@@ -325,7 +325,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // 설치 감지 패널 (분리)
-                      const IsaacInstallDetectCard(),
+                      const IsaacInstallDetectCard(showRepentogon: true),
                       Gaps.h16,
 
                       // 스팀 클라이언트 경로

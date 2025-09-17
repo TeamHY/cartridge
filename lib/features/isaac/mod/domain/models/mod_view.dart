@@ -85,9 +85,9 @@ sealed class ModView with _$ModView {
     return _extractWorkshopIdFromRowKey(id);
   }
   bool get isLocalMod {
-    return installedRef != null
-        && installedRef!.metadata.id.isEmpty
-        && _extractWorkshopIdFromRowKey(id).isEmpty;
+    final im = installedRef;
+    if (im == null) return false;
+    return im.origin == ModInstallOrigin.local;
   }
   String get version => installedRef?.version ?? "-";
   String? get installPath => !isMissing ? installedRef?.installPath : null;

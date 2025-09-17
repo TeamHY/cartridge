@@ -3,6 +3,7 @@ import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
 
 part 'installed_mod.freezed.dart';
 
+enum ModInstallOrigin { local, workshop, unknown }
 /// 실제 파일시스템 상의 **설치 정보(Installed)** 를 포함한 런타임 모델.
 /// - `folderName`: 실제 설치 폴더명(워크샵 ID 접미사 포함)
 /// - `disabled`  : 폴더 내 `disable.it` 파일 존재 여부 (존재하면 비활성화)
@@ -15,6 +16,7 @@ sealed class InstalledMod with _$InstalledMod {
     required ModMetadata metadata,
     required bool disabled,
     @Default('') String installPath,
+    @Default(ModInstallOrigin.unknown) ModInstallOrigin origin,
   }) = _InstalledMod;
 
   String get version => metadata.version;
@@ -39,5 +41,6 @@ sealed class InstalledMod with _$InstalledMod {
       tags: [],
     ),
     disabled: true,
+    origin: ModInstallOrigin.unknown,
   );
 }

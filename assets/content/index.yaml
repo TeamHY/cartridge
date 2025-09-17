@@ -14,6 +14,7 @@
     ko: 오헌영의 아이작 기록 경쟁
     en: 아이작 오헌영's Isaac Speedrun challenge.
   image: assets/content/시참대회.png
+
 - id: battle
   category: hyZone
   type: detail

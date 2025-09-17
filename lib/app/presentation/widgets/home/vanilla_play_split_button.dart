@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/features/cartridge/runtime/application/game_launch_ux.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -61,13 +62,18 @@ class VanillaPlaySplitButton extends ConsumerWidget {
 
     Future<void> launch(OptionPresetView v, {bool? useRepOverride}) async {
       try {
-        await ref.read(gameLaunchUxProvider).beforeLaunch(
-          origin: LaunchOrigin.instancePage,
-        );
         final launcher = ref.read(isaacLauncherServiceProvider);
-        await launcher.launchIsaac(
+        final proc = await launcher.launchIsaac(
           optionPreset: toDomain(v, useRepOverride: useRepOverride),
           entries: const {},
+        );
+        if (proc == null) {
+          if (!context.mounted) return;
+          UiFeedback.warn(context, content: loc.instance_play_failed_body);
+          return;
+        }
+        await ref.read(gameLaunchUxProvider).beforeLaunch(
+          origin: LaunchOrigin.instancePage,
         );
       } catch (e, st) {
         logE('VanillaPlaySplitButton', 'Run vanilla failed', e, st);
@@ -95,18 +101,21 @@ class VanillaPlaySplitButton extends ConsumerWidget {
           mainButtonText: loc.vanilla_play_button_title,
           secondaryText: loc.vanilla_play_no_preset,
           buttonColor: buttonColor,
-          onPressed: () {
-            unawaited(ref.read(gameLaunchUxProvider).beforeLaunch(
-              origin: LaunchOrigin.instancePage,
-            ));
-            // 프리셋 없이 바로 실행 (Repentogon 설치시 -repentogonoff)
-            if (installed) {
-              ref.read(isaacLauncherServiceProvider).launchIsaac(
-                extraArgs: const ['-repentogonoff'],
-              );
-            } else {
-              ref.read(isaacLauncherServiceProvider).launchIsaac();
+          onPressed: () async {
+            final launcher = ref.read(isaacLauncherServiceProvider);
+            final proc = await launcher.launchIsaac(
+              extraArgs: installed ? const ['-repentogonoff'] : const [],
+            );
+
+            if (proc == null) {
+              if (!context.mounted) return;
+              UiFeedback.warn(context, content: loc.instance_play_failed_body);
+              return;
             }
+
+            await ref.read(gameLaunchUxProvider).beforeLaunch(
+              origin: LaunchOrigin.instancePage,
+            );
           },
         ),
       );

@@ -1,5 +1,7 @@
 import 'package:cartridge/core/log.dart';
 import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
+import 'package:cartridge/features/isaac/runtime/domain/isaac_steam_ids.dart';
+import 'package:cartridge/features/steam/domain/steam_library_port.dart';
 
 /// {@template mods_service}
 /// # ModsService
@@ -25,13 +27,17 @@ import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
 class ModsService {
   static const _tag = 'ModsService';
   final ModsRepository repo;
+  final SteamLibraryPort? _steamLibrary;
 
-  ModsService({ModsRepository? repository})
-      : repo = repository ??
+  ModsService({
+    ModsRepository? repository,
+    SteamLibraryPort? steamLibrary,
+  })  : repo = repository ??
             ModsRepository(
               defaultScanConcurrency: 16,
               defaultApplyConcurrency: 16,
-            );
+            ),
+        _steamLibrary = steamLibrary;
 
   /// 설치된 모드 목록 조회.
   ///
@@ -40,11 +46,35 @@ class ModsService {
   ///
   /// 반환:
   /// - [Map<InstalledMod>] (루트 폴더가 없거나 비어 있으면 Empty Map)
-  Future<Map<String, InstalledMod>> getInstalledMap(String root) async {
-    logI(_tag, 'op=list fn=getInstalledMap msg=시작 root=$root');
-    final map = await repo.scanInstalledMap(root);
-    logI(_tag, 'op=list fn=getInstalledMap msg=완료 count=${map.length} root=$root');
-    return map;
+  Future<Map<String, InstalledMod>> getInstalledMap(
+      String root, {
+        int? appId = IsaacSteamIds.appId,
+        String? steamBaseOverride,
+      }) async {
+    logI(_tag, 'op=list fn=getInstalledMap msg=시작 root=$root appId=$appId');
+    final raw = await repo.scanInstalledMap(root);
+
+    // appId가 없거나 steamLibrary가 없으면 그냥 반환(호환)
+    if (appId == null || _steamLibrary == null) {
+      logI(_tag, 'op=list fn=getInstalledMap msg=완료(count=${raw.length}) origin=skip');
+      return raw;
+    }
+
+    // 1) 구독/설치 워크샵 ID 수집
+    final acfIds = await _steamLibrary!.readWorkshopItemIdsFromAcf(
+      appId, steamBaseOverride: steamBaseOverride,
+    );
+    logI(_tag, 'op=list fn=getInstalledMap msg=workshop ids=${acfIds.length}');
+
+    // 2) 각 모드별로 origin 결정
+    final withOrigin = <String, InstalledMod>{};
+    raw.forEach((folder, mod) {
+      final origin = _decideOrigin(folder, mod, acfIds);
+      withOrigin[folder] = mod.copyWith(origin: origin);
+    });
+
+    logI(_tag, 'op=list fn=getInstalledMap msg=완료(count=${withOrigin.length}) origin=resolved');
+    return withOrigin;
   }
 
   /// 프리셋 적용: `requested[key].enabled == true`만 ON, 그 외 OFF
@@ -56,5 +86,30 @@ class ModsService {
     logI(_tag, 'op=apply fn=applyPreset msg=시작 entries=${requested.length} root=$root');
     await repo.applyPreset(root, requested);
     logI(_tag, 'op=apply fn=applyPreset msg=완료 root=$root');
+  }
+
+
+  ModInstallOrigin _decideOrigin(
+      String folder,
+      InstalledMod mod,
+      Set<int> workshopIds,
+      ) {
+    // 후보 1: metadata.id
+    int? asInt(String s) => int.tryParse(s.trim());
+    int? id = mod.metadata.id.isNotEmpty ? asInt(mod.metadata.id) : null;
+
+    // 후보 2: 폴더명 접미사 _<digits>
+    id ??= _extractFolderSuffixNumericId(folder);
+
+    if (id != null && workshopIds.contains(id)) {
+      return ModInstallOrigin.workshop;
+    }
+
+    return ModInstallOrigin.local;
+  }
+
+  int? _extractFolderSuffixNumericId(String folder) {
+    final m = RegExp(r'_(\d+)$').firstMatch(folder);
+    return (m == null) ? null : int.tryParse(m.group(1)!);
   }
 }

@@ -69,7 +69,10 @@ final isaacPathResolverProvider = Provider<IsaacPathResolver>((ref) {
   );
 });
 
-final modsServiceProvider = Provider<ModsService>((ref) => ModsService());
+final modsServiceProvider = Provider<ModsService>((ref) {
+  final library = ref.read(steamLibraryPortProvider);
+  return ModsService(steamLibrary: library);
+});
 final isaacOptionsIniService =
 Provider<IsaacOptionsIniService>((ref) => IsaacOptionsIniService());
 

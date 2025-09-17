@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:cartridge/app/presentation/empty_state.dart';
+import 'package:cartridge/features/cartridge/record_mode/infra/recorder_mod.dart';
+import 'package:cartridge/features/isaac/runtime/domain/isaac_steam_ids.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -360,6 +362,16 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                         // 타일 밀도 + version 칼럼 숨김일 때만 제목 아래 버전 한 줄 표시
                         final showVersionUnderTitle = (isTile || isComfortable) && isNarrowVersion;
 
+                        Future<void> open() async {
+                          final links = ref.read(isaacSteamLinksProvider);
+                          if (r.modId.isNotEmpty) {
+                            await links.openIsaacWorkshopItem(r.modId);
+                          } else {
+                            if (nameForRow.isEmpty || nameForRow == RecorderMod.name) return;
+                            final searchUrl = SteamUrls.workshopSearch(appId: IsaacSteamIds.appId, searchText: nameForRow);
+                            await links.openWebUrl(searchUrl);
+                          }
+                        }
                         return ModTitleCell(
                           key: ValueKey(r.id),
                           row: r,
@@ -369,9 +381,7 @@ class _ModPresetDetailPageState extends ConsumerState<ModPresetDetailPage> {
                           isNarrowPreset:  isNarrowPreset,
                           placeholderFallback: 'M',
                           prewarmPreview: true,
-                          onTapTitle: r.modId.isEmpty
-                              ? null
-                              : () async => ref.read(isaacSteamLinksProvider).openIsaacWorkshopItem(r.modId),
+                          onTapTitle: open,
                         );
                       }),
                       Text(r.version),

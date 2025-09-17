@@ -83,7 +83,7 @@ class _UTActionCellState extends State<UTActionCell> {
       ],
     );
 
-    final clipped = ClipRect(child: stack); // ★ 셀 경계에서 최종 클립
+    final clipped = ClipRect(child: stack);
 
     final body = GestureDetector(
       behavior: HitTestBehavior.opaque,

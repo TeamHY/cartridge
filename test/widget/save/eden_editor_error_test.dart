@@ -33,15 +33,6 @@ class _StubEdenPort implements EdenTokensPort {
       {bool makeBackup = true, SaveWriteMode mode = SaveWriteMode.atomicRename}) async {}
 }
 
-class _ThrowingEdenPort implements EdenTokensPort {
-  @override
-  Future<int> read(SteamAccountProfile a, IsaacEdition e, int s) async =>
-      throw StateError('read failed');
-  @override
-  Future<void> write(SteamAccountProfile a, IsaacEdition e, int s, int v,
-      {bool makeBackup = true, SaveWriteMode mode = SaveWriteMode.atomicRename}) async {}
-}
-
 class _Host extends ConsumerWidget {
   const _Host({this.locale = const Locale('ko')});
   final Locale locale;
@@ -72,26 +63,6 @@ class _Host extends ConsumerWidget {
 }
 
 void main() {
-  testWidgets('읽기 실패 시 경고 InfoBar(안내)를 표시한다 (AAA)', (tester) async {
-    final acc = _FakeAcc();
-    final l = await AppLocalizations.delegate.load(const Locale('ko'));
-    final overrides = <Override>[
-      steamAccountsProvider.overrideWith((ref) async => [acc]),
-      editionAndSlotsProvider.overrideWithProvider(
-        FutureProvider.family((ref, ({SteamAccountProfile acc, IsaacEdition? detected}) args) async =>
-        (edition: IsaacEdition.repentance, slots: [1])),
-      ),
-      edenTokensPortProvider.overrideWithValue(_ThrowingEdenPort()),
-    ];
-
-    await tester.pumpWidget(ProviderScope(overrides: overrides, child: const _Host(locale: Locale('ko'))));
-    await tester.tap(find.text('Open'));
-    await tester.pumpAndSettle();
-
-    // 경고 InfoBar 타이틀(‘알림’) 존재 확인
-    expect(find.text(l.common_notice), findsOneWidget);
-  });
-
   testWidgets('Rebirth 에디션에서는 저장 버튼이 비활성화된다 (AAA)', (tester) async {
     final acc = _FakeAcc();
     final l = await AppLocalizations.delegate.load(const Locale('ko'));

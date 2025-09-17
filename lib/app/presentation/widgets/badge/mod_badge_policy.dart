@@ -19,7 +19,7 @@ class ModBadgePolicy {
         exclusiveGroup: 'install',
         priority: 10,
         when: (m) => (m as dynamic).isMissing == true,
-        spec: (m, c) => BadgeSpec(c.loc.mod_missing_short, c.sem.danger, icon: FluentIcons.error_badge),
+        spec: (m, c) => BadgeSpec(c.loc.mod_missing_short, c.sem.danger, icon: FluentIcons.cancel),
       ),
 
       // 2) CartridgeRecorder: local을 대체하는 전용 뱃지 (install 그룹, local보다 우선)

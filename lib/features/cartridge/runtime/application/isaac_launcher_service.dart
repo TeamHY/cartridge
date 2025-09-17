@@ -45,7 +45,10 @@ class IsaacLauncherService {
     // 1) 환경
     final env = await _env.resolveEnvironment(
         optionsIniPathOverride: optionsIniPathOverride);
-    if (env == null) return null;
+    if (env == null) {
+      logE(_tag, '설치된 게임을 찾지 못함', null);
+      return null;
+    }
 
     var effectiveArgs = <String>[...extraArgs];
     // 2) 옵션 프리셋 적용

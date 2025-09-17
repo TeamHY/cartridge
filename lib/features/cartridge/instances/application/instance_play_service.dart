@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:cartridge/core/log.dart';
 import 'package:cartridge/features/cartridge/instances/domain/instances_service.dart';
 import 'package:cartridge/features/cartridge/instances/domain/models/instance_view.dart';
 import 'package:cartridge/features/cartridge/option_presets/domain/option_presets_service.dart';
@@ -9,6 +10,8 @@ import 'package:cartridge/features/cartridge/runtime/application/isaac_launcher_
 import 'package:cartridge/features/isaac/mod/domain/models/mod_entry.dart';
 
 class InstancePlayService {
+  static const _tag = 'InstancePlayService';
+
   final InstancesService instances;
   final OptionPresetsService optionPresets;
   final IsaacLauncherService launcher;
@@ -26,9 +29,15 @@ class InstancePlayService {
         String? installPathOverride,
         List<String> extraArgs = const [],
       }) async {
+    logI(_tag,
+        'playByInstanceId start id=$instanceId optsOverride=${optionsIniPathOverride != null} installOverride=${installPathOverride != null} extraArgs=${extraArgs.length}');
+
     // 인스턴스 + 관련 뷰 확보
     final bundle = await instances.getViewWithRelated(instanceId);
-    if (bundle == null) return null;
+    if (bundle == null) {
+      logW(_tag, 'instance not found id=$instanceId');
+      return null;
+    }
     final (view, presetViews, optionView) = bundle;
 
     // 옵션 프리셋 로드 (id 없으면 기본값 처리 필요시 여기서)
@@ -40,13 +49,24 @@ class InstancePlayService {
     // 최종 “켜질 모드” → ModsService.applyPreset용 entries 맵 생성
     final entries = _buildEntriesFromView(view);
 
-    return launcher.launchIsaac(
-      optionPreset: optionPreset,
-      entries: entries,
-      optionsIniPathOverride: optionsIniPathOverride,
-      installPathOverride: installPathOverride,
-      extraArgs: extraArgs,
-    );
+    try {
+      final proc = await launcher.launchIsaac(
+        optionPreset: optionPreset,
+        entries: entries,
+        optionsIniPathOverride: optionsIniPathOverride,
+        installPathOverride: installPathOverride,
+        extraArgs: extraArgs,
+      );
+      if (proc == null) {
+        logW(_tag, 'launch failed instanceId=$instanceId');
+      } else {
+        logI(_tag, 'launch started pid=${proc.pid}');
+      }
+      return proc;
+    } catch (e, st) {
+      logE(_tag, 'launchIsaac threw', e, st);
+      rethrow;
+    }
   }
 
   /// 이미 계산된 InstanceView로 실행 (화면에서 바로 호출할 때)
@@ -56,6 +76,9 @@ class InstancePlayService {
         String? installPathOverride,
         List<String> extraArgs = const [],
       }) async {
+    logI(_tag,
+        'playWithView start id=${view.id} name=${view.name} enabledCount=${view.enabledCount} optsOverride=${optionsIniPathOverride != null} installOverride=${installPathOverride != null} extraArgs=${extraArgs.length}');
+
     final optionPresetId = view.optionPresetId?.trim();
     final optionPreset = (optionPresetId != null && optionPresetId.isNotEmpty)
         ? await optionPresets.getById(optionPresetId)
@@ -63,13 +86,24 @@ class InstancePlayService {
 
     final entries = _buildEntriesFromView(view);
 
-    return launcher.launchIsaac(
-      optionPreset: optionPreset,
-      entries: entries,
-      optionsIniPathOverride: optionsIniPathOverride,
-      installPathOverride: installPathOverride,
-      extraArgs: extraArgs,
-    );
+    try {
+      final proc = await launcher.launchIsaac(
+        optionPreset: optionPreset,
+        entries: entries,
+        optionsIniPathOverride: optionsIniPathOverride,
+        installPathOverride: installPathOverride,
+        extraArgs: extraArgs,
+      );
+      if (proc == null) {
+        logW(_tag, 'launch failed instanceId=${view.id}');
+      } else {
+        logI(_tag, 'launch started pid=${proc.pid}');
+      }
+      return proc;
+    } catch (e, st) {
+      logE(_tag, 'launchIsaac threw', e, st);
+      rethrow;
+    }
   }
 
   /// InstanceView.items(effectiveEnabled 기준) → ModsService.applyPreset 입력

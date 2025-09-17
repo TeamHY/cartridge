@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/features/cartridge/instances/instances.dart';
 import 'package:cartridge/features/cartridge/mod_presets/mod_presets.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 
 class PresetTileList extends ConsumerStatefulWidget {
@@ -30,7 +31,6 @@ class PresetTileList extends ConsumerStatefulWidget {
 }
 
 class _PresetTileListState extends ConsumerState<PresetTileList> {
-
   // ── 스윕 상태 ───────────────────────────────────────────────────────────
   bool _sweeping = false;        // 현재 스윕 중?
   bool? _sweepSelect;            // 스윕 목표 상태(true=선택, false=해제)
@@ -67,12 +67,18 @@ class _PresetTileListState extends ConsumerState<PresetTileList> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = fluent.FluentTheme.of(context);
+    final loc = AppLocalizations.of(context);
 
+    // 빈 상태: 텍스트 대신 ‘우리 테마’ 카드형 안내
     if (widget.presets.isEmpty) {
-      return Text('No presets', style: TextStyle(color: theme.inactiveColor));
+      return _EmptyHintCard(
+        icon: fluent.FluentIcons.fabric_user_folder, // 리스트 성격과 어울리는 아이콘
+        title: loc.presets_empty_title,              // “프리셋이 아직 없어요”
+        message: loc.presets_empty_desc,             // “필요한 조합을 만들어두면…”
+      );
     }
 
+    // count 조회 실패/로딩이어도 레이아웃 깨지지 않도록: 없으면 0개로만 표기
     final asyncList = ref.watch(modPresetsControllerProvider);
     final countsById = asyncList.maybeWhen<Map<String, int>>(
       data: (list) => { for (final v in list) v.key: v.enabledCount },
@@ -149,6 +155,52 @@ class _PresetTileListState extends ConsumerState<PresetTileList> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+/// 우리 테마에 맞춘 빈 상태 카드(고정색 없음)
+class _EmptyHintCard extends StatelessWidget {
+  const _EmptyHintCard({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final fTheme = fluent.FluentTheme.of(context);
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: Container(
+          decoration: BoxDecoration(
+            color: fTheme.cardColor,
+            borderRadius: AppShapes.panel,
+            border: Border.all(color: fTheme.dividerColor),
+          ),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 40, color: fTheme.accentColor.normal),
+              Gaps.h12,
+              Text(title, style: AppTypography.sectionTitle, textAlign: TextAlign.center),
+              Gaps.h6,
+              Text(
+                message,
+                style: AppTypography.body.copyWith(color: fTheme.resources.textFillColorSecondary),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

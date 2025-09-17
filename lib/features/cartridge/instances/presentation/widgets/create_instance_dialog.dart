@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/core/service_providers.dart';
 import 'package:cartridge/features/cartridge/instances/instances.dart';
 import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
@@ -32,6 +31,7 @@ class EditInstanceResult {
 Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
   final nameController = TextEditingController();
   final scrollCtrl = ScrollController();
+  final formKey = GlobalKey<FormState>();
   var mode = SeedMode.allOff;
   final loc = AppLocalizations.of(context);
 
@@ -54,80 +54,98 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
           ],
         ),
         constraints: const BoxConstraints(maxWidth: 560, maxHeight: 560),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560, maxHeight: 560),
-          child: Scrollbar(
-            controller: scrollCtrl,
-            interactive: true,
-            child: SingleChildScrollView(
+        content: Form(
+          key: formKey,
+          autovalidateMode: AutovalidateMode.disabled,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560, maxHeight: 560),
+            child: Scrollbar(
               controller: scrollCtrl,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: fTheme.cardColor,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: dividerColor),
-                ),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 이름
-                    Text(loc.instance_create_name_label, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h4,
-                    TextBox(
-                      controller: nameController,
-                      placeholder: loc.instance_create_name_placeholder,
-                    ),
-                    Gaps.h12,
+              interactive: true,
+              child: SingleChildScrollView(
+                controller: scrollCtrl,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: fTheme.cardColor,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: dividerColor),
+                  ),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 이름
+                      Text(loc.instance_create_name_label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h4,
+                      TextFormBox(
+                        controller: nameController,
+                        placeholder: loc.instance_create_name_placeholder,
+                        validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? loc.instance_create_validate_required : null,
+                        onFieldSubmitted: (_) {
+                          if (formKey.currentState?.validate() ?? false) {
+                            Navigator.of(ctx).pop(
+                              CreateInstanceResult(
+                                nameController.text.trim(),
+                                mode,
+                                selectedPresetIds.toList(growable: false),
+                                selectedOptionId,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      Gaps.h12,
 
-                    // 초기 모드
-                    Text(loc.instance_create_initial_mode_label, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h4,
-                    _RadioRow(
-                      label: loc.instance_create_all_off,
-                      selected: mode == SeedMode.allOff,
-                      onChanged: () {
-                        mode = SeedMode.allOff;
-                        (ctx as Element).markNeedsBuild();
-                      },
-                    ),
-                    _RadioRow(
-                      label: loc.instance_create_current_enabled,
-                      selected: mode == SeedMode.currentEnabled,
-                      onChanged: () {
-                        mode = SeedMode.currentEnabled;
-                        (ctx as Element).markNeedsBuild();
-                      },
-                    ),
-                    Gaps.h12,
-
-                    // 옵션 프리셋(단일)
-                    Text(loc.instance_option_preset_label, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h4,
-                    _OptionPresetComboField(
-                      selectedOptionId: selectedOptionId,
-                      onChanged: (v) {
-                        selectedOptionId = v;
-                        (ctx as Element).markNeedsBuild();
-                      },
-                    ),
-                    Gaps.h12,
-
-                    // 모드 프리셋(멀티)
-                    Text(loc.preset_tab_mod, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h4,
-                    _ModPresetPickerField(
-                      selectedCount: selectedPresetIds.length,
-                      onPressed: () async {
-                        final picked = await showModPresetPickerDialog(ctx, initialSelected: selectedPresetIds);
-                        if (picked != null) {
-                          selectedPresetIds..clear()..addAll(picked);
+                      // 초기 모드
+                      Text(loc.instance_create_initial_mode_label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h4,
+                      _RadioRow(
+                        label: loc.instance_create_all_off,
+                        selected: mode == SeedMode.allOff,
+                        onChanged: () {
+                          mode = SeedMode.allOff;
                           (ctx as Element).markNeedsBuild();
-                        }
-                      },
-                    ),
-                    Gaps.h8,
-                  ],
+                        },
+                      ),
+                      _RadioRow(
+                        label: loc.instance_create_current_enabled,
+                        selected: mode == SeedMode.currentEnabled,
+                        onChanged: () {
+                          mode = SeedMode.currentEnabled;
+                          (ctx as Element).markNeedsBuild();
+                        },
+                      ),
+                      Gaps.h12,
+
+                      // 옵션 프리셋(단일)
+                      Text(loc.instance_option_preset_label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h4,
+                      _OptionPresetComboField(
+                        selectedOptionId: selectedOptionId,
+                        onChanged: (v) {
+                          selectedOptionId = v;
+                          (ctx as Element).markNeedsBuild();
+                        },
+                      ),
+                      Gaps.h12,
+
+                      // 모드 프리셋(멀티)
+                      Text(loc.preset_tab_mod, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h4,
+                      _ModPresetPickerField(
+                        selectedCount: selectedPresetIds.length,
+                        onPressed: () async {
+                          final picked = await showModPresetPickerDialog(ctx, initialSelected: selectedPresetIds);
+                          if (picked != null) {
+                            selectedPresetIds..clear()..addAll(picked);
+                            (ctx as Element).markNeedsBuild();
+                          }
+                        },
+                      ),
+                      Gaps.h8,
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -138,14 +156,10 @@ Future<CreateInstanceResult?> showCreateInstanceDialog(BuildContext context) {
           FilledButton(
             child: Text(loc.common_create),
             onPressed: () {
-              final name = nameController.text.trim();
-              if (name.isEmpty) {
-                UiFeedback.error(ctx, content: loc.instance_create_validate_required);
-                return;
-              }
+              if (!(formKey.currentState?.validate() ?? false)) return;
               Navigator.of(ctx).pop(
                 CreateInstanceResult(
-                  name,
+                  nameController.text.trim(),
                   mode,
                   selectedPresetIds.toList(growable: false),
                   selectedOptionId,
@@ -168,6 +182,7 @@ Future<EditInstanceResult?> showEditInstanceDialog(
     }) {
   final nameController = TextEditingController(text: initialName);
   final scrollCtrl = ScrollController();
+  final formKey = GlobalKey<FormState>();
   final loc = AppLocalizations.of(context);
 
   final selectedPresetIds = <String>{...initialPresetIds};
@@ -189,58 +204,75 @@ Future<EditInstanceResult?> showEditInstanceDialog(
           ],
         ),
         constraints: const BoxConstraints(maxWidth: 560, maxHeight: 560),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560, maxHeight: 560),
-          child: Scrollbar(
-            controller: scrollCtrl,
-            interactive: true,
-            child: SingleChildScrollView(
+        content: Form(
+          key: formKey,
+          autovalidateMode: AutovalidateMode.disabled,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560, maxHeight: 560),
+            child: Scrollbar(
               controller: scrollCtrl,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: fTheme.cardColor,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: dividerColor),
-                ),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 이름
-                    Text(loc.instance_create_name_label, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h4,
-                    TextBox(
-                      controller: nameController,
-                      placeholder: loc.instance_create_name_placeholder,
-                    ),
-                    Gaps.h12,
+              interactive: true,
+              child: SingleChildScrollView(
+                controller: scrollCtrl,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: fTheme.cardColor,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: dividerColor),
+                  ),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 이름
+                      Text(loc.instance_create_name_label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h4,
+                      TextFormBox(
+                        controller: nameController,
+                        placeholder: loc.instance_create_name_placeholder,
+                        validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? loc.instance_create_validate_required : null,
+                        onFieldSubmitted: (_) {
+                          if (formKey.currentState?.validate() ?? false) {
+                            Navigator.of(ctx).pop(
+                              EditInstanceResult(
+                                nameController.text.trim(),
+                                selectedPresetIds.toList(growable: false),
+                                selectedOptionId,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      Gaps.h12,
 
-                    // 옵션 프리셋(단일)
-                    Text(loc.instance_option_preset_label, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h4,
-                    _OptionPresetComboField(
-                      selectedOptionId: selectedOptionId,
-                      onChanged: (v) {
-                        selectedOptionId = v;
-                        (ctx as Element).markNeedsBuild();
-                      },
-                    ),
-                    Gaps.h12,
-
-                    // 모드 프리셋(멀티)
-                    Text(loc.preset_tab_mod, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h4,
-                    _ModPresetPickerField(
-                      selectedCount: selectedPresetIds.length,
-                      onPressed: () async {
-                        final picked = await showModPresetPickerDialog(ctx, initialSelected: selectedPresetIds);
-                        if (picked != null) {
-                          selectedPresetIds..clear()..addAll(picked);
+                      // 옵션 프리셋(단일)
+                      Text(loc.instance_option_preset_label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h4,
+                      _OptionPresetComboField(
+                        selectedOptionId: selectedOptionId,
+                        onChanged: (v) {
+                          selectedOptionId = v;
                           (ctx as Element).markNeedsBuild();
-                        }
-                      },
-                    ),
-                  ],
+                        },
+                      ),
+                      Gaps.h12,
+
+                      // 모드 프리셋(멀티)
+                      Text(loc.preset_tab_mod, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h4,
+                      _ModPresetPickerField(
+                        selectedCount: selectedPresetIds.length,
+                        onPressed: () async {
+                          final picked = await showModPresetPickerDialog(ctx, initialSelected: selectedPresetIds);
+                          if (picked != null) {
+                            selectedPresetIds..clear()..addAll(picked);
+                            (ctx as Element).markNeedsBuild();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -251,14 +283,10 @@ Future<EditInstanceResult?> showEditInstanceDialog(
           FilledButton(
             child: Text(loc.common_save),
             onPressed: () {
-              final name = nameController.text.trim();
-              if (name.isEmpty) {
-                UiFeedback.error(ctx, content: loc.instance_create_validate_required);
-                return;
-              }
+              if (!(formKey.currentState?.validate() ?? false)) return;
               Navigator.of(ctx).pop(
                 EditInstanceResult(
-                  name,
+                  nameController.text.trim(),
                   selectedPresetIds.toList(growable: false),
                   selectedOptionId,
                 ),
@@ -401,7 +429,7 @@ class _ModPresetPickerField extends StatelessWidget {
                       color: theme.resources.textFillColorSecondary,
                       size: 8,
                     ),
-                    child: Icon(FluentIcons.chevron_down),
+                    child: const Icon(FluentIcons.chevron_down),
                   ),
                 ),
                 Gaps.w4

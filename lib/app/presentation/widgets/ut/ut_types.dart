@@ -15,6 +15,8 @@ class UTFlex extends UTWidth {
   const UTFlex(this.flex);
 }
 
+enum RowOverlayMode { none, replace, blend }
+
 /// 컬럼 스펙
 class UTColumnSpec {
   final String id;

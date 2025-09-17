@@ -1,4 +1,5 @@
 import 'package:cartridge/core/result.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +10,7 @@ import 'package:cartridge/features/cartridge/instances/instances.dart';
 import 'package:cartridge/theme/theme.dart';
 
 /// 인스턴스 Export 다이얼로그
-/// - 파일명 입력
+/// - 파일명 입력(검증: 비어있음 금지)
 /// - 로컬 모드 포함 여부
 /// - 이미지 포함 여부
 /// - Export 버튼 클릭 시 폴더 선택 → 즉시 내보내기
@@ -18,6 +19,9 @@ Future<void> showExportInstanceDialog(
       required InstanceView instanceView,
     }) {
   final fileNameCtrl = TextEditingController(text: instanceView.name);
+  final nameFocus = FocusNode();
+  final formKey = GlobalKey<FormState>();
+
   bool includeLocal = true;
   bool includeImage = true;
   bool busy = false;
@@ -28,6 +32,7 @@ Future<void> showExportInstanceDialog(
       final fTheme = FluentTheme.of(ctx);
       final accent = fTheme.accentColor.normal;
       final stroke = fTheme.dividerColor;
+      final loc = AppLocalizations.of(ctx);
 
       return Consumer(
         builder: (_, ref, __) {
@@ -35,11 +40,14 @@ Future<void> showExportInstanceDialog(
 
           Future<void> doExport() async {
             if (busy) return;
-            final name = fileNameCtrl.text.trim();
-            if (name.isEmpty) {
-              UiFeedback.error(ctx, content: '파일명을 입력하세요.');
+
+            if (!(formKey.currentState?.validate() ?? false)) {
+              // 포커스 이동(UX)
+              nameFocus.requestFocus();
               return;
             }
+
+            final name = fileNameCtrl.text.trim();
 
             busy = true;
             (ctx as Element).markNeedsBuild();
@@ -47,7 +55,7 @@ Future<void> showExportInstanceDialog(
             try {
               // 폴더 선택
               final dir = await getDirectoryPath(
-                confirmButtonText: '폴더 선택',
+                confirmButtonText: loc.export_directory_select_button,
               );
               if (dir == null) {
                 busy = false;
@@ -67,20 +75,20 @@ Future<void> showExportInstanceDialog(
 
               res.when(
                 ok: (zipPath, _, __) {
-                  UiFeedback.success(ctx, content: '내보내기 완료: $zipPath');
+                  UiFeedback.success(ctx, content: loc.export_complete_message(zipPath!));
                   Navigator.of(ctx).pop();
                 },
                 notFound: (_, __) {
-                  UiFeedback.error(ctx, content: '인스턴스를 찾을 수 없습니다.');
+                  UiFeedback.error(ctx, content: loc.export_error_instance_not_found);
                 },
                 invalid: (_, __, ___) {
-                  UiFeedback.error(ctx, content: '패키지 생성에 실패했습니다.');
+                  UiFeedback.error(ctx, content: loc.export_error_package_creation_failed);
                 },
                 conflict: (_, __) {
-                  UiFeedback.error(ctx, content: '패키지 생성에 실패했습니다.');
+                  UiFeedback.error(ctx, content: loc.export_error_package_creation_failed);
                 },
                 failure: (_, __, ___) {
-                  UiFeedback.error(ctx, content: '예상치 못한 오류가 발생했습니다.');
+                  UiFeedback.error(ctx, content: loc.export_error_unexpected);
                 },
               );
             } finally {
@@ -95,62 +103,90 @@ Future<void> showExportInstanceDialog(
               children: [
                 Icon(FluentIcons.upload, size: 18, color: accent),
                 Gaps.w4,
-                const Text('인스턴스 내보내기'),
+                Text(loc.export_title),
               ],
             ),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560, maxHeight: 480),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: fTheme.cardColor,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: stroke),
-                ),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 파일명
-                    const Text('파일명', style: TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h4,
-                    TextBox(
-                      controller: fileNameCtrl,
-                      placeholder: '예) ${instanceView.name}.zip (확장자는 자동)',
-                    ),
-                    Gaps.h12,
+            content: Form(
+              key: formKey,
+              autovalidateMode: AutovalidateMode.disabled,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560, maxHeight: 480),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: fTheme.cardColor,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: stroke),
+                  ),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 파일명
+                      Text(loc.export_file_name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h4,
+                      TextFormBox(
+                        focusNode: nameFocus,
+                        controller: fileNameCtrl,
+                        placeholder: loc.export_file_name_placeholder(instanceView.name),
+                        validator: (v) {
+                          final t = v?.trim() ?? '';
+                          if (t.isEmpty) return loc.export_error_file_name_empty;
+                          // 필요시 추가 규칙(윈도우 금지 문자 등) 확장 가능:
+                          // final invalid = RegExp(r'[\\/:*?"<>|]');
+                          // if (invalid.hasMatch(t)) return loc.export_error_file_name_invalid;
+                          return null;
+                        },
+                        onFieldSubmitted: (_) {
+                          if (!busy) doExport();
+                        },
+                      ),
+                      Gaps.h12,
 
-                    // 옵션들
-                    const Text('옵션', style: TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h6,
-                    ToggleSwitch(
-                      checked: includeLocal,
-                      onChanged: busy ? null : (v) { includeLocal = v; (ctx as Element).markNeedsBuild(); },
-                      content: const Text('로컬 모드 포함(폴더 복사)'),
-                    ),
-                    Gaps.h6,
-                    ToggleSwitch(
-                      checked: includeImage,
-                      onChanged: busy ? null : (v) { includeImage = v; (ctx as Element).markNeedsBuild(); },
-                      content: const Text('인스턴스 이미지 포함'),
-                    ),
-                    Gaps.h8,
-                    InfoBar(
-                      title: const Text('참고'),
-                      content: const Text('워크샵 모드는 활성화 정보만 포함됩니다. 로컬 모드/이미지 포함은 옵션으로 제어합니다.'),
-                      severity: InfoBarSeverity.info,
-                    ),
-                  ],
+                      // 옵션들
+                      Text(loc.export_options, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h6,
+                      ToggleSwitch(
+                        checked: includeLocal,
+                        onChanged: busy
+                            ? null
+                            : (v) {
+                          includeLocal = v;
+                          (ctx as Element).markNeedsBuild();
+                        },
+                        content: Text(loc.export_include_local_mods),
+                      ),
+                      Gaps.h8,
+                      ToggleSwitch(
+                        checked: includeImage,
+                        onChanged: busy
+                            ? null
+                            : (v) {
+                          includeImage = v;
+                          (ctx as Element).markNeedsBuild();
+                        },
+                        content: Text(loc.export_include_image),
+                      ),
+                      Gaps.h16,
+
+                      // 안내(정보성) – 검증용이 아님
+                      InfoBar(
+                        title: Text(loc.export_note),
+                        content: Text(loc.export_note_content),
+                        severity: InfoBarSeverity.info,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             actions: [
               Button(
                 onPressed: busy ? null : () => Navigator.of(ctx).pop(),
-                child: const Text('취소'),
+                child: Text(loc.common_cancel),
               ),
               FilledButton(
                 onPressed: busy ? null : doExport,
-                child: busy ? const ProgressRing() : const Text('내보내기'),
+                child: busy ? const ProgressRing() : Text(loc.common_export),
               ),
             ],
           );

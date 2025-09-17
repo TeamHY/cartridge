@@ -18,7 +18,7 @@ Future<void> openEdenTokenEditor(
     }) async {
   final loc = AppLocalizations.of(context);
 
-  // 1) 계정 선택 (로딩/에러/빈 상태: 사용자 친화적으로)
+  // 1) 계정 선택
   List<SteamAccountProfile> accounts;
   try {
     accounts = await ref.read(steamAccountsProvider.future);
@@ -83,6 +83,7 @@ class _EdenEditorDialog extends ConsumerStatefulWidget {
 class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
   static const _slotHeight = 54.0; // 슬롯 버튼 고정 높이
   int? newValue;
+  bool _errorNotified = false; // 에러 토스트/닫기 중복 방지
 
   int _clamp(int v) => v < 0 ? 0 : (v > kEdenMax ? kEdenMax : v);
 
@@ -92,15 +93,19 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
     final loc = AppLocalizations.of(context);
     final asyncState = ref.watch(edenEditorControllerProvider(widget.args));
 
-    Row titleRow(String text) => Row(
+    Row titleRow(String text, bool busy) => Row(
       children: [
         Icon(FluentIcons.pro_hockey, size: 18, color: fTheme.accentColor.normal),
         Gaps.w4,
         Text(text),
+        if (busy) ...[
+          Gaps.w8,
+          const ProgressRing(),
+        ]
       ],
     );
 
-    // 공용 Dialog 빌더: loading 여부만 바꿔 동일 레이아웃 유지
+    // 공용 Dialog 컨텐츠(레이아웃 고정)
     Widget buildDialogContent({
       required IsaacEdition edition,
       required List<int> slots,
@@ -110,10 +115,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
       required int? currentValue,
       String? warningText, // 내부 경고(파일 읽기 실패 등)
     }) {
-      // 로딩 중에도 컨트롤은 그대로 보여주되 비활성화
       final controlsEnabled = !isLoading && !isSaving && selectedSlot != 0;
-
-      // 초기 값 고정(로딩에서도 동일한 높이 확보)
       final effectiveValue = newValue ?? currentValue;
 
       return SingleChildScrollView(
@@ -133,7 +135,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
               ),
             ),
 
-            // 슬롯 선택 섹션
+            // 슬롯 선택
             Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.xs),
               child: Text(loc.eden_slot_help, style: AppTypography.caption),
@@ -156,7 +158,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                   child: Padding(
                     padding: EdgeInsetsDirectional.only(end: i < 2 ? AppSpacing.sm : 0),
                     child: SizedBox(
-                      height: _slotHeight, // 고정 높이
+                      height: _slotHeight,
                       child: Button(
                         key: ValueKey('slot_btn_$slot'),
                         onPressed: (!exists || isLoading || isSaving)
@@ -171,7 +173,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                           padding: WidgetStateProperty.all(
                             const EdgeInsets.symmetric(
                               horizontal: AppSpacing.sm,
-                              vertical: AppSpacing.sm, // 세로 패딩 확대
+                              vertical: AppSpacing.sm,
                             ),
                           ),
                           backgroundColor: WidgetStateProperty.all(bgColor),
@@ -181,7 +183,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                           children: [
                             if (selected) const Icon(FluentIcons.check_mark, size: 20),
                             if (selected) Gaps.w4,
-                            Text(loc.eden_slot_label(slot), style: AppTypography.sectionTitle,),
+                            Text(loc.eden_slot_label(slot), style: AppTypography.sectionTitle),
                           ],
                         ),
                       ),
@@ -191,8 +193,9 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
               }),
             ),
 
-            Gaps.h16, // 섹션 간 여백 확대
+            Gaps.h16,
 
+            // 값 카드
             Container(
               decoration: BoxDecoration(
                 color: fTheme.cardColor,
@@ -223,9 +226,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                           borderRadius: AppShapes.pill,
                         ),
                         child: Text(
-                          loc.eden_current_chip(
-                            (currentValue?.toString() ?? '–'),
-                          ),
+                          loc.eden_current_chip((currentValue?.toString() ?? '–')),
                           style: const TextStyle(fontSize: 12),
                         ),
                       ),
@@ -233,29 +234,47 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                   ),
                   const SizedBox(height: AppSpacing.md),
 
-                  // 입력부 (로딩/세이빙 중에는 비활성화만)
+                  // 입력부
                   Row(
                     children: [
                       Expanded(
                         child: IgnorePointer(
                           ignoring: !controlsEnabled,
-                          child: Opacity(
-                            opacity: controlsEnabled ? 1.0 : 0.6,
-                            child: NumberBox(
-                              value: effectiveValue,
-                              min: 0,
-                              max: kEdenMax,
-                              smallChange: 1,
-                              largeChange: 10,
-                              mode: SpinButtonPlacementMode.inline,
-                              onChanged: (v) {
-                                if (!controlsEnabled) return;
-                                setState(() {
-                                  final next = v ?? newValue ?? 0;
-                                  newValue = _clamp(next);
-                                });
-                              },
-                            ),
+                          child: Stack(
+                            children: [
+                              NumberBox(
+                                value: effectiveValue,
+                                min: 0,
+                                max: kEdenMax,
+                                smallChange: 1,
+                                largeChange: 10,
+                                mode: SpinButtonPlacementMode.inline,
+                                onChanged: (v) {
+                                  if (!controlsEnabled) return;
+                                  setState(() {
+                                    final next = v ?? newValue ?? 0;
+                                    newValue = _clamp(next);
+                                  });
+                                },
+                              ),
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  ignoring: true,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 90),
+                                    curve: Curves.easeOut,
+                                    color: FluentTheme.of(context)
+                                        .resources
+                                        .controlFillColorSecondary
+                                        .withAlpha(
+                                      controlsEnabled
+                                          ? 0
+                                          : (FluentTheme.of(context).brightness == Brightness.dark ? 90 : 70),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -277,27 +296,14 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
 
             const SizedBox(height: AppSpacing.md),
 
-            // 에디션 안내
+            // 에디션 안내 (정보)
             if (edition == IsaacEdition.rebirth)
-              InfoBar(
-                key: const ValueKey('rebirth_warning_notice'),
-                title: Text(loc.common_notice),
-                content: Text(loc.eden_info_rebirth_unsupported),
-                severity: InfoBarSeverity.info,
-              ),
+              _InlineNotice.info(text: loc.eden_info_rebirth_unsupported),
 
-
-            // 내부 경고(문구는 사용성 위주로)
+            // 내부 경고(예: 파일 읽기 실패)
             if (warningText != null && warningText.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: InfoBar(
-                  key: const ValueKey('warning_notice'),
-                  title: Text(loc.common_notice),
-                  content: Text(warningText),
-                  severity: InfoBarSeverity.warning,
-                ),
-              ),
+              Gaps.h8,
+              _InlineNotice.warning(text: warningText),
             ],
           ],
         ),
@@ -306,11 +312,11 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
 
     // === 상태별 렌더링 ===
     return asyncState.when(
-      // 로딩: 동일한 레이아웃(컨트롤 비활성화) 유지
+      // 로딩
       loading: () {
         return ContentDialog(
           key: const ValueKey('eden_dialog'),
-          title: titleRow(loc.eden_title),
+          title: titleRow(loc.eden_title, false),
           constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
           content: buildDialogContent(
             edition: widget.args.edition,
@@ -328,32 +334,24 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
             ),
             FilledButton(
               key: const ValueKey('save_button'),
-              onPressed: null, // 로딩 중 비활성화
+              onPressed: null,
               child: Text(loc.common_save),
             ),
           ],
         );
       },
 
-      // 에러: 레이아웃은 단순화
+      // 에러: UiFeedback.error + 닫기
       error: (_, __) {
-        return ContentDialog(
-          key: const ValueKey('eden_dialog'),
-          title: titleRow(loc.eden_title),
-          constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
-          content: InfoBar(
-            key: const ValueKey('error_notice'),
-            title: Text(loc.common_error),
-            content: Text(loc.eden_err_generic),
-            severity: InfoBarSeverity.error,
-          ),
-          actions: [
-            Button(
-              child: Text(loc.common_close),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        );
+        if (!_errorNotified) {
+          _errorNotified = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            UiFeedback.error(context, content: loc.eden_err_generic);
+            Navigator.of(context).pop();
+          });
+        }
+        return const SizedBox.shrink();
       },
 
       // 데이터 로딩 완료
@@ -377,7 +375,7 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
 
         return ContentDialog(
           key: const ValueKey('eden_dialog'),
-          title: titleRow(loc.eden_title),
+          title: titleRow(loc.eden_title, s.saving),
           constraints: const BoxConstraints(maxWidth: 520, maxHeight: 580),
           content: body,
           actions: [
@@ -398,11 +396,13 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
                   UiFeedback.success(context, content: loc.eden_saved_desc);
                   setState(() => newValue = after?.currentValue ?? newValue);
                 } else if (context.mounted) {
+                  // 저장 실패도 토스트로 알리고 닫기
                   UiFeedback.error(context, content: loc.eden_err_generic);
+                  Navigator.of(context).pop();
                 }
               }
                   : null,
-              child: s.saving ? const ProgressRing() : Text(loc.common_save),
+              child: Text(loc.common_save),
             ),
           ],
         );
@@ -410,3 +410,58 @@ class _EdenEditorDialogState extends ConsumerState<_EdenEditorDialog> {
     );
   }
 }
+
+/// 앱 톤에 맞춘 인라인 안내(Info/Warning만 사용)
+class _InlineNotice extends StatelessWidget {
+  final String text;
+  final _InlineNoticeType type;
+  const _InlineNotice._(this.text, this.type);
+
+  factory _InlineNotice.info({required String text}) =>
+      _InlineNotice._(text, _InlineNoticeType.info);
+
+  factory _InlineNotice.warning({required String text}) =>
+      _InlineNotice._(text, _InlineNoticeType.warning);
+
+  @override
+  Widget build(BuildContext context) {
+    final t = FluentTheme.of(context);
+    final (icon, color) = switch (type) {
+      _InlineNoticeType.info =>
+      (FluentIcons.info, t.resources.textFillColorSecondary),
+      _InlineNoticeType.warning =>
+      (FluentIcons.warning, t.resources.textFillColorSecondary),
+    };
+
+    return Container(
+      decoration: BoxDecoration(
+        color: t.cardColor,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: t.dividerColor),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: color),
+          Gaps.w8,
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 13,
+                color: color,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+enum _InlineNoticeType { info, warning }

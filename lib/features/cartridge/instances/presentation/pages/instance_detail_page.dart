@@ -1,5 +1,7 @@
 import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_export_dialog.dart';
+import 'package:cartridge/features/cartridge/record_mode/infra/recorder_mod.dart';
 import 'package:cartridge/features/cartridge/runtime/application/game_launch_ux.dart';
+import 'package:cartridge/features/isaac/runtime/domain/isaac_steam_ids.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -312,10 +314,15 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                   style: ButtonStyle(backgroundColor: WidgetStateProperty.all(FluentTheme.of(context).accentColor)),
                   onPressed: () async {
                     try {
+                      final proc = await ref.read(instancePlayServiceProvider).playByInstanceId(widget.instanceId);
+                      if (proc == null) {
+                        if (!context.mounted) return;
+                        UiFeedback.warn(context, content: loc.instance_play_failed_body);
+                        return;
+                      }
                       await ref.read(gameLaunchUxProvider).beforeLaunch(
                         origin: LaunchOrigin.instancePage,
                       );
-                      await ref.read(instancePlayServiceProvider).playByInstanceId(widget.instanceId);
                     } catch (e) {
                       if (!context.mounted) return;
                       UiFeedback.error(context, content: loc.instance_play_failed_body);
@@ -559,6 +566,16 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                         final showEnabledPresetUnderTitle =
                             !enabledPresetVisible && (isTile || isComfortable) && presetBadges.isNotEmpty;
 
+                        Future<void> open() async {
+                          final links = ref.read(isaacSteamLinksProvider);
+                          if (r.modId.isNotEmpty) {
+                            await links.openIsaacWorkshopItem(r.modId);
+                          } else {
+                            if (nameForRow.isEmpty || nameForRow == RecorderMod.name) return;
+                            final searchUrl = SteamUrls.workshopSearch(appId: IsaacSteamIds.appId, searchText: nameForRow);
+                            await links.openWebUrl(searchUrl);
+                          }
+                        }
                         return ModTitleCell(
                           key: ValueKey(r.id),
                           row: r,
@@ -575,9 +592,7 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                             }
                             return out;
                           },
-                          onTapTitle: r.modId.isEmpty
-                              ? null
-                              : () async => ref.read(isaacSteamLinksProvider).openIsaacWorkshopItem(r.modId),
+                          onTapTitle: open,
                         );
                       }),
                       BadgeStrip(

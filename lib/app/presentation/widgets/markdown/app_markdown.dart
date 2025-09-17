@@ -70,9 +70,9 @@ class AppMarkdown extends StatelessWidget {
           child: GptMarkdown(
             data,
             followLinkColor: true,
-            onLinkTap: (url, _) async {
+            onLinkTap: (url, _) {
               if (url.isEmpty) return;
-              await launchUrlString(url, mode: LaunchMode.externalApplication);
+              launchUrlString(url, mode: LaunchMode.externalApplication);
             },
             inlineComponents: inline,
 

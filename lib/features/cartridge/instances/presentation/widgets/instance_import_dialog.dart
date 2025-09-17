@@ -1,5 +1,6 @@
 import 'package:cartridge/core/result.dart';
 import 'package:cartridge/features/cartridge/instances/domain/instance_pack_service.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,12 +20,16 @@ Future<String?> showImportInstanceDialog(BuildContext context) {
   bool skipExistingLocal = true;
   bool busy = false;
 
+  final formKey = GlobalKey<FormState>();
+
   return showDialog<String?>(
     context: context,
     builder: (ctx) {
       final fTheme = FluentTheme.of(ctx);
       final accent = fTheme.accentColor.normal;
       final stroke = fTheme.dividerColor;
+      final loc = AppLocalizations.of(ctx);
+      final sem = ProviderScope.containerOf(ctx).read(themeSemanticsProvider);
 
       return Consumer(
         builder: (_, ref, __) {
@@ -36,13 +41,14 @@ Future<String?> showImportInstanceDialog(BuildContext context) {
             if (file != null) {
               filePath = file.path;
               (ctx as Element).markNeedsBuild();
+              formKey.currentState?.validate();
             }
           }
 
           Future<void> doImport() async {
             if (busy) return;
-            if (filePath == null || filePath!.isEmpty) {
-              UiFeedback.warn(ctx, content: '가져올 파일을 선택하세요(.zip).');
+
+            if (!(formKey.currentState?.validate() ?? false)) {
               return;
             }
 
@@ -59,24 +65,24 @@ Future<String?> showImportInstanceDialog(BuildContext context) {
               res.when(
                 ok: (newId, _, __) {
                   createdId = newId;
-                  UiFeedback.success(ctx, content: '가져오기 완료');
+                  UiFeedback.success(ctx, content: loc.import_complete_message);
                 },
                 invalid: (_, __, ___) {
-                  UiFeedback.error(ctx, content: '패키지 파일이 올바르지 않습니다.');
+                  UiFeedback.error(ctx, content: loc.import_error_invalid_package);
                 },
                 notFound: (_, __) {
-                  UiFeedback.error(ctx, content: '가져오기 실패: 구성 누락');
+                  UiFeedback.error(ctx, content: loc.import_error_missing_config);
                 },
                 conflict: (_, __) {
-                  UiFeedback.error(ctx, content: '가져오기 실패: 구성 누락');
+                  UiFeedback.error(ctx, content: loc.import_error_conflict);
                 },
                 failure: (_, __, ___) {
-                  UiFeedback.error(ctx, content: '가져오기 실패: 내부 오류');
+                  UiFeedback.error(ctx, content: loc.import_error_internal);
                 },
               );
 
               if (createdId != null) {
-                Navigator.of(ctx).pop(createdId);
+                if (context.mounted) Navigator.of(ctx).pop(createdId);
               }
             } finally {
               busy = false;
@@ -90,74 +96,114 @@ Future<String?> showImportInstanceDialog(BuildContext context) {
               children: [
                 Icon(FluentIcons.download, size: 18, color: accent),
                 Gaps.w4,
-                const Text('인스턴스 가져오기'),
+                Text(loc.import_title),
+                if (busy) ...[
+                  Gaps.w8,
+                  const ProgressRing(),
+                ]
               ],
             ),
-            content: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560, maxHeight: 480),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: fTheme.cardColor,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: stroke),
-                ),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 파일 선택 필드형 버튼
-                    const Text('가져올 파일(.zip)', style: TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h6,
-                    SizedBox(
-                      height: 36,
-                      child: Button(
-                        onPressed: busy ? null : pickFile,
-                        child: Row(
-                          children: [
-                            const Icon(FluentIcons.open_file, size: 16),
-                            Gaps.w8,
-                            Expanded(
-                              child: Text(
-                                filePath ?? '파일 선택...',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: filePath == null ? fTheme.inactiveColor : null,
-                                  fontWeight: filePath == null ? FontWeight.w400 : FontWeight.w600,
+            content: Form(
+              key: formKey,
+              autovalidateMode: AutovalidateMode.disabled, // 자동검증 off
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560, maxHeight: 480),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: fTheme.cardColor,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: stroke),
+                  ),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 파일 선택 필드 (FormField로 검증/에러 표시)
+                      Text(loc.import_file_label, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h6,
+                      FormField<String>(
+                        validator: (_) {
+                          if (filePath == null || filePath!.isEmpty) {
+                            return loc.import_error_no_file_selected;
+                          }
+                          // 필요 시 확장:
+                          // if (!filePath!.toLowerCase().endsWith('.zip')) {
+                          //   return loc.import_error_file_must_be_zip;
+                          // }
+                          return null;
+                        },
+                        builder: (state) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 36,
+                                child: Button(
+                                  onPressed: busy ? null : pickFile,
+                                  child: Row(
+                                    children: [
+                                      const Icon(FluentIcons.open_file, size: 16),
+                                      Gaps.w8,
+                                      Expanded(
+                                        child: Text(
+                                          filePath ?? loc.import_file_button_default,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: filePath == null ? fTheme.inactiveColor : null,
+                                            fontWeight: filePath == null ? FontWeight.w400 : FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
+                              if (state.hasError) ...[
+                                Gaps.h4,
+                                Text(
+                                  state.errorText!,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: sem.danger.fg,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          );
+                        },
                       ),
-                    ),
-                    Gaps.h12,
+                      Gaps.h12,
 
-                    const Text('옵션', style: TextStyle(fontWeight: FontWeight.w600)),
-                    Gaps.h6,
-                    ToggleSwitch(
-                      checked: skipExistingLocal,
-                      onChanged: busy ? null : (v) { skipExistingLocal = v; (ctx as Element).markNeedsBuild(); },
-                      content: const Text('이미 있는 로컬 모드는 건너뛰기'),
-                    ),
-                    Gaps.h8,
-                    InfoBar(
-                      title: const Text('참고'),
-                      content: const Text('동일한 프리셋은 자동으로 재사용하고, 없으면 새로 생성합니다. 인스턴스는 항상 새로 만들어집니다.'),
-                      severity: InfoBarSeverity.info,
-                    ),
-                  ],
+                      Text(loc.import_options, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Gaps.h6,
+                      ToggleSwitch(
+                        checked: skipExistingLocal,
+                        onChanged: busy ? null : (v) { skipExistingLocal = v; (ctx as Element).markNeedsBuild(); },
+                        content: Text(loc.import_skip_existing_local),
+                      ),
+                      Gaps.h16,
+
+                      // 정보성 안내(검증 아님)
+                      InfoBar(
+                        title: Text(loc.import_note),
+                        content: Text(loc.import_note_content),
+                        severity: InfoBarSeverity.info,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             actions: [
               Button(
                 onPressed: busy ? null : () => Navigator.of(ctx).pop(null),
-                child: const Text('취소'),
+                child: Text(loc.common_cancel),
               ),
               FilledButton(
                 onPressed: busy ? null : doImport,
-                child: busy ? const ProgressRing() : const Text('가져오기'),
+                child: Text(loc.common_import),
               ),
             ],
           );

@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/features/cartridge/option_presets/option_presets.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
@@ -57,6 +56,9 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
     return int.tryParse(t);
   }
 
+  // ✅ Form: 저장 버튼 누르기 전까지는 에러 문구를 표시하지 않음
+  final formKey = GlobalKey<FormState>();
+
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) {
@@ -74,7 +76,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
               final previewX = parseInt(xCtl)      ?? data.windowPosX;
               final previewY = parseInt(yCtl)      ?? data.windowPosY;
 
-              void markDirty() => setState(() {});
+              void markDirty() => setState(() {}); // 재빌드만
 
               return ContentDialog(
                 title: Row(
@@ -85,100 +87,108 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                   ],
                 ),
                 constraints: const BoxConstraints(maxWidth: 600, maxHeight: 560),
-                content: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600, maxHeight: 560),
-                  child: Scrollbar(
-                    controller: scrollCtl,
-                    interactive: true,
-                    child: SingleChildScrollView(
+
+                // Nickname 다이얼로그와 동일한 패턴: Form + field validator, 자동 검증 꺼짐
+                content: Form(
+                  key: formKey,
+                  autovalidateMode: AutovalidateMode.disabled,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600, maxHeight: 560),
+                    child: Scrollbar(
                       controller: scrollCtl,
-                      child: Column(
-                        children: [
-                          // 상단 상태 칩
-                          OptionPresetHeader(
-                            previewW: previewW,
-                            previewH: previewH,
-                            previewX: previewX,
-                            previewY: previewY,
-                            isFullscreen: isFullscreen,
-                            repentogonInstalled: repentogonInstalled,
-                            useRepentogon: useRepentogon,
-                          ),
-                          Gaps.h8,
-
-                          // 카드형 기본 옵션
-                          Container(
-                            decoration: BoxDecoration(
-                              color: fTheme.cardColor,
-                              borderRadius: AppShapes.panel,
-                              border: Border.all(color: dividerColor),
-                            ),
-                            padding: const EdgeInsets.all(AppSpacing.md),
-                            child: OptionPresetBasicSection(
-                              nameCtl: nameCtl,
-                              widthCtl: widthCtl,
-                              heightCtl: heightCtl,
-                              xCtl: xCtl,
-                              yCtl: yCtl,
+                      interactive: true,
+                      child: SingleChildScrollView(
+                        controller: scrollCtl,
+                        child: Column(
+                          children: [
+                            // 상단 상태 칩
+                            OptionPresetHeader(
+                              previewW: previewW,
+                              previewH: previewH,
+                              previewX: previewX,
+                              previewY: previewY,
                               isFullscreen: isFullscreen,
-                              onToggleFullscreen: (v) {
-                                setState(() {
-                                  isFullscreen = v;
-                                  if (isFullscreen) {
-                                    xCtl.text = '0';
-                                    yCtl.text = '0';
-                                  }
-                                });
-                              },
-                              onApplyQuickSize: (s) {
-                                applyQuickSize(s);
-                                markDirty();
-                              },
-                              onAnyChanged: markDirty,
-                            ),
-                          ),
-
-                          Gaps.h12,
-
-                          // 고급 옵션
-                          KeyedSubtree(
-                            key: advancedAnchorKey,
-                            child: OptionPresetAdvancedSection(
-                              initiallyExpanded: advancedOpen,
-                              onExpandedChanged: (v) => setState(() => advancedOpen = v),
-                              gamma: gamma,
-                              gammaCtl: gammaCtl,
-                              syncingGammaText: syncingGammaText,
-                              onGammaSliderChanged: (v) {
-                                setState(() {
-                                  gamma = double.parse(v.toStringAsFixed(2));
-                                  syncingGammaText = true;
-                                  gammaCtl.text = gamma.toStringAsFixed(2);
-                                  syncingGammaText = false;
-                                });
-                              },
-                              onGammaTextChanged: (t) {
-                                if (syncingGammaText) return;
-                                final v = double.tryParse(t);
-                                if (v == null) return;
-                                setState(() => gamma = v.clamp(0.5, 3.5));
-                              },
-                              enableDebugConsole: enableDebugConsole,
-                              onToggleDebugConsole: (v) => setState(() => enableDebugConsole = v),
-                              pauseOnFocusLost: pauseOnFocusLost,
-                              onTogglePauseOnFocusLost: (v) => setState(() => pauseOnFocusLost = v),
-                              mouseControl: mouseControl,
-                              onToggleMouseControl: (v) => setState(() => mouseControl = v),
                               repentogonInstalled: repentogonInstalled,
                               useRepentogon: useRepentogon,
-                              onToggleRepentogon: (v) => setState(() => useRepentogon = v),
                             ),
-                          ),
-                        ],
+                            Gaps.h8,
+
+                            // 카드형 기본 옵션 (각 필드에 validator 내장)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: fTheme.cardColor,
+                                borderRadius: AppShapes.panel,
+                                border: Border.all(color: dividerColor),
+                              ),
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: OptionPresetBasicSection(
+                                nameCtl: nameCtl,
+                                widthCtl: widthCtl,
+                                heightCtl: heightCtl,
+                                xCtl: xCtl,
+                                yCtl: yCtl,
+                                isFullscreen: isFullscreen,
+                                onToggleFullscreen: (v) {
+                                  setState(() {
+                                    isFullscreen = v;
+                                    if (isFullscreen) {
+                                      xCtl.text = '0';
+                                      yCtl.text = '0';
+                                    }
+                                  });
+                                  markDirty();
+                                },
+                                onApplyQuickSize: (s) {
+                                  applyQuickSize(s);
+                                  markDirty();
+                                },
+                                onAnyChanged: markDirty,
+                              ),
+                            ),
+
+                            Gaps.h12,
+
+                            // 고급 옵션
+                            KeyedSubtree(
+                              key: advancedAnchorKey,
+                              child: OptionPresetAdvancedSection(
+                                initiallyExpanded: advancedOpen,
+                                onExpandedChanged: (v) => setState(() => advancedOpen = v),
+                                gamma: gamma,
+                                gammaCtl: gammaCtl,
+                                syncingGammaText: syncingGammaText,
+                                onGammaSliderChanged: (v) {
+                                  setState(() {
+                                    gamma = double.parse(v.toStringAsFixed(2));
+                                    syncingGammaText = true;
+                                    gammaCtl.text = gamma.toStringAsFixed(2);
+                                    syncingGammaText = false;
+                                  });
+                                },
+                                onGammaTextChanged: (t) {
+                                  if (syncingGammaText) return;
+                                  final v = double.tryParse(t);
+                                  if (v == null) return;
+                                  setState(() => gamma = v.clamp(0.5, 3.5));
+                                },
+                                enableDebugConsole: enableDebugConsole,
+                                onToggleDebugConsole: (v) => setState(() => enableDebugConsole = v),
+                                pauseOnFocusLost: pauseOnFocusLost,
+                                onTogglePauseOnFocusLost: (v) => setState(() => pauseOnFocusLost = v),
+                                mouseControl: mouseControl,
+                                onToggleMouseControl: (v) => setState(() => mouseControl = v),
+                                repentogonInstalled: repentogonInstalled,
+                                useRepentogon: useRepentogon,
+                                onToggleRepentogon: (v) => setState(() => useRepentogon = v),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
+
                 actions: [
                   SizedBox(
                     width: double.infinity,
@@ -189,9 +199,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                           flex: 3,
                           child: HyperlinkButton(
                             onPressed: () {
-                              if (!advancedOpen) {
-                                setState(() => advancedOpen = true);
-                              }
+                              if (!advancedOpen) setState(() => advancedOpen = true);
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 if (!ctx.mounted) return;
                                 final anchorCtx = advancedAnchorKey.currentContext;
@@ -220,7 +228,7 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                                   Gaps.w6,
                                   Flexible(
                                     child: Text(
-                                      loc.option_advanced_title,
+                                      AppLocalizations.of(ctx).option_advanced_title,
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                     ),
@@ -249,25 +257,12 @@ Future<OptionPresetView?> showOptionPresetsCreateEditDialog(
                           ),
                         ),
                         Gaps.w8,
-                        // 저장 (flex=2)
+                        // 저장 (flex=2) — 항상 누를 수 있지만, 누르면 그때 validate 노출
                         Expanded(
                           flex: 2,
                           child: FilledButton(
                             onPressed: () {
-                              final err = OptionPresetValidators.validate(
-                                ctx: ctx,
-                                name: nameCtl.text,
-                                isFullscreen: isFullscreen,
-                                widthText: widthCtl.text,
-                                heightText: heightCtl.text,
-                                xText: xCtl.text,
-                                yText: yCtl.text,
-                              );
-                              if (err != null) {
-                                UiFeedback.error(ctx, title: AppLocalizations.of(ctx).common_save_fail, content: loc.option_preset_save_failed);
-                                Navigator.pop(ctx, false);
-                                return;
-                              }
+                              if (!(formKey.currentState?.validate() ?? false)) return;
                               Navigator.pop(ctx, true);
                             },
                             style: ButtonStyle(

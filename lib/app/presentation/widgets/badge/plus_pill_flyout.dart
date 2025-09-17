@@ -24,20 +24,41 @@ class PlusPillFlyout extends ConsumerStatefulWidget {
 }
 
 class _PlusPillFlyoutState extends ConsumerState<PlusPillFlyout> {
+  static const _kOpenGrace = Duration(milliseconds: 250);
+  static const _kCloseDelay = Duration(milliseconds: 180);
+
   final _flyout = FlyoutController();
 
   bool _opened = false;
   bool _hoverInPill = false;
   bool _hoverInPanel = false;
+
+  bool _awaitingPanelEnter = false;
+  DateTime? _openedAt;
+
   Timer? _closeDelayTimer;
+  Timer? _openGraceTimer;
 
   void _openDeferred() {
     if (_opened) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || _opened) return;
-      _opened = true;
 
       final fTheme = FluentTheme.of(context);
+      _opened = true;
+      _awaitingPanelEnter = true;
+      _openedAt = DateTime.now();
+
+      // 오픈 그레이스: 패널이 포인터 아래에 등장할 시간을 준다.
+      _openGraceTimer?.cancel();
+      _openGraceTimer = Timer(_kOpenGrace, () {
+        _awaitingPanelEnter = false;
+        // 그레이스가 끝났는데 아무 곳에도 hover 중이 아니면 닫기
+        if (!_hoverInPill && !_hoverInPanel) {
+          _scheduleClose();
+        }
+      });
+
       _flyout.showFlyout(
         barrierColor: Colors.transparent,
         placementMode: FlyoutPlacementMode.bottomLeft,
@@ -52,6 +73,7 @@ class _PlusPillFlyoutState extends ConsumerState<PlusPillFlyout> {
             child: MouseRegion(
               onEnter: (_) {
                 _hoverInPanel = true;
+                _awaitingPanelEnter = false; // 패널이 실제로 포인터 아래에 올라왔다
                 _closeDelayTimer?.cancel();
               },
               onExit: (_) {
@@ -71,13 +93,18 @@ class _PlusPillFlyoutState extends ConsumerState<PlusPillFlyout> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _opened = false;
-      Flyout.of(context).close();
+      _awaitingPanelEnter = false;
+      _openGraceTimer?.cancel();
+      _closeDelayTimer?.cancel();
+      try {
+        _flyout.close();
+      } catch (_) {}
     });
   }
 
   void _scheduleClose() {
     _closeDelayTimer?.cancel();
-    _closeDelayTimer = Timer(const Duration(milliseconds: 140), () {
+    _closeDelayTimer = Timer(_kCloseDelay, () {
       if (!_hoverInPill && !_hoverInPanel) {
         _closeDeferred();
       }
@@ -87,6 +114,11 @@ class _PlusPillFlyoutState extends ConsumerState<PlusPillFlyout> {
   @override
   void dispose() {
     _closeDelayTimer?.cancel();
+    _openGraceTimer?.cancel();
+    if (_opened) {
+      try { _flyout.close(); } catch (_) {}
+      _opened = false;
+    }
     super.dispose();
   }
 
@@ -104,6 +136,16 @@ class _PlusPillFlyoutState extends ConsumerState<PlusPillFlyout> {
         },
         onExit: (_) {
           _hoverInPill = false;
+
+          if (_awaitingPanelEnter) {
+            final openedAgo = _openedAt == null
+                ? Duration.zero
+                : DateTime.now().difference(_openedAt!);
+            if (openedAgo < _kOpenGrace) {
+              return; // 패널 onEnter를 기다린다
+            }
+          }
+
           _scheduleClose();
         },
         child: GestureDetector(

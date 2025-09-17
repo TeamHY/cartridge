@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui' show PointerDeviceKind;
+import 'package:cartridge/core/constants/urls.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +28,7 @@ class SteamNewsSection extends ConsumerWidget {
       trailing: HyperlinkButton(
         child: Text(loc.news_see_more),
         onPressed: () => ul.launchUrl(
-          Uri.parse('https://store.steampowered.com/news/app/250900'),
+          Uri.parse(AppUrls.steamIsaacNewsSeeMore),
         ),
       ),
       padding: const EdgeInsets.fromLTRB(

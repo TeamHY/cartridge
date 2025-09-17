@@ -1,3 +1,4 @@
+import 'package:cartridge/app/presentation/controllers/app_update_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,11 +12,30 @@ import 'package:cartridge/theme/theme.dart';
 
 
 // ── HomePage ───────────────────────────────────────────────────────────
-class HomePage extends ConsumerWidget {
+
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+  @override
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  bool _checked = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_checked) return;
+    _checked = true;
+    // 첫 프레임 이후로 미뤄 비차단 실행
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(appUpdateServiceProvider).checkAndPrompt(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ScaffoldPage(
       padding: EdgeInsets.only(top: AppSpacing.sm),
       header: const ContentHeaderBar.none(),

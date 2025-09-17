@@ -1,3 +1,4 @@
+import 'package:cartridge/core/constants/urls.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,9 +8,15 @@ import 'package:cartridge/app/presentation/widgets/ut/ut_header_refresh_button.d
 import 'package:cartridge/features/isaac/runtime/isaac_runtime.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
+import 'package:url_launcher/url_launcher.dart' as ul;
 
 class IsaacInstallDetectCard extends ConsumerWidget {
-  const IsaacInstallDetectCard({super.key});
+  const IsaacInstallDetectCard({
+    super.key,
+    this.showRepentogon = false,
+  });
+
+  final bool showRepentogon;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -129,7 +136,7 @@ class IsaacInstallDetectCard extends ConsumerWidget {
                 ],
               ),
 
-              if (info.canUseRepentogon && !info.repentogonInstalled) ...[
+              if (showRepentogon && info.canUseRepentogon && !info.repentogonInstalled) ...[
                 Gaps.h8,
                 Expander(
                   header: Text(loc.install_detect_repentogon_help_title),
@@ -142,6 +149,12 @@ class IsaacInstallDetectCard extends ConsumerWidget {
                         Text('· ${loc.install_detect_repentogon_help_prerepentance}'),
                       Gaps.h8,
                       Text('※ ${loc.install_detect_repentogon_help_verify}'),
+                      Gaps.h8,
+                      Button(child: Text(loc.common_open),
+                        onPressed: () => ul.launchUrl(
+                          Uri.parse(AppUrls.repentogon),
+                        ),
+                      ),
                     ],
                   ),
                 ),

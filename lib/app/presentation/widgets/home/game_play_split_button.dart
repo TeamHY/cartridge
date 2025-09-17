@@ -1,16 +1,14 @@
-import 'dart:async';
-
-import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_image/instance_image_thumb.dart';
-import 'package:cartridge/features/cartridge/runtime/application/game_launch_ux.dart';
-import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cartridge/app/presentation/controllers/home_controller.dart';
 import 'package:cartridge/app/presentation/widgets/home/ut_split_button.dart';
+import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/core/service_providers.dart';
-import 'package:cartridge/features/cartridge/instances/domain/models/instance_view.dart';
+import 'package:cartridge/features/cartridge/instances/instances.dart';
+import 'package:cartridge/features/cartridge/runtime/application/game_launch_ux.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:cartridge/theme/theme.dart';
 
 class GamePlaySplitButton extends ConsumerWidget {
   const GamePlaySplitButton({
@@ -45,13 +43,19 @@ class GamePlaySplitButton extends ConsumerWidget {
       }
     }
 
-    void playSelected() {
+    void playSelected() async {
       final runId = selectedId;
       if (runId != null && runId.isNotEmpty) {
-        unawaited(ref.read(gameLaunchUxProvider).beforeLaunch(
+        final proc = await ref.read(instancePlayServiceProvider).playByInstanceId(runId);
+        if (proc == null) {
+          if (!context.mounted) return;
+          UiFeedback.warn(context, content: loc.instance_play_failed_body);
+          return;
+        }
+
+        await ref.read(gameLaunchUxProvider).beforeLaunch(
           origin: LaunchOrigin.instancePage,
-        ));
-        ref.read(instancePlayServiceProvider).playByInstanceId(runId);
+        );
       }
     }
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_import_dialog.dart';
 import 'package:cartridge/features/cartridge/mod_presets/application/mod_presets_controller.dart';
+import 'package:cartridge/features/cartridge/runtime/application/game_launch_ux.dart';
 import 'package:collection/collection.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -314,7 +315,20 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                 }
                     : null,
                 onPlayInstance: () async {
-                  await ref.read(instancePlayServiceProvider).playByInstanceId(v.id);
+                  try {
+                    final proc = await ref.read(instancePlayServiceProvider).playByInstanceId(v.id);
+                    if (proc == null) {
+                      if (!context.mounted) return;
+                      UiFeedback.warn(context, content: loc.instance_play_failed_body);
+                      return;
+                    }
+                    await ref.read(gameLaunchUxProvider).beforeLaunch(
+                      origin: LaunchOrigin.instancePage,
+                    );
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    UiFeedback.error(context, content: loc.instance_play_failed_body);
+                  }
                 },
                 onTap: disableTap ? () {} : () => _goDetail(v.id, v.name),
                 menuBuilder: (ctx) => MenuFlyout(
@@ -362,7 +376,20 @@ class _InstanceListPageState extends ConsumerState<InstanceListPage> {
                 image: v.image,
                 badges: badges,
                 onPlayInstance: () async {
-                  await ref.read(instancePlayServiceProvider).playByInstanceId(v.id);
+                  try {
+                    final proc = await ref.read(instancePlayServiceProvider).playByInstanceId(v.id);
+                    if (proc == null) {
+                      if (!context.mounted) return;
+                      UiFeedback.warn(context, content: loc.instance_play_failed_body);
+                      return;
+                    }
+                    await ref.read(gameLaunchUxProvider).beforeLaunch(
+                      origin: LaunchOrigin.instancePage,
+                    );
+                  } catch (e) {
+                    if (!context.mounted) return;
+                    UiFeedback.error(context, content: loc.instance_play_failed_body);
+                  }
                 },
                 onTap: () => _goDetail(v.id, v.name),
                 menuBuilder: (ctx) => MenuFlyout(

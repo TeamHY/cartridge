@@ -28,4 +28,6 @@ class AppUrls {
   // 스팀
   static const steamAstrobirthPatchNotes =
       'https://steamcommunity.com/sharedfiles/filedetails/changelog/2492350811';
+  static const steamIsaacNewsSeeMore = 'https://store.steampowered.com/news/app/250900';
+  static const repentogon = 'https://github.com/TeamREPENTOGON/REPENTOGON';
 }

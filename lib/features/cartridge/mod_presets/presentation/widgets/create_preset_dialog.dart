@@ -1,7 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/widgets.dart';
 
-import 'package:cartridge/app/presentation/widgets/ui_feedback.dart';
 import 'package:cartridge/features/isaac/mod/isaac_mod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
@@ -19,6 +18,8 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
   var mode = SeedMode.allOff;
   final loc = AppLocalizations.of(context);
 
+  final formKey = GlobalKey<FormState>();
+
   return fluent.showDialog<CreatePresetResult>(
     context: context,
     builder: (ctx) {
@@ -35,59 +36,74 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
           ],
         ),
         constraints: const BoxConstraints(maxWidth: 560, maxHeight: 460),
-        content: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560, maxHeight: 460),
-          child: fluent.Scrollbar(
-            controller: scrollCtrl,
-            interactive: true,
-            child: SingleChildScrollView(
+        content: Form(
+          key: formKey,
+          autovalidateMode: AutovalidateMode.disabled,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560, maxHeight: 460),
+            child: fluent.Scrollbar(
               controller: scrollCtrl,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.cardColor,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: dividerColor),
-                ),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 이름
-                    Text(
-                      loc.mod_preset_create_name_label,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Gaps.h4,
-                    fluent.TextBox(
-                      controller: nameController,
-                      placeholder: loc.mod_preset_create_name_placeholder,
-                    ),
-                    Gaps.h12,
+              interactive: true,
+              child: SingleChildScrollView(
+                controller: scrollCtrl,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: theme.cardColor,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: dividerColor),
+                  ),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 이름
+                      Text(
+                        loc.mod_preset_create_name_label,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Gaps.h4,
+                      fluent.TextFormBox(
+                        controller: nameController,
+                        placeholder: loc.mod_preset_create_name_placeholder,
+                        validator: (v) =>
+                        (v == null || v.trim().isEmpty)
+                            ? loc.mod_preset_create_validate_required
+                            : null,
+                        onFieldSubmitted: (_) {
+                          if (formKey.currentState?.validate() ?? false) {
+                            Navigator.of(ctx).pop(
+                              CreatePresetResult(nameController.text.trim(), mode),
+                            );
+                          }
+                        },
+                      ),
+                      Gaps.h12,
 
-                    // 초기 모드
-                    Text(
-                      loc.mod_preset_create_initial_mode_label,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Gaps.h4,
-                    _RadioRow(
-                      label: loc.mod_preset_create_all_off,
-                      selected: mode == SeedMode.allOff,
-                      onChanged: () {
-                        mode = SeedMode.allOff;
-                        (ctx as Element).markNeedsBuild();
-                      },
-                    ),
-                    _RadioRow(
-                      label: loc.mod_preset_create_current_enabled,
-                      selected: mode == SeedMode.currentEnabled,
-                      onChanged: () {
-                        mode = SeedMode.currentEnabled;
-                        (ctx as Element).markNeedsBuild();
-                      },
-                    ),
-                    Gaps.h8,
-                  ],
+                      // 초기 모드
+                      Text(
+                        loc.mod_preset_create_initial_mode_label,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      Gaps.h4,
+                      _RadioRow(
+                        label: loc.mod_preset_create_all_off,
+                        selected: mode == SeedMode.allOff,
+                        onChanged: () {
+                          mode = SeedMode.allOff;
+                          (ctx as Element).markNeedsBuild();
+                        },
+                      ),
+                      _RadioRow(
+                        label: loc.mod_preset_create_current_enabled,
+                        selected: mode == SeedMode.currentEnabled,
+                        onChanged: () {
+                          mode = SeedMode.currentEnabled;
+                          (ctx as Element).markNeedsBuild();
+                        },
+                      ),
+                      Gaps.h8,
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -101,12 +117,10 @@ Future<CreatePresetResult?> showCreatePresetDialog(BuildContext context) {
           fluent.FilledButton(
             child: Text(loc.common_create),
             onPressed: () {
-              final name = nameController.text.trim();
-              if (name.isEmpty) {
-                UiFeedback.error(ctx, content: loc.mod_preset_create_validate_required);
-                return;
-              }
-              Navigator.of(ctx).pop(CreatePresetResult(name, mode));
+              if (!(formKey.currentState?.validate() ?? false)) return;
+              Navigator.of(ctx).pop(
+                CreatePresetResult(nameController.text.trim(), mode),
+              );
             },
           ),
         ],
@@ -153,7 +167,7 @@ class _RadioRow extends StatelessWidget {
   }
 }
 
-/// 이름만 수정하는 다이얼로그 (동일 톤/레이아웃)
+/// 이름만 수정하는 다이얼로그 (동일 톤/레이아웃, 저장 시에만 검증)
 Future<String?> showEditPresetNameDialog(
     BuildContext context, {
       required String initialName,
@@ -164,6 +178,8 @@ Future<String?> showEditPresetNameDialog(
   final loc = AppLocalizations.of(context);
   final accent = theme.accentColor.normal;
   final dividerColor = theme.dividerColor;
+
+  final formKey = GlobalKey<FormState>();
 
   return fluent.showDialog<String>(
     context: context,
@@ -179,45 +195,50 @@ Future<String?> showEditPresetNameDialog(
         maxWidth: AppBreakpoints.sm - 1,
         maxHeight: AppBreakpoints.md,
       ),
-      content: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: AppBreakpoints.sm - 1,
-          maxHeight: AppBreakpoints.md,
-        ),
-        child: fluent.Scrollbar(
-          controller: scrollCtrl,
-          interactive: true,
-          child: SingleChildScrollView(
+      content: Form(
+        key: formKey,
+        autovalidateMode: AutovalidateMode.disabled,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: AppBreakpoints.sm - 1,
+            maxHeight: AppBreakpoints.md,
+          ),
+          child: fluent.Scrollbar(
             controller: scrollCtrl,
-            child: Container(
-              decoration: BoxDecoration(
-                color: theme.cardColor,
-                borderRadius: BorderRadius.circular(AppRadius.md),
-                border: Border.all(color: dividerColor),
-              ),
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    loc.mod_preset_edit_name_label,
-                    style: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  Gaps.h4,
-                  fluent.TextBox(
-                    controller: nameController,
-                    placeholder: loc.mod_preset_edit_name_placeholder,
-                    autofocus: true,
-                    onSubmitted: (_) {
-                      final name = nameController.text.trim();
-                      if (name.isEmpty) {
-                        UiFeedback.error(ctx, content: loc.mod_preset_create_validate_required);
-                        return;
-                      }
-                      Navigator.of(ctx).pop(name);
-                    },
-                  ),
-                ],
+            interactive: true,
+            child: SingleChildScrollView(
+              controller: scrollCtrl,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: dividerColor),
+                ),
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.mod_preset_edit_name_label,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    Gaps.h4,
+                    fluent.TextFormBox(
+                      controller: nameController,
+                      placeholder: loc.mod_preset_edit_name_placeholder,
+                      autofocus: true,
+                      validator: (v) =>
+                      (v == null || v.trim().isEmpty)
+                          ? loc.mod_preset_create_validate_required
+                          : null,
+                      onFieldSubmitted: (_) {
+                        if (formKey.currentState?.validate() ?? false) {
+                          Navigator.of(ctx).pop(nameController.text.trim());
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -231,12 +252,8 @@ Future<String?> showEditPresetNameDialog(
         fluent.FilledButton(
           child: Text(loc.common_save),
           onPressed: () {
-            final name = nameController.text.trim();
-            if (name.isEmpty) {
-              UiFeedback.error(ctx, content: loc.mod_preset_create_validate_required);
-              return;
-            }
-            Navigator.of(ctx).pop(name);
+            if (!(formKey.currentState?.validate() ?? false)) return;
+            Navigator.of(ctx).pop(nameController.text.trim());
           },
         ),
       ],
