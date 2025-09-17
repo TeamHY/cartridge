@@ -48,6 +48,7 @@ dependencies:
   file: ^7.0.1                      # [FS Abstraction] 테스트 가능한 FileSystem(Local/Memory 교체 DI). 단위테스트에서 MemoryFileSystem 사용
   tailf: ^1.1.0                     # [Logs] 파일 실시간 tail(기록 모드 로그 리딩)
   path: ^1.9.1                      # [FS/Path] 경로 조작(join, basename 등). 런타임에서 저장 경로/파일명 계산에 사용.
+  archive: ^4.0.7                   # [Zip] 인스턴스 pack Export/Import용 ZIP 인코딩/디코딩
 
   # ── Networking / Backend ────────────────────────────────────────────────────
   http: ^1.1.0                      # [Net] REST 호출(업데이트 체크, 서버 연동 등)
@@ -86,7 +87,6 @@ dependencies:
   # ── Media / Cache ───────────────────────────────────────────────────────────
   crypto: ^3.0.6                    # 이미지 캐싱 할때 해싱으로 사용
   image: ^4.5.4                     # 이미지 캐싱할때 용량 최적화를 위해 이미지 축소하는 기능에 사용하는 패키지
-  archive: ^4.0.7
 
 
 dev_dependencies:

@@ -1,4 +1,4 @@
-// test/unit/record_mode/record_mode_allowed_prefs_service_test.dart
+// test/unit/cartridge/record_mode/record_mode_allowed_prefs_service_test.dart
 import 'package:cartridge/features/cartridge/record_mode/domain/record_mode_allowed_prefs_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -6,132 +6,175 @@ import 'package:cartridge/features/cartridge/record_mode/domain/models/game_pres
 import 'package:cartridge/features/cartridge/record_mode/domain/repositories/record_mode_allowed_prefs_repository.dart';
 
 
-// ── Test Double: In-memory repo ───────────────────────────────────────────────
-class _FakeRepo implements RecordModeAllowedPrefsRepository {
-  Map<String, bool> store;
-  int readCalls = 0;
-  int writeCalls = 0;
-  final List<Map<String, bool>> writeSnapshots = [];
+void main() {
+  group('RecordModeAllowedPrefsServiceImpl (no fake_async)', () {
+    late _MemRepo repo;
+    late RecordModeAllowedPrefsServiceImpl svc;
 
-  _FakeRepo({Map<String, bool>? initial}) : store = Map.of(initial ?? {});
+    AllowedModRow row({
+      required String name,
+      String? workshopId,
+      bool installed = false,
+      bool alwaysOn = false,
+    }) {
+      return AllowedModRow(
+        name: name,
+        installed: installed,
+        workshopId: workshopId,
+        alwaysOn: alwaysOn,
+      );
+    }
+
+    setUp(() {
+      repo = _MemRepo();
+      svc = RecordModeAllowedPrefsServiceImpl(repo);
+    });
+
+    test('keyFor(): workshopId 우선, 없으면 name 기반', () {
+      expect(svc.keyFor(row(name: 'Cool', workshopId: '123')), 'wid:123');
+      expect(svc.keyFor(row(name: 'LocalOnly')), 'name:LocalOnly');
+      expect(svc.keyFor(row(name: 'X', workshopId: '')), 'name:X');
+    });
+
+    test('ensureInitialized(): 신규 키는 (alwaysOn || installed)로 초기화 후 저장 1회', () async {
+      // 기존 저장값 1개 이미 존재
+      repo.store = {'name:Existing': false};
+
+      final items = [
+        row(name: 'Existing', installed: true),          // 이미 존재 → 변경 없음
+        row(name: 'A', installed: true),                 // 신규 → true
+        row(name: 'B', installed: false),                // 신규 → false
+        row(name: 'C', installed: false, alwaysOn: true) // 신규(alwaysOn) → true
+      ];
+
+      final out = await svc.ensureInitialized(items);
+
+      expect(repo.writeCount, 1);
+      expect(out, {
+        'name:Existing': false,
+        'name:A': true,
+        'name:B': false,
+        'name:C': true,
+      });
+      expect(repo.store, out);
+    });
+
+    test('ensureInitialized(): 동일 목록으로 2번째 호출은 write 없이 캐시 반환', () async {
+      final items = [
+        row(name: 'A', installed: true),
+        row(name: 'B', installed: false),
+      ];
+      final first = await svc.ensureInitialized(items);
+      expect(repo.writeCount, 1);
+
+      final second = await svc.ensureInitialized(items);
+      expect(repo.writeCount, 1, reason: '변화 없음 → 추가 저장 없음');
+      expect(second, first);
+    });
+
+    test('setEnabled(): 즉시 write 안 됨 → flush() 후 write 1회', () async {
+      await svc.setEnabled(row(name: 'M'), true);
+
+      // 디바운스 중: 아직 write 안 됨
+      expect(repo.writeCount, 0);
+
+      await svc.flush();
+      expect(repo.writeCount, 1);
+      expect(repo.store['name:M'], true);
+    });
+
+    test('setManyByRows(): 다건 설정 후 flush()로 1회 저장', () async {
+      final rows = [
+        row(name: 'A', workshopId: '11'),
+        row(name: 'B'),
+        row(name: 'C'),
+      ];
+
+      await svc.setManyByRows(rows, true);
+      expect(repo.writeCount, 0, reason: '디바운스 중');
+
+      await svc.flush();
+      expect(repo.writeCount, 1);
+      expect(repo.store, {
+        'wid:11': true,
+        'name:B': true,
+        'name:C': true,
+      });
+    });
+
+    test('flush(): pending 없으면 no-op', () async {
+      // pending 없음
+      await svc.flush();
+      expect(repo.writeCount, 0);
+
+      // 초기화로 저장 1회
+      await svc.ensureInitialized([row(name: 'A', installed: true)]);
+      expect(repo.writeCount, 1);
+
+      // pending 없음 → flush no-op
+      await svc.flush();
+      expect(repo.writeCount, 1);
+    });
+
+    test('ensureInitialized 이후 사용자 변경 → flush로 최종 반영', () async {
+      await svc.ensureInitialized([
+        row(name: 'A', installed: true),
+        row(name: 'B', installed: false),
+      ]);
+      expect(repo.store, {'name:A': true, 'name:B': false});
+      expect(repo.writeCount, 1);
+
+      await svc.setEnabled(row(name: 'B'), true);
+      await svc.flush();
+
+      expect(repo.writeCount, 2);
+      expect(repo.store, {'name:A': true, 'name:B': true});
+    });
+
+    test('여러 setEnabled 호출 후 flush(): 마지막 값이 반영되고 write 1회', () async {
+      await svc.setEnabled(row(name: 'X'), true);
+      await svc.setEnabled(row(name: 'X'), false);
+      await svc.setEnabled(row(name: 'Y', workshopId: '777'), true);
+
+      // 아직 디바운스 중
+      expect(repo.writeCount, 0);
+
+      await svc.flush();
+      expect(repo.writeCount, 1);
+      expect(repo.store, {
+        'name:X': false,  // 마지막 값
+        'wid:777': true,
+      });
+    });
+
+    // 참고: 진짜 타이머 경과를 검증하고 싶다면 아래 테스트를 해제(느려질 수 있음)
+    // test('디바운스 타이머가 자동으로 write를 트리거한다(실시간 대기)', () async {
+    //   await svc.setEnabled(row(name: 'D'), true);
+    //   await Future<void>.delayed(const Duration(milliseconds: 450));
+    //   expect(repo.writeCount, 1);
+    //   expect(repo.store['name:D'], true);
+    // });
+  });
+}
+
+/// 메모리 저장소 스텁(호출 횟수/최신 상태 추적)
+class _MemRepo implements RecordModeAllowedPrefsRepository {
+  Map<String, bool> store = {};
+  int readCount = 0;
+  int writeCount = 0;
+  final List<Map<String, bool>> writes = [];
 
   @override
   Future<Map<String, bool>> readAll() async {
-    readCalls++;
-    return Map.of(store);
+    readCount++;
+    return Map<String, bool>.from(store);
   }
 
   @override
   Future<void> writeAll(Map<String, bool> map) async {
-    writeCalls++;
-    store = Map.of(map);
-    writeSnapshots.add(Map.of(map));
+    writeCount++;
+    final snap = Map<String, bool>.from(map);
+    writes.add(snap);
+    store = snap;
   }
-}
-
-// AllowedModRow 헬퍼 (필요 필드만)
-AllowedModRow row({
-  required String name,
-  String? workshopId,
-  bool installed = false,
-}) {
-  // AllowedModRow의 실제 생성자가 프로젝트마다 다를 수 있는데,
-  // 일반적으로 다음과 같은 형태를 가정한다.
-  // (필요 시 여기만 프로젝트 실제 시그니처에 맞춰 수정)
-  return AllowedModRow(
-    name: name,
-    workshopId: workshopId,
-    installed: installed,
-  );
-}
-
-void main() {
-  group('RecordModeAllowedPrefsServiceImpl', () {
-    test('keyFor(): workshopId 우선, 없으면 name 기반', () {
-      final svc = RecordModeAllowedPrefsServiceImpl(_FakeRepo());
-      expect(svc.keyFor(row(name: 'A', workshopId: '123')), 'wid:123');
-      expect(svc.keyFor(row(name: 'B', workshopId: '')), 'name:B');
-      expect(svc.keyFor(row(name: 'C')), 'name:C');
-    });
-
-    test('ensureInitialized(): 비어있으면 installed=true/false로 기본값 저장', () async {
-      final repo = _FakeRepo(); // empty
-      final svc = RecordModeAllowedPrefsServiceImpl(repo);
-
-      final items = [
-        row(name: 'Alpha', workshopId: '1', installed: true),
-        row(name: 'Beta',  workshopId: '2', installed: false),
-        row(name: 'Gamma',                installed: true), // no wid -> name key
-      ];
-
-      final map = await svc.ensureInitialized(items);
-      expect(map['wid:1'], isTrue);
-      expect(map['wid:2'], isFalse);
-      expect(map['name:Gamma'], isTrue);
-
-      // 최초 한 번 writeAll 호출
-      expect(repo.writeCalls, 1);
-
-      // 같은 목록으로 다시 호출해도 변경 없음 → writeAll 추가 호출 없음
-      final again = await svc.ensureInitialized(items);
-      expect(again, equals(map));
-      expect(repo.writeCalls, 1);
-
-      // 새 항목 추가 → 누락 키만 추가되고 writeAll 1회 더
-      final next = [...items, row(name: 'Delta', workshopId: '4', installed: false)];
-      final map2 = await svc.ensureInitialized(next);
-      expect(map2['wid:4'], isFalse);
-      expect(repo.writeCalls, 2);
-    });
-
-    test('setEnabled(): 단건 토글 + 캐시 갱신', () async {
-      final repo = _FakeRepo(initial: {'wid:1': true});
-      final svc = RecordModeAllowedPrefsServiceImpl(repo);
-
-      // false로 토글
-      await svc.setEnabled(row(name: 'X', workshopId: '1'), false);
-      expect(repo.store['wid:1'], isFalse);
-      expect(repo.writeCalls, 1);
-
-      // 새 키에도 동작(없던 키 추가)
-      await svc.setEnabled(row(name: 'Y', workshopId: '2'), true);
-      expect(repo.store['wid:2'], isTrue);
-      expect(repo.writeCalls, 2);
-    });
-
-    test('setManyByRows(): 여러 항목 일괄 설정', () async {
-      final repo = _FakeRepo(initial: {'wid:1': true, 'wid:2': true, 'name:Z': true});
-      final svc = RecordModeAllowedPrefsServiceImpl(repo);
-
-      await svc.setManyByRows([
-        row(name: 'A', workshopId: '1'),
-        row(name: 'B', workshopId: '2'),
-        row(name: 'Z'), // name-key
-      ], false);
-
-      expect(repo.store['wid:1'], isFalse);
-      expect(repo.store['wid:2'], isFalse);
-      expect(repo.store['name:Z'], isFalse);
-      expect(repo.writeCalls, 1);
-    });
-
-
-    test('ensureInitialized() 이후 setEnabled()/setManyByRows(): readAll 재호출 없이 캐시 사용', () async {
-      final repo = _FakeRepo(); // empty start
-      final svc = RecordModeAllowedPrefsServiceImpl(repo);
-
-      // 초기화(한 번 readAll)
-      await svc.ensureInitialized([
-        row(name: 'Alpha', workshopId: '1', installed: true),
-      ]);
-      final readsAfterInit = repo.readCalls;
-
-      // 캐시로 동작 → readAll 호출 수 증가하지 않아야 함
-      await svc.setEnabled(row(name: 'Alpha', workshopId: '1'), false);
-      await svc.setManyByRows([row(name: 'Alpha', workshopId: '1')], true);
-
-      expect(repo.readCalls, readsAfterInit);
-      expect(repo.store['wid:1'], isTrue); // 마지막 호출(true) 반영
-    });
-  });
 }

@@ -1,4 +1,5 @@
 import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_export_dialog.dart';
+import 'package:cartridge/features/cartridge/runtime/application/game_launch_ux.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -311,6 +312,9 @@ class _InstanceDetailPageState extends ConsumerState<InstanceDetailPage> {
                   style: ButtonStyle(backgroundColor: WidgetStateProperty.all(FluentTheme.of(context).accentColor)),
                   onPressed: () async {
                     try {
+                      await ref.read(gameLaunchUxProvider).beforeLaunch(
+                        origin: LaunchOrigin.instancePage,
+                      );
                       await ref.read(instancePlayServiceProvider).playByInstanceId(widget.instanceId);
                     } catch (e) {
                       if (!context.mounted) return;

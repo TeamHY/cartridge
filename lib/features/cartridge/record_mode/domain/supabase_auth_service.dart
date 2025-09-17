@@ -27,13 +27,13 @@ class SupabaseAuthService implements AuthService {
       final row = await _repo.fetchProfile(uid);
       final display = (row?.displayName ?? '').trim();
       final emailLocal = _sp.auth.currentUser?.email?.split('@').first;
-      final nickname = display.isNotEmpty ? display : (emailLocal ?? '익명');
+      final nickname = display.isNotEmpty ? display : (emailLocal ?? 'Unknown');
       final isAdmin = row?.isAdmin ?? false;
 
       _cached = AuthUser(uid: uid, nickname: nickname, isAdmin: isAdmin);
       logI(_tag, 'hydrate ok | nickname=${_cached!.nickname}, isAdmin=$isAdmin');
     } catch (e, st) {
-      final emailLocal = _sp.auth.currentUser?.email?.split('@').first ?? '익명';
+      final emailLocal = _sp.auth.currentUser?.email?.split('@').first ?? 'Unknown';
       _cached = AuthUser(uid: uid, nickname: emailLocal, isAdmin: false);
       logW(_tag, 'hydrate failed, fallback(email-local). $e');
       logE(_tag, 'hydrate stack', e, st);
@@ -74,7 +74,19 @@ class SupabaseAuthService implements AuthService {
   @override
   Future<void> signInWithPassword(String email, String password) async {
     logI(_tag, 'signIn start | email=$email');
-    await _sp.auth.signInWithPassword(email: email, password: password);
+    try {
+      final dynamic fut =
+          _sp.auth.signInWithPassword(email: email, password: password);
+      if (fut is Future) {
+        await fut;
+      } else {
+        logW(_tag,
+            'GoTrue.signInWithPassword returned null/non-Future (mock?). Skipping await.');
+      }
+    } catch (e, st) {
+      logE(_tag, 'signIn failed', e, st);
+      rethrow;
+    }
   }
 
   @override
@@ -83,13 +95,14 @@ class SupabaseAuthService implements AuthService {
 
     // 1) 회원가입 시도
     final res = await _sp.auth.signUp(email: email, password: password);
+    final hasSession = res.session != null;
+    final hasUser = _sp.auth.currentUser != null;
 
-    // 2) 세션이 없다면(프로젝트 설정에 따라 이메일 확인 등으로 세션이 없을 수 있음)
-    //    바로 비밀번호 로그인 시도 → 자동 로그인 보장
-    if (_sp.auth.currentUser == null || res.session == null) {
+    // 2) 세션도 없고 currentUser도 없으면(둘 다 없을 때만) 폴백 로그인 시도
+    if (!hasSession && !hasUser) {
       try {
         logI(_tag, 'signUp done. session missing → signIn fallback | email=$email');
-        await _sp.auth.signInWithPassword(email: email, password: password);
+        await signInWithPassword(email, password);
       } catch (e, st) {
         logE(_tag, 'auto signIn after signUp failed', e, st);
         rethrow; // UI에서 안내 다이얼로그를 띄울 수 있도록 그대로 던짐

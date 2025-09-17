@@ -2,7 +2,7 @@ import 'package:cartridge/features/cartridge/option_presets/domain/models/option
 import 'package:cartridge/features/isaac/runtime/domain/repentogon.dart';
 
 /// 옵션 프리셋과 설치 경로를 받아 **추가 실행 인자**를 만든다.
-/// - Repentogon 설치되어 있고, 프리셋에서 비활성(false)이면 '-repentogone'
+/// - Repentogon 설치되어 있고, 프리셋에서 비활성(false)이면 `kArgRepentogonOff`
 Future<List<String>> buildIsaacExtraArgs({
   required String installPath,
   required OptionPreset preset,

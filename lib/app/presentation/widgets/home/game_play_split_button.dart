@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cartridge/features/cartridge/instances/presentation/widgets/instance_image/instance_image_thumb.dart';
+import 'package:cartridge/features/cartridge/runtime/application/game_launch_ux.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/theme/theme.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -45,6 +48,9 @@ class GamePlaySplitButton extends ConsumerWidget {
     void playSelected() {
       final runId = selectedId;
       if (runId != null && runId.isNotEmpty) {
+        unawaited(ref.read(gameLaunchUxProvider).beforeLaunch(
+          origin: LaunchOrigin.instancePage,
+        ));
         ref.read(instancePlayServiceProvider).playByInstanceId(runId);
       }
     }

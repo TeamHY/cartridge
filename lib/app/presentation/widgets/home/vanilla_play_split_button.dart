@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cartridge/features/cartridge/runtime/application/game_launch_ux.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,6 +61,9 @@ class VanillaPlaySplitButton extends ConsumerWidget {
 
     Future<void> launch(OptionPresetView v, {bool? useRepOverride}) async {
       try {
+        await ref.read(gameLaunchUxProvider).beforeLaunch(
+          origin: LaunchOrigin.instancePage,
+        );
         final launcher = ref.read(isaacLauncherServiceProvider);
         await launcher.launchIsaac(
           optionPreset: toDomain(v, useRepOverride: useRepOverride),
@@ -90,6 +96,9 @@ class VanillaPlaySplitButton extends ConsumerWidget {
           secondaryText: loc.vanilla_play_no_preset,
           buttonColor: buttonColor,
           onPressed: () {
+            unawaited(ref.read(gameLaunchUxProvider).beforeLaunch(
+              origin: LaunchOrigin.instancePage,
+            ));
             // 프리셋 없이 바로 실행 (Repentogon 설치시 -repentogonoff)
             if (installed) {
               ref.read(isaacLauncherServiceProvider).launchIsaac(

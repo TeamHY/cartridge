@@ -1,4 +1,5 @@
 import 'dart:io' as io;
+import 'package:cartridge/app/presentation/widgets/minimize_observer.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,7 +29,9 @@ class App extends ConsumerWidget {
     return _buildFluentApp(
       languageCode: languageCode,
       resolved: resolvedTheme,
-      home: const StageShell(),
+        home: const MinimizeObserver(
+          child: TickerGate(child: StageShell()),
+        ),
     );
   }
 
