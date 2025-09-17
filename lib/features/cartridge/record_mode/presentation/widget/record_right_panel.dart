@@ -71,37 +71,11 @@ class RecordModeRightPanel extends ConsumerWidget {
                 if (entries.isEmpty && !loading) return const RankingEmptyPanelPast();
 
                 // 스크롤 + 로딩/데이터 공용 처리
-                return Scrollbar(
-                  thumbVisibility: true,
-                  child: CustomScrollView(
-                    primary: false,
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
-                          child: Podium(
-                            entries: podium,
-                            isAdmin: isAdmin,
-                            loading: loading,
-                          ),
-                        ),
-                      ),
-                      if (loading)
-                        SliverList.builder(
-                          itemCount: 8,
-                          itemBuilder: (_, __) => const Padding(
-                            padding: EdgeInsets.only(bottom: 8),
-                            child: RankTile.loading(),
-                          ),
-                        )
-                      else
-                        SliverList.separated(
-                          itemCount: rest.length,
-                          itemBuilder: (_, i) => RankTile(entry: rest[i], isAdmin: isAdmin),
-                          separatorBuilder: (_, __) => Gaps.h8,
-                        ),
-                    ],
-                  ),
+                return _RankingScroll(
+                  podium: podium,
+                  rest: rest,
+                  isAdmin: isAdmin,
+                  loading: loading,
                 );
               }(),
             ),
@@ -137,11 +111,13 @@ class _RankingScroll extends StatefulWidget {
     required this.podium,
     required this.rest,
     required this.isAdmin,
+    this.loading = false,
   });
 
   final List<LeaderboardEntry> podium;
   final List<LeaderboardEntry> rest;
   final bool isAdmin;
+  final bool loading;
 
   @override
   State<_RankingScroll> createState() => _RankingScrollState();
@@ -174,14 +150,28 @@ class _RankingScrollState extends State<_RankingScroll> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
-              child: Podium(entries: widget.podium, isAdmin: widget.isAdmin),
+              child: Podium(
+                entries: widget.podium,
+                isAdmin: widget.isAdmin,
+                loading: widget.loading,
+              ),
             ),
           ),
-          SliverList.separated(
-            itemCount: widget.rest.length,
-            itemBuilder: (_, i) => RankTile(entry: widget.rest[i], isAdmin: widget.isAdmin),
-            separatorBuilder: (_, __) => Gaps.h4,
-          ),
+          if (widget.loading)
+            SliverList.builder(
+              itemCount: 3,
+              itemBuilder: (_, __) => const Padding(
+                padding: EdgeInsets.only(bottom: 8),
+                child: RankTile.loading(),
+              ),
+            )
+          else
+            SliverList.separated(
+              itemCount: widget.rest.length,
+              itemBuilder: (_, i) =>
+                  RankTile(entry: widget.rest[i], isAdmin: widget.isAdmin),
+              separatorBuilder: (_, __) => Gaps.h8,
+            ),
         ],
       ),
     );
