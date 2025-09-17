@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:cartridge/app/presentation/empty_state.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
@@ -790,9 +791,13 @@ class _UTTableFrameState<T> extends State<UTTableFrame<T>>
             Widget buildBody() {
               if (view.isEmpty) {
                 final empty = widget.emptyPlaceholder ??
-                    Center(child: Text(loc.table_empty));
+                    EmptyState.withDefault404(
+                      title: loc.table_empty,
+                    );
                 final noResults = widget.noResultsPlaceholder ??
-                    Center(child: Text(loc.table_no_results));
+                    EmptyState.withDefault404(
+                      title: loc.table_no_results,
+                    );
                 return hasFiniteHeight
                     ? Expanded(child: (filteredThen == 0 ? empty : noResults))
                     : (filteredThen == 0 ? empty : noResults);
