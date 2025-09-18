@@ -3,10 +3,11 @@ on:
     branches:
       - main
       - develop
+  workflow_dispatch:
 
 jobs:
     build:
-      runs-on: windows-latest
+      runs-on: ${{ github.event_name == 'workflow_dispatch' && 'self-hosted' || 'windows-latest' }}
       steps:
         - uses: actions/checkout@v4
         - uses: subosito/flutter-action@v2
