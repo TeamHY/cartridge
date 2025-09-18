@@ -31,9 +31,10 @@ ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
-OutputDir=Output
+SourceDir={#SourcePath}\..
+OutputDir={#SourcePath}\Output
 OutputBaseFilename=Cartridge-Setup
-SetupIconFile=..\windows\runner\resources\app_icon.ico
+SetupIconFile={#SourcePath}\..\windows\runner\resources\app_icon.ico
 SolidCompression=yes
 WizardStyle=modern
 
@@ -45,7 +46,7 @@ Name: "korean"; MessagesFile: "compiler:Languages\Korean.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourcePath}\..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
