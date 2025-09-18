@@ -20,6 +20,15 @@ jobs:
         - name: Run build_runner (freezed/json)
           run: flutter pub run build_runner build --delete-conflicting-outputs
 
+        - name: Read app version from pubspec.yaml
+          id: appver
+          shell: pwsh
+          run: |
+            $m = Select-String -Path pubspec.yaml -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)' | Select-Object -First 1
+            if (-not $m) { throw "version not found in pubspec.yaml" }
+            $ver = $m.Matches[0].Groups[1].Value
+            "version=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
         - name: Generate .env file
           run: |
             Set-Content -Path .env -Value 'RECORD_PRESET_URL="${{ secrets.RECORD_PRESET_URL }}"'
@@ -33,7 +42,7 @@ jobs:
         - name: Upload Build Artifact
           uses: actions/upload-artifact@v4
           with:
-            name: cartridge
+            name: Cartridge-${{ steps.appver.outputs.version }}
             path: ./build/windows/x64/runner/Release
 
         - name: Install Inno Setup (Chocolatey)
@@ -71,5 +80,5 @@ jobs:
         - name: Upload Installer Artifact
           uses: actions/upload-artifact@v4
           with:
-            name: installer
+            name: Cartridge-Setup-${{ steps.appver.outputs.version }}
             path: installer/Output/*.exe
