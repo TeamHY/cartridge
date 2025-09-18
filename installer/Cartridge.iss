@@ -2,7 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Cartridge"
-#define MyAppVersion "5.0.0"
+#ifndef MyAppVersion
+  #define MyAppVersion "0.0.0-dev"
+#endif
 #define MyAppPublisher "TeamHY"
 #define MyAppURL "https://github.com/TeamHY/cartridge"
 #define MyAppExeName "cartridge.exe"
