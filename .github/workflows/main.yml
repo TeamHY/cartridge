@@ -21,10 +21,10 @@ jobs:
 
         - name: Generate .env file
           run: |
-            Set-Content .env "RECORD_PRESET_URL=`"${{ secrets.RECORD_PRESET_URL }}`"" |
-            Add-Content .env "RECORDER_MOD_URL=`"${{ secrets.RECORDER_MOD_URL }}`"" |
-            Add-Content .env "SUPABASE_URL=`"${{ secrets.SUPABASE_URL }}`"" |
-            Add-Content .env "SUPABASE_ANON_KEY=`"${{ secrets.SUPABASE_ANON_KEY }}`""
+            Set-Content -Path .env -Value 'RECORD_PRESET_URL="${{ secrets.RECORD_PRESET_URL }}"'
+            Add-Content -Path .env -Value 'RECORDER_MOD_URL="${{ secrets.RECORDER_MOD_URL }}"'
+            Add-Content -Path .env -Value 'SUPABASE_URL="${{ secrets.SUPABASE_URL }}"'
+            Add-Content -Path .env -Value 'SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"'
 
         - name: Build Windows (Release)
           run: flutter build windows --release
