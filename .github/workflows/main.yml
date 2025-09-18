@@ -45,10 +45,11 @@ jobs:
             name: Cartridge-${{ steps.appver.outputs.version }}
             path: ./build/windows/x64/runner/Release
 
-        - name: Install Inno Setup (Chocolatey)
+        - name: Install & Compile Inno Setup (one step)
           shell: pwsh
           run: |
             choco install innosetup --no-progress -y
+            
             $candidates = @(
               "${env:ProgramFiles(x86)}\Inno Setup 6\iscc.exe",
               "${env:ProgramFiles}\Inno Setup 6\iscc.exe"
@@ -65,17 +66,9 @@ jobs:
             if (-not $found) {
               throw "ISCC.exe not found after install"
             }
-            Write-Host "ISCC = $env:ISCC"
-
-        - name: Verify build output exists (debug)
-          shell: pwsh
-          run: |
-            Get-ChildItem -Recurse -Depth 2 build\windows\x64\runner\Release | Select-Object FullName
-
-        - name: Compile .ISS to .EXE Installer
-          shell: pwsh
-          run: |
-            & "$env:ISCC" /O+ installer\Cartridge.iss
+            & "$env:ISCC" /O+ `
+              "/DMyAppVersion=${{ steps.appver.outputs.version }}" `
+              installer\Cartridge.iss
 
         - name: Upload Installer Artifact
           uses: actions/upload-artifact@v4
