@@ -10,6 +10,7 @@ jobs:
       runs-on: ${{ github.event_name == 'workflow_dispatch' && 'self-hosted' || 'windows-latest' }}
       steps:
         - uses: actions/checkout@v4
+
         - uses: subosito/flutter-action@v2
           with:
             channel: 'stable'
@@ -39,11 +40,21 @@ jobs:
         - name: Build Windows (Release)
           run: flutter build windows --release
 
+        - name: Pack build output as versioned zip
+          shell: pwsh
+          run: |
+            New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+            $zip = "artifacts/Cartridge-${{ steps.appver.outputs.version }}.zip"
+            if (Test-Path $zip) { Remove-Item $zip -Force }
+            Compress-Archive `
+            -Path build/windows/x64/runner/Release/* `
+            -DestinationPath $zip
+
         - name: Upload Build Artifact
           uses: actions/upload-artifact@v4
           with:
-            name: Cartridge-${{ steps.appver.outputs.version }}
-            path: ./build/windows/x64/runner/Release
+            name: Cartridge-${{ steps.appver.outputs.version }}.zip
+            path: artifacts/Cartridge-${{ steps.appver.outputs.version }}.zip
 
         - name: Install & Compile Inno Setup (one step)
           shell: pwsh
@@ -63,15 +74,14 @@ jobs:
               $gc = Get-Command iscc.exe -ErrorAction SilentlyContinue
               if ($gc) { $env:ISCC = $gc.Source; $found = $true }
             }
-            if (-not $found) {
-              throw "ISCC.exe not found after install"
-            }
+            if (-not $found) { throw "ISCC.exe not found after install" }
+            
             & "$env:ISCC" /O+ `
               "/DMyAppVersion=${{ steps.appver.outputs.version }}" `
               installer\Cartridge.iss
 
-        - name: Upload Installer Artifact
+        - name: Upload Installer EXE Artifact
           uses: actions/upload-artifact@v4
           with:
-            name: Cartridge-Setup-${{ steps.appver.outputs.version }}
-            path: installer/Output/*.exe
+            name: Cartridge-Setup-${{ steps.appver.outputs.version }}.exe
+            path: installer/Output/Cartridge-Setup-${{ steps.appver.outputs.version }}.exe
