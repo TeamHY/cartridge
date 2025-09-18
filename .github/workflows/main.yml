@@ -36,11 +36,37 @@ jobs:
             name: cartridge
             path: ./build/windows/x64/runner/Release
 
+        - name: Install Inno Setup (Chocolatey)
+          shell: pwsh
+          run: |
+            choco install innosetup --no-progress -y
+            $candidates = @(
+              "${env:ProgramFiles(x86)}\Inno Setup 6\iscc.exe",
+              "${env:ProgramFiles}\Inno Setup 6\iscc.exe"
+            )
+            $found = $false
+            foreach ($c in $candidates) {
+              Write-Host "Probe: $c"
+              if (Test-Path $c) { $env:ISCC = $c; $found = $true; break }
+            }
+            if (-not $found) {
+              $gc = Get-Command iscc.exe -ErrorAction SilentlyContinue
+              if ($gc) { $env:ISCC = $gc.Source; $found = $true }
+            }
+            if (-not $found) {
+              throw "ISCC.exe not found after install"
+            }
+            Write-Host "ISCC = $env:ISCC"
+
+        - name: Verify build output exists (debug)
+          shell: pwsh
+          run: |
+            Get-ChildItem -Recurse -Depth 2 build\windows\x64\runner\Release | Select-Object FullName
+
         - name: Compile .ISS to .EXE Installer
-          uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
-          with:
-            path: installer/Cartridge.iss
-            options: /O+
+          shell: pwsh
+          run: |
+            & "$env:ISCC" /O+ installer\Cartridge.iss
 
         - name: Upload Installer Artifact
           uses: actions/upload-artifact@v4
