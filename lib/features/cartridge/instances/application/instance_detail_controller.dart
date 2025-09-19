@@ -192,6 +192,7 @@ class InstanceDetailController
           optionPresetId: optionPresetId,
           updatedAt: r.data?.updatedAt,
         ));
+        _touchList();
       },
       notFound: (_) async {},
       invalid:  (_) async {},
