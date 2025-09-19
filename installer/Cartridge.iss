@@ -61,3 +61,5 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 [UninstallDelete]
 Type: filesandordirs; Name: "{userappdata}\TeamHY\Cartridge"
 Type: dirifempty;     Name: "{userappdata}\TeamHY"
+Type: filesandordirs; Name: "{app}\*"
+Type: dirifempty;     Name: "{app}"
