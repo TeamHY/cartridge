@@ -6,6 +6,7 @@ import 'package:cartridge/core/validation.dart';
 import 'package:crypto/crypto.dart' show sha256;
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:path/path.dart' as p;
+import 'package:cartridge/core/infra/file_io.dart' as fio;
 
 import 'package:cartridge/core/result.dart';
 import 'package:cartridge/core/utils/id.dart';
@@ -195,10 +196,11 @@ class InstancePackService {
 
     // 3) 인스턴스 모델 생성 + 이미지 언팩
     final newInstanceId = IdUtil.genId('inst');
+    final imageBaseDir = await _imageBaseDir();
     final image = await _unpackImageForInstance(
       z: z,
       imageJson: (instanceJson['image'] as Map?)?.cast<String, dynamic>(),
-      destDirForImages: p.join(p.dirname(zipPath), 'cartridge_images'),
+      destDirForImages: imageBaseDir,
       instanceId: newInstanceId,
     );
 
@@ -530,5 +532,11 @@ class InstancePackService {
     // 최빈값 parent 선택
     final best = parents.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
     return best;
+  }
+
+  // 인스턴스 이미지 저장 기본 경로(AppSupport/instance_images)
+  Future<String> _imageBaseDir() async {
+    final dir = await fio.ensureAppSupportSubDir('instance_images');
+    return dir.path;
   }
 }
