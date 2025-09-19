@@ -1,4 +1,5 @@
 import 'package:cartridge/core/constants/urls.dart';
+import 'package:cartridge/core/service_providers.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -117,6 +118,7 @@ class IsaacInstallDetectCard extends ConsumerWidget {
                   UTHeaderRefreshButton(
                     tooltip: loc.common_refresh,
                     onRefresh: () async {
+                      ref.invalidate(repentogonInstalledProvider);
                       ref.invalidate(isaacAutoInfoProvider);
                       try {
                         final refreshed = await ref.read(isaacAutoInfoProvider.future);

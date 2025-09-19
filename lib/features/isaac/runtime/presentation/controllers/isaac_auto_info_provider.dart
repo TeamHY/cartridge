@@ -17,7 +17,7 @@ final isaacAutoInfoProvider = FutureProvider<IsaacAutoInfo>((ref) async {
   final asset = (ed == null) ? null : IsaacEditionInfo.imageAssetFor(ed);
 
   // 3) Repentogon installed only valid when path is valid (handled by provider contract)
-  final repInstalled = await ref.read(repentogonInstalledProvider.future);
+  final repInstalled = await ref.watch(repentogonInstalledProvider.future);
 
   return IsaacAutoInfo(
     editionName: IsaacEditionInfo.folderName[ed],

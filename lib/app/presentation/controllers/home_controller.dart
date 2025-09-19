@@ -16,7 +16,7 @@ const _tag = 'HomeController';
 
 
 Future<bool> isRepentogonInstalled(WidgetRef ref) async {
-  return await ref.read(repentogonInstalledProvider.future);
+  return await ref.watch(repentogonInstalledProvider.future);
 }
 
 Future<void> openInstallFolder(BuildContext context, WidgetRef ref) async {

@@ -85,7 +85,7 @@ class OptionPresetsController extends AsyncNotifier<List<OptionPresetView>> {
   }
 
   Future<bool> isRepentogonInstalled() async {
-    return await ref.read(repentogonInstalledProvider.future);
+    return await ref.watch(repentogonInstalledProvider.future);
   }
 
   /// 드래그로 정한 순서를 영구 저장 → 성공 시 목록 갱신

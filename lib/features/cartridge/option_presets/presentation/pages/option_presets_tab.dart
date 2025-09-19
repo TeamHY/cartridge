@@ -85,7 +85,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
   }
 
   Future<void> createFlow() async {
-    final repInstalled = await ref.read(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
+    final repInstalled = await ref.watch(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
     OptionPresetView? init;
     try {
       init = await ref.read(optionPresetInitialFromCurrentProvider.future);
@@ -265,7 +265,7 @@ class _OptionPresetsTabState extends ConsumerState<OptionPresetsTab> {
                 onTap: disableTap
                     ? () {}
                     : () async {
-                  final repInstalled = await ref.read(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
+                  final repInstalled = await ref.watch(optionPresetsControllerProvider.notifier).isRepentogonInstalled();
                   if (!context.mounted) return;
                   final res = await showOptionPresetsCreateEditDialog(context, initial: v, repentogonInstalled: repInstalled);
                   if (res == null) return;
