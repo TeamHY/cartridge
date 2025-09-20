@@ -8,12 +8,6 @@
 
 <h4 align="center">쉽게 컨텐츠를 추가할 수 있는 가이드 (목록은 YAML, 상세는 Markdown)</h4>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/who-Non-Developer-success" alt="Who">
-  <img src="https://img.shields.io/badge/edit-YAML%20%26%20Markdown-ffcc00" alt="Edit">
-  <img src="https://img.shields.io/badge/i18n-KO%20%2F%20EN%20in%20file-00aaff" alt="i18n">
-</p>
-
 ---
 
 ## 빠른 시작 (TL;DR)
