@@ -71,13 +71,17 @@ class StoreNotifier extends ChangeNotifier {
 
   final Ref ref;
 
-  PresetsDataV3? _presetsData;
+  PresetsDataV3 _presetsData = PresetsDataV3(
+    presets: [],
+    gameConfigs: [],
+    groups: {},
+  );
 
-  List<Preset> get presets => _presetsData?.presets ?? [];
+  List<Preset> get presets => _presetsData.presets;
 
-  List<GameConfig> get gameConfigs => _presetsData?.gameConfigs ?? [];
+  List<GameConfig> get gameConfigs => _presetsData.gameConfigs;
 
-  Map<String, Set<String>> get groups => _presetsData?.groups ?? {};
+  Map<String, Set<String>> get groups => _presetsData.groups;
 
   List<Mod> currentMods = [];
 
@@ -323,7 +327,12 @@ class StoreNotifier extends ChangeNotifier {
       return;
     }
 
-    _presetsData = await PresetsParser.parseFromFile(file);
+    _presetsData = await PresetsParser.parseFromFile(file) ??
+        PresetsDataV3(
+          presets: [],
+          gameConfigs: [],
+          groups: {},
+        );
 
     notifyListeners();
   }
@@ -332,70 +341,59 @@ class StoreNotifier extends ChangeNotifier {
     final appSupportDir = await getApplicationSupportDirectory();
     final file = File('${appSupportDir.path}/presets.json');
 
-    file.writeAsString(jsonEncode(_presetsData?.toJson()));
+    file.writeAsString(jsonEncode(_presetsData.toJson()));
   }
 
   void addGroup(String groupName) {
-    if (_presetsData == null) {
-      _presetsData = PresetsDataV3(
-        presets: [],
-        gameConfigs: [],
-        groups: {},
-      );
-    }
-
-    if (!_presetsData!.groups.containsKey(groupName)) {
-      _presetsData!.groups[groupName] = <String>{};
+    if (!_presetsData.groups.containsKey(groupName)) {
+      _presetsData.groups[groupName] = <String>{};
       savePresets();
       notifyListeners();
     }
   }
 
   void removeGroup(String groupName) {
-    if (_presetsData != null && _presetsData!.groups.containsKey(groupName)) {
-      _presetsData!.groups.remove(groupName);
+    if (_presetsData.groups.containsKey(groupName)) {
+      _presetsData.groups.remove(groupName);
       savePresets();
       notifyListeners();
     }
   }
 
   void renameGroup(String oldName, String newName) {
-    if (_presetsData != null &&
-        _presetsData!.groups.containsKey(oldName) &&
-        !_presetsData!.groups.containsKey(newName)) {
-      final modNames = _presetsData!.groups[oldName]!;
-      _presetsData!.groups.remove(oldName);
-      _presetsData!.groups[newName] = modNames;
+    if (_presetsData.groups.containsKey(oldName) &&
+        !_presetsData.groups.containsKey(newName)) {
+      final modNames = _presetsData.groups[oldName]!;
+      _presetsData.groups.remove(oldName);
+      _presetsData.groups[newName] = modNames;
       savePresets();
       notifyListeners();
     }
   }
 
   void addModToGroup(String groupName, String modName) {
-    if (_presetsData != null && _presetsData!.groups.containsKey(groupName)) {
-      _presetsData!.groups[groupName]!.add(modName);
+    if (_presetsData.groups.containsKey(groupName)) {
+      _presetsData.groups[groupName]!.add(modName);
       savePresets();
       notifyListeners();
     }
   }
 
   void removeModFromGroup(String groupName, String modName) {
-    if (_presetsData != null && _presetsData!.groups.containsKey(groupName)) {
-      _presetsData!.groups[groupName]!.remove(modName);
+    if (_presetsData.groups.containsKey(groupName)) {
+      _presetsData.groups[groupName]!.remove(modName);
       savePresets();
       notifyListeners();
     }
   }
 
   void moveModToGroup(String modName, String? fromGroup, String? toGroup) {
-    if (_presetsData == null) return;
-
-    if (fromGroup != null && _presetsData!.groups.containsKey(fromGroup)) {
-      _presetsData!.groups[fromGroup]!.remove(modName);
+    if (fromGroup != null && _presetsData.groups.containsKey(fromGroup)) {
+      _presetsData.groups[fromGroup]!.remove(modName);
     }
 
-    if (toGroup != null && _presetsData!.groups.containsKey(toGroup)) {
-      _presetsData!.groups[toGroup]!.add(modName);
+    if (toGroup != null && _presetsData.groups.containsKey(toGroup)) {
+      _presetsData.groups[toGroup]!.add(modName);
     }
 
     savePresets();
@@ -403,9 +401,7 @@ class StoreNotifier extends ChangeNotifier {
   }
 
   String? getModGroup(String modName) {
-    if (_presetsData == null) return null;
-
-    for (var entry in _presetsData!.groups.entries) {
+    for (var entry in _presetsData.groups.entries) {
       if (entry.value.contains(modName)) {
         return entry.key;
       }
