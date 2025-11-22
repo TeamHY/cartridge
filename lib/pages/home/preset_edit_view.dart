@@ -3,11 +3,12 @@ import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/widgets/dialogs/game_config_dialog.dart';
-import 'package:cartridge/widgets/dialogs/mod_group_dialog.dart';
-import 'package:cartridge/widgets/mod_item.dart';
+import 'package:cartridge/components/dialogs/game_config_dialog.dart';
+import 'package:cartridge/components/dialogs/mod_group_dialog.dart';
+import 'package:cartridge/pages/home/components/mod_item.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class PresetEditView extends ConsumerStatefulWidget {
   final Preset selectedPreset;
@@ -156,9 +157,9 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                 ),
               ),
               IconButton(
-                icon: Icon(_isEditingPresetName
-                    ? FluentIcons.check_mark
-                    : FluentIcons.edit),
+                icon: PhosphorIcon(_isEditingPresetName
+                    ? PhosphorIconsBold.check
+                    : PhosphorIconsBold.pencilSimple),
                 onPressed: () {
                   if (_isEditingPresetName) {
                     widget.selectedPreset.name =
@@ -189,8 +190,8 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     return Row(
       children: [
         IconButton(
-          icon: Icon(
-            FluentIcons.list,
+          icon: PhosphorIcon(
+            PhosphorIconsBold.rows,
             color: !setting.isGridView ? Colors.blue : Colors.grey,
           ),
           onPressed: () {
@@ -199,8 +200,8 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
           },
         ),
         IconButton(
-          icon: Icon(
-            FluentIcons.grid_view_medium,
+          icon: PhosphorIcon(
+            PhosphorIconsBold.gridFour,
             color: setting.isGridView ? Colors.blue : Colors.grey,
           ),
           onPressed: () {
@@ -505,7 +506,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
                   : Column(
                       spacing: 8,
                       children: mods
-                          .map((mod) => Container(
+                          .map((mod) => SizedBox(
                                 width: double.infinity,
                                 child: ModItem(
                                   mod: mod,

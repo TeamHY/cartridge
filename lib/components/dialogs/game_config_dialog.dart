@@ -1,7 +1,7 @@
 import 'package:cartridge/models/game_config.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/widgets/game_config_list_view.dart';
-import 'package:cartridge/widgets/game_config_form_view.dart';
+import 'package:cartridge/components/game_config_list_view.dart';
+import 'package:cartridge/components/game_config_form_view.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -139,8 +139,10 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
     showDialog(
       context: context,
       builder: (context) => ContentDialog(
-        title: Text(AppLocalizations.of(context).game_config_unsaved_changes_title),
-        content: Text(AppLocalizations.of(context).game_config_unsaved_changes_message),
+        title: Text(
+            AppLocalizations.of(context).game_config_unsaved_changes_title),
+        content: Text(
+            AppLocalizations.of(context).game_config_unsaved_changes_message),
         actions: [
           Button(
             onPressed: () => Navigator.pop(context),

@@ -9,18 +9,18 @@ import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/models/weekly_challenge.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/utils/isaac_log_file.dart';
+import 'package:cartridge/services/isaac_log_file.dart';
 import 'package:cartridge/utils/format_util.dart';
-import 'package:cartridge/utils/process_util.dart';
-import 'package:cartridge/utils/recorder_mod.dart';
-import 'package:cartridge/widgets/back_arrow_view.dart';
-import 'package:cartridge/widgets/daily_challenge_ranking.dart';
-import 'package:cartridge/widgets/dialogs/error_dialog.dart';
-import 'package:cartridge/widgets/dialogs/nickname_edit_dialog.dart';
-import 'package:cartridge/widgets/dialogs/sign_in_dialog.dart';
+import 'package:cartridge/services/process_util.dart';
+import 'package:cartridge/services/recorder_mod.dart';
+import 'package:cartridge/pages/record/components/back_arrow_view.dart';
+import 'package:cartridge/pages/record/components/ranking/daily_challenge_ranking.dart';
+import 'package:cartridge/components/dialogs/error_dialog.dart';
+import 'package:cartridge/components/dialogs/nickname_edit_dialog.dart';
+import 'package:cartridge/components/dialogs/sign_in_dialog.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:cartridge/widgets/dialogs/sign_up_dialog.dart';
-import 'package:cartridge/widgets/weekly_challenge_ranking.dart';
+import 'package:cartridge/components/dialogs/sign_up_dialog.dart';
+import 'package:cartridge/pages/record/components/ranking/weekly_challenge_ranking.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -215,7 +215,8 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       ProcessUtil.killIsaac();
 
       if (context.mounted) {
-        showErrorDialog(context, AppLocalizations.of(context).record_invalid_mod_warning);
+        showErrorDialog(
+            context, AppLocalizations.of(context).record_invalid_mod_warning);
       }
     }
 
@@ -499,8 +500,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                   ),
                 ),
                 onPressed: () async {
-                  await launchUrl(
-                      Uri.parse(AppUrls.rulesPost));
+                  await launchUrl(Uri.parse(AppUrls.rulesPost));
                 },
               ),
               const SizedBox(height: 32),

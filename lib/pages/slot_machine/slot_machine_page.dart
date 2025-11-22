@@ -1,6 +1,6 @@
 import 'package:cartridge/providers/slot_machine_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/widgets/slot_view.dart';
+import 'package:cartridge/pages/slot_machine/components/slot_view.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';

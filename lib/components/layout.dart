@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/widgets/quick_bar.dart';
-import 'package:cartridge/widgets/dialogs/setting_dialog.dart';
+import 'package:cartridge/components/quick_bar.dart';
+import 'package:cartridge/components/dialogs/setting_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 class Layout extends ConsumerWidget {
@@ -18,6 +19,7 @@ class Layout extends ConsumerWidget {
 
     return NavigationView(
       appBar: NavigationAppBar(
+        height: 32,
         automaticallyImplyLeading: false,
         title: DragToMoveArea(
           child: Row(children: [
@@ -37,12 +39,14 @@ class Layout extends ConsumerWidget {
               children: [
                 Expanded(child: Container()),
                 IconButton(
-                  icon: const Icon(FluentIcons.refresh, size: 20),
+                  icon: const PhosphorIcon(PhosphorIconsRegular.arrowClockwise,
+                      size: 16),
                   onPressed: () => store.reloadMods(),
                 ),
                 const SizedBox(width: 4),
                 IconButton(
-                  icon: const Icon(FluentIcons.settings, size: 20),
+                  icon: const PhosphorIcon(PhosphorIconsRegular.gearSix,
+                      size: 16),
                   onPressed: () => showDialog(
                     context: context,
                     builder: (context) => const SettingDialog(),
@@ -86,12 +90,14 @@ class Layout extends ConsumerWidget {
               children: [
                 Expanded(child: Container()),
                 IconButton(
-                  icon: const Icon(FluentIcons.refresh, size: 12),
+                  icon: const PhosphorIcon(PhosphorIconsRegular.arrowClockwise,
+                      size: 12),
                   onPressed: () => store.reloadMods(),
                 ),
                 const SizedBox(width: 4),
                 IconButton(
-                  icon: const Icon(FluentIcons.settings, size: 12),
+                  icon: const PhosphorIcon(PhosphorIconsRegular.gearSix,
+                      size: 12),
                   onPressed: () => showDialog(
                     context: context,
                     builder: (context) => const SettingDialog(),

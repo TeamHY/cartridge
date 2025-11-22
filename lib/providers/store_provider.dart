@@ -6,7 +6,7 @@ import 'package:cartridge/models/game_config.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/utils/presets_parser.dart';
-import 'package:cartridge/utils/process_util.dart';
+import 'package:cartridge/services/process_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -97,11 +97,6 @@ class StoreNotifier extends ChangeNotifier {
       astroLocalVersion != astroRemoteVersion ||
       astroLocalVersion == null ||
       astroRemoteVersion == null;
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   Future<List<Mod>> loadMods() async {
     final setting = ref.read(settingProvider);

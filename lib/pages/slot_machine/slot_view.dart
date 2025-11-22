@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:cartridge/widgets/slot_item.dart';
+import 'package:cartridge/pages/slot_machine/components/slot_item.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -31,7 +31,7 @@ class SlotView extends StatefulWidget {
 }
 
 class _SlotViewState extends State<SlotView> {
-  FixedExtentScrollController _controller = FixedExtentScrollController();
+  final FixedExtentScrollController _controller = FixedExtentScrollController();
   bool _isHovered = false;
 
   void onStart() {
@@ -123,7 +123,8 @@ class _SlotViewState extends State<SlotView> {
                                       builder: (context) {
                                         return ContentDialog(
                                           title: Text(loc.slot_delete_title),
-                                          content: Text(loc.slot_delete_message),
+                                          content:
+                                              Text(loc.slot_delete_message),
                                           actions: [
                                             Button(
                                               onPressed: () {

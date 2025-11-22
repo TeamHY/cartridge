@@ -1,0 +1,257 @@
+import 'dart:math';
+import 'dart:ui';
+
+import 'package:cartridge/pages/slot_machine/components/slot_item.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
+
+class SlotViewController {
+  SlotViewController({this.start});
+
+  void Function()? start;
+}
+
+class SlotView extends StatefulWidget {
+  const SlotView({
+    super.key,
+    required this.items,
+    required this.controller,
+    required this.onEdited,
+    required this.onDeleted,
+  });
+
+  final List<String> items;
+  final SlotViewController controller;
+  final void Function(List<String> newItems) onEdited;
+  final void Function() onDeleted;
+
+  @override
+  State<SlotView> createState() => _SlotViewState();
+}
+
+class _SlotViewState extends State<SlotView> {
+  final FixedExtentScrollController _controller = FixedExtentScrollController();
+  bool _isHovered = false;
+
+  void onStart() {
+    _controller.jumpToItem(_controller.selectedItem % widget.items.length);
+
+    _controller.animateToItem(
+      Random().nextInt(widget.items.length * 200) + widget.items.length * 5,
+      duration: Duration(
+        milliseconds: (3000 * ((Random().nextDouble() + 1) / 2)).toInt(),
+      ),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller.start = onStart;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
+    return SizedBox(
+      width: 180,
+      height: 320,
+      child: Stack(
+        children: [
+          ListWheelScrollView.useDelegate(
+            controller: _controller,
+            itemExtent: 100,
+            physics: const FixedExtentScrollPhysics(),
+            diameterRatio: 1,
+            overAndUnderCenterOpacity: 0.2,
+            childDelegate: ListWheelChildLoopingListDelegate(
+                children: widget.items
+                    .map((value) =>
+                        SlotItem(width: 180, height: 100, text: value))
+                    .toList()),
+          ),
+          Center(
+            child: SizedBox(
+              width: 180,
+              height: 100,
+              child: MouseRegion(
+                onHover: (event) => setState(() => _isHovered = true),
+                onExit: (event) => setState(() => _isHovered = false),
+                child: ClipRect(
+                  child: TweenAnimationBuilder(
+                      duration: const Duration(milliseconds: 100),
+                      tween: Tween<double>(begin: 0, end: _isHovered ? 1 : 0),
+                      curve: Curves.easeInOutCubic,
+                      builder: (context, value, child) {
+                        return Opacity(
+                          opacity: value,
+                          child: Container(
+                            color: const Color.fromRGBO(255, 255, 255, 0.85),
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(FluentIcons.sync),
+                                    onPressed: onStart,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(FluentIcons.edit),
+                                    onPressed: () => showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return SlotDialog(
+                                          items: widget.items,
+                                          onEdit: widget.onEdited,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: Icon(
+                                      FluentIcons.delete,
+                                      color: Colors.red.dark,
+                                    ),
+                                    onPressed: () => showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return ContentDialog(
+                                          title: Text(loc.slot_delete_title),
+                                          content:
+                                              Text(loc.slot_delete_message),
+                                          actions: [
+                                            Button(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(loc.common_cancel),
+                                            ),
+                                            FilledButton(
+                                              style: ButtonStyle(
+                                                backgroundColor:
+                                                    ButtonState.all<Color>(
+                                                        Colors.red.dark),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                widget.onDeleted();
+                                              },
+                                              child: Text(loc.common_delete),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SlotDialog extends ConsumerStatefulWidget {
+  const SlotDialog({
+    super.key,
+    required this.items,
+    required this.onEdit,
+  });
+
+  final List<String> items;
+  final Function(List<String> newItems) onEdit;
+
+  @override
+  ConsumerState<SlotDialog> createState() => _SlotDialogState();
+}
+
+class _SlotDialogState extends ConsumerState<SlotDialog> {
+  late List<String> newItems;
+
+  @override
+  void initState() {
+    super.initState();
+
+    newItems = List.from(widget.items);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
+    return ContentDialog(
+      title: Text(loc.slot_edit_title),
+      constraints: const BoxConstraints(maxWidth: 368, maxHeight: 600),
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            for (var i = 0; i < newItems.length; i++)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(FluentIcons.remove),
+                      onPressed: () => setState(() {
+                        newItems.removeAt(i);
+                      }),
+                    ),
+                    const SizedBox(width: 4),
+                    SizedBox(
+                      width: 298,
+                      child: TextBox(
+                        onChanged: (value) {
+                          // setState를 의도해서 사용하지 않았음
+                          newItems[i] = value;
+                        },
+                        controller: TextEditingController(
+                          text: newItems[i],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            IconButton(
+              icon: const Icon(FluentIcons.add),
+              onPressed: () {
+                setState(() {
+                  newItems.add('');
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        Button(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(loc.common_cancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            widget.onEdit(newItems);
+            Navigator.pop(context);
+          },
+          child: Text(loc.common_apply),
+        ),
+      ],
+    );
+  }
+}

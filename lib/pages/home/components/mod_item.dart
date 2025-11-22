@@ -129,6 +129,7 @@ class _ModItemState extends ConsumerState<ModItem> {
               _showContextMenu(details.globalPosition),
           child: InkWell(
             onTap: () => widget.onChanged(widget.mod.isDisable),
+            mouseCursor: SystemMouseCursors.click,
             borderRadius: BorderRadius.circular(12),
             splashColor: enabled
                 ? Colors.green.withValues(alpha: 0.2)

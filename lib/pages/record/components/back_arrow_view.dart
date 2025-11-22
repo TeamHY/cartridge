@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 class BackArrowView extends StatelessWidget {
@@ -22,8 +23,8 @@ class BackArrowView extends StatelessWidget {
                   iconButtonMode: IconButtonMode.large,
                   icon: const Padding(
                     padding: EdgeInsets.all(12.0),
-                    child: Icon(
-                      FluentIcons.back,
+                    child: PhosphorIcon(
+                      PhosphorIconsBold.arrowLeft,
                       color: Colors.white,
                     ),
                   ),

@@ -6,7 +6,7 @@ import 'package:roulette/roulette.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
 class Arrow extends StatelessWidget {
-  const Arrow({Key? key}) : super(key: key);
+  const Arrow({super.key});
 
   @override
   Widget build(BuildContext context) {
