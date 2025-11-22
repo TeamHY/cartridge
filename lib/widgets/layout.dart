@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/widgets/quick_bar.dart';
 import 'package:cartridge/widgets/dialogs/setting_dialog.dart';
@@ -11,8 +13,7 @@ class Layout extends ConsumerWidget {
 
   final Widget child;
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget buildWindowsTitleBar(BuildContext context, WidgetRef ref) {
     final store = ref.watch(storeProvider);
 
     return NavigationView(
@@ -65,5 +66,56 @@ class Layout extends ConsumerWidget {
         child: child,
       ),
     );
+  }
+
+  Widget buildMacOSTitleBar(BuildContext context, WidgetRef ref) {
+    final store = ref.watch(storeProvider);
+
+    return NavigationView(
+      appBar: NavigationAppBar(
+        automaticallyImplyLeading: false,
+        height: 30,
+        title: const DragToMoveArea(
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text('Cartridge'),
+          ]),
+        ),
+        actions: Stack(
+          children: [
+            Row(
+              children: [
+                Expanded(child: Container()),
+                IconButton(
+                  icon: const Icon(FluentIcons.refresh, size: 12),
+                  onPressed: () => store.reloadMods(),
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: const Icon(FluentIcons.settings, size: 12),
+                  onPressed: () => showDialog(
+                    context: context,
+                    builder: (context) => const SettingDialog(),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+            ),
+          ],
+        ),
+      ),
+      content: material.Material(
+        color: Colors.transparent,
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (Platform.isMacOS) {
+      return buildMacOSTitleBar(context, ref);
+    }
+
+    return buildWindowsTitleBar(context, ref);
   }
 }
