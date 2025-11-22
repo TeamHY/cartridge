@@ -4,6 +4,7 @@ import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class PresetCreationBar extends ConsumerWidget {
   final TextEditingController controller;
@@ -18,35 +19,36 @@ class PresetCreationBar extends ConsumerWidget {
     final store = ref.watch(storeProvider);
     final loc = AppLocalizations.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        children: [
-          Flexible(
-            child: TextBox(
-              controller: controller,
-              placeholder: loc.home_preset_placeholder,
-            ),
+    void onSubmit(String value) {
+      store.addPreset(
+        Preset(
+          name: controller.value.text != ''
+              ? controller.value.text
+              : loc.home_preset_placeholder,
+          mods: store.currentMods
+              .map((mod) => Mod.fromJson(mod.toJson()))
+              .toList(),
+        ),
+      );
+
+      controller.clear();
+    }
+
+    return Row(
+      children: [
+        Flexible(
+          child: TextBox(
+            controller: controller,
+            onSubmitted: (value) => onSubmit(value),
+            placeholder: loc.home_preset_placeholder,
           ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(FluentIcons.add),
-            onPressed: () {
-              store.presets.add(
-                Preset(
-                  name: controller.value.text != ''
-                      ? controller.value.text
-                      : loc.home_preset_placeholder,
-                  mods: store.currentMods
-                      .map((mod) => Mod.fromJson(mod.toJson()))
-                      .toList(),
-                ),
-              );
-              store.savePresets();
-            },
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 4),
+        IconButton(
+          icon: const PhosphorIcon(PhosphorIconsRegular.plus, size: 16),
+          onPressed: () => onSubmit(controller.value.text),
+        ),
+      ],
     );
   }
 }

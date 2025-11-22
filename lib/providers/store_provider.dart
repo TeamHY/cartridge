@@ -339,6 +339,12 @@ class StoreNotifier extends ChangeNotifier {
     file.writeAsString(jsonEncode(_presetsData.toJson()));
   }
 
+  void addPreset(Preset preset) {
+    _presetsData.presets.add(preset);
+    savePresets();
+    notifyListeners();
+  }
+
   void addGroup(String groupName) {
     if (!_presetsData.groups.containsKey(groupName)) {
       _presetsData.groups[groupName] = <String>{};

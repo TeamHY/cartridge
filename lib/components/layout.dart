@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/components/quick_bar.dart';
 import 'package:cartridge/components/dialogs/setting_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
@@ -10,9 +9,11 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 class Layout extends ConsumerWidget {
-  const Layout({super.key, required this.child});
+  const Layout({super.key, required this.child, required this.onHomePressed});
 
   final Widget child;
+
+  final VoidCallback onHomePressed;
 
   Widget buildWindowsTitleBar(BuildContext context, WidgetRef ref) {
     final store = ref.watch(storeProvider);
@@ -21,22 +22,22 @@ class Layout extends ConsumerWidget {
       appBar: NavigationAppBar(
         height: 32,
         automaticallyImplyLeading: false,
-        title: DragToMoveArea(
-          child: Row(children: [
-            const Text('Cartridge'),
-            const SizedBox(width: 8.0),
-            MediaQuery.of(context).size.width <= 800
-                ? const QuickBar()
-                : Container(),
+        title: const DragToMoveArea(
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text('Cartridge'),
           ]),
         ),
         actions: Stack(
           children: [
-            MediaQuery.of(context).size.width > 800
-                ? const Center(child: QuickBar())
-                : Container(),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const SizedBox(width: 4),
+                IconButton(
+                  icon:
+                      const PhosphorIcon(PhosphorIconsRegular.house, size: 16),
+                  onPressed: onHomePressed,
+                ),
                 Expanded(child: Container()),
                 IconButton(
                   icon: const PhosphorIcon(PhosphorIconsRegular.arrowClockwise,

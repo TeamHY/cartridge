@@ -25,7 +25,7 @@ class PresetList extends ConsumerWidget {
     if (store.presets.isEmpty) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(32.0),
+          padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -60,7 +60,6 @@ class PresetList extends ConsumerWidget {
 
     return ReorderableListView.builder(
       buildDefaultDragHandles: false,
-      padding: const EdgeInsets.all(8),
       itemCount: store.presets.length,
       itemBuilder: (context, index) => ReorderableDragStartListener(
         key: ValueKey(store.presets[index]),

@@ -13,52 +13,37 @@ class HomeNavigationBar extends ConsumerWidget {
     final store = ref.watch(storeProvider);
     final loc = AppLocalizations.of(context);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 245, 248, 252),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 2,
-            offset: const Offset(0, -2),
+    return Row(
+      children: [
+        Button(
+          onPressed: () => Navigator.push(
+            context,
+            FluentPageRoute(
+              builder: (context) => const RecordPage(),
+            ),
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Button(
-              onPressed: () => Navigator.push(
-                context,
-                FluentPageRoute(
-                  builder: (context) => const RecordPage(),
-                ),
-              ),
-              child: Text(loc.home_button_record),
-            ),
-            const SizedBox(width: 4),
-            Button(
-              onPressed: () => Navigator.push(
-                context,
-                FluentPageRoute(
-                  builder: (context) => const SlotMachinePage(),
-                ),
-              ),
-              child: Text(loc.home_button_slot_machine),
-            ),
-            const SizedBox(width: 4),
-            Button(
-              onPressed: () => store.applyPreset(
-                null,
-                isEnableMods: false,
-                isDebugConsole: false,
-              ),
-              child: Text(loc.home_button_daily_run),
-            ),
-          ],
+          child: Text(loc.home_button_record),
         ),
-      ),
+        const SizedBox(width: 4),
+        Button(
+          onPressed: () => Navigator.push(
+            context,
+            FluentPageRoute(
+              builder: (context) => const SlotMachinePage(),
+            ),
+          ),
+          child: Text(loc.home_button_slot_machine),
+        ),
+        const SizedBox(width: 4),
+        Button(
+          onPressed: () => store.applyPreset(
+            null,
+            isEnableMods: false,
+            isDebugConsole: false,
+          ),
+          child: Text(loc.home_button_daily_run),
+        ),
+      ],
     );
   }
 }
