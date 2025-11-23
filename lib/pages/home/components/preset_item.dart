@@ -85,121 +85,111 @@ class _PresetItemState extends State<PresetItem>
           : Colors.transparent,
       borderColor: widget.isSelected ? theme.accentColor : Colors.transparent,
       padding: EdgeInsetsGeometry.zero,
-      child: MouseRegion(
-        onEnter: (_) {
-          setState(() => _isHovering = true);
-          _animationController.forward();
-        },
-        onExit: (_) {
-          setState(() => _isHovering = false);
-          _animationController.reverse();
-        },
-        child: material.InkWell(
-          onTap: widget.onTap,
-          mouseCursor: SystemMouseCursors.click,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    widget.preset.name,
-                    style: TextStyle(
-                      fontWeight: widget.isSelected
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                      fontSize: 14,
-                      color: widget.isSelected ? theme.accentColor : null,
-                    ),
+      child: material.InkWell(
+        onTap: widget.onTap,
+        mouseCursor: SystemMouseCursors.click,
+        borderRadius: BorderRadius.circular(4),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  widget.preset.name,
+                  style: TextStyle(
+                    fontWeight:
+                        widget.isSelected ? FontWeight.w600 : FontWeight.normal,
+                    fontSize: 14,
+                    color: widget.isSelected ? theme.accentColor : null,
                   ),
                 ),
-                AnimatedBuilder(
-                  animation: _fadeAnimation,
-                  builder: (context, child) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          onPressed: () => widget.onApply(widget.preset),
-                          icon: const PhosphorIcon(
-                            PhosphorIconsRegular.play,
-                            size: 16,
-                          ),
-                          style: ButtonStyle(
-                            backgroundColor:
-                                WidgetStateProperty.resolveWith((states) {
-                              if (states.contains(WidgetState.hovered)) {
-                                return theme.accentColor.withValues(alpha: 0.1);
-                              }
-                              return Colors.transparent;
-                            }),
-                            foregroundColor:
-                                WidgetStateProperty.resolveWith((states) {
-                              if (states.contains(WidgetState.hovered)) {
-                                return theme.accentColor;
-                              }
-                              return Colors.black.withAlpha(230);
-                            }),
-                          ),
+              ),
+              AnimatedBuilder(
+                animation: _fadeAnimation,
+                builder: (context, child) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () => widget.onApply(widget.preset),
+                        icon: const PhosphorIcon(
+                          PhosphorIconsRegular.play,
+                          size: 16,
                         ),
-                        IconButton(
-                          onPressed: () => showDialog(
-                            context: context,
-                            builder: (context) {
-                              return ContentDialog(
-                                title: Text(loc.preset_delete_title),
-                                content: Text(loc.preset_delete_message),
-                                actions: [
-                                  Button(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(loc.common_cancel),
-                                  ),
-                                  FilledButton(
-                                    style: ButtonStyle(
-                                      backgroundColor:
-                                          WidgetStatePropertyAll<Color>(
-                                              Colors.red.dark),
-                                    ),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      widget.onDelete(widget.preset);
-                                    },
-                                    child: Text(loc.common_delete),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          icon: const PhosphorIcon(
-                            PhosphorIconsRegular.trash,
-                            size: 16,
-                          ),
-                          style: ButtonStyle(
-                            backgroundColor:
-                                WidgetStateProperty.resolveWith((states) {
-                              if (states.contains(WidgetState.hovered)) {
-                                return Colors.red.withValues(alpha: 0.1);
-                              }
-                              return Colors.transparent;
-                            }),
-                            foregroundColor:
-                                WidgetStateProperty.resolveWith((states) {
-                              if (states.contains(WidgetState.hovered)) {
-                                return Colors.red.dark.withAlpha(200);
-                              }
-                              return Colors.black.withAlpha(230);
-                            }),
-                          ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.hovered)) {
+                              return theme.accentColor.withValues(alpha: 0.1);
+                            }
+                            return Colors.transparent;
+                          }),
+                          foregroundColor:
+                              WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.hovered)) {
+                              return theme.accentColor;
+                            }
+                            return Colors.black.withAlpha(230);
+                          }),
                         ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
+                      ),
+                      IconButton(
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (context) {
+                            return ContentDialog(
+                              title: Text(loc.preset_delete_title),
+                              content: Text(loc.preset_delete_message),
+                              actions: [
+                                Button(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(loc.common_cancel),
+                                ),
+                                FilledButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        WidgetStatePropertyAll<Color>(
+                                            Colors.red.dark),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    widget.onDelete(widget.preset);
+                                  },
+                                  child: Text(loc.common_delete),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        icon: const PhosphorIcon(
+                          PhosphorIconsRegular.trash,
+                          size: 16,
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.hovered)) {
+                              return Colors.red.withValues(alpha: 0.1);
+                            }
+                            return Colors.transparent;
+                          }),
+                          foregroundColor:
+                              WidgetStateProperty.resolveWith((states) {
+                            if (states.contains(WidgetState.hovered)) {
+                              return Colors.red.dark.withAlpha(200);
+                            }
+                            return Colors.black.withAlpha(230);
+                          }),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),

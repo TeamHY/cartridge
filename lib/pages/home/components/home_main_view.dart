@@ -1,4 +1,5 @@
 import 'package:cartridge/constants/urls.dart';
+import 'package:cartridge/pages/home/components/home_navigation_bar.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,6 +13,7 @@ class HomeMainView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const HomeNavigationBar(),
           Row(
             children: [
               Expanded(

@@ -1,18 +1,18 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cartridge/constants/urls.dart';
 import 'package:cartridge/models/daily_challenge.dart';
-import 'package:cartridge/models/mod.dart';
-import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/models/weekly_challenge.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/services/isaac_log_file.dart';
+import 'package:cartridge/services/auth_service.dart';
+import 'package:cartridge/services/challenge_service.dart';
+import 'package:cartridge/services/record_preset_service.dart';
+import 'package:cartridge/services/recorder_manager.dart';
 import 'package:cartridge/utils/format_util.dart';
 import 'package:cartridge/services/process_util.dart';
-import 'package:cartridge/services/recorder_mod.dart';
 import 'package:cartridge/pages/record/components/back_arrow_view.dart';
 import 'package:cartridge/pages/record/components/ranking/daily_challenge_ranking.dart';
 import 'package:cartridge/components/dialogs/error_dialog.dart';
@@ -22,13 +22,11 @@ import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/components/dialogs/sign_up_dialog.dart';
 import 'package:cartridge/pages/record/components/ranking/weekly_challenge_ranking.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:week_of_year/week_of_year.dart';
-import 'package:http/http.dart' as http;
+import 'package:cartridge/services/mod_service.dart';
 
 enum ChallengeType { daily, weekly }
 
@@ -57,6 +55,8 @@ class RecordPage extends ConsumerStatefulWidget {
 class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
   final _stopwatch = Stopwatch();
   final _supabase = Supabase.instance.client;
+  late final AuthService _authService;
+  late final ChallengeService _challengeService;
 
   late Timer _timer;
   late StreamSubscription<AuthState> _authSubscription;
@@ -75,6 +75,9 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     super.initState();
     windowManager.addListener(this);
 
+    _authService = AuthService(_supabase);
+    _challengeService = ChallengeService(_supabase);
+
     ref.read(storeProvider.notifier).checkAstroVersion();
 
     _timer = Timer.periodic(const Duration(milliseconds: 10), (Timer timer) {
@@ -83,29 +86,20 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       });
     });
 
-    _authSubscription = _supabase.auth.onAuthStateChange.listen((data) {
-      _supabase
-          .from('users')
-          .select()
-          .eq('id', data.session?.user.id ?? '')
-          .single()
-          .then((user) {
-        setState(() {
-          _isAdmin = user['is_tester'] ?? false;
-        });
-      }).catchError((e) {
-        setState(() {
-          _isAdmin = false;
-        });
+    _authSubscription = _authService.authStateChanges.listen((data) async {
+      final isAdmin = await _authService.isUserAdmin(data.session?.user.id);
+      setState(() {
+        _isAdmin = isAdmin;
       });
     });
 
-    _logFile = IsaacLogFile(
-      '$isaacDocumentPath\\log.txt',
-      onMessage: onMessage,
-    );
+    final setting = ref.read(settingProvider);
+    final logFilePath = Platform.isMacOS
+        ? '${setting.isaacDocumentPath}/log.txt'
+        : '${setting.isaacDocumentPath}\\log.txt';
+    _logFile = IsaacLogFile(logFilePath, onMessage: onMessage);
 
-    refreshChallenge();
+    _refreshChallenge();
   }
 
   @override
@@ -124,17 +118,33 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     ref.read(storeProvider.notifier).checkAstroVersion();
   }
 
-  void postDailyRecord(int time) async {
-    if (_recorder == null) {
-      return;
-    }
+  Future<void> _submitDailyRecord(int time) async {
+    if (_recorder == null) return;
 
-    await _supabase.functions.invoke('daily-record', body: {
-      'time': time,
-      'seed': _recorder!.seed,
-      'character': _recorder!.character,
-      'data': _recorder!.data
-    });
+    await _challengeService.submitDailyRecord(
+      time: time,
+      seed: _recorder!.seed,
+      character: _recorder!.character,
+      data: _recorder!.data,
+    );
+
+    _showRecordCompleteDialog(time);
+  }
+
+  Future<void> _submitWeeklyRecord(int time) async {
+    if (_recorder == null) return;
+
+    await _challengeService.submitWeeklyRecord(
+      time: time,
+      seed: _recorder!.seed,
+      character: _recorder!.character,
+      data: _recorder!.data,
+    );
+
+    _showRecordCompleteDialog(time);
+  }
+
+  void _showRecordCompleteDialog(int time) {
     final loc = AppLocalizations.of(context);
 
     if (context.mounted) {
@@ -160,162 +170,87 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     }
   }
 
-  void postWeeklyRecord(int time) async {
-    if (_recorder == null) {
-      return;
-    }
-
-    await _supabase.functions.invoke('weekly-record', body: {
-      'time': time,
-      'seed': _recorder!.seed,
-      'character': _recorder!.character,
-      'data': _recorder!.data
-    });
-    final loc = AppLocalizations.of(context);
-
-    if (context.mounted) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return ContentDialog(
-            title: Text(loc.record_record_complete_title),
-            content: Text(
-              FormatUtil.getTimeString(Duration(milliseconds: time)),
-            ),
-            actions: [
-              FilledButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(loc.common_close),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
-  Future<Preset> getRecordPreset() async {
-    final response =
-        await http.get(Uri.parse(dotenv.env['RECORD_PRESET_URL'] ?? ''));
-
-    if (response.statusCode != 200) {
-      throw Exception(response.body);
-    }
-
-    final json = jsonDecode(response.body).cast<Map<String, dynamic>>();
-    final mods = List<Mod>.from(json.map((e) => Mod.fromJson(e)));
-
-    return Preset(name: 'record', mods: mods);
-  }
-
-  void onLoad() async {
-    if (!(await checkRecordPreset())) {
-      ProcessUtil.killIsaac();
+  Future<void> _onLoad() async {
+    if (!(await _validateRecordPreset())) {
+      await ProcessUtil.killIsaac();
 
       if (context.mounted) {
         showErrorDialog(
             context, AppLocalizations.of(context).record_invalid_mod_warning);
       }
     }
-
-    // final setting = ref.read(settingProvider);
-
-    // final recorderDirectory =
-    //     Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
-
-    // if (recorderDirectory.existsSync()) {
-    //   recorderDirectory.deleteSync(recursive: true);
-    // }
   }
 
-  void resetRecorder() {
+  void _resetRecorder() {
     _stopwatch.stop();
     _stopwatch.reset();
     _recorder = null;
   }
 
-  Future<bool> checkRecordPreset() async {
-    final store = ref.read(storeProvider);
-    final preset = await getRecordPreset();
+  Future<bool> _validateRecordPreset() async {
+    final setting = ref.read(settingProvider);
+    final preset = await RecordPresetService.getRecordPreset();
+    final currentMods = await ModService.loadMods(setting.isaacPath);
 
-    final currentMods = (await store.loadMods())
-        .where((mod) => !mod.isDisable)
-        .map((mod) => mod.name)
-        .toSet();
-    final presetMods = preset.mods
-        .where((mod) => !mod.isDisable)
-        .map((mod) => mod.name)
-        .toSet();
-
-    return presetMods.containsAll(currentMods);
+    return RecordPresetService.validateRecordPreset(
+      currentMods: currentMods,
+      recordPreset: preset,
+    );
   }
 
   void onMessage(String type, List<String> data) {
     if (type == 'LOAD') {
-      onLoad();
+      _onLoad();
     } else if (type == 'RESET') {
-      resetRecorder();
+      _resetRecorder();
     } else if (type == 'START') {
       final setting = ref.read(settingProvider);
+      RecorderManager.deleteRecorderMod(setting.isaacPath);
 
-      final recorderDirectory =
-          Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
+      _resetRecorder();
 
-      if (recorderDirectory.existsSync()) {
-        recorderDirectory.deleteSync(recursive: true);
-      }
-
-      resetRecorder();
-
-      final type = data[0];
+      final challengeType = data[0];
       final character = int.parse(data[1]);
       final seed = data[2];
 
-      if (type == 'D') {
-        if (seed == _dailyChallenge?.seed) {
-          _stopwatch.start();
-
-          _recorder = RecorderState(
-            type: ChallengeType.daily,
-            character: character,
-            seed: seed,
-          );
-        }
-      } else if (type == 'W') {
-        if (character == _weeklyChallenge?.character &&
-            seed == _weeklyChallenge?.seed) {
-          _stopwatch.start();
-
-          _recorder = RecorderState(
-            type: ChallengeType.weekly,
-            character: character,
-            seed: seed,
-          );
-        }
+      if (challengeType == 'D' && seed == _dailyChallenge?.seed) {
+        _stopwatch.start();
+        _recorder = RecorderState(
+          type: ChallengeType.daily,
+          character: character,
+          seed: seed,
+        );
+      } else if (challengeType == 'W' &&
+          character == _weeklyChallenge?.character &&
+          seed == _weeklyChallenge?.seed) {
+        _stopwatch.start();
+        _recorder = RecorderState(
+          type: ChallengeType.weekly,
+          character: character,
+          seed: seed,
+        );
       }
     } else if (type == 'END') {
-      final type = data[0];
+      final challengeType = data[0];
       final character = int.parse(data[1]);
       final seed = data[2];
 
       if (_recorder != null && _recorder!.isBossKilled == true) {
         if (_recorder!.type == ChallengeType.daily &&
-            type == 'D' &&
+            challengeType == 'D' &&
             seed == _dailyChallenge?.seed) {
-          postDailyRecord(_stopwatch.elapsedMilliseconds);
+          _submitDailyRecord(_stopwatch.elapsedMilliseconds);
         } else if (_recorder!.type == ChallengeType.weekly &&
-            type == 'W' &&
+            challengeType == 'W' &&
             seed == _weeklyChallenge?.seed) {
-          postWeeklyRecord(_stopwatch.elapsedMilliseconds);
+          _submitWeeklyRecord(_stopwatch.elapsedMilliseconds);
         }
 
         _recorder!.character = character;
         _recorder!.seed = seed;
       }
 
-      resetRecorder();
+      _resetRecorder();
     } else if (type == 'BOSS') {
       _recorder?.isBossKilled = true;
     } else if (type == 'STAGE') {
@@ -328,98 +263,47 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     }
   }
 
-  Future<void> refreshChallenge() async {
-    final today = DateTime.now();
-    final week = today.weekOfYear;
-    final year = today.day > 15 && week == 1 ? today.year + 1 : today.year;
-
-    final daily = await _supabase
-        .from("daily_challenges")
-        .select()
-        .gte("date", today)
-        .lte("date", today);
-
-    final weekly = await _supabase
-        .from("weekly_challenges")
-        .select()
-        .eq("week", week)
-        .eq("year", year);
+  Future<void> _refreshChallenge() async {
+    final dailyChallenge = await _challengeService.getDailyChallenge();
+    final weeklyChallenge = await _challengeService.getWeeklyChallenge();
 
     setState(() {
-      _dailyChallenge = null;
-      _weeklyChallenge = null;
-
-      if (daily.isNotEmpty) {
-        _dailyChallenge = DailyChallenge.fromJson(daily.first);
-      }
-
-      if (weekly.isNotEmpty) {
-        _weeklyChallenge = WeeklyChallenge.fromJson(weekly.first);
-      }
+      _dailyChallenge = dailyChallenge;
+      _weeklyChallenge = weeklyChallenge;
     });
   }
 
-  Future<void> createRecorderMod() async {
-    try {
-      await refreshChallenge();
+  Future<void> _createRecorderMod() async {
+    await _refreshChallenge();
 
-      if (_dailyChallenge == null || _weeklyChallenge == null) {
-        throw Exception(AppLocalizations.of(context).record_no_challenge);
-      }
-
-      final setting = ref.read(settingProvider);
-      final recorderDirectory =
-          Directory('${setting.isaacPath}\\mods\\cartridge-recorder');
-
-      if (await recorderDirectory.exists()) {
-        await recorderDirectory.delete(recursive: true);
-      }
-
-      await recorderDirectory.create();
-
-      final mainFile = File("${recorderDirectory.path}\\main.lua");
-      await mainFile.create();
-      mainFile.writeAsString(
-        await RecorderMod.getModMain(
-          _dailyChallenge!.seed,
-          _dailyChallenge!.boss,
-          _dailyChallenge!.character ?? 0,
-          _weeklyChallenge!.seed,
-          _weeklyChallenge!.boss,
-          _weeklyChallenge!.character,
-        ),
-      );
-
-      final metadataFile = File("${recorderDirectory.path}\\metadata.xml");
-      await metadataFile.create();
-      metadataFile.writeAsString(RecorderMod.modMetadata);
-    } catch (e) {
-      if (context.mounted) {
-        showErrorDialog(context, e.toString());
-      }
+    if (_dailyChallenge == null || _weeklyChallenge == null) {
+      throw Exception(AppLocalizations.of(context).record_no_challenge);
     }
+
+    final setting = ref.read(settingProvider);
+
+    await RecorderManager.createRecorderMod(
+      isaacPath: setting.isaacPath,
+      dailySeed: _dailyChallenge!.seed,
+      dailyBoss: _dailyChallenge!.boss,
+      dailyCharacter: _dailyChallenge!.character ?? 0,
+      weeklySeed: _weeklyChallenge!.seed,
+      weeklyBoss: _weeklyChallenge!.boss,
+      weeklyCharacter: _weeklyChallenge!.character,
+    );
   }
 
-  void startGame() async {
+  Future<void> _startGame() async {
     try {
       final store = ref.watch(storeProvider);
 
       await ProcessUtil.killIsaac();
+      await _createRecorderMod();
 
-      await createRecorderMod();
-
-      final userId = _supabase.auth.currentSession?.user.id;
-
-      final user = await _supabase
-          .from('users')
-          .select()
-          .eq('id', userId ?? '')
-          .single();
-
-      final isDebugConsole = user['is_tester'] ?? false;
+      final isDebugConsole = await _authService.isCurrentUserAdmin();
 
       await store.applyPreset(
-        await getRecordPreset(),
+        await RecordPresetService.getRecordPreset(),
         isForceRerun: true,
         isNoDelay: true,
         isDebugConsole: isDebugConsole,
@@ -436,7 +320,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     final baseColor = Colors.blue.lightest;
 
     final time = _stopwatch.elapsed;
-    final session = _supabase.auth.currentSession;
+    final session = _authService.currentSession;
     final loc = AppLocalizations.of(context);
 
     final stopwatchView = (session == null || session.isExpired)
@@ -535,7 +419,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                       ),
                     ),
                     onPressed: () async {
-                      await Supabase.instance.client.auth.signOut();
+                      await _authService.signOut();
                     },
                   ),
                 ],
@@ -649,7 +533,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                       ),
                     ),
                     iconButtonMode: IconButtonMode.large,
-                    onPressed: startGame,
+                    onPressed: _startGame,
                   ),
                 ],
               ),

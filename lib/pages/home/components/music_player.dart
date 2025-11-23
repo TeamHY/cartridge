@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/material.dart' as material;
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class MusicPlayer extends ConsumerStatefulWidget {
-  const MusicPlayer({super.key});
+  const MusicPlayer({super.key, this.onTap, this.isSelected});
+
+  final bool? isSelected;
+  final VoidCallback? onTap;
 
   @override
   ConsumerState<MusicPlayer> createState() => _MusicPlayerState();
@@ -24,14 +28,6 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
   StreamSubscription? _playerStateChangeSubscription;
 
   bool get _isPlaying => _playerState == PlayerState.playing;
-  bool get _isPaused => _playerState == PlayerState.paused;
-
-  double get _progress => (_position != null &&
-          _duration != null &&
-          _position!.inMilliseconds > 0 &&
-          _position!.inMilliseconds < _duration!.inMilliseconds)
-      ? _position!.inMilliseconds / _duration!.inMilliseconds
-      : 0.0;
 
   @override
   void initState() {
@@ -84,98 +80,86 @@ class _MusicPlayerState extends ConsumerState<MusicPlayer> {
     await player.pause();
   }
 
-  Future<void> _stop() async {
-    await player.stop();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
+    return material.Ink(
       decoration: BoxDecoration(
-        color: FluentTheme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.grey.withValues(alpha: 0.2),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: widget.isSelected == true
+                ? FluentTheme.of(context).accentColor
+                : Colors.black.withValues(alpha: 0.1),
+            width: 1,
+          )),
+      child: material.InkWell(
+        onTap: widget.onTap,
+        mouseCursor: SystemMouseCursors.click,
+        borderRadius: BorderRadius.circular(4),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                FluentIcons.music_note,
-                size: 16,
-                color: Colors.grey[130],
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Now Playing',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+              Row(
+                children: [
+                  Icon(
+                    FluentIcons.music_note,
+                    size: 16,
                     color: Colors.grey[130],
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Now Playing',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[130],
+                      ),
+                    ),
+                  ),
+                  Text(
+                    _duration != null
+                        ? '${_position?.inMinutes.remainder(60).toString().padLeft(2, '0')}:${_position?.inSeconds.remainder(60).toString().padLeft(2, '0')} / ${_duration?.inMinutes.remainder(60).toString().padLeft(2, '0')}:${_duration?.inSeconds.remainder(60).toString().padLeft(2, '0')}'
+                        : '00:00 / 00:00',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[130],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const PhosphorIcon(PhosphorIconsFill.skipBack,
+                        size: 16),
+                    onPressed: () {},
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: PhosphorIcon(
+                      _isPlaying
+                          ? PhosphorIconsFill.pause
+                          : PhosphorIconsFill.play,
+                      size: 20,
+                    ),
+                    onPressed: _isPlaying ? _pause : _play,
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const PhosphorIcon(PhosphorIconsFill.skipForward,
+                        size: 16),
+                    onPressed: () {},
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            'No track selected',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[120],
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          material.SliderTheme(
-            data: material.SliderThemeData(
-              inactiveTrackColor: Colors.grey.withValues(alpha: 0.1),
-            ),
-            child: material.Slider(
-              value: _progress,
-              onChanged: (value) {
-                final duration = _duration;
-                if (duration == null) {
-                  return;
-                }
-                final position = value * duration.inMilliseconds;
-                player.seek(Duration(milliseconds: position.round()));
-              },
-              min: 0.0,
-              max: 1.0,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: Icon(FluentIcons.previous, size: 16),
-                onPressed: () {},
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: Icon(
-                  _isPlaying ? FluentIcons.pause : FluentIcons.play,
-                  size: 20,
-                ),
-                onPressed: _isPlaying ? _pause : _play,
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: Icon(FluentIcons.chrome_close, size: 16),
-                onPressed: _isPlaying || _isPaused ? _stop : null,
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }

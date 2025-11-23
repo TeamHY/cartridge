@@ -233,10 +233,6 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
   }
 
   Widget _buildModsList() {
-    return _buildGroupedModsList();
-  }
-
-  Widget _buildGroupedModsList() {
     final groupedMods = _getModsByGroup();
     final store = ref.read(storeProvider);
 

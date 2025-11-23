@@ -76,13 +76,7 @@ class PresetList extends ConsumerWidget {
           onEdit: onSelect,
         ),
       ),
-      onReorder: (oldIndex, newIndex) {
-        if (oldIndex < newIndex) {
-          newIndex -= 1;
-        }
-        final item = store.presets.removeAt(oldIndex);
-        store.presets.insert(newIndex, item);
-      },
+      onReorder: store.movePreset,
     );
   }
 }
