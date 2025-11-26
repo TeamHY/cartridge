@@ -15,14 +15,6 @@ class SettingNotifier extends ChangeNotifier {
 
   String get isaacPath => _isaacPath;
 
-  String get isaacDocumentPath {
-    if (Platform.isMacOS) {
-      return '${Platform.environment['HOME']}/Documents/My Games/Binding of Isaac Repentance+';
-    }
-
-    return '${Platform.environment['UserProfile']}\\Documents\\My Games\\Binding of Isaac Repentance+';
-  }
-
   int rerunDelay = 1000;
 
   String? languageCode;

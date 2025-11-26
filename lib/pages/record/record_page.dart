@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cartridge/constants/urls.dart';
 import 'package:cartridge/models/daily_challenge.dart';
 import 'package:cartridge/models/weekly_challenge.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/services/isaac_log_file.dart';
 import 'package:cartridge/services/auth_service.dart';
 import 'package:cartridge/services/challenge_service.dart';
 import 'package:cartridge/services/record_preset_service.dart';
@@ -60,7 +58,6 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
   late Timer _timer;
   late StreamSubscription<AuthState> _authSubscription;
-  late IsaacLogFile _logFile;
 
   int _rankingTabIndex = 1;
 
@@ -93,12 +90,6 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
       });
     });
 
-    final setting = ref.read(settingProvider);
-    final logFilePath = Platform.isMacOS
-        ? '${setting.isaacDocumentPath}/log.txt'
-        : '${setting.isaacDocumentPath}\\log.txt';
-    _logFile = IsaacLogFile(logFilePath, onMessage: onMessage);
-
     _refreshChallenge();
   }
 
@@ -108,7 +99,6 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
     _timer.cancel();
     _authSubscription.cancel();
-    _logFile.dispose();
 
     super.dispose();
   }

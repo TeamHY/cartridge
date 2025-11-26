@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 class IsaacLogFile {
-  IsaacLogFile(String path, {required this.onMessage}) {
+  IsaacLogFile(String path, {required this.onDebugMessage}) {
     _file = File(path);
     _previousLength = _file.lengthSync();
     _timer = Timer.periodic(const Duration(milliseconds: 10), (Timer timer) {
@@ -13,9 +13,9 @@ class IsaacLogFile {
     });
   }
 
-  static const String _prefix = '[INFO] - Lua Debug: [CR]';
+  static const String _prefix = '[INFO] - Lua Debug: ';
 
-  final Function(String, List<String>) onMessage;
+  final Function(String) onDebugMessage;
 
   late final File _file;
   late final Timer _timer;
@@ -40,9 +40,7 @@ class IsaacLogFile {
       text.split('\n').forEach((line) {
         if (line.startsWith(_prefix)) {
           final message = line.substring(_prefix.length);
-          final parts = message.split(':');
-
-          onMessage(parts[0], parts[1].split('.'));
+          onDebugMessage(message);
         }
       });
     });

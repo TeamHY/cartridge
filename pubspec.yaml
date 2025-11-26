@@ -57,6 +57,7 @@ dependencies:
   phosphor_flutter: ^2.1.0
   multi_split_view: ^3.6.1
   audioplayers: ^6.5.1
+  path: ^1.9.1
 
 dev_dependencies:
   flutter_test:

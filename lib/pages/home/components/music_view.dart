@@ -1,3 +1,5 @@
+import 'package:cartridge/components/dialogs/create_playlist_dialog.dart';
+import 'package:cartridge/components/dialogs/edit_playlist_dialog.dart';
 import 'package:cartridge/providers/music_player_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,7 +43,12 @@ class _MusicViewState extends ConsumerState<MusicView> {
                       PhosphorIconsRegular.plus,
                       size: 20,
                     ),
-                    onPressed: () {}),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const CreatePlaylistDialog(),
+                      );
+                    }),
               ],
             ),
           ),
@@ -63,6 +70,20 @@ class _MusicViewState extends ConsumerState<MusicView> {
                                   style:
                                       FluentTheme.of(context).typography.body,
                                 ),
+                              ),
+                              IconButton(
+                                icon: const PhosphorIcon(
+                                  PhosphorIconsRegular.pencil,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => EditPlaylistDialog(
+                                      playlist: playlist,
+                                    ),
+                                  );
+                                },
                               ),
                               IconButton(
                                 icon: const PhosphorIcon(
