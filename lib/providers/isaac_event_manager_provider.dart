@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 typedef StageEnteredParams = ({IsaacStage stage});
 
-typedef RoomEnteredParams = ({IsaacRoomType roomType});
+typedef RoomEnteredParams = ({IsaacRoomType roomType, bool isCleared});
 
 typedef BossClearedParams = ({IsaacBossType bossType});
 
@@ -176,8 +176,10 @@ class IsaacEventManager {
               .add((stage: _convertStageToIsaacStage(stage, stageType)));
           break;
         case 'RoomEntered':
-          _roomEnteredStreamController
-              .add((roomType: IsaacRoomType.values[int.parse(eventParams[0])]));
+          _roomEnteredStreamController.add((
+            roomType: IsaacRoomType.values[int.parse(eventParams[0])],
+            isCleared: eventParams[1] == 'true'
+          ));
           break;
         case 'BossCleared':
           final bossTypeString = eventParams[0];

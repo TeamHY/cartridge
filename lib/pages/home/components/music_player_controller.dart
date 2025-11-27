@@ -16,6 +16,7 @@ class MusicPlayer extends ConsumerWidget {
     final isPlaying = musicPlayer.isPlaying;
     final duration = musicPlayer.duration;
     final position = musicPlayer.position;
+    final volume = musicPlayer.volume;
 
     return material.Ink(
       decoration: BoxDecoration(
@@ -89,6 +90,43 @@ class MusicPlayer extends ConsumerWidget {
                     icon: const PhosphorIcon(PhosphorIconsFill.skipForward,
                         size: 16),
                     onPressed: () {},
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    volume == 0
+                        ? PhosphorIconsFill.speakerSimpleSlash
+                        : volume < 0.5
+                            ? PhosphorIconsFill.speakerSimpleLow
+                            : PhosphorIconsFill.speakerSimpleHigh,
+                    size: 16,
+                    color: Colors.grey[130],
+                  ),
+                  SizedBox(
+                    width: 120,
+                    child: material.Slider(
+                      value: volume,
+                      min: 0.0,
+                      max: 1.0,
+                      onChanged: (value) {
+                        ref.read(musicPlayerProvider).setVolume(value);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 32,
+                    child: Text(
+                      '${(volume * 100).round()}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[130],
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
                   ),
                 ],
               ),

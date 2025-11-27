@@ -1,13 +1,11 @@
 import 'package:cartridge/constants/isaac_enums.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class PlaylistDialogContent extends StatelessWidget {
   final TextEditingController nameController;
   final String conditionType;
   final Function(String) onConditionTypeChanged;
   final VoidCallback onNameChanged;
-  final VoidCallback onFolderPathChanged;
   final Widget conditionSettings;
 
   const PlaylistDialogContent({
@@ -16,7 +14,6 @@ class PlaylistDialogContent extends StatelessWidget {
     required this.conditionType,
     required this.onConditionTypeChanged,
     required this.onNameChanged,
-    required this.onFolderPathChanged,
     required this.conditionSettings,
   });
 

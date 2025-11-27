@@ -107,7 +107,6 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
               setState(() => _conditionType = value);
             },
             onNameChanged: () => setState(() {}),
-            onFolderPathChanged: () => setState(() {}),
             conditionSettings: _buildConditionSettings(),
           ),
         ),

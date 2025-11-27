@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:cartridge/models/music_track.dart';
 import 'package:cartridge/models/music_trigger_condition.dart';
 import 'package:path/path.dart';
@@ -8,6 +9,8 @@ class MusicPlaylist {
   final MusicTriggerCondition? condition;
 
   final List<MusicTrack> tracks;
+  final List<MusicTrack> _recentlyPlayed = [];
+  final Random _random = Random();
 
   late final String path;
 
@@ -52,6 +55,34 @@ class MusicPlaylist {
   bool _isMusicFile(String path) {
     final ext = path.toLowerCase().split('.').last;
     return ['mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac'].contains(ext);
+  }
+
+  MusicTrack? getRandomTrack() {
+    if (tracks.isEmpty) {
+      return null;
+    }
+
+    if (_recentlyPlayed.length >= tracks.length) {
+      _recentlyPlayed.clear();
+    }
+
+    final availableTracks =
+        tracks.where((track) => !_recentlyPlayed.contains(track)).toList();
+
+    if (availableTracks.isEmpty) {
+      _recentlyPlayed.clear();
+      return tracks[_random.nextInt(tracks.length)];
+    }
+
+    final selectedTrack =
+        availableTracks[_random.nextInt(availableTracks.length)];
+
+    _recentlyPlayed.add(selectedTrack);
+    if (_recentlyPlayed.length > (tracks.length / 2).ceil()) {
+      _recentlyPlayed.removeAt(0);
+    }
+
+    return selectedTrack;
   }
 
   void openFolder() async {

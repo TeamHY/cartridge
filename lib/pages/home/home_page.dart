@@ -80,7 +80,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                 presetNameController: _presetNameController,
                 editPresetNameController: _editPresetNameController,
                 selectedPreset: _selectedPreset,
-                isMusicPlayerSelected: _currentView == HomeView.music,
                 onSelectPreset: (preset) => setState(() {
                   _selectedPreset = preset;
                   _editPresetNameController.text = preset.name;
@@ -96,10 +95,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                   });
                 },
                 onDeselectPreset: onHomePressed,
-                onMusicPlayerTap: () => setState(() {
-                  _selectedPreset = null;
-                  _currentView = HomeView.music;
-                }),
               ),
               size: 300,
             ),

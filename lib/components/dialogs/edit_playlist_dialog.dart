@@ -146,7 +146,6 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
               setState(() => _conditionType = value);
             },
             onNameChanged: () => setState(() {}),
-            onFolderPathChanged: () => setState(() {}),
             conditionSettings: _buildConditionSettings(),
           ),
         ),

@@ -1,103 +1,153 @@
 import 'package:cartridge/constants/urls.dart';
-import 'package:cartridge/pages/home/components/home_navigation_bar.dart';
+import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:cartridge/pages/record/record_page.dart';
+import 'package:cartridge/pages/slot_machine/slot_machine_page.dart';
+import 'package:cartridge/providers/store_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/material.dart' as material;
 
-class HomeMainView extends StatelessWidget {
+class HomeMainView extends ConsumerWidget {
   const HomeMainView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final store = ref.watch(storeProvider);
+    final loc = AppLocalizations.of(context);
+    final typography = FluentTheme.of(context).typography;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(32.0),
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const HomeNavigationBar(),
-          Row(
-            children: [
-              Expanded(
-                child: _buildPlayCard(
-                  context,
-                  title: 'Play instance',
-                  subtitle: 'No instances',
-                  icon: FluentIcons.play,
-                  color: const Color(0xFF2C3E50),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildPlayCard(
-                  context,
-                  title: 'Play vanilla',
-                  subtitle: 'No preset',
-                  icon: FluentIcons.play,
-                  color: const Color(0xFF3498DB),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Steam Isaac News',
-                style: FluentTheme.of(context).typography.subtitle,
-              ),
-              HyperlinkButton(
-                onPressed: () {},
-                child: const Text('See more news →'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const SizedBox(height: 32),
           Container(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: const Icon(FluentIcons.people, size: 40),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
-                const SizedBox(width: 24),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '아이작 오헌영 • Community & Support',
-                        style: FluentTheme.of(context).typography.subtitle,
+              ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'A place made with Isaac players! Find streams, community, guides and various event news.',
-                        style: FluentTheme.of(context).typography.body,
+                      child: const Icon(FluentIcons.people,
+                          size: 50, color: Color(0xFF6366F1)),
+                    ),
+                    const SizedBox(width: 24),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '아이작 오헌영',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        context,
+                        label: loc.home_button_record,
+                        icon: FluentIcons.trophy,
+                        color: Colors.white,
+                        textColor: const Color(0xFF6366F1),
+                        onTap: () => Navigator.push(
+                          context,
+                          FluentPageRoute(
+                            builder: (context) => const RecordPage(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        context,
+                        label: loc.home_button_slot_machine,
+                        icon: FluentIcons.game,
+                        color: Colors.white,
+                        textColor: const Color(0xFF8B5CF6),
+                        onTap: () => Navigator.push(
+                          context,
+                          FluentPageRoute(
+                            builder: (context) => const SlotMachinePage(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        context,
+                        label: loc.home_button_daily_run,
+                        icon: FluentIcons.calendar_day,
+                        color: Colors.white,
+                        textColor: const Color(0xFFEC4899),
+                        onTap: () => store.applyPreset(
+                          null,
+                          isEnableMods: false,
+                          isDebugConsole: false,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 40),
+          Text(
+            'Community Links',
+            style: typography.subtitle?.copyWith(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
           GridView.count(
             crossAxisCount: 4,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 16,
             crossAxisSpacing: 16,
-            childAspectRatio: 1.2,
+            childAspectRatio: 1.0,
             children: [
               _buildLinkCard(
                 context,
@@ -169,44 +219,48 @@ class HomeMainView extends StatelessWidget {
     );
   }
 
-  Widget _buildPlayCard(
+  Widget _buildQuickActionButton(
     BuildContext context, {
-    required String title,
-    required String subtitle,
+    required String label,
     required IconData icon,
     required Color color,
+    required Color textColor,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.white, size: 32),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+    return material.Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      child: material.Ink(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: material.InkWell(
+          onTap: onTap,
+          mouseCursor: SystemMouseCursors.click,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: textColor, size: 28),
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 14,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -218,40 +272,55 @@ class HomeMainView extends StatelessWidget {
     required IconData icon,
     required VoidCallback onTap,
   }) {
-    return Button(
-      onPressed: onTap,
-      style: ButtonStyle(
-        padding: WidgetStateProperty.all(const EdgeInsets.all(16)),
-        backgroundColor: WidgetStateProperty.all(const Color(0xFFF5F5F5)),
-        shape: WidgetStateProperty.all(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return material.Ink(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.black.withValues(alpha: 0.2),
+          width: 1,
         ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: Colors.white, size: 32),
+      child: material.InkWell(
+        onTap: onTap,
+        mouseCursor: SystemMouseCursors.click,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Icon(icon, color: Colors.white, size: 36),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Color(0xFF1F2937),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        ),
       ),
     );
   }

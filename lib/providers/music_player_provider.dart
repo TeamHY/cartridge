@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cartridge/models/music_playlist.dart';
+import 'package:cartridge/models/music_trigger_condition.dart';
 import 'package:cartridge/providers/isaac_event_manager_provider.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:flutter/foundation.dart';
@@ -20,10 +21,12 @@ class MusicPlayerNotifier extends ChangeNotifier {
 
   final AudioPlayer _audioPlayer = AudioPlayer();
   List<MusicPlaylist> _playlists = [];
+  final List<MusicPlaylist> _playlistStack = [];
 
   PlayerState? _playerState;
   Duration? _duration;
   Duration? _position;
+  double _volume = 1.0;
 
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
@@ -35,6 +38,7 @@ class MusicPlayerNotifier extends ChangeNotifier {
   Duration? get duration => _duration;
   Duration? get position => _position;
   bool get isPlaying => _playerState == PlayerState.playing;
+  double get volume => _volume;
 
   void _initAudioPlayer() {
     _playerState = _audioPlayer.state;
@@ -71,19 +75,128 @@ class MusicPlayerNotifier extends ChangeNotifier {
       loadPlaylists();
     });
 
+    _playerCompleteSubscription = _audioPlayer.onPlayerComplete.listen((_) {
+      _playNextTrack();
+    });
+
     final isaacEventManager = ref.read(isaacEventManagerProvider);
 
     isaacEventManager.stageEnteredStream.listen((event) {
-      print('Stage Entered: ${event.stage.name}');
+      _handleStageEntered(event.stage);
     });
 
     isaacEventManager.roomEnteredStream.listen((event) {
-      print('Room Entered: ${event.roomType.name}');
+      _handleRoomEntered(event.roomType, event.isCleared);
     });
 
     isaacEventManager.bossClearedStream.listen((event) {
-      print('Boss Cleared: ${event.bossType.name}');
+      _handleBossCleared(event.bossType);
     });
+  }
+
+  void _debugPrintStack() {
+    if (_playlistStack.isEmpty) {
+      debugPrint('[MusicStack] Empty');
+    } else {
+      debugPrint('[MusicStack] Stack (${_playlistStack.length} items):');
+      for (int i = _playlistStack.length - 1; i >= 0; i--) {
+        final playlist = _playlistStack[i];
+        final marker = i == _playlistStack.length - 1 ? '-> ' : '   ';
+        debugPrint(
+            '$marker[$i] ${playlist.id} (${playlist.condition?.type ?? 'default'})');
+      }
+    }
+  }
+
+  void _handleStageEntered(stage) {
+    final matchedPlaylists = _playlists.where((p) {
+      if (p.condition is StageStayingCondition) {
+        return (p.condition as StageStayingCondition).stage.contains(stage);
+      }
+      return false;
+    }).toList();
+
+    if (matchedPlaylists.isNotEmpty) {
+      _processEvent(matchedPlaylists.first, 'stage');
+    }
+  }
+
+  void _handleRoomEntered(roomType, bool isCleared) {
+    final matchedPlaylists = _playlists.where((p) {
+      if (p.condition is RoomStayingCondition) {
+        final condition = p.condition as RoomStayingCondition;
+        return condition.roomType == roomType &&
+            (!condition.isOnlyUncleared || !isCleared);
+      }
+      return false;
+    }).toList();
+
+    if (matchedPlaylists.isNotEmpty) {
+      _processEvent(matchedPlaylists.first, 'room');
+    }
+  }
+
+  void _handleBossCleared(bossType) {
+    final matchedPlaylists = _playlists.where((p) {
+      if (p.condition is BossClearedCondition) {
+        return (p.condition as BossClearedCondition).bossType == bossType;
+      }
+      return false;
+    }).toList();
+
+    if (matchedPlaylists.isNotEmpty) {
+      _processEvent(matchedPlaylists.first, 'boss');
+    }
+  }
+
+  void _processEvent(MusicPlaylist playlist, String conditionType) {
+    final existingIndex =
+        _playlistStack.indexWhere((p) => p.condition?.type == conditionType);
+
+    if (existingIndex != -1) {
+      debugPrint(
+          '[MusicStack] Found existing type "$conditionType" at index $existingIndex, popping to that level');
+      while (_playlistStack.length > existingIndex) {
+        _playlistStack.removeLast();
+      }
+    }
+
+    _playlistStack.add(playlist);
+    debugPrint('[MusicStack] Pushed "${playlist.id}" (type: $conditionType)');
+    _debugPrintStack();
+
+    _playNextTrack();
+  }
+
+  void _playNextTrack() async {
+    if (_playlistStack.isEmpty) {
+      final defaultPlaylist =
+          _playlists.where((p) => p.condition == null).toList();
+      if (defaultPlaylist.isNotEmpty) {
+        _playlistStack.add(defaultPlaylist.first);
+        debugPrint(
+            '[MusicStack] Initialized with default playlist: ${defaultPlaylist.first.id}');
+        _debugPrintStack();
+      }
+    }
+
+    if (_playlistStack.isEmpty) {
+      debugPrint('[MusicStack] No playlists available');
+      return;
+    }
+
+    final currentPlaylist = _playlistStack.last;
+    final track = currentPlaylist.getRandomTrack();
+
+    if (track == null) {
+      debugPrint(
+          '[MusicStack] No tracks in current playlist: ${currentPlaylist.id}');
+      return;
+    }
+
+    debugPrint(
+        '[MusicStack] Playing: ${track.title} from ${currentPlaylist.id}');
+    await _audioPlayer.play(DeviceFileSource(track.filePath));
   }
 
   Future<void> play() async {
@@ -102,8 +215,24 @@ class MusicPlayerNotifier extends ChangeNotifier {
     await _audioPlayer.seek(position);
   }
 
+  Future<void> setVolume(double volume) async {
+    final newVolume = volume.clamp(0.0, 1.0);
+    if (_volume != newVolume) {
+      _volume = newVolume;
+      await _audioPlayer.setVolume(_volume);
+      notifyListeners();
+    }
+  }
+
   Future<void> playSource(String source) async {
     await _audioPlayer.play(DeviceFileSource(source));
+  }
+
+  void resetMusicStack() {
+    _playlistStack.clear();
+    debugPrint('[MusicStack] Stack cleared');
+    _debugPrintStack();
+    _playNextTrack();
   }
 
   Future<void> loadPlaylists() async {

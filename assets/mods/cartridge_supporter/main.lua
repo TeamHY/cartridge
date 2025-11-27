@@ -22,7 +22,7 @@ mod:AddCallback(
 mod:AddCallback(
     ModCallbacks.MC_POST_NEW_ROOM,
     function(_)
-        Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(Game():GetRoom():GetType()))
+        Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(Game():GetRoom():GetType()) .. "." .. tostring(Game():GetRoom():IsClear()))
     end
 )
 
