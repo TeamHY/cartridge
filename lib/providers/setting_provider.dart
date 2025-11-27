@@ -15,11 +15,46 @@ class SettingNotifier extends ChangeNotifier {
 
   String get isaacPath => _isaacPath;
 
-  int rerunDelay = 1000;
+  set isaacPath(String path) {
+    _isaacPath = path;
+    notifyListeners();
+  }
 
-  String? languageCode;
+  String _musicPlaylistPath = '';
 
-  bool isGridView = false;
+  String get musicPlaylistPath => _musicPlaylistPath;
+
+  set musicPlaylistPath(String path) {
+    _musicPlaylistPath = path;
+    notifyListeners();
+  }
+
+  int _rerunDelay = 1000;
+
+  int get rerunDelay => _rerunDelay;
+
+  set rerunDelay(int delay) {
+    _rerunDelay = delay;
+    notifyListeners();
+  }
+
+  String? _languageCode;
+
+  String? get languageCode => _languageCode;
+
+  set languageCode(String? code) {
+    _languageCode = code;
+    notifyListeners();
+  }
+
+  bool _isGridView = false;
+
+  bool get isGridView => _isGridView;
+
+  set isGridView(bool value) {
+    _isGridView = value;
+    notifyListeners();
+  }
 
   Future<void> loadSetting() async {
     final appSupportDir = await getApplicationSupportDirectory();
@@ -32,9 +67,11 @@ class SettingNotifier extends ChangeNotifier {
     final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
 
     _isaacPath = json['isaacPath'] as String? ?? _isaacPath;
-    rerunDelay = json['rerunDelay'] as int? ?? 1000;
-    languageCode = json['languageCode'] as String?;
-    isGridView = json['isGridView'] as bool? ?? false;
+    _musicPlaylistPath =
+        json['musicPlaylistPath'] as String? ?? _musicPlaylistPath;
+    _rerunDelay = json['rerunDelay'] as int? ?? 1000;
+    _languageCode = json['languageCode'] as String?;
+    _isGridView = json['isGridView'] as bool? ?? false;
 
     notifyListeners();
   }
@@ -45,34 +82,11 @@ class SettingNotifier extends ChangeNotifier {
 
     file.writeAsString(jsonEncode({
       'isaacPath': _isaacPath,
-      'rerunDelay': rerunDelay,
-      'languageCode': languageCode,
-      'isGridView': isGridView,
+      'musicPlaylistPath': _musicPlaylistPath,
+      'rerunDelay': _rerunDelay,
+      'languageCode': _languageCode,
+      'isGridView': _isGridView,
     }));
-  }
-
-  void setIsaacPath(String path) {
-    _isaacPath = path;
-
-    notifyListeners();
-  }
-
-  void setRerunDelay(int delay) {
-    rerunDelay = delay;
-
-    notifyListeners();
-  }
-
-  void setLanguageCode(String code) {
-    languageCode = code;
-
-    notifyListeners();
-  }
-
-  void setIsGridView(bool value) {
-    isGridView = value;
-
-    notifyListeners();
   }
 }
 

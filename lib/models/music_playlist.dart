@@ -1,31 +1,34 @@
 import 'dart:io';
 import 'package:cartridge/models/music_track.dart';
 import 'package:cartridge/models/music_trigger_condition.dart';
+import 'package:path/path.dart';
 
 class MusicPlaylist {
   final String id;
-  final String name;
-  final MusicTriggerCondition condition;
-  final String folderPath;
+  final MusicTriggerCondition? condition;
 
-  final Map<String, List<MusicTrack>> tracks = {};
+  final List<MusicTrack> tracks;
+
+  late final String path;
 
   MusicPlaylist({
     required this.id,
-    required this.name,
-    required this.condition,
-    required this.folderPath,
-  });
+    required String rootPath,
+    this.condition,
+    List<MusicTrack>? tracks,
+  }) : tracks = tracks ?? [] {
+    path = join(rootPath, id);
+  }
 
   Future<bool> get isFolderExists async {
-    final folder = Directory(folderPath);
+    final folder = Directory(path);
     return await folder.exists();
   }
 
   Future<void> loadTracks() async {
     tracks.clear();
 
-    final folder = Directory(folderPath);
+    final folder = Directory(path);
 
     if (!await folder.exists()) {
       return;
@@ -33,24 +36,15 @@ class MusicPlaylist {
 
     await for (final entity in folder.list()) {
       if (entity is Directory) {
-        final groupName = entity.path.split(Platform.pathSeparator).last;
-        final groupTracks = <MusicTrack>[];
-
         await for (final file in entity.list()) {
           if (file is File && _isMusicFile(file.path)) {
             final fileName = file.path.split(Platform.pathSeparator).last;
-            groupTracks.add(MusicTrack(title: fileName, filePath: file.path));
+            tracks.add(MusicTrack(title: fileName, filePath: file.path));
           }
-        }
-
-        if (groupTracks.isNotEmpty) {
-          tracks[groupName] = groupTracks;
         }
       } else if (entity is File && _isMusicFile(entity.path)) {
         final fileName = entity.path.split(Platform.pathSeparator).last;
-        tracks
-            .putIfAbsent('미분류', () => [])
-            .add(MusicTrack(title: fileName, filePath: entity.path));
+        tracks.add(MusicTrack(title: fileName, filePath: entity.path));
       }
     }
   }
@@ -60,22 +54,31 @@ class MusicPlaylist {
     return ['mp3', 'wav', 'flac', 'ogg', 'm4a', 'aac'].contains(ext);
   }
 
+  void openFolder() async {
+    if (Platform.isWindows) {
+      await Process.run('explorer', [path.replaceAll(RegExp('/'), "\\")]);
+    } else if (Platform.isMacOS) {
+      await Process.run('open', [path]);
+    } else if (Platform.isLinux) {
+      await Process.run('xdg-open', [path]);
+    }
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
-      'condition': condition.toJson(),
-      'folderPath': folderPath,
+      'condition': condition?.toJson(),
     };
   }
 
-  factory MusicPlaylist.fromJson(Map<String, dynamic> json) {
+  factory MusicPlaylist.fromJson(Map<String, dynamic> json, String path) {
     return MusicPlaylist(
       id: json['id'] as String,
-      name: json['name'] as String,
-      condition: MusicTriggerCondition.fromJson(
-          json['condition'] as Map<String, dynamic>),
-      folderPath: json['folderPath'] as String,
+      condition: json['condition'] != null
+          ? MusicTriggerCondition.fromJson(
+              json['condition'] as Map<String, dynamic>)
+          : null,
+      rootPath: path,
     );
   }
 }

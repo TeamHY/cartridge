@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:cartridge/constants/urls.dart';
 import 'package:cartridge/models/daily_challenge.dart';
 import 'package:cartridge/models/weekly_challenge.dart';
+import 'package:cartridge/providers/isaac_event_manager_provider.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/services/auth_service.dart';
 import 'package:cartridge/services/challenge_service.dart';
+import 'package:cartridge/services/mod_manager.dart';
 import 'package:cartridge/services/record_preset_service.dart';
-import 'package:cartridge/services/recorder_manager.dart';
 import 'package:cartridge/utils/format_util.dart';
 import 'package:cartridge/services/process_util.dart';
 import 'package:cartridge/pages/record/components/back_arrow_view.dart';
@@ -89,6 +90,8 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         _isAdmin = isAdmin;
       });
     });
+
+    ref.read(isaacEventManagerProvider).recorderStream.listen(onMessage);
 
     _refreshChallenge();
   }
@@ -188,14 +191,17 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     );
   }
 
-  void onMessage(String type, List<String> data) {
+  void onMessage((String type, List<String> data) params) {
+    final type = params.$1;
+    final data = params.$2;
+
     if (type == 'LOAD') {
       _onLoad();
     } else if (type == 'RESET') {
       _resetRecorder();
     } else if (type == 'START') {
       final setting = ref.read(settingProvider);
-      RecorderManager.deleteRecorderMod(setting.isaacPath);
+      ModManager.deleteRecorderMod(setting.isaacPath);
 
       _resetRecorder();
 
@@ -272,7 +278,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
     final setting = ref.read(settingProvider);
 
-    await RecorderManager.createRecorderMod(
+    await ModManager.createRecorderMod(
       isaacPath: setting.isaacPath,
       dailySeed: _dailyChallenge!.seed,
       dailyBoss: _dailyChallenge!.boss,

@@ -17,21 +17,24 @@ class ModService {
     for (var modDirectory in directory.listSync()) {
       final metadataFile = File('${modDirectory.path}/metadata.xml');
 
-      if (await metadataFile.exists()) {
-        final metadata = Metadata.fromString(await metadataFile.readAsString());
-        final disableFile = File('${modDirectory.path}/disable.it');
-        final isDisable = await disableFile.exists();
+      if (!await metadataFile.exists()) continue;
 
-        final mod = Mod(
-          name: metadata.name ?? '',
-          path: modDirectory.path,
-          id: metadata.id,
-          version: metadata.version,
-          isDisable: isDisable,
-        );
+      final metadata = Metadata.fromString(await metadataFile.readAsString());
 
-        mods.add(mod);
-      }
+      if (metadata.name == "CartridgeSupporter") continue;
+
+      final disableFile = File('${modDirectory.path}/disable.it');
+      final isDisable = await disableFile.exists();
+
+      final mod = Mod(
+        name: metadata.name ?? '',
+        path: modDirectory.path,
+        id: metadata.id,
+        version: metadata.version,
+        isDisable: isDisable,
+      );
+
+      mods.add(mod);
     }
 
     mods.sort((a, b) => a.name.compareTo(b.name));

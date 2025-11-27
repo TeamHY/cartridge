@@ -175,7 +175,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
             size: 16,
           ),
           onPressed: () {
-            setting.setIsGridView(false);
+            setting.isGridView = false;
             setting.saveSetting();
           },
         ),
@@ -186,7 +186,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
             size: 16,
           ),
           onPressed: () {
-            setting.setIsGridView(true);
+            setting.isGridView = true;
             setting.saveSetting();
           },
         ),

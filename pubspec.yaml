@@ -91,6 +91,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/images/
+    - assets/mods/cartridge_supporter/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

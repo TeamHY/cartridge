@@ -1,14 +1,14 @@
 import 'dart:io';
+import 'package:cartridge/components/dialogs/error_dialog.dart';
 import 'package:cartridge/components/dialogs/playlist_dialog_content.dart';
 import 'package:cartridge/constants/isaac_enums.dart';
 import 'package:cartridge/models/music_playlist.dart';
 import 'package:cartridge/models/music_trigger_condition.dart';
 import 'package:cartridge/providers/music_player_provider.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:cartridge/providers/setting_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as path;
-import 'package:uuid/uuid.dart';
 
 class CreatePlaylistDialog extends ConsumerStatefulWidget {
   const CreatePlaylistDialog({super.key});
@@ -20,9 +20,7 @@ class CreatePlaylistDialog extends ConsumerStatefulWidget {
 
 class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
   final _nameController = TextEditingController();
-  final _folderPathController = TextEditingController();
 
-  bool _isPickingFolder = false;
   String _conditionType = 'stage';
 
   final Set<IsaacStage> _selectedStages = {};
@@ -35,33 +33,7 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
   @override
   void dispose() {
     _nameController.dispose();
-    _folderPathController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickFolder() async {
-    setState(() {
-      _isPickingFolder = true;
-    });
-
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-
-    if (selectedDirectory != null) {
-      final executablePath = path.dirname(Platform.resolvedExecutable);
-      final relativePath =
-          path.relative(selectedDirectory, from: executablePath);
-
-      final isSubPath = !relativePath.startsWith('..');
-
-      setState(() {
-        _folderPathController.text =
-            isSubPath ? relativePath : selectedDirectory;
-      });
-    }
-
-    setState(() {
-      _isPickingFolder = false;
-    });
   }
 
   MusicTriggerCondition _buildCondition() {
@@ -77,20 +49,43 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
     }
   }
 
-  void _createPlaylist() {
-    final musicPlayer = ref.read(musicPlayerProvider);
+  void _createPlaylist() async {
+    try {
+      final setting = ref.read(settingProvider);
+      final musicPlayer = ref.read(musicPlayerProvider);
 
-    final playlist = MusicPlaylist(
-      id: const Uuid().v4(),
-      name: _nameController.text,
-      condition: _buildCondition(),
-      folderPath: _folderPathController.text,
-    );
-    playlist.loadTracks();
+      await musicPlayer.loadPlaylists();
 
-    musicPlayer.addPlaylist(playlist);
+      final playlistDir =
+          Directory(path.join(setting.musicPlaylistPath, _nameController.text));
 
-    Navigator.of(context).pop();
+      if (!playlistDir.existsSync()) {
+        playlistDir.createSync(recursive: true);
+      }
+
+      final playlist = MusicPlaylist(
+        id: _nameController.text,
+        rootPath: setting.musicPlaylistPath,
+        condition: _buildCondition(),
+      );
+      await playlist.loadTracks();
+
+      musicPlayer.addPlaylist(playlist);
+    } catch (e) {
+      if (mounted) {
+        Navigator.of(context).pop();
+        showDialog(
+          context: context,
+          builder: (context) => const ErrorDialog(
+            text: '플레이리스트 생성 실패',
+          ),
+        );
+      }
+    }
+
+    if (mounted) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -107,16 +102,13 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
         child: SingleChildScrollView(
           child: PlaylistDialogContent(
             nameController: _nameController,
-            folderPathController: _folderPathController,
             conditionType: _conditionType,
             onConditionTypeChanged: (value) {
               setState(() => _conditionType = value);
             },
-            onFolderPick: _pickFolder,
             onNameChanged: () => setState(() {}),
             onFolderPathChanged: () => setState(() {}),
             conditionSettings: _buildConditionSettings(),
-            isPickingFolder: _isPickingFolder,
           ),
         ),
       ),
@@ -126,10 +118,7 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
           child: const Text('취소'),
         ),
         FilledButton(
-          onPressed: (_nameController.text.isEmpty ||
-                  _folderPathController.text.isEmpty)
-              ? null
-              : _createPlaylist,
+          onPressed: (_nameController.text.isEmpty) ? null : _createPlaylist,
           child: const Text('만들기'),
         ),
       ],

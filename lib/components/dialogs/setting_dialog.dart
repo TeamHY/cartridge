@@ -106,11 +106,9 @@ class _SettingDialogState extends ConsumerState<SettingDialog> {
               ? () {
                   final setting = ref.read(settingProvider);
 
-                  setting.setIsaacPath(_pathController.text);
-                  setting.setRerunDelay(
-                    int.parse(_rerunDelayController.text),
-                  );
-                  setting.setLanguageCode(_selectedLanguageCode);
+                  setting.isaacPath = _pathController.text;
+                  setting.rerunDelay = int.parse(_rerunDelayController.text);
+                  setting.languageCode = _selectedLanguageCode;
                   setting.saveSetting();
 
                   Navigator.pop(context);

@@ -3,15 +3,20 @@ import 'package:cartridge/models/game_config.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/services/isaac_config_service.dart';
-import 'package:cartridge/services/mod_service.dart';
+import 'package:cartridge/services/mod_manager.dart';
+import 'package:cartridge/services/mod_names.dart';
+import 'package:cartridge/services/mod_service.dart'
+    hide cartridgeSupporterName;
 import 'package:cartridge/services/preset_service.dart';
 import 'package:cartridge/services/game_launcher_service.dart';
 import 'package:cartridge/utils/presets_parser.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class StoreNotifier extends ChangeNotifier {
   StoreNotifier(this.ref) {
+    createSupporterMod();
     reloadMods();
     loadPresets();
     checkAstroVersion();
@@ -43,6 +48,26 @@ class StoreNotifier extends ChangeNotifier {
       astroLocalVersion != astroRemoteVersion ||
       astroLocalVersion == null ||
       astroRemoteVersion == null;
+
+  Future<void> createSupporterMod() async {
+    final setting = ref.read(settingProvider);
+
+    await ModManager.deleteMod(
+      isaacPath: setting.isaacPath,
+      modName: cartridgeSupporterName,
+    );
+
+    await ModManager.createMod(
+      isaacPath: setting.isaacPath,
+      modName: cartridgeSupporterName,
+      files: {
+        'main.lua': await rootBundle
+            .loadString('assets/mods/cartridge_supporter/main.lua'),
+        'metadata.xml': await rootBundle
+            .loadString('assets/mods/cartridge_supporter/metadata.xml'),
+      },
+    );
+  }
 
   Future<void> reloadMods() async {
     final setting = ref.read(settingProvider);

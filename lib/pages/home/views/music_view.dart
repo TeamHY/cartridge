@@ -2,6 +2,8 @@ import 'package:cartridge/components/dialogs/create_playlist_dialog.dart';
 import 'package:cartridge/components/dialogs/edit_playlist_dialog.dart';
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
 import 'package:cartridge/providers/music_player_provider.dart';
+import 'package:cartridge/providers/setting_provider.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -16,10 +18,32 @@ class MusicView extends ConsumerStatefulWidget {
 }
 
 class _MusicViewState extends ConsumerState<MusicView> {
+  bool _isPickingFolder = false;
+
+  Future<void> _pickFolder() async {
+    setState(() {
+      _isPickingFolder = true;
+    });
+
+    try {
+      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      if (selectedDirectory != null) {
+        ref.read(settingProvider).musicPlaylistPath = selectedDirectory;
+        ref.read(settingProvider).saveSetting();
+      }
+    } finally {
+      setState(() {
+        _isPickingFolder = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final musicPlayer = ref.watch(musicPlayerProvider);
     final playlists = musicPlayer.playlists;
+    final musicPlaylistPath =
+        ref.watch(settingProvider.select((s) => s.musicPlaylistPath));
 
     return Column(
       children: [
@@ -27,18 +51,38 @@ class _MusicViewState extends ConsumerState<MusicView> {
           title: 'Music Player',
           onBackPressed: widget.onBackPressed,
           actions: [
+            if (musicPlaylistPath.isNotEmpty)
+              Expanded(
+                child: Tooltip(
+                  message: musicPlaylistPath,
+                  child: Text(
+                    musicPlaylistPath,
+                    overflow: TextOverflow.ellipsis,
+                    style: FluentTheme.of(context).typography.caption,
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ),
             IconButton(
               icon: const PhosphorIcon(
-                PhosphorIconsRegular.plus,
+                PhosphorIconsRegular.folderOpen,
                 size: 20,
               ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const CreatePlaylistDialog(),
-                );
-              },
+              onPressed: _isPickingFolder ? null : _pickFolder,
             ),
+            if (musicPlaylistPath.isNotEmpty)
+              IconButton(
+                icon: const PhosphorIcon(
+                  PhosphorIconsRegular.plus,
+                  size: 20,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const CreatePlaylistDialog(),
+                  );
+                },
+              ),
           ],
         ),
         Expanded(
@@ -56,7 +100,7 @@ class _MusicViewState extends ConsumerState<MusicView> {
                           children: [
                             Expanded(
                               child: Text(
-                                playlist.name,
+                                playlist.id,
                                 style: FluentTheme.of(context).typography.body,
                               ),
                             ),
@@ -76,39 +120,24 @@ class _MusicViewState extends ConsumerState<MusicView> {
                             ),
                             IconButton(
                               icon: const PhosphorIcon(
-                                PhosphorIconsRegular.play,
+                                PhosphorIconsRegular.folder,
                                 size: 20,
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                playlist.openFolder();
+                              },
                             ),
                           ],
                         ),
-                        ...playlist.tracks.entries.map((entry) {
+                        ...playlist.tracks.map((track) {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                entry.key,
+                                track.title,
                                 style:
                                     FluentTheme.of(context).typography.caption,
                               ),
-                              ...entry.value.map((track) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Row(
-                                    children: [
-                                      IconButton(
-                                        icon: const PhosphorIcon(
-                                          PhosphorIconsRegular.play,
-                                          size: 16,
-                                        ),
-                                        onPressed: () {},
-                                      ),
-                                      Expanded(child: Text(track.title)),
-                                    ],
-                                  ),
-                                );
-                              }),
                             ],
                           );
                         }),

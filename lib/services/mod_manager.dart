@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:cartridge/services/recorder_mod.dart';
 
-class RecorderManager {
+class ModManager {
   static Future<void> createRecorderMod({
     required String isaacPath,
     required String dailySeed,
@@ -43,6 +43,37 @@ class RecorderManager {
 
     if (await recorderDirectory.exists()) {
       await recorderDirectory.delete(recursive: true);
+    }
+  }
+
+  static Future<void> createMod({
+    required String isaacPath,
+    required String modName,
+    required Map<String, String> files,
+  }) async {
+    final modDirectory = Directory('$isaacPath\\mods\\$modName');
+
+    if (await modDirectory.exists()) {
+      await modDirectory.delete(recursive: true);
+    }
+
+    await modDirectory.create(recursive: true);
+
+    for (final entry in files.entries) {
+      final file = File('${modDirectory.path}\\${entry.key}');
+      await file.parent.create(recursive: true);
+      await file.writeAsString(entry.value);
+    }
+  }
+
+  static Future<void> deleteMod({
+    required String isaacPath,
+    required String modName,
+  }) async {
+    final modDirectory = Directory('$isaacPath\\mods\\$modName');
+
+    if (await modDirectory.exists()) {
+      await modDirectory.delete(recursive: true);
     }
   }
 }

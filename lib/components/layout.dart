@@ -37,21 +37,24 @@ class Layout extends ConsumerWidget {
           height: 32,
           automaticallyImplyLeading: false,
           title: const DragToMoveArea(
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text('Cartridge'),
-            ]),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text('Cartridge'),
+              ],
+            ),
           ),
           actions: Stack(
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(width: 4),
-                  IconButton(
-                    icon: const PhosphorIcon(PhosphorIconsRegular.house,
-                        size: 16),
-                    onPressed: onHomePressed,
-                  ),
+                  // const SizedBox(width: 4),
+                  // IconButton(
+                  //   icon: const PhosphorIcon(PhosphorIconsRegular.house,
+                  //       size: 16),
+                  //   onPressed: onHomePressed,
+                  // ),
                   Expanded(child: Container()),
                   IconButton(
                     icon: const PhosphorIcon(

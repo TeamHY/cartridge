@@ -4,26 +4,20 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class PlaylistDialogContent extends StatelessWidget {
   final TextEditingController nameController;
-  final TextEditingController folderPathController;
   final String conditionType;
   final Function(String) onConditionTypeChanged;
-  final VoidCallback onFolderPick;
   final VoidCallback onNameChanged;
   final VoidCallback onFolderPathChanged;
   final Widget conditionSettings;
-  final bool isPickingFolder;
 
   const PlaylistDialogContent({
     super.key,
     required this.nameController,
-    required this.folderPathController,
     required this.conditionType,
     required this.onConditionTypeChanged,
-    required this.onFolderPick,
     required this.onNameChanged,
     required this.onFolderPathChanged,
     required this.conditionSettings,
-    this.isPickingFolder = false,
   });
 
   Widget _buildConditionButton(
@@ -76,28 +70,6 @@ class PlaylistDialogContent extends StatelessWidget {
           controller: nameController,
           onChanged: (value) => onNameChanged(),
           placeholder: '플레이리스트 이름을 입력하세요',
-        ),
-        const SizedBox(height: 16),
-        const Text('폴더 경로'),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: TextBox(
-                controller: folderPathController,
-                onChanged: (value) => onFolderPathChanged(),
-                placeholder: '폴더를 선택하세요',
-              ),
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              onPressed: isPickingFolder ? null : onFolderPick,
-              icon: const PhosphorIcon(
-                PhosphorIconsRegular.folder,
-                size: 16,
-              ),
-            ),
-          ],
         ),
         const SizedBox(height: 16),
         Container(

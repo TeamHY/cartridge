@@ -58,6 +58,108 @@ class IsaacEventManager {
     );
   }
 
+// StageType = {
+//     STAGETYPE_ORIGINAL = 0,
+//     STAGETYPE_WOTL = 1,
+//     STAGETYPE_AFTERBIRTH = 2,
+//     STAGETYPE_GREEDMODE = 3, -- deprecated, Greed Mode no longer has its own stages
+//     STAGETYPE_REPENTANCE = 4,
+//     STAGETYPE_REPENTANCE_B = 5,
+// }
+
+  IsaacStage _convertStageToIsaacStage(int stage, int stageType) {
+    switch (stage) {
+      case 1:
+      case 2:
+        switch (stageType) {
+          case 0:
+            return IsaacStage.basement;
+          case 1:
+            return IsaacStage.cellar;
+          case 2:
+            return IsaacStage.burningBasement;
+          case 4:
+            return IsaacStage.downpour;
+          case 5:
+            return IsaacStage.dross;
+        }
+        break;
+      case 3:
+      case 4:
+        switch (stageType) {
+          case 0:
+            return IsaacStage.caves;
+          case 1:
+            return IsaacStage.catacombs;
+          case 2:
+            return IsaacStage.floodedCaves;
+          case 4:
+            return IsaacStage.mines;
+          case 5:
+            return IsaacStage.ashpit;
+        }
+        break;
+      case 5:
+      case 6:
+        switch (stageType) {
+          case 0:
+            return IsaacStage.depths;
+          case 1:
+            return IsaacStage.necropolis;
+          case 2:
+            return IsaacStage.dankDepths;
+          case 4:
+            return IsaacStage.mausoleum;
+          case 5:
+            return IsaacStage.gehenna;
+        }
+        break;
+      case 7:
+      case 8:
+        switch (stageType) {
+          case 0:
+            return IsaacStage.womb;
+          case 1:
+            return IsaacStage.utero;
+          case 2:
+            return IsaacStage.scarredWomb;
+          case 4:
+            return IsaacStage.corpse;
+        }
+        break;
+      case 9:
+        return IsaacStage.blueWomb;
+      case 10:
+        switch (stageType) {
+          case 0:
+            return IsaacStage.sheol;
+          case 1:
+            return IsaacStage.cathedral;
+        }
+        break;
+      case 11:
+        switch (stageType) {
+          case 0:
+            return IsaacStage.darkRoom;
+          case 1:
+            return IsaacStage.chest;
+        }
+        break;
+      case 12:
+        return IsaacStage.theVoid;
+      case 13:
+        switch (stageType) {
+          case 0:
+            return IsaacStage.homeDay;
+          case 1:
+            return IsaacStage.homeNight;
+        }
+        break;
+    }
+
+    return IsaacStage.basement;
+  }
+
   onDebugMessage(String message) {
     if (message.startsWith(_prefix)) {
       final data = message.substring(_prefix.length);
@@ -67,16 +169,25 @@ class IsaacEventManager {
 
       switch (eventType) {
         case 'StageEntered':
+          final stage = int.parse(eventParams[0]);
+          final stageType = int.parse(eventParams[1]);
+
           _stageEnteredStreamController
-              .add((stage: IsaacStage.values[int.parse(eventParams[0])],));
+              .add((stage: _convertStageToIsaacStage(stage, stageType)));
           break;
         case 'RoomEntered':
-          _roomEnteredStreamController.add(
-              (roomType: IsaacRoomType.values[int.parse(eventParams[0])],));
+          _roomEnteredStreamController
+              .add((roomType: IsaacRoomType.values[int.parse(eventParams[0])]));
           break;
         case 'BossCleared':
-          _bossClearedStreamController.add(
-              (bossType: IsaacBossType.values[int.parse(eventParams[0])],));
+          final bossTypeString = eventParams[0];
+
+          for (var type in IsaacBossType.values) {
+            if (type.name == bossTypeString) {
+              _bossClearedStreamController.add((bossType: type));
+              break;
+            }
+          }
           break;
         default:
           if (kDebugMode) {
