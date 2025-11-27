@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cartridge/providers/music_player_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:cartridge/components/dialogs/setting_dialog.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,11 +9,17 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 class Layout extends ConsumerWidget {
-  const Layout({super.key, required this.child, required this.onHomePressed});
+  const Layout({
+    super.key,
+    required this.child,
+    required this.onHomePressed,
+    required this.onSettingPressed,
+  });
 
   final Widget child;
 
   final VoidCallback onHomePressed;
+  final VoidCallback onSettingPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -58,10 +63,7 @@ class Layout extends ConsumerWidget {
                   IconButton(
                     icon: const PhosphorIcon(PhosphorIconsRegular.gearSix,
                         size: 16),
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => const SettingDialog(),
-                    ),
+                    onPressed: onSettingPressed,
                   ),
                   const SizedBox(width: 4),
                   const SizedBox(
@@ -108,10 +110,7 @@ class Layout extends ConsumerWidget {
                   IconButton(
                     icon: const PhosphorIcon(PhosphorIconsRegular.gearSix,
                         size: 12),
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (context) => const SettingDialog(),
-                    ),
+                    onPressed: onSettingPressed,
                   ),
                   const SizedBox(width: 8),
                 ],

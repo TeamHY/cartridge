@@ -68,7 +68,7 @@ class HomeMainView extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(40),
                   ),
-                  child: Icon(FluentIcons.people, size: 40),
+                  child: const Icon(FluentIcons.people, size: 40),
                 ),
                 const SizedBox(width: 24),
                 Expanded(
@@ -242,7 +242,7 @@ class HomeMainView extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.grey,
               fontSize: 13,
               fontWeight: FontWeight.w500,

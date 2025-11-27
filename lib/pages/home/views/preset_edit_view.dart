@@ -6,6 +6,7 @@ import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/components/dialogs/game_config_dialog.dart';
 import 'package:cartridge/components/dialogs/mod_group_dialog.dart';
 import 'package:cartridge/pages/home/components/mod_item.dart';
+import 'package:cartridge/pages/home/components/sub_page_header.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -14,6 +15,7 @@ class PresetEditView extends ConsumerStatefulWidget {
   final Preset selectedPreset;
   final TextEditingController editPresetNameController;
   final TextEditingController searchController;
+  final VoidCallback? onBackPressed;
   final VoidCallback onCancel;
   final Function(List<Mod> mods) onSave;
 
@@ -22,6 +24,7 @@ class PresetEditView extends ConsumerStatefulWidget {
     required this.selectedPreset,
     required this.editPresetNameController,
     required this.searchController,
+    this.onBackPressed,
     required this.onCancel,
     required this.onSave,
   });
@@ -97,83 +100,59 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildTopRow(context, store, loc),
+        SubPageHeader(
+          title: widget.selectedPreset.name.isEmpty
+              ? loc.preset_edit_name_placeholder
+              : widget.selectedPreset.name,
+          onBackPressed: widget.onBackPressed,
+          actions: [
+            IconButton(
+              icon: PhosphorIcon(_isEditingPresetName
+                  ? PhosphorIconsBold.check
+                  : PhosphorIconsBold.pencilSimple),
+              onPressed: () {
+                if (_isEditingPresetName) {
+                  widget.selectedPreset.name =
+                      widget.editPresetNameController.text;
+                } else {
+                  widget.editPresetNameController.text =
+                      widget.selectedPreset.name;
+                }
+                setState(() => _isEditingPresetName = !_isEditingPresetName);
+              },
+            ),
+          ],
+        ),
+        if (_isEditingPresetName)
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: TextBox(
+              controller: widget.editPresetNameController,
+              style: FluentTheme.of(context).typography.subtitle,
+              placeholder: loc.preset_edit_name_placeholder,
+              onChanged: (value) => setState(() {
+                widget.selectedPreset.name = value;
+              }),
+              onSubmitted: (value) {
+                widget.selectedPreset.name = value;
+                setState(() => _isEditingPresetName = false);
+              },
+              autofocus: true,
+            ),
+          ),
+        _buildToolbar(context, store, loc),
         _buildModsList(),
         _buildActionButtons(context, loc),
       ],
     );
   }
 
-  Widget _buildTopRow(BuildContext context, store, AppLocalizations loc) {
+  Widget _buildToolbar(BuildContext context, store, AppLocalizations loc) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         children: [
-          Row(
-            children: [
-              IntrinsicWidth(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minWidth: 10),
-                  child: _isEditingPresetName
-                      ? TextBox(
-                          controller: widget.editPresetNameController,
-                          style: FluentTheme.of(context).typography.subtitle,
-                          placeholder: loc.preset_edit_name_placeholder,
-                          onChanged: (value) =>
-                              widget.selectedPreset.name = value,
-                          onSubmitted: (value) {
-                            widget.selectedPreset.name = value;
-                            setState(() => _isEditingPresetName = false);
-                          },
-                          autofocus: true,
-                        )
-                      : GestureDetector(
-                          onTap: () =>
-                              setState(() => _isEditingPresetName = true),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.only(bottom: 3),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.transparent),
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            child: Text(
-                              widget.selectedPreset.name.isEmpty
-                                  ? loc.preset_edit_name_placeholder
-                                  : widget.selectedPreset.name,
-                              style: widget.selectedPreset.name.isEmpty
-                                  ? FluentTheme.of(context)
-                                      .typography
-                                      .subtitle
-                                      ?.copyWith(
-                                        color: FluentTheme.of(context)
-                                            .resources
-                                            .textFillColorSecondary,
-                                      )
-                                  : FluentTheme.of(context).typography.subtitle,
-                            ),
-                          ),
-                        ),
-                ),
-              ),
-              IconButton(
-                icon: PhosphorIcon(_isEditingPresetName
-                    ? PhosphorIconsBold.check
-                    : PhosphorIconsBold.pencilSimple),
-                onPressed: () {
-                  if (_isEditingPresetName) {
-                    widget.selectedPreset.name =
-                        widget.editPresetNameController.text;
-                  } else {
-                    widget.editPresetNameController.text =
-                        widget.selectedPreset.name;
-                  }
-                  setState(() => _isEditingPresetName = !_isEditingPresetName);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(width: 16),
           _GameConfigSelector(store: store),
           const Expanded(child: SizedBox()),
           _buildViewToggle(),

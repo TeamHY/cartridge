@@ -1,5 +1,5 @@
 import 'package:cartridge/models/preset.dart';
-import 'package:cartridge/pages/home/components/music_player.dart';
+import 'package:cartridge/pages/home/components/music_player_controller.dart';
 import 'package:cartridge/pages/home/components/preset_creation_bar.dart';
 import 'package:cartridge/pages/home/components/preset_list.dart';
 import 'package:fluent_ui/fluent_ui.dart';
