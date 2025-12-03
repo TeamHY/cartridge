@@ -38,6 +38,18 @@
   "setting_language_label": "언어",
   "setting_language_ko": "한국어",
   "setting_language_en": "English",
+  "setting_hotkey_section": "음악 플레이어 단축키",
+  "setting_hotkey_play_pause_label": "재생/일시정지",
+  "setting_hotkey_next_track_label": "다음 곡",
+  "setting_hotkey_volume_up_label": "볼륨 증가",
+  "setting_hotkey_volume_down_label": "볼륨 감소",
+  "setting_hotkey_hint": "예: ctrl+alt+p",
+  "setting_hotkey_record_button": "녹화",
+  "hotkey_record_dialog_title": "단축키 녹화",
+  "hotkey_record_dialog_prompt": "'녹화' 버튼을 누른 후 원하는 키 조합을 눌러주세요.",
+  "hotkey_record_dialog_recording": "키를 눌러주세요...",
+  "hotkey_record_dialog_waiting": "대기 중...",
+  "hotkey_record_dialog_start_recording": "녹화 시작",
   "setting_license_button": "라이센스",
 
   "@game_config": {

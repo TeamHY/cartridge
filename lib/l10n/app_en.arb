@@ -38,6 +38,18 @@
   "setting_language_label": "Language",
   "setting_language_ko": "Korean",
   "setting_language_en": "English",
+  "setting_hotkey_section": "Music Player Hotkeys",
+  "setting_hotkey_play_pause_label": "Play/Pause",
+  "setting_hotkey_next_track_label": "Next Track",
+  "setting_hotkey_volume_up_label": "Volume Up",
+  "setting_hotkey_volume_down_label": "Volume Down",
+  "setting_hotkey_hint": "e.g., ctrl+alt+p",
+  "setting_hotkey_record_button": "Record",
+  "hotkey_record_dialog_title": "Record Hotkey",
+  "hotkey_record_dialog_prompt": "Press 'Start Recording' button, then press your desired key combination.",
+  "hotkey_record_dialog_recording": "Press keys...",
+  "hotkey_record_dialog_waiting": "Waiting...",
+  "hotkey_record_dialog_start_recording": "Start Recording",
   "setting_license_button": "License",
 
   "@game_config": {

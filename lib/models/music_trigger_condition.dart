@@ -47,10 +47,10 @@ class StageStayingCondition extends MusicTriggerCondition {
 }
 
 class RoomStayingCondition extends MusicTriggerCondition {
-  final IsaacRoomType roomType;
-  final bool isOnlyUncleared;
+  final Set<IsaacRoomType> roomTypes;
+  final bool isOnlyWithMonsters;
 
-  RoomStayingCondition(this.roomType, this.isOnlyUncleared);
+  RoomStayingCondition(this.roomTypes, this.isOnlyWithMonsters);
 
   @override
   String get type => 'room';
@@ -59,23 +59,25 @@ class RoomStayingCondition extends MusicTriggerCondition {
   Map<String, dynamic> toJson() {
     return {
       'type': type,
-      'roomType': roomType.index,
-      'isOnlyUncleared': isOnlyUncleared,
+      'roomTypes': roomTypes.map((r) => r.index).toList(),
+      'isOnlyWithMonsters': isOnlyWithMonsters,
     };
   }
 
   factory RoomStayingCondition.fromJson(Map<String, dynamic> json) {
     return RoomStayingCondition(
-      IsaacRoomType.values[json['roomType'] as int],
-      json['isOnlyUncleared'] as bool,
+      (json['roomTypes'] as List<dynamic>)
+          .map((e) => IsaacRoomType.values[e as int])
+          .toSet(),
+      json['isOnlyWithMonsters'] as bool,
     );
   }
 }
 
 class BossClearedCondition extends MusicTriggerCondition {
-  final IsaacBossType bossType;
+  final Set<IsaacBossType> bossTypes;
 
-  BossClearedCondition(this.bossType);
+  BossClearedCondition(this.bossTypes);
 
   @override
   String get type => 'boss';
@@ -84,13 +86,15 @@ class BossClearedCondition extends MusicTriggerCondition {
   Map<String, dynamic> toJson() {
     return {
       'type': type,
-      'bossName': bossType.index,
+      'bossNames': bossTypes.map((b) => b.index).toList(),
     };
   }
 
   factory BossClearedCondition.fromJson(Map<String, dynamic> json) {
     return BossClearedCondition(
-      IsaacBossType.values[json['bossName'] as int],
+      (json['bossNames'] as List<dynamic>)
+          .map((e) => IsaacBossType.values[e as int])
+          .toSet(),
     );
   }
 }

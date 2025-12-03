@@ -9,18 +9,22 @@ class HomeSidebar extends ConsumerWidget {
   final TextEditingController presetNameController;
   final TextEditingController editPresetNameController;
   final Preset? selectedPreset;
+  final bool isMusicPlayerSelected;
   final Function(Preset) onSelectPreset;
   final Function(Preset) onDeletePreset;
   final VoidCallback? onDeselectPreset;
+  final VoidCallback? onMusicPlayerTap;
 
   const HomeSidebar({
     super.key,
     required this.presetNameController,
     required this.editPresetNameController,
     required this.selectedPreset,
+    required this.isMusicPlayerSelected,
     required this.onSelectPreset,
     required this.onDeletePreset,
     required this.onDeselectPreset,
+    required this.onMusicPlayerTap,
   });
 
   @override
@@ -42,7 +46,8 @@ class HomeSidebar extends ConsumerWidget {
           const SizedBox(height: 8),
           PresetCreationBar(controller: presetNameController),
           const SizedBox(height: 8),
-          const MusicPlayer(),
+          MusicPlayer(
+              isSelected: isMusicPlayerSelected, onTap: onMusicPlayerTap),
         ],
       ),
     );

@@ -45,10 +45,14 @@ class _MusicViewState extends ConsumerState<MusicView> {
     final musicPlaylistPath =
         ref.watch(settingProvider.select((s) => s.musicPlaylistPath));
 
+    playlists.sort(
+      (a, b) => a.id.compareTo(b.id),
+    );
+
     return Column(
       children: [
         SubPageHeader(
-          title: 'Music Player',
+          title: '음악 플레이어',
           onBackPressed: widget.onBackPressed,
           actions: [
             if (musicPlaylistPath.isNotEmpty)
@@ -89,6 +93,7 @@ class _MusicViewState extends ConsumerState<MusicView> {
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              spacing: 8,
               children: playlists.map((playlist) {
                 return Card(
                   child: Padding(
@@ -104,6 +109,8 @@ class _MusicViewState extends ConsumerState<MusicView> {
                                 style: FluentTheme.of(context).typography.body,
                               ),
                             ),
+                            Text('${playlist.tracks.length}'),
+                            const SizedBox(width: 8),
                             IconButton(
                               icon: const PhosphorIcon(
                                 PhosphorIconsRegular.pencil,
@@ -129,18 +136,6 @@ class _MusicViewState extends ConsumerState<MusicView> {
                             ),
                           ],
                         ),
-                        ...playlist.tracks.map((track) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                track.title,
-                                style:
-                                    FluentTheme.of(context).typography.caption,
-                              ),
-                            ],
-                          );
-                        }),
                       ],
                     ),
                   ),

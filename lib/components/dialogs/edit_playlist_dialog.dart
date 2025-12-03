@@ -26,10 +26,10 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
 
   late Set<IsaacStage> _selectedStages;
 
-  late IsaacRoomType _roomType;
+  late Set<IsaacRoomType> _selectedRoomTypes;
   late bool _isOnlyUncleared;
 
-  late IsaacBossType _bossType;
+  late Set<IsaacBossType> _selectedBossTypes;
 
   @override
   void initState() {
@@ -41,27 +41,27 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
     if (condition is StageStayingCondition) {
       _conditionType = 'stage';
       _selectedStages = Set.from(condition.stage);
-      _roomType = IsaacRoomType.defaultRoom;
+      _selectedRoomTypes = {};
       _isOnlyUncleared = false;
-      _bossType = IsaacBossType.blueBaby;
+      _selectedBossTypes = {};
     } else if (condition is RoomStayingCondition) {
       _conditionType = 'room';
       _selectedStages = {};
-      _roomType = condition.roomType;
-      _isOnlyUncleared = condition.isOnlyUncleared;
-      _bossType = IsaacBossType.blueBaby;
+      _selectedRoomTypes = Set.from(condition.roomTypes);
+      _isOnlyUncleared = condition.isOnlyWithMonsters;
+      _selectedBossTypes = {};
     } else if (condition is BossClearedCondition) {
       _conditionType = 'boss';
       _selectedStages = {};
-      _roomType = IsaacRoomType.defaultRoom;
+      _selectedRoomTypes = {};
       _isOnlyUncleared = false;
-      _bossType = condition.bossType;
+      _selectedBossTypes = Set.from(condition.bossTypes);
     } else {
       _conditionType = 'stage';
       _selectedStages = {};
-      _roomType = IsaacRoomType.defaultRoom;
+      _selectedRoomTypes = {};
       _isOnlyUncleared = false;
-      _bossType = IsaacBossType.blueBaby;
+      _selectedBossTypes = {};
     }
   }
 
@@ -76,9 +76,9 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
       case 'stage':
         return StageStayingCondition(_selectedStages);
       case 'room':
-        return RoomStayingCondition(_roomType, _isOnlyUncleared);
+        return RoomStayingCondition(_selectedRoomTypes, _isOnlyUncleared);
       case 'boss':
-        return BossClearedCondition(_bossType);
+        return BossClearedCondition(_selectedBossTypes);
       default:
         return StageStayingCondition(_selectedStages);
     }
@@ -211,11 +211,15 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
 
   Widget _buildRoomSettings() {
     return RoomSettings(
-      roomType: _roomType,
+      selectedRoomTypes: _selectedRoomTypes,
       isOnlyUncleared: _isOnlyUncleared,
-      onRoomTypeChanged: (value) {
+      onRoomTypeToggle: (roomType, value) {
         setState(() {
-          _roomType = value!;
+          if (value) {
+            _selectedRoomTypes.add(roomType);
+          } else {
+            _selectedRoomTypes.remove(roomType);
+          }
         });
       },
       onUnclearedChanged: (value) {
@@ -228,10 +232,14 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
 
   Widget _buildBossSettings() {
     return BossSettings(
-      bossType: _bossType,
-      onBossTypeChanged: (value) {
+      selectedBossTypes: _selectedBossTypes,
+      onBossTypeToggle: (bossType, value) {
         setState(() {
-          _bossType = value!;
+          if (value) {
+            _selectedBossTypes.add(bossType);
+          } else {
+            _selectedBossTypes.remove(bossType);
+          }
         });
       },
     );

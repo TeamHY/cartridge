@@ -248,16 +248,16 @@ class StageSettings extends StatelessWidget {
 }
 
 class RoomSettings extends StatelessWidget {
-  final IsaacRoomType roomType;
+  final Set<IsaacRoomType> selectedRoomTypes;
   final bool isOnlyUncleared;
-  final Function(IsaacRoomType?) onRoomTypeChanged;
+  final Function(IsaacRoomType, bool) onRoomTypeToggle;
   final Function(bool?) onUnclearedChanged;
 
   const RoomSettings({
     super.key,
-    required this.roomType,
+    required this.selectedRoomTypes,
     required this.isOnlyUncleared,
-    required this.onRoomTypeChanged,
+    required this.onRoomTypeToggle,
     required this.onUnclearedChanged,
   });
 
@@ -266,19 +266,28 @@ class RoomSettings extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('방 타입', style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text('방 타입 (복수 선택 가능)',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        ComboBox<IsaacRoomType>(
-          value: roomType,
-          items: IsaacRoomType.values
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: IsaacRoomType.values
               .where((roomType) => roomType != IsaacRoomType.null_)
               .map((roomType) {
-            return ComboBoxItem<IsaacRoomType>(
-              value: roomType,
-              child: Text(roomType.toDisplayString()),
+            final isSelected = selectedRoomTypes.contains(roomType);
+            return ToggleButton(
+              checked: isSelected,
+              onChanged: (value) => onRoomTypeToggle(roomType, value),
+              child: Text(
+                roomType.toDisplayString(),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isSelected ? Colors.white : null,
+                ),
+              ),
             );
           }).toList(),
-          onChanged: onRoomTypeChanged,
         ),
         const SizedBox(height: 12),
         Checkbox(
@@ -292,13 +301,13 @@ class RoomSettings extends StatelessWidget {
 }
 
 class BossSettings extends StatelessWidget {
-  final IsaacBossType bossType;
-  final Function(IsaacBossType?) onBossTypeChanged;
+  final Set<IsaacBossType> selectedBossTypes;
+  final Function(IsaacBossType, bool) onBossTypeToggle;
 
   const BossSettings({
     super.key,
-    required this.bossType,
-    required this.onBossTypeChanged,
+    required this.selectedBossTypes,
+    required this.onBossTypeToggle,
   });
 
   @override
@@ -306,17 +315,26 @@ class BossSettings extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('보스 타입', style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text('보스 타입 (복수 선택 가능)',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
-        ComboBox<IsaacBossType>(
-          value: bossType,
-          items: IsaacBossType.values.map((bossType) {
-            return ComboBoxItem<IsaacBossType>(
-              value: bossType,
-              child: Text(bossType.toDisplayString()),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: IsaacBossType.values.map((bossType) {
+            final isSelected = selectedBossTypes.contains(bossType);
+            return ToggleButton(
+              checked: isSelected,
+              onChanged: (value) => onBossTypeToggle(bossType, value),
+              child: Text(
+                bossType.toDisplayString(),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isSelected ? Colors.white : null,
+                ),
+              ),
             );
           }).toList(),
-          onChanged: onBossTypeChanged,
         ),
       ],
     );

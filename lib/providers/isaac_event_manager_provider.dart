@@ -10,6 +10,8 @@ typedef StageEnteredParams = ({IsaacStage stage});
 
 typedef RoomEnteredParams = ({IsaacRoomType roomType, bool isCleared});
 
+typedef RoomClearedParams = ({IsaacRoomType roomType});
+
 typedef BossClearedParams = ({IsaacBossType bossType});
 
 class IsaacEventManager {
@@ -33,6 +35,9 @@ class IsaacEventManager {
   final _roomEnteredStreamController =
       StreamController<RoomEnteredParams>.broadcast();
 
+  final _roomClearedStreamController =
+      StreamController<RoomClearedParams>.broadcast();
+
   final _bossClearedStreamController =
       StreamController<BossClearedParams>.broadcast();
 
@@ -44,6 +49,9 @@ class IsaacEventManager {
 
   Stream<RoomEnteredParams> get roomEnteredStream =>
       _roomEnteredStreamController.stream;
+
+  Stream<RoomClearedParams> get roomClearedStream =>
+      _roomClearedStreamController.stream;
 
   Stream<BossClearedParams> get bossClearedStream =>
       _bossClearedStreamController.stream;
@@ -176,10 +184,18 @@ class IsaacEventManager {
               .add((stage: _convertStageToIsaacStage(stage, stageType)));
           break;
         case 'RoomEntered':
+          final roomType = int.parse(eventParams[0]);
+
           _roomEnteredStreamController.add((
-            roomType: IsaacRoomType.values[int.parse(eventParams[0])],
+            roomType: IsaacRoomType.values[roomType],
             isCleared: eventParams[1] == 'true'
           ));
+          break;
+        case 'RoomCleared':
+          final roomType = int.parse(eventParams[0]);
+
+          _roomClearedStreamController
+              .add((roomType: IsaacRoomType.values[roomType]));
           break;
         case 'BossCleared':
           final bossTypeString = eventParams[0];

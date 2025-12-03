@@ -27,6 +27,15 @@ mod:AddCallback(
 )
 
 mod:AddCallback(
+    ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD,
+    ---@param rng RNG
+    ---@param spawnPos Vector
+    function(_, rng, spawnPos)
+        Isaac.DebugString("[Cartridge]RoomCleared:" .. tostring(Game():GetRoom():GetType()))
+    end
+)
+
+mod:AddCallback(
 	ModCallbacks.MC_POST_NPC_DEATH,
 	---@param npc EntityNPC
 	function(_, npc)

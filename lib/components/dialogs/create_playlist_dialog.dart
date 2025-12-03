@@ -25,10 +25,10 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
 
   final Set<IsaacStage> _selectedStages = {};
 
-  IsaacRoomType _roomType = IsaacRoomType.defaultRoom;
+  final Set<IsaacRoomType> _selectedRoomTypes = {};
   bool _isOnlyUncleared = false;
 
-  IsaacBossType _bossType = IsaacBossType.blueBaby;
+  final Set<IsaacBossType> _selectedBossTypes = {};
 
   @override
   void dispose() {
@@ -41,9 +41,9 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
       case 'stage':
         return StageStayingCondition(_selectedStages);
       case 'room':
-        return RoomStayingCondition(_roomType, _isOnlyUncleared);
+        return RoomStayingCondition(_selectedRoomTypes, _isOnlyUncleared);
       case 'boss':
-        return BossClearedCondition(_bossType);
+        return BossClearedCondition(_selectedBossTypes);
       default:
         return StageStayingCondition(_selectedStages);
     }
@@ -172,11 +172,15 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
 
   Widget _buildRoomSettings() {
     return RoomSettings(
-      roomType: _roomType,
+      selectedRoomTypes: _selectedRoomTypes,
       isOnlyUncleared: _isOnlyUncleared,
-      onRoomTypeChanged: (value) {
+      onRoomTypeToggle: (roomType, value) {
         setState(() {
-          _roomType = value!;
+          if (value) {
+            _selectedRoomTypes.add(roomType);
+          } else {
+            _selectedRoomTypes.remove(roomType);
+          }
         });
       },
       onUnclearedChanged: (value) {
@@ -189,10 +193,14 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
 
   Widget _buildBossSettings() {
     return BossSettings(
-      bossType: _bossType,
-      onBossTypeChanged: (value) {
+      selectedBossTypes: _selectedBossTypes,
+      onBossTypeToggle: (bossType, value) {
         setState(() {
-          _bossType = value!;
+          if (value) {
+            _selectedBossTypes.add(bossType);
+          } else {
+            _selectedBossTypes.remove(bossType);
+          }
         });
       },
     );

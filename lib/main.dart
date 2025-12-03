@@ -1,3 +1,4 @@
+import 'package:cartridge/providers/hotkey_provider.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/pages/home/home_page.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -44,6 +45,8 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final languageCode = ref.watch(settingProvider).languageCode ?? 'ko';
+
+    // ref.read(hotkeyProvider).init();
 
     return FluentApp(
       title: 'Cartridge',

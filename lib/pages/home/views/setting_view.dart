@@ -1,6 +1,7 @@
 import 'package:cartridge/main.dart';
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
 import 'package:cartridge/providers/setting_provider.dart';
+import 'package:cartridge/components/hotkey_input_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart' as material;
@@ -20,6 +21,10 @@ class _SettingViewState extends ConsumerState<SettingView> {
 
   late TextEditingController _pathController;
   late TextEditingController _rerunDelayController;
+  late TextEditingController _playPauseHotkeyController;
+  late TextEditingController _nextTrackHotkeyController;
+  late TextEditingController _volumeUpHotkeyController;
+  late TextEditingController _volumeDownHotkeyController;
   late String _selectedLanguageCode;
 
   @override
@@ -30,6 +35,14 @@ class _SettingViewState extends ConsumerState<SettingView> {
     _pathController = TextEditingController(text: settings.isaacPath);
     _rerunDelayController =
         TextEditingController(text: settings.rerunDelay.toString());
+    _playPauseHotkeyController =
+        TextEditingController(text: settings.playPauseHotkey);
+    _nextTrackHotkeyController =
+        TextEditingController(text: settings.nextTrackHotkey);
+    _volumeUpHotkeyController =
+        TextEditingController(text: settings.volumeUpHotkey);
+    _volumeDownHotkeyController =
+        TextEditingController(text: settings.volumeDownHotkey);
     _selectedLanguageCode = settings.languageCode ?? 'ko';
   }
 
@@ -37,6 +50,10 @@ class _SettingViewState extends ConsumerState<SettingView> {
   void dispose() {
     _pathController.dispose();
     _rerunDelayController.dispose();
+    _playPauseHotkeyController.dispose();
+    _nextTrackHotkeyController.dispose();
+    _volumeUpHotkeyController.dispose();
+    _volumeDownHotkeyController.dispose();
     super.dispose();
   }
 
@@ -93,6 +110,50 @@ class _SettingViewState extends ConsumerState<SettingView> {
                     },
                   ),
                 ),
+                // const SizedBox(height: 24.0),
+                // Text(
+                //   loc.setting_hotkey_section,
+                //   style: const TextStyle(
+                //     fontSize: 14,
+                //     fontWeight: FontWeight.w600,
+                //   ),
+                // ),
+                // const SizedBox(height: 8.0),
+                // InfoLabel(
+                //   label: loc.setting_hotkey_play_pause_label,
+                //   child: HotkeyInputField(
+                //     controller: _playPauseHotkeyController,
+                //     placeholder: loc.setting_hotkey_hint,
+                //     onChanged: () => setState(() => _isChanged = true),
+                //   ),
+                // ),
+                // const SizedBox(height: 16.0),
+                // InfoLabel(
+                //   label: loc.setting_hotkey_next_track_label,
+                //   child: HotkeyInputField(
+                //     controller: _nextTrackHotkeyController,
+                //     placeholder: loc.setting_hotkey_hint,
+                //     onChanged: () => setState(() => _isChanged = true),
+                //   ),
+                // ),
+                // const SizedBox(height: 16.0),
+                // InfoLabel(
+                //   label: loc.setting_hotkey_volume_up_label,
+                //   child: HotkeyInputField(
+                //     controller: _volumeUpHotkeyController,
+                //     placeholder: loc.setting_hotkey_hint,
+                //     onChanged: () => setState(() => _isChanged = true),
+                //   ),
+                // ),
+                // const SizedBox(height: 16.0),
+                // InfoLabel(
+                //   label: loc.setting_hotkey_volume_down_label,
+                //   child: HotkeyInputField(
+                //     controller: _volumeDownHotkeyController,
+                //     placeholder: loc.setting_hotkey_hint,
+                //     onChanged: () => setState(() => _isChanged = true),
+                //   ),
+                // ),
                 const SizedBox(height: 16.0),
                 Row(
                   children: [
@@ -135,6 +196,14 @@ class _SettingViewState extends ConsumerState<SettingView> {
                           setting.rerunDelay =
                               int.parse(_rerunDelayController.text);
                           setting.languageCode = _selectedLanguageCode;
+                          setting.playPauseHotkey =
+                              _playPauseHotkeyController.text;
+                          setting.nextTrackHotkey =
+                              _nextTrackHotkeyController.text;
+                          setting.volumeUpHotkey =
+                              _volumeUpHotkeyController.text;
+                          setting.volumeDownHotkey =
+                              _volumeDownHotkeyController.text;
                           setting.saveSetting();
 
                           setState(() => _isChanged = false);
