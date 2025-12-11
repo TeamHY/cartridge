@@ -163,7 +163,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
                       child: Text(loc.setting_license_button),
                     ),
                     const SizedBox(width: 8.0),
-                    Text('v$currentVersion'),
+                    Text('v${packageInfo.version}'),
                   ],
                 ),
               ],

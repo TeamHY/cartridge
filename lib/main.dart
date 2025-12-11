@@ -1,4 +1,3 @@
-import 'package:cartridge/providers/hotkey_provider.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/pages/home/home_page.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -8,14 +7,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'l10n/app_localizations.dart';
 
-final currentVersion = Version.parse('4.17.0');
+late final PackageInfo packageInfo;
+late final Version currentVersion;
 
 void main() async {
   await dotenv.load(fileName: '.env');
 
   WidgetsFlutterBinding.ensureInitialized();
+  packageInfo = await PackageInfo.fromPlatform();
+  currentVersion = Version.parse(packageInfo.version);
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = const WindowOptions(
