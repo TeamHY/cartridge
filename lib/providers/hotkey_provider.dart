@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/music_player_provider.dart';
 import 'package:cartridge/services/hotkey_service.dart';
@@ -10,6 +12,7 @@ class HotkeyNotifier {
 
   final Ref ref;
   final HotkeyService _hotkeyService = HotkeyService();
+  Timer? _registerTimer;
 
   void _init() {
     final setting = ref.read(settingProvider);
@@ -39,36 +42,32 @@ class HotkeyNotifier {
       setting.saveSetting();
     };
 
-    _hotkeyService.registerPlayPauseHotkey(setting.playPauseHotkey);
-    _hotkeyService.registerNextTrackHotkey(setting.nextTrackHotkey);
-    _hotkeyService.registerVolumeUpHotkey(setting.volumeUpHotkey);
-    _hotkeyService.registerVolumeDownHotkey(setting.volumeDownHotkey);
-
-    ref.listen(settingProvider, (previous, next) {
-      if (previous?.playPauseHotkey != next.playPauseHotkey) {
-        _hotkeyService.registerPlayPauseHotkey(next.playPauseHotkey);
-      }
-      if (previous?.nextTrackHotkey != next.nextTrackHotkey) {
-        _hotkeyService.registerNextTrackHotkey(next.nextTrackHotkey);
-      }
-      if (previous?.volumeUpHotkey != next.volumeUpHotkey) {
-        _hotkeyService.registerVolumeUpHotkey(next.volumeUpHotkey);
-      }
-      if (previous?.volumeDownHotkey != next.volumeDownHotkey) {
-        _hotkeyService.registerVolumeDownHotkey(next.volumeDownHotkey);
-      }
-    });
+    ref.listen(
+      settingProvider,
+      (_, next) {
+        _registerTimer?.cancel();
+        _registerTimer = Timer(const Duration(milliseconds: 500), () async {
+          await _hotkeyService.unregisterAll();
+          await _hotkeyService.registerPlayPauseHotkey(next.playPauseHotkey);
+          await _hotkeyService.registerNextTrackHotkey(next.nextTrackHotkey);
+          await _hotkeyService.registerVolumeUpHotkey(next.volumeUpHotkey);
+          await _hotkeyService.registerVolumeDownHotkey(next.volumeDownHotkey);
+        });
+      },
+      fireImmediately: true,
+    );
   }
 
-  void dispose() {
-    _hotkeyService.unregisterAll();
+  Future<void> dispose() async {
+    _registerTimer?.cancel();
+    await _hotkeyService.unregisterAll();
   }
 }
 
 final hotkeyProvider = Provider<HotkeyNotifier>((ref) {
   final notifier = HotkeyNotifier(ref);
-  ref.onDispose(() {
-    notifier.dispose();
+  ref.onDispose(() async {
+    await notifier.dispose();
   });
   return notifier;
 });

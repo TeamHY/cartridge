@@ -105,6 +105,32 @@ class SettingNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateSettings({
+    String? isaacPath,
+    String? musicPlaylistPath,
+    double? musicVolume,
+    int? rerunDelay,
+    String? languageCode,
+    bool? isGridView,
+    String? playPauseHotkey,
+    String? nextTrackHotkey,
+    String? volumeUpHotkey,
+    String? volumeDownHotkey,
+  }) {
+    if (isaacPath != null) _isaacPath = isaacPath;
+    if (musicPlaylistPath != null) _musicPlaylistPath = musicPlaylistPath;
+    if (musicVolume != null) _musicVolume = musicVolume.clamp(0.0, 1.0);
+    if (rerunDelay != null) _rerunDelay = rerunDelay;
+    if (languageCode != null) _languageCode = languageCode;
+    if (isGridView != null) _isGridView = isGridView;
+    if (playPauseHotkey != null) _playPauseHotkey = playPauseHotkey;
+    if (nextTrackHotkey != null) _nextTrackHotkey = nextTrackHotkey;
+    if (volumeUpHotkey != null) _volumeUpHotkey = volumeUpHotkey;
+    if (volumeDownHotkey != null) _volumeDownHotkey = volumeDownHotkey;
+
+    notifyListeners();
+  }
+
   Future<void> loadSetting() async {
     final appSupportDir = await getApplicationSupportDirectory();
     final file = File('${appSupportDir.path}\\setting.json');
@@ -122,10 +148,10 @@ class SettingNotifier extends ChangeNotifier {
     _rerunDelay = json['rerunDelay'] as int? ?? 1000;
     _languageCode = json['languageCode'] as String?;
     _isGridView = json['isGridView'] as bool? ?? false;
-    // _playPauseHotkey = json['playPauseHotkey'] as String? ?? 'ctrl+alt+p';
-    // _nextTrackHotkey = json['nextTrackHotkey'] as String? ?? 'ctrl+alt+n';
-    // _volumeUpHotkey = json['volumeUpHotkey'] as String? ?? 'ctrl+alt+up';
-    // _volumeDownHotkey = json['volumeDownHotkey'] as String? ?? 'ctrl+alt+down';
+    _playPauseHotkey = json['playPauseHotkey'] as String? ?? 'ctrl+alt+p';
+    _nextTrackHotkey = json['nextTrackHotkey'] as String? ?? 'ctrl+alt+n';
+    _volumeUpHotkey = json['volumeUpHotkey'] as String? ?? 'ctrl+alt+up';
+    _volumeDownHotkey = json['volumeDownHotkey'] as String? ?? 'ctrl+alt+down';
 
     notifyListeners();
   }
@@ -143,10 +169,10 @@ class SettingNotifier extends ChangeNotifier {
         'rerunDelay': _rerunDelay,
         'languageCode': _languageCode,
         'isGridView': _isGridView,
-        // 'playPauseHotkey': _playPauseHotkey,
-        // 'nextTrackHotkey': _nextTrackHotkey,
-        // 'volumeUpHotkey': _volumeUpHotkey,
-        // 'volumeDownHotkey': _volumeDownHotkey,
+        'playPauseHotkey': _playPauseHotkey,
+        'nextTrackHotkey': _nextTrackHotkey,
+        'volumeUpHotkey': _volumeUpHotkey,
+        'volumeDownHotkey': _volumeDownHotkey,
       }));
     });
   }

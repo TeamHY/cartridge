@@ -14,11 +14,6 @@ class HotkeyService {
   VoidCallback? onVolumeDown;
 
   Future<void> registerPlayPauseHotkey(String hotkeyString) async {
-    if (_playPauseHotkey != null) {
-      await hotKeyManager.unregister(_playPauseHotkey!);
-      _playPauseHotkey = null;
-    }
-
     if (hotkeyString.trim().isEmpty) {
       return;
     }
@@ -43,11 +38,6 @@ class HotkeyService {
   }
 
   Future<void> registerNextTrackHotkey(String hotkeyString) async {
-    if (_nextTrackHotkey != null) {
-      await hotKeyManager.unregister(_nextTrackHotkey!);
-      _nextTrackHotkey = null;
-    }
-
     if (hotkeyString.trim().isEmpty) {
       return;
     }
@@ -72,11 +62,6 @@ class HotkeyService {
   }
 
   Future<void> registerVolumeUpHotkey(String hotkeyString) async {
-    if (_volumeUpHotkey != null) {
-      await hotKeyManager.unregister(_volumeUpHotkey!);
-      _volumeUpHotkey = null;
-    }
-
     if (hotkeyString.trim().isEmpty) {
       return;
     }
@@ -101,16 +86,11 @@ class HotkeyService {
   }
 
   Future<void> registerVolumeDownHotkey(String hotkeyString) async {
-    if (_volumeDownHotkey != null) {
-      await hotKeyManager.unregister(_volumeDownHotkey!);
-      _volumeDownHotkey = null;
-    }
-
     if (hotkeyString.trim().isEmpty) {
       return;
     }
 
-    try{
+    try {
       final hotkey = _parseHotkey(hotkeyString);
       if (hotkey != null) {
         await hotKeyManager.register(
@@ -130,22 +110,11 @@ class HotkeyService {
   }
 
   Future<void> unregisterAll() async {
-    if (_playPauseHotkey != null) {
-      await hotKeyManager.unregister(_playPauseHotkey!);
-      _playPauseHotkey = null;
-    }
-    if (_nextTrackHotkey != null) {
-      await hotKeyManager.unregister(_nextTrackHotkey!);
-      _nextTrackHotkey = null;
-    }
-    if (_volumeUpHotkey != null) {
-      await hotKeyManager.unregister(_volumeUpHotkey!);
-      _volumeUpHotkey = null;
-    }
-    if (_volumeDownHotkey != null) {
-      await hotKeyManager.unregister(_volumeDownHotkey!);
-      _volumeDownHotkey = null;
-    }
+    hotKeyManager.unregisterAll();
+    _playPauseHotkey = null;
+    _nextTrackHotkey = null;
+    _volumeUpHotkey = null;
+    _volumeDownHotkey = null;
     debugPrint('[HotkeyService] Unregistered all hotkeys');
   }
 
