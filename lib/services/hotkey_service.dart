@@ -16,6 +16,11 @@ class HotkeyService {
   Future<void> registerPlayPauseHotkey(String hotkeyString) async {
     if (_playPauseHotkey != null) {
       await hotKeyManager.unregister(_playPauseHotkey!);
+      _playPauseHotkey = null;
+    }
+
+    if (hotkeyString.trim().isEmpty) {
+      return;
     }
 
     try {
@@ -40,6 +45,11 @@ class HotkeyService {
   Future<void> registerNextTrackHotkey(String hotkeyString) async {
     if (_nextTrackHotkey != null) {
       await hotKeyManager.unregister(_nextTrackHotkey!);
+      _nextTrackHotkey = null;
+    }
+
+    if (hotkeyString.trim().isEmpty) {
+      return;
     }
 
     try {
@@ -64,6 +74,11 @@ class HotkeyService {
   Future<void> registerVolumeUpHotkey(String hotkeyString) async {
     if (_volumeUpHotkey != null) {
       await hotKeyManager.unregister(_volumeUpHotkey!);
+      _volumeUpHotkey = null;
+    }
+
+    if (hotkeyString.trim().isEmpty) {
+      return;
     }
 
     try {
@@ -88,9 +103,14 @@ class HotkeyService {
   Future<void> registerVolumeDownHotkey(String hotkeyString) async {
     if (_volumeDownHotkey != null) {
       await hotKeyManager.unregister(_volumeDownHotkey!);
+      _volumeDownHotkey = null;
     }
 
-    try {
+    if (hotkeyString.trim().isEmpty) {
+      return;
+    }
+
+    try{
       final hotkey = _parseHotkey(hotkeyString);
       if (hotkey != null) {
         await hotKeyManager.register(

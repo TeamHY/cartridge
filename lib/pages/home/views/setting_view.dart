@@ -110,50 +110,50 @@ class _SettingViewState extends ConsumerState<SettingView> {
                     },
                   ),
                 ),
-                // const SizedBox(height: 24.0),
-                // Text(
-                //   loc.setting_hotkey_section,
-                //   style: const TextStyle(
-                //     fontSize: 14,
-                //     fontWeight: FontWeight.w600,
-                //   ),
-                // ),
-                // const SizedBox(height: 8.0),
-                // InfoLabel(
-                //   label: loc.setting_hotkey_play_pause_label,
-                //   child: HotkeyInputField(
-                //     controller: _playPauseHotkeyController,
-                //     placeholder: loc.setting_hotkey_hint,
-                //     onChanged: () => setState(() => _isChanged = true),
-                //   ),
-                // ),
-                // const SizedBox(height: 16.0),
-                // InfoLabel(
-                //   label: loc.setting_hotkey_next_track_label,
-                //   child: HotkeyInputField(
-                //     controller: _nextTrackHotkeyController,
-                //     placeholder: loc.setting_hotkey_hint,
-                //     onChanged: () => setState(() => _isChanged = true),
-                //   ),
-                // ),
-                // const SizedBox(height: 16.0),
-                // InfoLabel(
-                //   label: loc.setting_hotkey_volume_up_label,
-                //   child: HotkeyInputField(
-                //     controller: _volumeUpHotkeyController,
-                //     placeholder: loc.setting_hotkey_hint,
-                //     onChanged: () => setState(() => _isChanged = true),
-                //   ),
-                // ),
-                // const SizedBox(height: 16.0),
-                // InfoLabel(
-                //   label: loc.setting_hotkey_volume_down_label,
-                //   child: HotkeyInputField(
-                //     controller: _volumeDownHotkeyController,
-                //     placeholder: loc.setting_hotkey_hint,
-                //     onChanged: () => setState(() => _isChanged = true),
-                //   ),
-                // ),
+                const SizedBox(height: 24.0),
+                Text(
+                  loc.setting_hotkey_section,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                InfoLabel(
+                  label: loc.setting_hotkey_play_pause_label,
+                  child: HotkeyInputField(
+                    controller: _playPauseHotkeyController,
+                    placeholder: loc.setting_hotkey_hint,
+                    onChanged: () => setState(() => _isChanged = true),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                InfoLabel(
+                  label: loc.setting_hotkey_next_track_label,
+                  child: HotkeyInputField(
+                    controller: _nextTrackHotkeyController,
+                    placeholder: loc.setting_hotkey_hint,
+                    onChanged: () => setState(() => _isChanged = true),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                InfoLabel(
+                  label: loc.setting_hotkey_volume_up_label,
+                  child: HotkeyInputField(
+                    controller: _volumeUpHotkeyController,
+                    placeholder: loc.setting_hotkey_hint,
+                    onChanged: () => setState(() => _isChanged = true),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                InfoLabel(
+                  label: loc.setting_hotkey_volume_down_label,
+                  child: HotkeyInputField(
+                    controller: _volumeDownHotkeyController,
+                    placeholder: loc.setting_hotkey_hint,
+                    onChanged: () => setState(() => _isChanged = true),
+                  ),
+                ),
                 const SizedBox(height: 16.0),
                 Row(
                   children: [

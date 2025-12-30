@@ -1,4 +1,5 @@
 import 'package:cartridge/providers/store_provider.dart';
+import 'package:cartridge/providers/hotkey_provider.dart';
 import 'package:cartridge/components/layout.dart';
 import 'package:cartridge/pages/home/components/home_sidebar.dart';
 import 'package:cartridge/pages/home/views/home_main_view.dart';
@@ -41,6 +42,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     _editPresetNameController = TextEditingController();
     _searchController.addListener(() {
       setState(() {});
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(hotkeyProvider);
     });
 
     VersionChecker.checkAppVersion(context);
