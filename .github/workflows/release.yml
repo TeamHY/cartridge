@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      
+      - name: Flutter pub get
+        run: flutter pub get
+      
+      - name: Run build_runner (freezed/json)
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+      
+      - name: Read app version from pubspec.yaml
+        id: appver
+        shell: pwsh
+        run: |
+          $m = Select-String -Path pubspec.yaml -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)' | Select-Object -First 1
+          if (-not $m) { throw "version not found in pubspec.yaml" }
+          $ver = $m.Matches[0].Groups[1].Value
+          "version=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      
+      - name: Generate .env file
+        run: |
+          Set-Content -Path .env -Value 'RECORD_PRESET_URL="${{ secrets.RECORD_PRESET_URL }}"'
+          Add-Content -Path .env -Value 'RECORDER_MOD_URL="${{ secrets.RECORDER_MOD_URL }}"'
+          Add-Content -Path .env -Value 'SUPABASE_URL="${{ secrets.SUPABASE_URL }}"'
+          Add-Content -Path .env -Value 'SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"'
+      
+      - name: Build Windows (Release)
+        run: flutter build windows --release
+      
+      - name: Pack build output as versioned zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          $zip = "artifacts/cartridge-${{ steps.appver.outputs.version }}.zip"
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          Compress-Archive `
+          -Path build/windows/x64/runner/Release/* `
+          -DestinationPath $zip
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.appver.outputs.version }}
+          files: artifacts/cartridge-${{ steps.appver.outputs.version }}.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
