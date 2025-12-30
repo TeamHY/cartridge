@@ -192,18 +192,15 @@ class _SettingViewState extends ConsumerState<SettingView> {
                       ? () {
                           final setting = ref.read(settingProvider);
 
-                          setting.isaacPath = _pathController.text;
-                          setting.rerunDelay =
-                              int.parse(_rerunDelayController.text);
-                          setting.languageCode = _selectedLanguageCode;
-                          setting.playPauseHotkey =
-                              _playPauseHotkeyController.text;
-                          setting.nextTrackHotkey =
-                              _nextTrackHotkeyController.text;
-                          setting.volumeUpHotkey =
-                              _volumeUpHotkeyController.text;
-                          setting.volumeDownHotkey =
-                              _volumeDownHotkeyController.text;
+                          setting.updateSettings(
+                            isaacPath: _pathController.text,
+                            rerunDelay: int.parse(_rerunDelayController.text),
+                            languageCode: _selectedLanguageCode,
+                            playPauseHotkey: _playPauseHotkeyController.text,
+                            nextTrackHotkey: _nextTrackHotkeyController.text,
+                            volumeUpHotkey: _volumeUpHotkeyController.text,
+                            volumeDownHotkey: _volumeDownHotkeyController.text,
+                          );
                           setting.saveSetting();
 
                           setState(() => _isChanged = false);

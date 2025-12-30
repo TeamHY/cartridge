@@ -1,9 +1,17 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - '**'
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: 'patch'
 
 jobs:
   build-and-release:
@@ -12,6 +20,38 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      
+      - name: Bump version
+        id: bump
+        shell: pwsh
+        run: |
+          dart scripts/bump_version.dart ${{ inputs.bump_type }}
+          $m = Select-String -Path pubspec.yaml -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)' | Select-Object -First 1
+          if (-not $m) { throw "version not found in pubspec.yaml" }
+          $ver = $m.Matches[0].Groups[1].Value
+          "version=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Host "Bumped version to $ver"
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Commit and push changes
+        run: |
+          git add pubspec.yaml
+          git commit -m "Release ${{ steps.bump.outputs.version }}"
+          git tag "${{ steps.bump.outputs.version }}"
+          git push origin main
+          git push origin "${{ steps.bump.outputs.version }}"
       
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -23,15 +63,6 @@ jobs:
       
       - name: Run build_runner (freezed/json)
         run: flutter pub run build_runner build --delete-conflicting-outputs
-      
-      - name: Read app version from pubspec.yaml
-        id: appver
-        shell: pwsh
-        run: |
-          $m = Select-String -Path pubspec.yaml -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)' | Select-Object -First 1
-          if (-not $m) { throw "version not found in pubspec.yaml" }
-          $ver = $m.Matches[0].Groups[1].Value
-          "version=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       
       - name: Generate .env file
         run: |
@@ -47,7 +78,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          $zip = "artifacts/cartridge-${{ steps.appver.outputs.version }}.zip"
+          $zip = "artifacts/cartridge-${{ steps.bump.outputs.version }}.zip"
           if (Test-Path $zip) { Remove-Item $zip -Force }
           Compress-Archive `
           -Path build/windows/x64/runner/Release/* `
@@ -56,8 +87,9 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          name: ${{ steps.appver.outputs.version }}
-          files: artifacts/cartridge-${{ steps.appver.outputs.version }}.zip
+          tag_name: ${{ steps.bump.outputs.version }}
+          name: ${{ steps.bump.outputs.version }}
+          files: artifacts/cartridge-${{ steps.bump.outputs.version }}.zip
           draft: false
           prerelease: false
           generate_release_notes: true
