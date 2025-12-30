@@ -200,17 +200,10 @@ class HomeMainView extends ConsumerWidget {
               ),
               _buildLinkCard(
                 context,
-                label: 'Donate (Playsquad)',
+                label: 'Donate',
                 color: const Color(0xFFFF6B6B),
                 icon: FluentIcons.heart,
                 onTap: () => launchUrl(Uri.parse(AppUrls.donationPlaysquad)),
-              ),
-              _buildLinkCard(
-                context,
-                label: 'Donate (Toonation)',
-                color: const Color(0xFF00D4FF),
-                icon: FluentIcons.money,
-                onTap: () => launchUrl(Uri.parse(AppUrls.donation)),
               ),
             ],
           ),
