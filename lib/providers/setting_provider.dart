@@ -105,6 +105,15 @@ class SettingNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  double _volumeStepSize = 0.05;
+
+  double get volumeStepSize => _volumeStepSize;
+
+  set volumeStepSize(double value) {
+    _volumeStepSize = value.clamp(0.01, 0.5);
+    notifyListeners();
+  }
+
   void updateSettings({
     String? isaacPath,
     String? musicPlaylistPath,
@@ -116,6 +125,7 @@ class SettingNotifier extends ChangeNotifier {
     String? nextTrackHotkey,
     String? volumeUpHotkey,
     String? volumeDownHotkey,
+    double? volumeStepSize,
   }) {
     if (isaacPath != null) _isaacPath = isaacPath;
     if (musicPlaylistPath != null) _musicPlaylistPath = musicPlaylistPath;
@@ -127,6 +137,8 @@ class SettingNotifier extends ChangeNotifier {
     if (nextTrackHotkey != null) _nextTrackHotkey = nextTrackHotkey;
     if (volumeUpHotkey != null) _volumeUpHotkey = volumeUpHotkey;
     if (volumeDownHotkey != null) _volumeDownHotkey = volumeDownHotkey;
+    if (volumeStepSize != null)
+      _volumeStepSize = volumeStepSize.clamp(0.01, 0.5);
 
     notifyListeners();
   }
@@ -152,6 +164,7 @@ class SettingNotifier extends ChangeNotifier {
     _nextTrackHotkey = json['nextTrackHotkey'] as String? ?? 'ctrl+alt+n';
     _volumeUpHotkey = json['volumeUpHotkey'] as String? ?? 'ctrl+alt+up';
     _volumeDownHotkey = json['volumeDownHotkey'] as String? ?? 'ctrl+alt+down';
+    _volumeStepSize = (json['volumeStepSize'] as num?)?.toDouble() ?? 0.05;
 
     notifyListeners();
   }
@@ -173,6 +186,7 @@ class SettingNotifier extends ChangeNotifier {
         'nextTrackHotkey': _nextTrackHotkey,
         'volumeUpHotkey': _volumeUpHotkey,
         'volumeDownHotkey': _volumeDownHotkey,
+        'volumeStepSize': _volumeStepSize,
       }));
     });
   }

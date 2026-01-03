@@ -43,6 +43,8 @@
   "setting_hotkey_next_track_label": "Next Track",
   "setting_hotkey_volume_up_label": "Volume Up",
   "setting_hotkey_volume_down_label": "Volume Down",
+  "setting_hotkey_volume_step_label": "Volume Step Size (%)",
+  "setting_hotkey_volume_step_hint": "e.g., 5 (increase/decrease by 5%)",
   "setting_hotkey_hint": "e.g., ctrl+alt+p",
   "setting_hotkey_record_button": "Record",
   "hotkey_record_dialog_title": "Record Hotkey",

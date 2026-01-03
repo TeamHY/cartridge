@@ -32,13 +32,15 @@ class HotkeyNotifier {
 
     _hotkeyService.onVolumeUp = () {
       final currentVolume = setting.musicVolume;
-      setting.musicVolume = (currentVolume + 0.1).clamp(0.0, 1.0);
+      setting.musicVolume =
+          (currentVolume + setting.volumeStepSize).clamp(0.0, 1.0);
       setting.saveSetting();
     };
 
     _hotkeyService.onVolumeDown = () {
       final currentVolume = setting.musicVolume;
-      setting.musicVolume = (currentVolume - 0.1).clamp(0.0, 1.0);
+      setting.musicVolume =
+          (currentVolume - setting.volumeStepSize).clamp(0.0, 1.0);
       setting.saveSetting();
     };
 

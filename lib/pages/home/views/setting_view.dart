@@ -25,6 +25,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
   late TextEditingController _nextTrackHotkeyController;
   late TextEditingController _volumeUpHotkeyController;
   late TextEditingController _volumeDownHotkeyController;
+  late TextEditingController _volumeStepController;
   late String _selectedLanguageCode;
 
   @override
@@ -43,6 +44,8 @@ class _SettingViewState extends ConsumerState<SettingView> {
         TextEditingController(text: settings.volumeUpHotkey);
     _volumeDownHotkeyController =
         TextEditingController(text: settings.volumeDownHotkey);
+    _volumeStepController = TextEditingController(
+        text: (settings.volumeStepSize * 100).toStringAsFixed(0));
     _selectedLanguageCode = settings.languageCode ?? 'ko';
   }
 
@@ -54,6 +57,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
     _nextTrackHotkeyController.dispose();
     _volumeUpHotkeyController.dispose();
     _volumeDownHotkeyController.dispose();
+    _volumeStepController.dispose();
     super.dispose();
   }
 
@@ -155,6 +159,17 @@ class _SettingViewState extends ConsumerState<SettingView> {
                   ),
                 ),
                 const SizedBox(height: 16.0),
+                InfoLabel(
+                  label: loc.setting_hotkey_volume_step_label,
+                  child: TextBox(
+                    controller: _volumeStepController,
+                    placeholder: loc.setting_hotkey_volume_step_hint,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (_) => setState(() => _isChanged = true),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
                 Row(
                   children: [
                     Button(
@@ -200,6 +215,8 @@ class _SettingViewState extends ConsumerState<SettingView> {
                             nextTrackHotkey: _nextTrackHotkeyController.text,
                             volumeUpHotkey: _volumeUpHotkeyController.text,
                             volumeDownHotkey: _volumeDownHotkeyController.text,
+                            volumeStepSize:
+                                double.parse(_volumeStepController.text) / 100,
                           );
                           setting.saveSetting();
 

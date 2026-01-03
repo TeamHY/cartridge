@@ -43,6 +43,8 @@
   "setting_hotkey_next_track_label": "다음 곡",
   "setting_hotkey_volume_up_label": "볼륨 증가",
   "setting_hotkey_volume_down_label": "볼륨 감소",
+  "setting_hotkey_volume_step_label": "볼륨 조절 단위 (%)",
+  "setting_hotkey_volume_step_hint": "예: 5 (5%씩 증가/감소)",
   "setting_hotkey_hint": "예: ctrl+alt+p",
   "setting_hotkey_record_button": "녹화",
   "hotkey_record_dialog_title": "단축키 녹화",
