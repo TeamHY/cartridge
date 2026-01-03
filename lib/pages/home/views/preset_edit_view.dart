@@ -17,7 +17,7 @@ class PresetEditView extends ConsumerStatefulWidget {
   final TextEditingController searchController;
   final VoidCallback? onBackPressed;
   final VoidCallback onCancel;
-  final Function(List<Mod> mods) onSave;
+  final Function(String? selectedGameConfigId, List<Mod> mods) onSave;
 
   const PresetEditView({
     super.key,
@@ -34,7 +34,8 @@ class PresetEditView extends ConsumerStatefulWidget {
 }
 
 class _PresetEditViewState extends ConsumerState<PresetEditView> {
-  List<Mod> editedMods = [];
+  String? _selectedGameConfigId;
+  List<Mod> _editedMods = [];
   bool _isEditingPresetName = false;
   final Map<String, FlyoutController> _menuControllers = {};
 
@@ -52,8 +53,9 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
   }
 
   void _resetEditedMods() {
-    editedMods = ref.read(storeProvider).currentMods.toList();
-    for (var mod in editedMods) {
+    _selectedGameConfigId = widget.selectedPreset.gameConfigId;
+    _editedMods = ref.read(storeProvider).currentMods.toList();
+    for (var mod in _editedMods) {
       mod.isDisable = widget.selectedPreset.mods
           .firstWhere(
             (element) => element.name == mod.name,
@@ -64,7 +66,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
   }
 
   List<Mod> _getFilteredMods() {
-    return editedMods.where((mod) {
+    return _editedMods.where((mod) {
       final searchText = widget.searchController.text
           .toLowerCase()
           .replaceAll(RegExp('\\s'), "");
@@ -148,12 +150,21 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
     );
   }
 
-  Widget _buildToolbar(BuildContext context, store, AppLocalizations loc) {
+  Widget _buildToolbar(
+      BuildContext context, StoreNotifier store, AppLocalizations loc) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         children: [
-          _GameConfigSelector(store: store),
+          _GameConfigSelector(
+            store: store,
+            selectedGameConfigId: _selectedGameConfigId,
+            selectGameConfig: (value) {
+              setState(() {
+                _selectedGameConfigId = value;
+              });
+            },
+          ),
           const Expanded(child: SizedBox()),
           _buildViewToggle(),
           const SizedBox(width: 8),
@@ -549,13 +560,13 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
               onPressed: () {
                 final mods = <Mod>[];
 
-                for (var mod in editedMods) {
+                for (var mod in _editedMods) {
                   if (!mod.isDisable) {
                     mods.add(Mod.fromJson(mod.toJson()));
                   }
                 }
 
-                widget.onSave(mods);
+                widget.onSave(_selectedGameConfigId, mods);
               },
               child: Text(loc.common_save),
             ),
@@ -567,9 +578,15 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
 }
 
 class _GameConfigSelector extends ConsumerWidget {
-  final dynamic store;
+  final StoreNotifier store;
+  final String? selectedGameConfigId;
+  final ValueChanged<String?> selectGameConfig;
 
-  const _GameConfigSelector({required this.store});
+  const _GameConfigSelector({
+    required this.store,
+    required this.selectedGameConfigId,
+    required this.selectGameConfig,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -581,7 +598,7 @@ class _GameConfigSelector extends ConsumerWidget {
         child: ComboBox<String?>(
           placeholder:
               Text(AppLocalizations.of(context).game_config_dialog_title),
-          value: store.selectedGameConfigId,
+          value: selectedGameConfigId,
           items: _buildComboBoxItems(loc),
           onChanged: (value) => _handleComboBoxChange(context, value),
         ),
@@ -637,11 +654,10 @@ class _GameConfigSelector extends ConsumerWidget {
     }
 
     if (value == null) {
-      store.selectGameConfig(null);
+      selectGameConfig(null);
       return;
     }
 
-    store.isSync = false;
-    store.selectGameConfig(value);
+    selectGameConfig(value);
   }
 }

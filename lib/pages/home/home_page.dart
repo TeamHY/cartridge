@@ -132,7 +132,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                             _selectedPreset = null;
                             _currentView = HomeView.main;
                           }),
-                          onSave: (mods) {
+                          onSave: (selectedGameConfigId, mods) {
+                            _selectedPreset!.gameConfigId =
+                                selectedGameConfigId;
                             _selectedPreset!.mods = mods;
                             store.savePresets();
                             setState(() {
