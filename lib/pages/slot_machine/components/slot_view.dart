@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:cartridge/components/dialogs/mod_group_selector_dialog.dart';
 import 'package:cartridge/pages/slot_machine/components/slot_item.dart';
 import 'package:cartridge/providers/slot_machine_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
@@ -85,6 +86,18 @@ class _SlotViewState extends ConsumerState<SlotView> {
       height: 320,
       child: Stack(
         children: [
+          Center(
+            child: SizedBox(
+              width: 180,
+              height: 100,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 0.85),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
           ListWheelScrollView.useDelegate(
             controller: _controller,
             itemExtent: 100,
@@ -113,7 +126,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
                   child: Text(
                     slotMachine.getGroupName(widget.items) ?? '',
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Colors.black,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -137,7 +150,10 @@ class _SlotViewState extends ConsumerState<SlotView> {
                         return Opacity(
                           opacity: value,
                           child: Container(
-                            color: const Color.fromRGBO(255, 255, 255, 0.85),
+                            decoration: BoxDecoration(
+                              color: const Color.fromRGBO(255, 255, 255, 0.85),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                             child: Center(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -147,20 +163,35 @@ class _SlotViewState extends ConsumerState<SlotView> {
                                     onPressed: onStart,
                                   ),
                                   const SizedBox(width: 8),
-                                  if (!isGroup)
-                                    IconButton(
-                                      icon: const Icon(FluentIcons.edit),
-                                      onPressed: () => showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return SlotDialog(
-                                            items: widget.items,
-                                            onEdit: widget.onEdited,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  if (!isGroup) const SizedBox(width: 8),
+                                  IconButton(
+                                    icon: const Icon(FluentIcons.edit),
+                                    onPressed: () async {
+                                      if (isGroup) {
+                                        final newGroupName =
+                                            await showDialog<String>(
+                                          context: context,
+                                          builder: (context) =>
+                                              const ModGroupSelectorDialog(),
+                                        );
+
+                                        if (newGroupName != null) {
+                                          widget.onEdited(
+                                              ['${groupPrefix}$newGroupName']);
+                                        }
+                                      } else {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return SlotDialog(
+                                              items: widget.items,
+                                              onEdit: widget.onEdited,
+                                            );
+                                          },
+                                        );
+                                      }
+                                    },
+                                  ),
+                                  const SizedBox(width: 8),
                                   IconButton(
                                     icon: Icon(
                                       FluentIcons.delete,

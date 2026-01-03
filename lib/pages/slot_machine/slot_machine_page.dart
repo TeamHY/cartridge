@@ -83,7 +83,7 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
           child: Tooltip(
             message: AppLocalizations.of(context).slot_add_from_mod_group,
             child: IconButton(
-              icon: const Icon(FluentIcons.folder_open),
+              icon: const Icon(FluentIcons.tag_group),
               onPressed: () async {
                 final groupName = await showDialog<String>(
                   context: context,
