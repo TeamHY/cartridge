@@ -135,6 +135,9 @@
   "slot_add_item": "Add Item",
   "slot_remove_item": "Remove Item",
   "slot_default": "Default",
+  "slot_add_from_mod_group": "Add from Mod Group",
+  "select_mod_group": "Select Mod Group",
+  "no_mod_groups": "No mod groups available",
 
   "@roulette": {
     "description": "Roulette dialog messages"

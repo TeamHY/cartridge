@@ -135,6 +135,9 @@
   "slot_add_item": "항목 추가",
   "slot_remove_item": "항목 제거",
   "slot_default": "기본",
+  "slot_add_from_mod_group": "모드 그룹에서 추가",
+  "select_mod_group": "모드 그룹 선택",
+  "no_mod_groups": "모드 그룹이 없습니다",
 
   "@roulette": {
     "description": "돌림판 다이얼로그"

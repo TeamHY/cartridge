@@ -7,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 
 typedef SlotList = List<List<String>>;
 
+const String groupPrefix = '__GROUP__:';
+
 class SlotMachineNotifier extends ChangeNotifier {
   SlotMachineNotifier() {
     loadSlot();
@@ -44,11 +46,29 @@ class SlotMachineNotifier extends ChangeNotifier {
     file.writeAsString(jsonEncode({'slots': slots}));
   }
 
-  void addSlot(String defaultText) {
-    _slots.add([defaultText]);
+  void addSlot(String defaultText, {List<String>? items}) {
+    _slots.add(items ?? [defaultText]);
 
     saveSlot();
     notifyListeners();
+  }
+
+  void addGroupSlot(String groupName) {
+    _slots.add(['$groupPrefix$groupName']);
+
+    saveSlot();
+    notifyListeners();
+  }
+
+  bool isGroupSlot(List<String> slot) {
+    return slot.length == 1 && slot[0].startsWith(groupPrefix);
+  }
+
+  String? getGroupName(List<String> slot) {
+    if (isGroupSlot(slot)) {
+      return slot[0].substring(groupPrefix.length);
+    }
+    return null;
   }
 
   void removeSlot(int slotIndex) {

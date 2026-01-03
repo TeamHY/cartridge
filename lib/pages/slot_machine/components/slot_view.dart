@@ -2,6 +2,8 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:cartridge/pages/slot_machine/components/slot_item.dart';
+import 'package:cartridge/providers/slot_machine_provider.dart';
+import 'package:cartridge/providers/store_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -12,7 +14,7 @@ class SlotViewController {
   void Function()? start;
 }
 
-class SlotView extends StatefulWidget {
+class SlotView extends ConsumerStatefulWidget {
   const SlotView({
     super.key,
     required this.items,
@@ -27,18 +29,36 @@ class SlotView extends StatefulWidget {
   final void Function() onDeleted;
 
   @override
-  State<SlotView> createState() => _SlotViewState();
+  ConsumerState<SlotView> createState() => _SlotViewState();
 }
 
-class _SlotViewState extends State<SlotView> {
+class _SlotViewState extends ConsumerState<SlotView> {
   final FixedExtentScrollController _controller = FixedExtentScrollController();
   bool _isHovered = false;
 
+  List<String> get resolvedItems {
+    final slotMachine = ref.read(slotMachineProvider);
+    final store = ref.read(storeProvider);
+
+    if (slotMachine.isGroupSlot(widget.items)) {
+      final groupName = slotMachine.getGroupName(widget.items);
+      if (groupName != null && store.groups.containsKey(groupName)) {
+        final groupMods = store.groups[groupName];
+        if (groupMods != null && groupMods.isNotEmpty) {
+          return groupMods.toList();
+        }
+      }
+      return [groupName ?? 'Empty Group'];
+    }
+    return widget.items;
+  }
+
   void onStart() {
-    _controller.jumpToItem(_controller.selectedItem % widget.items.length);
+    final items = resolvedItems;
+    _controller.jumpToItem(_controller.selectedItem % items.length);
 
     _controller.animateToItem(
-      Random().nextInt(widget.items.length * 200) + widget.items.length * 5,
+      Random().nextInt(items.length * 200) + items.length * 5,
       duration: Duration(
         milliseconds: (3000 * ((Random().nextDouble() + 1) / 2)).toInt(),
       ),
@@ -56,6 +76,9 @@ class _SlotViewState extends State<SlotView> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final items = resolvedItems;
+    final slotMachine = ref.watch(slotMachineProvider);
+    final isGroup = slotMachine.isGroupSlot(widget.items);
 
     return SizedBox(
       width: 180,
@@ -69,11 +92,35 @@ class _SlotViewState extends State<SlotView> {
             diameterRatio: 1,
             overAndUnderCenterOpacity: 0.2,
             childDelegate: ListWheelChildLoopingListDelegate(
-                children: widget.items
+                children: items
                     .map((value) =>
                         SlotItem(width: 180, height: 100, text: value))
                     .toList()),
           ),
+          if (isGroup)
+            Positioned(
+              top: 8,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    slotMachine.getGroupName(widget.items) ?? '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           Center(
             child: SizedBox(
               width: 180,
@@ -100,19 +147,20 @@ class _SlotViewState extends State<SlotView> {
                                     onPressed: onStart,
                                   ),
                                   const SizedBox(width: 8),
-                                  IconButton(
-                                    icon: const Icon(FluentIcons.edit),
-                                    onPressed: () => showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return SlotDialog(
-                                          items: widget.items,
-                                          onEdit: widget.onEdited,
-                                        );
-                                      },
+                                  if (!isGroup)
+                                    IconButton(
+                                      icon: const Icon(FluentIcons.edit),
+                                      onPressed: () => showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return SlotDialog(
+                                            items: widget.items,
+                                            onEdit: widget.onEdited,
+                                          );
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
+                                  if (!isGroup) const SizedBox(width: 8),
                                   IconButton(
                                     icon: Icon(
                                       FluentIcons.delete,

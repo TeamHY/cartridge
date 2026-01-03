@@ -1,3 +1,4 @@
+import 'package:cartridge/components/dialogs/mod_group_selector_dialog.dart';
 import 'package:cartridge/providers/slot_machine_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/pages/slot_machine/components/slot_view.dart';
@@ -61,16 +62,42 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
       ));
     }
 
-    children.add(SizedBox(
-      width: 40,
-      height: 40,
-      child: IconButton(
-        icon: const Icon(FluentIcons.add),
-        onPressed: () {
-          final loc = AppLocalizations.of(context);
-          ref.read(slotMachineProvider).addSlot(loc.slot_default);
-        },
-      ),
+    children.add(Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 40,
+          height: 40,
+          child: IconButton(
+            icon: const Icon(FluentIcons.add),
+            onPressed: () {
+              final loc = AppLocalizations.of(context);
+              ref.read(slotMachineProvider).addSlot(loc.slot_default);
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: 40,
+          height: 40,
+          child: Tooltip(
+            message: AppLocalizations.of(context).slot_add_from_mod_group,
+            child: IconButton(
+              icon: const Icon(FluentIcons.folder_open),
+              onPressed: () async {
+                final groupName = await showDialog<String>(
+                  context: context,
+                  builder: (context) => const ModGroupSelectorDialog(),
+                );
+
+                if (groupName != null) {
+                  ref.read(slotMachineProvider).addGroupSlot(groupName);
+                }
+              },
+            ),
+          ),
+        ),
+      ],
     ));
 
     return NavigationView(
