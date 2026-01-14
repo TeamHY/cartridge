@@ -49,8 +49,10 @@ class StageStayingCondition extends MusicTriggerCondition {
 class RoomStayingCondition extends MusicTriggerCondition {
   final Set<IsaacRoomType> roomTypes;
   final bool isOnlyWithMonsters;
+  final Set<IsaacBossType>? bossTypes; // null이면 모든 보스, 비어있지 않으면 필터링
 
-  RoomStayingCondition(this.roomTypes, this.isOnlyWithMonsters);
+  RoomStayingCondition(this.roomTypes, this.isOnlyWithMonsters,
+      [this.bossTypes]);
 
   @override
   String get type => 'room';
@@ -61,15 +63,24 @@ class RoomStayingCondition extends MusicTriggerCondition {
       'type': type,
       'roomTypes': roomTypes.map((r) => r.index).toList(),
       'isOnlyWithMonsters': isOnlyWithMonsters,
+      if (bossTypes != null)
+        'bossTypes': bossTypes!.map((b) => b.index).toList(),
     };
   }
 
   factory RoomStayingCondition.fromJson(Map<String, dynamic> json) {
+    final bossTypes = json['bossTypes'] != null
+        ? (json['bossTypes'] as List<dynamic>)
+            .map((e) => IsaacBossType.values[e as int])
+            .toSet()
+        : null;
+
     return RoomStayingCondition(
       (json['roomTypes'] as List<dynamic>)
           .map((e) => IsaacRoomType.values[e as int])
           .toSet(),
       json['isOnlyWithMonsters'] as bool,
+      bossTypes,
     );
   }
 }

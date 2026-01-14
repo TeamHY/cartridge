@@ -27,8 +27,8 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
 
   final Set<IsaacRoomType> _selectedRoomTypes = {};
   bool _isOnlyUncleared = false;
-
   final Set<IsaacBossType> _selectedBossTypes = {};
+  bool _filterByBossType = false;
 
   @override
   void dispose() {
@@ -41,7 +41,11 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
       case 'stage':
         return StageStayingCondition(_selectedStages);
       case 'room':
-        return RoomStayingCondition(_selectedRoomTypes, _isOnlyUncleared);
+        final bossTypes = _filterByBossType && _selectedBossTypes.isNotEmpty
+            ? _selectedBossTypes
+            : null;
+        return RoomStayingCondition(
+            _selectedRoomTypes, _isOnlyUncleared, bossTypes);
       case 'boss':
         return BossClearedCondition(_selectedBossTypes);
       default:
@@ -174,6 +178,8 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
     return RoomSettings(
       selectedRoomTypes: _selectedRoomTypes,
       isOnlyUncleared: _isOnlyUncleared,
+      filterByBossType: _filterByBossType,
+      selectedBossTypes: _selectedBossTypes,
       onRoomTypeToggle: (roomType, value) {
         setState(() {
           if (value) {
@@ -186,6 +192,23 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
       onUnclearedChanged: (value) {
         setState(() {
           _isOnlyUncleared = value ?? false;
+        });
+      },
+      onFilterByBossTypeChanged: (value) {
+        setState(() {
+          _filterByBossType = value ?? false;
+          if (!_filterByBossType) {
+            _selectedBossTypes.clear();
+          }
+        });
+      },
+      onBossTypeToggle: (bossType, value) {
+        setState(() {
+          if (value) {
+            _selectedBossTypes.add(bossType);
+          } else {
+            _selectedBossTypes.remove(bossType);
+          }
         });
       },
     );

@@ -137,12 +137,21 @@ class MusicPlayerNotifier extends ChangeNotifier {
     }
   }
 
-  void _handleRoomEntered(IsaacRoomType roomType, bool isCleared) {
+  void _handleRoomEntered(IsaacRoomType roomType, bool isCleared,
+      {IsaacBossType? bossType}) {
     final matchedPlaylists = _playlists.where((p) {
       if (p.condition is RoomStayingCondition) {
         final condition = p.condition as RoomStayingCondition;
 
         if (!condition.roomTypes.contains(roomType)) return false;
+
+        if (roomType == IsaacRoomType.boss &&
+            condition.bossTypes != null &&
+            condition.bossTypes!.isNotEmpty) {
+          if (bossType == null || !condition.bossTypes!.contains(bossType)) {
+            return false;
+          }
+        }
 
         if (isCleared) return !condition.isOnlyWithMonsters;
 
@@ -172,12 +181,20 @@ class MusicPlayerNotifier extends ChangeNotifier {
     }
   }
 
-  void _handleRoomCleared(IsaacRoomType roomType) {
+  void _handleRoomCleared(IsaacRoomType roomType, {IsaacBossType? bossType}) {
     final matchedPlaylists = _playlists.where((p) {
       if (p.condition is RoomStayingCondition) {
         final condition = p.condition as RoomStayingCondition;
 
         if (!condition.roomTypes.contains(roomType)) return false;
+
+        if (roomType == IsaacRoomType.boss &&
+            condition.bossTypes != null &&
+            condition.bossTypes!.isNotEmpty) {
+          if (bossType == null || !condition.bossTypes!.contains(bossType)) {
+            return false;
+          }
+        }
 
         return !condition.isOnlyWithMonsters;
       }

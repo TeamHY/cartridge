@@ -28,6 +28,7 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
 
   late Set<IsaacRoomType> _selectedRoomTypes;
   late bool _isOnlyUncleared;
+  late bool _filterByBossType;
 
   late Set<IsaacBossType> _selectedBossTypes;
 
@@ -36,7 +37,6 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.playlist.id);
 
-    // Initialize condition based on the playlist's condition
     final condition = widget.playlist.condition;
     if (condition is StageStayingCondition) {
       _conditionType = 'stage';
@@ -49,7 +49,9 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
       _selectedStages = {};
       _selectedRoomTypes = Set.from(condition.roomTypes);
       _isOnlyUncleared = condition.isOnlyWithMonsters;
-      _selectedBossTypes = {};
+      _filterByBossType = condition.bossTypes != null;
+      _selectedBossTypes =
+          condition.bossTypes != null ? Set.from(condition.bossTypes!) : {};
     } else if (condition is BossClearedCondition) {
       _conditionType = 'boss';
       _selectedStages = {};
@@ -61,6 +63,7 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
       _selectedStages = {};
       _selectedRoomTypes = {};
       _isOnlyUncleared = false;
+      _filterByBossType = false;
       _selectedBossTypes = {};
     }
   }
@@ -76,7 +79,11 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
       case 'stage':
         return StageStayingCondition(_selectedStages);
       case 'room':
-        return RoomStayingCondition(_selectedRoomTypes, _isOnlyUncleared);
+        final bossTypes = _filterByBossType && _selectedBossTypes.isNotEmpty
+            ? _selectedBossTypes
+            : null;
+        return RoomStayingCondition(
+            _selectedRoomTypes, _isOnlyUncleared, bossTypes);
       case 'boss':
         return BossClearedCondition(_selectedBossTypes);
       default:
@@ -213,6 +220,8 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
     return RoomSettings(
       selectedRoomTypes: _selectedRoomTypes,
       isOnlyUncleared: _isOnlyUncleared,
+      filterByBossType: _filterByBossType,
+      selectedBossTypes: _selectedBossTypes,
       onRoomTypeToggle: (roomType, value) {
         setState(() {
           if (value) {
@@ -225,6 +234,23 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
       onUnclearedChanged: (value) {
         setState(() {
           _isOnlyUncleared = value ?? false;
+        });
+      },
+      onFilterByBossTypeChanged: (value) {
+        setState(() {
+          _filterByBossType = value ?? false;
+          if (!_filterByBossType) {
+            _selectedBossTypes.clear();
+          }
+        });
+      },
+      onBossTypeToggle: (bossType, value) {
+        setState(() {
+          if (value) {
+            _selectedBossTypes.add(bossType);
+          } else {
+            _selectedBossTypes.remove(bossType);
+          }
         });
       },
     );
