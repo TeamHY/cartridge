@@ -76,6 +76,7 @@ class StoreNotifier extends ChangeNotifier {
     currentMods = await ModService.loadMods(setting.isaacPath);
     isSync = true;
 
+    cleanupGroupInMods();
     notifyListeners();
   }
 
@@ -181,11 +182,30 @@ class StoreNotifier extends ChangeNotifier {
 
   Future<void> loadPresets() async {
     _presetsData = await PresetService.loadPresets();
+
+    final setting = ref.read(settingProvider);
+    await setting.loadSetting();
+    currentMods = await ModService.loadMods(setting.isaacPath);
+
+    cleanupGroupInMods();
     notifyListeners();
+  }
+
+  void cleanupGroupInMods() {
+    final allModNames = currentMods.map((mod) => mod.name).toSet();
+
+    _presetsData.groups.forEach((groupName, modNames) {
+      final modNamesToRemove = modNames.difference(allModNames);
+
+      for (var modName in modNamesToRemove) {
+        modNames.remove(modName);
+      }
+    });
   }
 
   // TODO: Private로 변경해야 함
   Future<void> savePresets() async {
+    cleanupGroupInMods();
     await PresetService.savePresets(_presetsData);
   }
 
