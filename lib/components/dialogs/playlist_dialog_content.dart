@@ -332,7 +332,7 @@ class RoomSettings extends StatelessWidget {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: IsaacBossType.values.map((bossType) {
+                    children: IsaacBossExtension.sortedValues.map((bossType) {
                       final isSelected = selectedBossTypes.contains(bossType);
                       return ToggleButton(
                         checked: isSelected,
@@ -378,7 +378,7 @@ class BossSettings extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: IsaacBossType.values.map((bossType) {
+          children: IsaacBossExtension.sortedValues.map((bossType) {
             final isSelected = selectedBossTypes.contains(bossType);
             return ToggleButton(
               checked: isSelected,

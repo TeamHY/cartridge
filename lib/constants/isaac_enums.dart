@@ -196,9 +196,26 @@ enum IsaacBossType {
   mother,
   theBeast,
   delirium,
+  isaac,
+  satan,
+  hush,
+  dogma,
 }
 
 extension IsaacBossExtension on IsaacBossType {
+  static const List<IsaacBossType> sortedValues = [
+    IsaacBossType.hush,
+    IsaacBossType.isaac,
+    IsaacBossType.satan,
+    IsaacBossType.blueBaby,
+    IsaacBossType.theLamb,
+    IsaacBossType.megaSatan,
+    IsaacBossType.delirium,
+    IsaacBossType.mother,
+    IsaacBossType.dogma,
+    IsaacBossType.theBeast,
+  ];
+
   String toDisplayString() {
     switch (this) {
       case IsaacBossType.blueBaby:
@@ -213,6 +230,14 @@ extension IsaacBossExtension on IsaacBossType {
         return 'The Beast';
       case IsaacBossType.delirium:
         return 'Delirium';
+      case IsaacBossType.isaac:
+        return 'Isaac';
+      case IsaacBossType.satan:
+        return 'Satan';
+      case IsaacBossType.hush:
+        return 'Hush';
+      case IsaacBossType.dogma:
+        return 'Dogma';
     }
   }
 }
