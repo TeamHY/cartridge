@@ -250,29 +250,19 @@ class StageSettings extends StatelessWidget {
 class RoomSettings extends StatelessWidget {
   final Set<IsaacRoomType> selectedRoomTypes;
   final bool isOnlyUncleared;
-  final bool filterByBossType;
-  final Set<IsaacBossType> selectedBossTypes;
   final Function(IsaacRoomType, bool) onRoomTypeToggle;
   final Function(bool?) onUnclearedChanged;
-  final Function(bool?) onFilterByBossTypeChanged;
-  final Function(IsaacBossType, bool) onBossTypeToggle;
 
   const RoomSettings({
     super.key,
     required this.selectedRoomTypes,
     required this.isOnlyUncleared,
-    required this.filterByBossType,
-    required this.selectedBossTypes,
     required this.onRoomTypeToggle,
     required this.onUnclearedChanged,
-    required this.onFilterByBossTypeChanged,
-    required this.onBossTypeToggle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final showBossTypeFilter = selectedRoomTypes.contains(IsaacRoomType.boss);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -305,53 +295,6 @@ class RoomSettings extends StatelessWidget {
           onChanged: onUnclearedChanged,
           content: const Text('클리어 전까지만 재생'),
         ),
-        if (showBossTypeFilter) ...[
-          const SizedBox(height: 16),
-          Checkbox(
-            checked: filterByBossType,
-            onChanged: onFilterByBossTypeChanged,
-            content: const Text('특정 보스만 필터링'),
-          ),
-          if (filterByBossType) ...[
-            const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
-                borderRadius: BorderRadius.circular(6),
-                color: Colors.grey.withValues(alpha: 0.05),
-              ),
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('보스 타입 선택 (복수 선택 가능)',
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: IsaacBossExtension.sortedValues.map((bossType) {
-                      final isSelected = selectedBossTypes.contains(bossType);
-                      return ToggleButton(
-                        checked: isSelected,
-                        onChanged: (value) => onBossTypeToggle(bossType, value),
-                        child: Text(
-                          bossType.toDisplayString(),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isSelected ? Colors.white : null,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
       ],
     );
   }
