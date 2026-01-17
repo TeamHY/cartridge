@@ -120,6 +120,16 @@ enum IsaacRoomType {
   secretExit,
   blue,
   ultraSecret,
+  hushBoss,
+  isaacBoss,
+  satanBoss,
+  blueBabyBoss,
+  theLambBoss,
+  megaSatanBoss,
+  deliriumBoss,
+  motherBoss,
+  dogmaBoss,
+  theBeastBoss,
 }
 
 extension IsaacRoomExtension on IsaacRoomType {
@@ -185,6 +195,26 @@ extension IsaacRoomExtension on IsaacRoomType {
         return 'Blue';
       case IsaacRoomType.ultraSecret:
         return 'Ultra Secret';
+      case IsaacRoomType.hushBoss:
+        return 'Hush Boss';
+      case IsaacRoomType.isaacBoss:
+        return 'Isaac Boss';
+      case IsaacRoomType.satanBoss:
+        return 'Satan Boss';
+      case IsaacRoomType.blueBabyBoss:
+        return 'Blue Baby Boss';
+      case IsaacRoomType.theLambBoss:
+        return 'The Lamb Boss';
+      case IsaacRoomType.megaSatanBoss:
+        return 'Mega Satan Boss';
+      case IsaacRoomType.deliriumBoss:
+        return 'Delirium Boss';
+      case IsaacRoomType.motherBoss:
+        return 'Mother Boss';
+      case IsaacRoomType.dogmaBoss:
+        return 'Dogma Boss';
+      case IsaacRoomType.theBeastBoss:
+        return 'The Beast Boss';
     }
   }
 }
@@ -196,23 +226,15 @@ enum IsaacBossType {
   mother,
   theBeast,
   delirium,
-  isaac,
-  satan,
-  hush,
-  dogma,
 }
 
 extension IsaacBossExtension on IsaacBossType {
   static const List<IsaacBossType> sortedValues = [
-    IsaacBossType.hush,
-    IsaacBossType.isaac,
-    IsaacBossType.satan,
     IsaacBossType.blueBaby,
     IsaacBossType.theLamb,
     IsaacBossType.megaSatan,
     IsaacBossType.delirium,
     IsaacBossType.mother,
-    IsaacBossType.dogma,
     IsaacBossType.theBeast,
   ];
 
@@ -230,14 +252,6 @@ extension IsaacBossExtension on IsaacBossType {
         return 'The Beast';
       case IsaacBossType.delirium:
         return 'Delirium';
-      case IsaacBossType.isaac:
-        return 'Isaac';
-      case IsaacBossType.satan:
-        return 'Satan';
-      case IsaacBossType.hush:
-        return 'Hush';
-      case IsaacBossType.dogma:
-        return 'Dogma';
     }
   }
 }

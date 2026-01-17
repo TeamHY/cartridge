@@ -29,7 +29,7 @@ mod:AddCallback(
 
         if level:GetAbsoluteStage() == LevelStage.STAGE8 then
             if roomDesc.Data.Name == "Beast Room" then
-                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(RoomType.ROOM_BOSS) .. "." .. tostring(room:IsClear()) .. ".4")
+                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(RoomType.NUM_ROOMTYPES + 4) .. "." .. tostring(room:IsClear()))
             end
             return
         end
@@ -57,7 +57,7 @@ mod:AddCallback(
             end
 
             if bossDartId ~= nil then
-                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(roomType) .. "." .. tostring(room:IsClear()) .. "." .. tostring(bossDartId))
+                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(RoomType.NUM_ROOMTYPES + bossDartId) .. "." .. tostring(room:IsClear()))
                 return
             end
         end
@@ -73,7 +73,7 @@ mod:AddCallback(
         local room = Game():GetLevel():GetCurrentRoom()
 
         if entityNPC.Type == EntityType.ENTITY_DOGMA and entityNPC.Variant == 1 then
-            Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(RoomType.ROOM_BOSS) .. "." .. tostring(room:IsClear()) .. ".9") -- Dogma
+            Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(RoomType.NUM_ROOMTYPES + 9) .. "." .. tostring(room:IsClear())) -- Dogma
         end
     end
 )
@@ -84,7 +84,7 @@ mod:AddCallback(
     ---@param spawnPos Vector
     function(_, rng, spawnPos)
         if Game():GetLevel():GetCurrentRoomDesc().Data.Name == "Dogma Test" then
-            Isaac.DebugString("[Cartridge]RoomCleared:" .. tostring(RoomType.ROOM_BOSS) .. ".9") -- Dogma
+            Isaac.DebugString("[Cartridge]RoomCleared:" .. tostring(RoomType.NUM_ROOMTYPES + 9) .. "." .. tostring(Game():GetRoom():IsClear())) -- Dogma
             return
         end
 

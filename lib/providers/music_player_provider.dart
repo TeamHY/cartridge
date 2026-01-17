@@ -93,11 +93,7 @@ class MusicPlayerNotifier extends ChangeNotifier {
     });
 
     isaacEventManager.roomEnteredStream.listen((event) {
-      _handleRoomEntered(
-        event.roomType,
-        event.isCleared,
-        bossType: event.bossType,
-      );
+      _handleRoomEntered(event.roomType, event.isCleared);
     });
 
     isaacEventManager.roomClearedStream.listen((event) {
