@@ -59,7 +59,7 @@ class RoomStayingCondition extends MusicTriggerCondition {
   Map<String, dynamic> toJson() {
     return {
       'type': type,
-      'roomTypes': roomTypes.map((r) => r.index).toList(),
+      'roomTypes': roomTypes.map((r) => r.value).toList(),
       'isOnlyWithMonsters': isOnlyWithMonsters,
     };
   }
@@ -67,7 +67,7 @@ class RoomStayingCondition extends MusicTriggerCondition {
   factory RoomStayingCondition.fromJson(Map<String, dynamic> json) {
     return RoomStayingCondition(
       (json['roomTypes'] as List<dynamic>)
-          .map((e) => IsaacRoomType.values[e as int])
+          .map((e) => IsaacRoomType.fromValue(e as int))
           .toSet(),
       json['isOnlyWithMonsters'] as bool,
     );

@@ -191,7 +191,7 @@ class IsaacEventManager {
           final roomType = int.parse(eventParams[0]);
 
           _roomEnteredStreamController.add((
-            roomType: IsaacRoomType.values[roomType],
+            roomType: IsaacRoomType.fromValue(roomType),
             isCleared: eventParams[1] == 'true',
             bossType: eventParams.length > 2
                 ? IsaacBossType.values[int.parse(eventParams[2])]
@@ -202,7 +202,7 @@ class IsaacEventManager {
           final roomType = int.parse(eventParams[0]);
 
           _roomClearedStreamController
-              .add((roomType: IsaacRoomType.values[roomType]));
+              .add((roomType: IsaacRoomType.fromValue(roomType)));
           break;
         case 'BossCleared':
           final bossTypeString = eventParams[0];

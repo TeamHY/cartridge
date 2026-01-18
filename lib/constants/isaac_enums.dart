@@ -90,46 +90,57 @@ extension IsaacStageExtension on IsaacStage {
 }
 
 enum IsaacRoomType {
-  null_,
-  defaultRoom,
-  shop,
-  error,
-  treasure,
-  boss,
-  miniboss,
-  secret,
-  superSecret,
-  arcade,
-  curse,
-  challenge,
-  library,
-  sacrifice,
-  devil,
-  angel,
-  dungeon,
-  bossRush,
-  isaacs,
-  barren,
-  chest,
-  dice,
-  blackMarket,
-  greedExit,
-  planetarium,
-  teleporter,
-  teleporterExit,
-  secretExit,
-  blue,
-  ultraSecret,
-  hushBoss,
-  isaacBoss,
-  satanBoss,
-  blueBabyBoss,
-  theLambBoss,
-  megaSatanBoss,
-  deliriumBoss,
-  motherBoss,
-  dogmaBoss,
-  theBeastBoss,
+  null_(0),
+  defaultRoom(1),
+  shop(2),
+  error(3),
+  treasure(4),
+  boss(5),
+  miniboss(6),
+  secret(7),
+  superSecret(8),
+  arcade(9),
+  curse(10),
+  challenge(11),
+  library(12),
+  sacrifice(13),
+  devil(14),
+  angel(15),
+  dungeon(16),
+  bossRush(17),
+  isaacs(18),
+  barren(19),
+  chest(20),
+  dice(21),
+  blackMarket(22),
+  greedExit(23),
+  planetarium(24),
+  teleporter(25),
+  teleporterExit(26),
+  secretExit(27),
+  blue(28),
+  ultraSecret(29),
+  deathMatch(30),
+  hushBoss(1000),
+  isaacBoss(1001),
+  satanBoss(1002),
+  blueBabyBoss(1003),
+  theLambBoss(1004),
+  megaSatanBoss(1005),
+  deliriumBoss(1006),
+  motherBoss(1007),
+  dogmaBoss(1008),
+  theBeastBoss(1009);
+
+  final int value;
+  const IsaacRoomType(this.value);
+
+  static IsaacRoomType fromValue(int value) {
+    return IsaacRoomType.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => IsaacRoomType.null_,
+    );
+  }
 }
 
 extension IsaacRoomExtension on IsaacRoomType {
@@ -195,6 +206,8 @@ extension IsaacRoomExtension on IsaacRoomType {
         return 'Blue';
       case IsaacRoomType.ultraSecret:
         return 'Ultra Secret';
+      case IsaacRoomType.deathMatch:
+        return 'Death Match';
       case IsaacRoomType.hushBoss:
         return 'Hush Boss';
       case IsaacRoomType.isaacBoss:

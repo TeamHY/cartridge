@@ -28,8 +28,12 @@ mod:AddCallback(
         local roomType = room:GetType()
 
         if level:GetAbsoluteStage() == LevelStage.STAGE8 then
-            if roomDesc.Data.Name == "Beast Room" then
-                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(RoomType.NUM_ROOMTYPES + 4) .. "." .. tostring(room:IsClear()))
+            if roomDesc.Data.Name == "Living Room" and level:GetStageType() == StageType.STAGETYPE_WOTL then
+                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(1000 + 8) .. "." .. tostring(false)) -- Dogma
+            elseif roomDesc.Data.Name == "Beast Room" then
+                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(1000 + 9) .. "." .. tostring(false))
+            else
+                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(roomType) .. "." .. tostring(room:IsClear()))
             end
             return
         end
@@ -37,27 +41,27 @@ mod:AddCallback(
         if roomType == RoomType.ROOM_BOSS then
             local bossId = room:GetBossID()
             local bossDartId = nil
-
-            if bossId == 40 then
-                bossDartId = 0 -- Blue Baby
-            elseif bossId == 54 then
-                bossDartId = 1 -- The Lamb
-            elseif bossId == 55 then
-                bossDartId = 2 -- Mega Satan
-            elseif bossId == 88 then
-                bossDartId = 3 -- Mother
-            elseif bossId == 70 then
-                bossDartId = 5 -- Delirium
+            
+            if bossId == 63 then
+                bossDartId = 0 -- Hush
             elseif bossId == 39 then
-                bossDartId = 6 -- Isaac
+                bossDartId = 1 -- Isaac
             elseif bossId == 24 then
-                bossDartId = 7 -- Satan
-            elseif bossId == 63 then
-                bossDartId = 8 -- Hush
+                bossDartId = 2 -- Satan
+            elseif bossId == 40 then
+                bossDartId = 3 -- Blue Baby
+            elseif bossId == 54 then
+                bossDartId = 4 -- The Lamb
+            elseif bossId == 55 then
+                bossDartId = 5 -- Mega Satan
+            elseif bossId == 70 then
+                bossDartId = 6 -- Delirium
+            elseif bossId == 88 then
+                bossDartId = 7 -- Mother
             end
 
             if bossDartId ~= nil then
-                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(RoomType.NUM_ROOMTYPES + bossDartId) .. "." .. tostring(room:IsClear()))
+                Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(1000 + bossDartId) .. "." .. tostring(room:IsClear()))
                 return
             end
         end
@@ -66,26 +70,59 @@ mod:AddCallback(
     end
 )
 
-mod:AddCallback(
-    ModCallbacks.MC_POST_NPC_INIT,
-    ---@param entityNPC EntityNPC
-    function(_, entityNPC)
-        local room = Game():GetLevel():GetCurrentRoom()
+-- mod:AddCallback(
+--     ModCallbacks.MC_POST_NPC_INIT,
+--     ---@param entityNPC EntityNPC
+--     function(_, entityNPC)
+--         local room = Game():GetLevel():GetCurrentRoom()
 
-        if entityNPC.Type == EntityType.ENTITY_DOGMA and entityNPC.Variant == 1 then
-            Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(RoomType.NUM_ROOMTYPES + 9) .. "." .. tostring(room:IsClear())) -- Dogma
-        end
-    end
-)
+--         if entityNPC.Type == EntityType.ENTITY_DOGMA and entityNPC.Variant == 1 then
+--             Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(1000 + 9) .. "." .. tostring(room:IsClear())) -- Dogma
+--         end
+--     end
+-- )
 
 mod:AddCallback(
     ModCallbacks.MC_PRE_SPAWN_CLEAN_AWARD,
     ---@param rng RNG
     ---@param spawnPos Vector
     function(_, rng, spawnPos)
-        if Game():GetLevel():GetCurrentRoomDesc().Data.Name == "Dogma Test" then
-            Isaac.DebugString("[Cartridge]RoomCleared:" .. tostring(RoomType.NUM_ROOMTYPES + 9) .. "." .. tostring(Game():GetRoom():IsClear())) -- Dogma
+        local level = Game():GetLevel()
+        local room = level:GetCurrentRoom()
+        local roomDesc = level:GetCurrentRoomDesc()
+        local roomType = room:GetType()
+
+        if roomDesc.Data.Name == "Dogma Test" then
+            Isaac.DebugString("[Cartridge]RoomCleared:" .. tostring(1000 + 8) .. "." .. tostring(Game():GetRoom():IsClear())) -- Dogma
             return
+        end
+
+        if roomType == RoomType.ROOM_BOSS then
+            local bossId = room:GetBossID()
+            local bossDartId = nil
+            
+            if bossId == 63 then
+                bossDartId = 0 -- Hush
+            elseif bossId == 39 then
+                bossDartId = 1 -- Isaac
+            elseif bossId == 24 then
+                bossDartId = 2 -- Satan
+            elseif bossId == 40 then
+                bossDartId = 3 -- Blue Baby
+            elseif bossId == 54 then
+                bossDartId = 4 -- The Lamb
+            elseif bossId == 55 then
+                bossDartId = 5 -- Mega Satan
+            elseif bossId == 70 then
+                bossDartId = 6 -- Delirium
+            elseif bossId == 88 then
+                bossDartId = 7 -- Mother
+            end
+
+            if bossDartId ~= nil then
+                Isaac.DebugString("[Cartridge]RoomCleared:" .. tostring(1000 + bossDartId))
+                return
+            end
         end
 
         Isaac.DebugString("[Cartridge]RoomCleared:" .. tostring(Game():GetRoom():GetType()))
