@@ -393,7 +393,7 @@ class RoomSettings extends StatelessWidget {
         const SizedBox(height: 8),
         buildRoomGroup('일반 방', normalRoomTypes),
         buildRoomGroup('엔딩 보스 방', bossRoomTypes),
-        buildRoomGroup('미러 방', mirrorRoomTypes),
+        buildRoomGroup('거울 방', mirrorRoomTypes),
         const SizedBox(height: 12),
         Checkbox(
           checked: isOnlyUncleared,
