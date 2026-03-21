@@ -130,7 +130,37 @@ enum IsaacRoomType {
   deliriumBoss(1006),
   motherBoss(1007),
   dogmaBoss(1008),
-  theBeastBoss(1009);
+  theBeastBoss(1009),
+  mirrorDefaultRoom(2001),
+  mirrorShop(2002),
+  mirrorError(2003),
+  mirrorTreasure(2004),
+  mirrorBoss(2005),
+  mirrorMiniboss(2006),
+  mirrorSecret(2007),
+  mirrorSuperSecret(2008),
+  mirrorArcade(2009),
+  mirrorCurse(2010),
+  mirrorChallenge(2011),
+  mirrorLibrary(2012),
+  mirrorSacrifice(2013),
+  mirrorDevil(2014),
+  mirrorAngel(2015),
+  mirrorDungeon(2016),
+  mirrorBossRush(2017),
+  mirrorIsaacs(2018),
+  mirrorBarren(2019),
+  mirrorChest(2020),
+  mirrorDice(2021),
+  mirrorBlackMarket(2022),
+  mirrorGreedExit(2023),
+  mirrorPlanetarium(2024),
+  mirrorTeleporter(2025),
+  mirrorTeleporterExit(2026),
+  mirrorSecretExit(2027),
+  mirrorBlue(2028),
+  mirrorUltraSecret(2029),
+  mirrorDeathMatch(2030);
 
   final int value;
   const IsaacRoomType(this.value);
@@ -228,6 +258,66 @@ extension IsaacRoomExtension on IsaacRoomType {
         return 'Dogma Boss';
       case IsaacRoomType.theBeastBoss:
         return 'The Beast Boss';
+      case IsaacRoomType.mirrorDefaultRoom:
+        return 'Mirror Default';
+      case IsaacRoomType.mirrorShop:
+        return 'Mirror Shop';
+      case IsaacRoomType.mirrorError:
+        return 'Mirror Error';
+      case IsaacRoomType.mirrorTreasure:
+        return 'Mirror Treasure';
+      case IsaacRoomType.mirrorBoss:
+        return 'Mirror Boss';
+      case IsaacRoomType.mirrorMiniboss:
+        return 'Mirror Miniboss';
+      case IsaacRoomType.mirrorSecret:
+        return 'Mirror Secret';
+      case IsaacRoomType.mirrorSuperSecret:
+        return 'Mirror Super Secret';
+      case IsaacRoomType.mirrorArcade:
+        return 'Mirror Arcade';
+      case IsaacRoomType.mirrorCurse:
+        return 'Mirror Curse';
+      case IsaacRoomType.mirrorChallenge:
+        return 'Mirror Challenge';
+      case IsaacRoomType.mirrorLibrary:
+        return 'Mirror Library';
+      case IsaacRoomType.mirrorSacrifice:
+        return 'Mirror Sacrifice';
+      case IsaacRoomType.mirrorDevil:
+        return 'Mirror Devil';
+      case IsaacRoomType.mirrorAngel:
+        return 'Mirror Angel';
+      case IsaacRoomType.mirrorDungeon:
+        return 'Mirror Dungeon';
+      case IsaacRoomType.mirrorBossRush:
+        return 'Mirror Boss Rush';
+      case IsaacRoomType.mirrorIsaacs:
+        return "Mirror Isaac's Room";
+      case IsaacRoomType.mirrorBarren:
+        return 'Mirror Barren';
+      case IsaacRoomType.mirrorChest:
+        return 'Mirror Chest';
+      case IsaacRoomType.mirrorDice:
+        return 'Mirror Dice';
+      case IsaacRoomType.mirrorBlackMarket:
+        return 'Mirror Black Market';
+      case IsaacRoomType.mirrorGreedExit:
+        return 'Mirror Greed Exit';
+      case IsaacRoomType.mirrorPlanetarium:
+        return 'Mirror Planetarium';
+      case IsaacRoomType.mirrorTeleporter:
+        return 'Mirror Teleporter';
+      case IsaacRoomType.mirrorTeleporterExit:
+        return 'Mirror Teleporter Exit';
+      case IsaacRoomType.mirrorSecretExit:
+        return 'Mirror Secret Exit';
+      case IsaacRoomType.mirrorBlue:
+        return 'Mirror Blue';
+      case IsaacRoomType.mirrorUltraSecret:
+        return 'Mirror Ultra Secret';
+      case IsaacRoomType.mirrorDeathMatch:
+        return 'Mirror Death Match';
     }
   }
 }

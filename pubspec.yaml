@@ -95,6 +95,7 @@ flutter:
   assets:
     - assets/images/
     - assets/mods/cartridge_supporter/
+    - assets/saves/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

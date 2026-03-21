@@ -251,6 +251,7 @@ class RoomSettings extends StatelessWidget {
   final Set<IsaacRoomType> selectedRoomTypes;
   final bool isOnlyUncleared;
   final Function(IsaacRoomType, bool) onRoomTypeToggle;
+  final Function(List<IsaacRoomType>, bool) onRoomGroupToggle;
   final Function(bool?) onUnclearedChanged;
 
   const RoomSettings({
@@ -258,37 +259,141 @@ class RoomSettings extends StatelessWidget {
     required this.selectedRoomTypes,
     required this.isOnlyUncleared,
     required this.onRoomTypeToggle,
+    required this.onRoomGroupToggle,
     required this.onUnclearedChanged,
   });
 
   @override
   Widget build(BuildContext context) {
+    final normalRoomTypes = IsaacRoomType.values
+        .where((roomType) =>
+            roomType != IsaacRoomType.null_ &&
+            !roomType.name.startsWith('mirror') &&
+            roomType.value < 1000)
+        .toList();
+    final bossRoomTypes = IsaacRoomType.values
+        .where((roomType) =>
+            roomType != IsaacRoomType.null_ &&
+            !roomType.name.startsWith('mirror') &&
+            roomType.value >= 1000)
+        .toList();
+    final mirrorRoomTypes = IsaacRoomType.values
+        .where((roomType) => roomType.name.startsWith('mirror'))
+        .toList();
+    final allRoomTypes = IsaacRoomType.values
+        .where((roomType) => roomType != IsaacRoomType.null_)
+        .toList();
+
+    final areAllRoomTypesSelected =
+        allRoomTypes.every((roomType) => selectedRoomTypes.contains(roomType));
+    final areAllMirrorsSelected = mirrorRoomTypes
+        .every((roomType) => selectedRoomTypes.contains(roomType));
+
+    Widget buildRoomGroup(String title, List<IsaacRoomType> roomTypes) {
+      final allSelected =
+          roomTypes.every((roomType) => selectedRoomTypes.contains(roomType));
+
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+            borderRadius: BorderRadius.circular(6),
+            color: Colors.white,
+          ),
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[140],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: () => onRoomGroupToggle(roomTypes, allSelected),
+                    style: ButtonStyle(
+                      padding: WidgetStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      ),
+                      backgroundColor: WidgetStateProperty.all(
+                        allSelected ? Colors.grey[60] : Colors.blue.light,
+                      ),
+                    ),
+                    child: Text(
+                      allSelected ? '전체 해제' : '전체 선택',
+                      style: const TextStyle(fontSize: 11),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: roomTypes.map((roomType) {
+                  final isSelected = selectedRoomTypes.contains(roomType);
+                  return ToggleButton(
+                    checked: isSelected,
+                    onChanged: (value) => onRoomTypeToggle(roomType, value),
+                    child: Text(
+                      roomType.toDisplayString(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isSelected ? Colors.white : null,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('방 타입 (복수 선택 가능)',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: IsaacRoomType.values
-              .where((roomType) => roomType != IsaacRoomType.null_)
-              .map((roomType) {
-            final isSelected = selectedRoomTypes.contains(roomType);
-            return ToggleButton(
-              checked: isSelected,
-              onChanged: (value) => onRoomTypeToggle(roomType, value),
-              child: Text(
-                roomType.toDisplayString(),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isSelected ? Colors.white : null,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('방 타입 (복수 선택 가능)',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              children: [
+                FilledButton(
+                  onPressed: () =>
+                      onRoomGroupToggle(allRoomTypes, areAllRoomTypesSelected),
+                  style: ButtonStyle(
+                    padding: WidgetStateProperty.all(
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    ),
+                    backgroundColor: WidgetStateProperty.all(
+                      areAllRoomTypesSelected
+                          ? Colors.grey[60]
+                          : Colors.blue.light,
+                    ),
+                  ),
+                  child: Text(
+                    areAllRoomTypesSelected ? '전체 해제' : '전체 선택',
+                    style: const TextStyle(fontSize: 11),
+                  ),
                 ),
-              ),
-            );
-          }).toList(),
+              ],
+            ),
+          ],
         ),
+        const SizedBox(height: 8),
+        buildRoomGroup('일반 방', normalRoomTypes),
+        buildRoomGroup('엔딩 보스 방', bossRoomTypes),
+        buildRoomGroup('미러 방', mirrorRoomTypes),
         const SizedBox(height: 12),
         Checkbox(
           checked: isOnlyUncleared,

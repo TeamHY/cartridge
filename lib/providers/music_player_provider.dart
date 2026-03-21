@@ -46,6 +46,8 @@ class MusicPlayerNotifier extends ChangeNotifier {
   void _initAudioPlayer() {
     _playerState = _audioPlayer.state;
 
+    _audioPlayer.setPlaybackRate(0.5);
+
     _audioPlayer.getDuration().then((value) {
       _duration = value;
       notifyListeners();

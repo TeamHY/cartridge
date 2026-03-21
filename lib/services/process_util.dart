@@ -27,4 +27,20 @@ class ProcessUtil {
       ]);
     }
   }
+
+  static Future<void> launchSteam(String steamPath) async {
+    if (Platform.isWindows) {
+      await Process.start(
+        '$steamPath/steam.exe',
+        [],
+        mode: ProcessStartMode.detached,
+      );
+    } else if (Platform.isMacOS) {
+      await Process.start(
+        'open',
+        ['-a', 'Steam'],
+        mode: ProcessStartMode.detached,
+      );
+    }
+  }
 }

@@ -5,6 +5,7 @@ import 'package:cartridge/pages/home/components/home_sidebar.dart';
 import 'package:cartridge/pages/home/views/home_main_view.dart';
 import 'package:cartridge/pages/home/views/preset_edit_view.dart';
 import 'package:cartridge/pages/home/views/music_view.dart';
+import 'package:cartridge/pages/home/views/save_apply_view.dart';
 import 'package:cartridge/pages/home/views/setting_view.dart';
 import 'package:cartridge/services/version_checker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -16,6 +17,7 @@ enum HomeView {
   main,
   presetEdit,
   music,
+  saveApply,
   setting,
 }
 
@@ -119,8 +121,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ),
                 ),
                 child: switch (_currentView) {
-                  HomeView.main => const HomeMainView(),
+                  HomeView.main => HomeMainView(
+                      onSaveApplyPressed: () => setState(() {
+                            _selectedPreset = null;
+                            _currentView = HomeView.saveApply;
+                          })),
                   HomeView.music => MusicView(onBackPressed: onHomePressed),
+                  HomeView.saveApply =>
+                    SaveApplyView(onBackPressed: onHomePressed),
                   HomeView.setting => SettingView(onBackPressed: onHomePressed),
                   HomeView.presetEdit => _selectedPreset != null
                       ? PresetEditView(

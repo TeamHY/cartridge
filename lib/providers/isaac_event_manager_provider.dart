@@ -11,7 +11,6 @@ typedef StageEnteredParams = ({IsaacStage stage});
 typedef RoomEnteredParams = ({
   IsaacRoomType roomType,
   bool isCleared,
-  IsaacBossType? bossType
 });
 
 typedef RoomClearedParams = ({IsaacRoomType roomType});
@@ -193,9 +192,6 @@ class IsaacEventManager {
           _roomEnteredStreamController.add((
             roomType: IsaacRoomType.fromValue(roomType),
             isCleared: eventParams[1] == 'true',
-            bossType: eventParams.length > 2
-                ? IsaacBossType.values[int.parse(eventParams[2])]
-                : null,
           ));
           break;
         case 'RoomCleared':

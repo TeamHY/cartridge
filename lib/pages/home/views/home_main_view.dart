@@ -9,7 +9,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart' as material;
 
 class HomeMainView extends ConsumerWidget {
-  const HomeMainView({super.key});
+  const HomeMainView({super.key, this.onSaveApplyPressed});
+
+  final VoidCallback? onSaveApplyPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -125,6 +127,17 @@ class HomeMainView extends ConsumerWidget {
                           isEnableMods: false,
                           isDebugConsole: false,
                         ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        context,
+                        label: '올클 세이브',
+                        icon: FluentIcons.save,
+                        color: Colors.white,
+                        textColor: const Color(0xFF0EA5A3),
+                        onTap: onSaveApplyPressed ?? () {},
                       ),
                     ),
                   ],

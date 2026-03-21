@@ -222,6 +222,15 @@ class _EditPlaylistDialogState extends ConsumerState<EditPlaylistDialog> {
           }
         });
       },
+      onRoomGroupToggle: (roomTypes, allSelected) {
+        setState(() {
+          if (allSelected) {
+            _selectedRoomTypes.removeAll(roomTypes);
+          } else {
+            _selectedRoomTypes.addAll(roomTypes);
+          }
+        });
+      },
       onUnclearedChanged: (value) {
         setState(() {
           _isOnlyUncleared = value ?? false;

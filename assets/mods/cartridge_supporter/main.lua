@@ -66,6 +66,11 @@ mod:AddCallback(
             end
         end
 
+        if room:IsMirrorWorld() then
+            Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(2000 + roomType) .. "." .. tostring(room:IsClear()))
+            return
+        end
+        
         Isaac.DebugString("[Cartridge]RoomEntered:" .. tostring(roomType) .. "." .. tostring(room:IsClear()))
     end
 )
