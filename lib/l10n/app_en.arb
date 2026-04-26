@@ -54,6 +54,19 @@
   "hotkey_record_dialog_start_recording": "Start Recording",
   "setting_license_button": "License",
 
+  "setting_isaac_options_section": "Isaac Options",
+  "setting_isaac_options_mouse_control": "Mouse Control",
+  "setting_isaac_options_debug_console": "Debug Console",
+  "setting_isaac_options_repentance": "Repentance",
+  "setting_isaac_options_repentance_plus": "Repentance+",
+  "setting_isaac_options_not_found": "options.ini not found",
+  "setting_isaac_options_section_general": "General",
+  "setting_isaac_options_section_display": "Display",
+  "setting_isaac_options_section_audio": "Audio",
+  "setting_isaac_options_section_gameplay": "Gameplay",
+  "setting_isaac_options_section_input": "Input",
+  "setting_isaac_options_section_misc": "Misc",
+
   "@game_config": {
     "description": "Game Config Dialog"
   },

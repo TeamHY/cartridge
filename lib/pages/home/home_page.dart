@@ -5,6 +5,7 @@ import 'package:cartridge/pages/home/components/home_sidebar.dart';
 import 'package:cartridge/pages/home/views/home_main_view.dart';
 import 'package:cartridge/pages/home/views/preset_edit_view.dart';
 import 'package:cartridge/pages/home/views/music_view.dart';
+import 'package:cartridge/pages/home/views/isaac_options_view.dart';
 import 'package:cartridge/pages/home/views/save_apply_view.dart';
 import 'package:cartridge/pages/home/views/setting_view.dart';
 import 'package:cartridge/services/version_checker.dart';
@@ -18,6 +19,7 @@ enum HomeView {
   presetEdit,
   music,
   saveApply,
+  isaacOptions,
   setting,
 }
 
@@ -125,10 +127,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                       onSaveApplyPressed: () => setState(() {
                             _selectedPreset = null;
                             _currentView = HomeView.saveApply;
+                          }),
+                      onIsaacOptionsPressed: () => setState(() {
+                            _selectedPreset = null;
+                            _currentView = HomeView.isaacOptions;
                           })),
                   HomeView.music => MusicView(onBackPressed: onHomePressed),
                   HomeView.saveApply =>
                     SaveApplyView(onBackPressed: onHomePressed),
+                  HomeView.isaacOptions =>
+                    IsaacOptionsView(onBackPressed: onHomePressed),
                   HomeView.setting => SettingView(onBackPressed: onHomePressed),
                   HomeView.presetEdit => _selectedPreset != null
                       ? PresetEditView(

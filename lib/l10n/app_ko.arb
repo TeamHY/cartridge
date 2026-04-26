@@ -54,6 +54,19 @@
   "hotkey_record_dialog_start_recording": "녹화 시작",
   "setting_license_button": "라이센스",
 
+  "setting_isaac_options_section": "아이작 옵션",
+  "setting_isaac_options_mouse_control": "마우스 조작",
+  "setting_isaac_options_debug_console": "디버그 콘솔",
+  "setting_isaac_options_repentance": "Repentance",
+  "setting_isaac_options_repentance_plus": "Repentance+",
+  "setting_isaac_options_not_found": "options.ini를 찾을 수 없습니다",
+  "setting_isaac_options_section_general": "일반",
+  "setting_isaac_options_section_display": "화면",
+  "setting_isaac_options_section_audio": "오디오",
+  "setting_isaac_options_section_gameplay": "게임플레이",
+  "setting_isaac_options_section_input": "입력",
+  "setting_isaac_options_section_misc": "기타",
+
   "@game_config": {
     "description": "게임 설정 다이얼로그"
   },

@@ -9,9 +9,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart' as material;
 
 class HomeMainView extends ConsumerWidget {
-  const HomeMainView({super.key, this.onSaveApplyPressed});
+  const HomeMainView({super.key, this.onSaveApplyPressed, this.onIsaacOptionsPressed});
 
   final VoidCallback? onSaveApplyPressed;
+  final VoidCallback? onIsaacOptionsPressed;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -138,6 +139,17 @@ class HomeMainView extends ConsumerWidget {
                         color: Colors.white,
                         textColor: const Color(0xFF0EA5A3),
                         onTap: onSaveApplyPressed ?? () {},
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        context,
+                        label: loc.setting_isaac_options_section,
+                        icon: FluentIcons.settings,
+                        color: Colors.white,
+                        textColor: const Color(0xFF475569),
+                        onTap: onIsaacOptionsPressed ?? () {},
                       ),
                     ),
                   ],
