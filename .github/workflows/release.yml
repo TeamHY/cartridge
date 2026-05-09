@@ -102,12 +102,11 @@ jobs:
           $releaseBody = @()
           foreach ($line in ($commits -split "`n")) {
             $line = $line.Trim()
-            if ($line -match "^(\w+):\s*(.+)$") {
-              $changes += @{ type = $Matches[1]; message = $Matches[2].Trim() }
-              $releaseBody += "- **$($Matches[1])**: $($Matches[2].Trim())"
-            } elseif ($line -and $line -notmatch "^Release ") {
-              $changes += @{ type = "feat"; message = $line }
-              $releaseBody += "- $line"
+            if ($line -match "^(feat|fix|refactor|perf|style|docs|test|ci|build)(\(.+?\))?:\s*(.+)$") {
+              $type = $Matches[1]
+              $msg = $Matches[3].Trim()
+              $changes += @{ type = $type; message = $msg }
+              $releaseBody += "- **$type**: $msg"
             }
           }
 
