@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:sentry_flutter/sentry_flutter.dart';
+
 enum IsaacEdition {
   repentance('Binding of Isaac Repentance'),
   repentancePlus('Binding of Isaac Repentance+');
@@ -39,8 +41,8 @@ class IsaacConfigService {
           return line.split('=').last.trim() == '1';
         }
       }
-    } catch (e) {
-      //
+    } catch (e, stackTrace) {
+      await Sentry.captureException(e, stackTrace: stackTrace);
     }
     return false;
   }
@@ -70,8 +72,8 @@ class IsaacConfigService {
           result[trimmed.substring(0, idx)] = trimmed.substring(idx + 1);
         }
       }
-    } catch (e) {
-      //
+    } catch (e, stackTrace) {
+      await Sentry.captureException(e, stackTrace: stackTrace);
     }
     return result;
   }
@@ -139,8 +141,8 @@ class IsaacConfigService {
       final newContent = content.split('\n').map(transform).join('\n');
 
       await optionFile.writeAsString(newContent);
-    } catch (e) {
-      //
+    } catch (e, stackTrace) {
+      await Sentry.captureException(e, stackTrace: stackTrace);
     }
   }
 }

@@ -6,6 +6,7 @@ import 'package:fluent_ui/fluent_ui.dart' as fluent;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ModItem extends ConsumerStatefulWidget {
@@ -41,8 +42,8 @@ class _ModItemState extends ConsumerState<ModItem> {
       } else if (Platform.isLinux) {
         await Process.run('xdg-open', [widget.mod.path]);
       }
-    } catch (e) {
-      // Error handling
+    } catch (e, stackTrace) {
+      Sentry.captureException(e, stackTrace: stackTrace);
     }
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class HotkeyService {
   HotKey? _playPauseHotkey;
@@ -32,7 +33,8 @@ class HotkeyService {
         debugPrint(
             '[HotkeyService] Registered play/pause hotkey: $hotkeyString');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      Sentry.captureException(e, stackTrace: stackTrace);
       debugPrint('[HotkeyService] Failed to register play/pause hotkey: $e');
     }
   }
@@ -56,7 +58,8 @@ class HotkeyService {
         debugPrint(
             '[HotkeyService] Registered next track hotkey: $hotkeyString');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      Sentry.captureException(e, stackTrace: stackTrace);
       debugPrint('[HotkeyService] Failed to register next track hotkey: $e');
     }
   }
@@ -80,7 +83,8 @@ class HotkeyService {
         debugPrint(
             '[HotkeyService] Registered volume up hotkey: $hotkeyString');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      Sentry.captureException(e, stackTrace: stackTrace);
       debugPrint('[HotkeyService] Failed to register volume up hotkey: $e');
     }
   }
@@ -104,7 +108,8 @@ class HotkeyService {
         debugPrint(
             '[HotkeyService] Registered volume down hotkey: $hotkeyString');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      Sentry.captureException(e, stackTrace: stackTrace);
       debugPrint('[HotkeyService] Failed to register volume down hotkey: $e');
     }
   }

@@ -13,6 +13,7 @@ import 'package:cartridge/utils/presets_parser.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class StoreNotifier extends ChangeNotifier {
   StoreNotifier(this.ref) {
@@ -101,8 +102,8 @@ class StoreNotifier extends ChangeNotifier {
         windowPosX: gameConfig.windowPosX,
         windowPosY: gameConfig.windowPosY,
       );
-    } catch (e) {
-      //
+    } catch (e, stackTrace) {
+      await Sentry.captureException(e, stackTrace: stackTrace);
     }
   }
 

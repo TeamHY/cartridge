@@ -70,6 +70,7 @@ jobs:
           Add-Content -Path .env -Value 'RECORDER_MOD_URL="${{ secrets.RECORDER_MOD_URL }}"'
           Add-Content -Path .env -Value 'SUPABASE_URL="${{ secrets.SUPABASE_URL }}"'
           Add-Content -Path .env -Value 'SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"'
+          Add-Content -Path .env -Value 'SENTRY_DSN="${{ secrets.SENTRY_DSN }}"'
       
       - name: Build Windows (Release)
         run: flutter build windows --release

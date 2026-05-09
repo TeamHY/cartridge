@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:pub_semver/pub_semver.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -17,10 +18,26 @@ late final Version currentVersion;
 void main() async {
   await dotenv.load(fileName: '.env');
 
+  final sentryDsn = dotenv.env['SENTRY_DSN'] ?? '';
+
+  if (sentryDsn.isNotEmpty) {
+    await SentryFlutter.init(
+      (options) {
+        options.dsn = sentryDsn;
+        options.tracesSampleRate = 1.0;
+      },
+      appRunner: () => _initAndRunApp(),
+    );
+  } else {
+    await _initAndRunApp();
+  }
+}
+
+Future<void> _initAndRunApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   packageInfo = await PackageInfo.fromPlatform();
   currentVersion = Version.parse(packageInfo.version);
-  
+
   await hotKeyManager.unregisterAll();
   await windowManager.ensureInitialized();
 
@@ -41,6 +58,12 @@ void main() async {
     url: dotenv.env['SUPABASE_URL'] ?? '',
     anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
+
+  if (Sentry.isEnabled) {
+    Sentry.configureScope((scope) {
+      scope.setTag('version', packageInfo.version);
+    });
+  }
 
   runApp(const ProviderScope(child: MyApp()));
 }

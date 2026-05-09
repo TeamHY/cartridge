@@ -23,6 +23,7 @@
   },
   "deno.enable": true,
   "files.associations": {
+    "*.dbclient-js": "javascript",
     "*.ejs": "html",
     "*.anm2": "xml",
     ".env*": "dotenv",

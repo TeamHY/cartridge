@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cartridge/models/metadata.dart';
 import 'package:cartridge/models/mod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 const astrobirthName = '!Astrobirth';
 
@@ -56,8 +57,8 @@ class ModService {
             await disableFile.delete();
           }
         }
-      } catch (e) {
-        //
+      } catch (e, stackTrace) {
+        await Sentry.captureException(e, stackTrace: stackTrace);
       }
     }
   }

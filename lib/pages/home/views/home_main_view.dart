@@ -9,7 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart' as material;
 
 class HomeMainView extends ConsumerWidget {
-  const HomeMainView({super.key, this.onSaveApplyPressed, this.onIsaacOptionsPressed});
+  const HomeMainView(
+      {super.key, this.onSaveApplyPressed, this.onIsaacOptionsPressed});
 
   final VoidCallback? onSaveApplyPressed;
   final VoidCallback? onIsaacOptionsPressed;

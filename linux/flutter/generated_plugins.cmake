@@ -7,6 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   gtk
   hotkey_manager_linux
   screen_retriever_linux
+  sentry_flutter
   url_launcher_linux
   window_manager
 )
