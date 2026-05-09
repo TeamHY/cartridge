@@ -91,26 +91,46 @@ jobs:
           $build = "${{ steps.bump.outputs.build_number }}"
           $date = Get-Date -Format "yyyy-MM-dd"
 
+          $lastTag = git describe --tags --abbrev=0 HEAD~1 2>$null
+          if ($lastTag) {
+            $commits = git log "$lastTag..HEAD~1" --pretty=format:"%s"
+          } else {
+            $commits = git log HEAD~1 --pretty=format:"%s"
+          }
+
+          $changes = @()
+          $releaseBody = @()
+          foreach ($line in ($commits -split "`n")) {
+            $line = $line.Trim()
+            if ($line -match "^(\w+):\s*(.+)$") {
+              $changes += @{ type = $Matches[1]; message = $Matches[2].Trim() }
+              $releaseBody += "- **$($Matches[1])**: $($Matches[2].Trim())"
+            } elseif ($line -and $line -notmatch "^Release ") {
+              $changes += @{ type = "feat"; message = $line }
+              $releaseBody += "- $line"
+            }
+          }
+
+          $releaseBody -join "`n" | Set-Content -Path release_notes.md -Encoding utf8
+
           New-Item -ItemType Directory -Force -Path gh-pages | Out-Null
 
-          $json = @"
-          {
-            "appName": "Cartridge",
-            "description": "Isaac Mod Preset Manager",
-            "items": [
-              {
-                "version": "$version",
-                "shortVersion": $build,
-                "changes": [],
-                "date": "$date",
-                "mandatory": true,
-                "url": "https://teamhy.github.io/cartridge/$version+$build-windows",
-                "platform": "windows"
+          $archive = @{
+            appName = "Cartridge"
+            description = "Isaac Mod Preset Manager"
+            items = @(
+              @{
+                version = $version
+                shortVersion = [int]$build
+                changes = $changes
+                date = $date
+                mandatory = $true
+                url = "https://teamhy.github.io/cartridge/$version+$build-windows"
+                platform = "windows"
               }
-            ]
+            )
           }
-          "@
-          $json | Set-Content -Path gh-pages/app-archive.json -Encoding utf8
+          $archive | ConvertTo-Json -Depth 4 | Set-Content -Path gh-pages/app-archive.json -Encoding utf8
 
           $archivePath = "dist/$build/$version+$build-windows"
           if (Test-Path $archivePath) {
@@ -143,9 +163,9 @@ jobs:
           tag_name: ${{ steps.bump.outputs.version }}
           name: ${{ steps.bump.outputs.version }}
           files: artifacts/cartridge-${{ steps.bump.outputs.version }}.zip
+          body_path: release_notes.md
           draft: false
           prerelease: false
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

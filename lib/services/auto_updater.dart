@@ -37,12 +37,30 @@ class AutoUpdater {
               Future.microtask(() => _controller!.restartApp());
             }
 
+            final notes = _controller!.releaseNotes;
+            final version = _controller!.appVersion;
+
             return ContentDialog(
-              title: Text(loc.home_dialog_update_title),
+              title: Text(
+                '${loc.home_dialog_update_title} ${version ?? ''}',
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(loc.home_dialog_update_required),
+                  if (notes != null && notes.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    ...notes.map((note) {
+                      if (note == null) return const SizedBox.shrink();
+                      final prefix =
+                          note.type != null ? '[${note.type}] ' : '';
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text('• $prefix${note.message}'),
+                      );
+                    }),
+                  ],
                   const SizedBox(height: 16),
                   ProgressBar(value: _controller!.downloadProgress * 100),
                 ],
