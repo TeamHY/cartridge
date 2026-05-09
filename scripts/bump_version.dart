@@ -32,7 +32,6 @@ void main(List<String> args) {
       var major = int.parse(match.group(1)!);
       var minor = int.parse(match.group(2)!);
       var patch = int.parse(match.group(3)!);
-      final suffix = match.group(4) ?? '';
 
       switch (bumpType) {
         case 'major':
@@ -49,9 +48,10 @@ void main(List<String> args) {
           break;
       }
 
+      final buildNumber = major * 10000 + minor * 100 + patch;
       newVersion = '$major.$minor.$patch';
-      newLines.add('version: $newVersion$suffix');
-      print('Version bumped: $newVersion');
+      newLines.add('version: $newVersion+$buildNumber');
+      print('Version bumped: $newVersion+$buildNumber');
     } else {
       newLines.add(line);
     }

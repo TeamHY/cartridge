@@ -8,7 +8,7 @@ import 'package:cartridge/pages/home/views/music_view.dart';
 import 'package:cartridge/pages/home/views/isaac_options_view.dart';
 import 'package:cartridge/pages/home/views/save_apply_view.dart';
 import 'package:cartridge/pages/home/views/setting_view.dart';
-import 'package:cartridge/services/version_checker.dart';
+import 'package:cartridge/services/auto_updater.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,7 +52,7 @@ class _HomePageState extends ConsumerState<HomePage> {
       ref.read(hotkeyProvider);
     });
 
-    VersionChecker.checkAppVersion(context);
+    AutoUpdater.checkAndUpdate(context);
   }
 
   @override

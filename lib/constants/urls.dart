@@ -5,6 +5,9 @@ class AppUrls {
   static const githubApiLatestRelease =
       'https://api.github.com/repos/TeamHY/cartridge/releases/latest';
 
+  static const appArchive =
+      'https://teamhy.github.io/cartridge/app-archive.json';
+
   // 오헌영 방송 채널
   static const youtube =
       'https://www.youtube.com/@아이작오헌영'; // 변경되면 README.md도 수정하기

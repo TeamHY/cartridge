@@ -16,35 +16,52 @@ on:
 jobs:
   build-and-release:
     runs-on: windows-latest
-    
+
+    permissions:
+      contents: write
+      pages: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-      
+
       - name: Setup Dart
         uses: dart-lang/setup-dart@v1
         with:
           sdk: stable
-      
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Run build_runner (freezed/json)
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
       - name: Bump version
         id: bump
         shell: pwsh
         run: |
           dart scripts/bump_version.dart ${{ inputs.bump_type }}
-          $m = Select-String -Path pubspec.yaml -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)' | Select-Object -First 1
+          $m = Select-String -Path pubspec.yaml -Pattern '^version:\s*([0-9]+\.[0-9]+\.[0-9]+)\+(\d+)' | Select-Object -First 1
           if (-not $m) { throw "version not found in pubspec.yaml" }
           $ver = $m.Matches[0].Groups[1].Value
+          $build = $m.Matches[0].Groups[2].Value
           "version=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-          Write-Host "Bumped version to $ver"
-      
+          "build_number=$build" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          Write-Host "Bumped version to $ver+$build"
+
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      
+
       - name: Commit and push changes
         run: |
           git add pubspec.yaml
@@ -52,18 +69,7 @@ jobs:
           git tag "${{ steps.bump.outputs.version }}"
           git push origin main
           git push origin "${{ steps.bump.outputs.version }}"
-      
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-      
-      - name: Flutter pub get
-        run: flutter pub get
-      
-      - name: Run build_runner (freezed/json)
-        run: flutter pub run build_runner build --delete-conflicting-outputs
-      
+
       - name: Generate .env file
         run: |
           Set-Content -Path .env -Value 'RECORD_PRESET_URL="${{ secrets.RECORD_PRESET_URL }}"'
@@ -71,20 +77,66 @@ jobs:
           Add-Content -Path .env -Value 'SUPABASE_URL="${{ secrets.SUPABASE_URL }}"'
           Add-Content -Path .env -Value 'SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"'
           Add-Content -Path .env -Value 'SENTRY_DSN="${{ secrets.SENTRY_DSN }}"'
-      
-      - name: Build Windows (Release)
-        run: flutter build windows --release
-      
+
+      - name: Build and create release archive
+        run: dart run desktop_updater:release windows
+
+      - name: Generate file hashes
+        run: dart run desktop_updater:archive windows
+
+      - name: Prepare GitHub Pages deployment
+        shell: pwsh
+        run: |
+          $version = "${{ steps.bump.outputs.version }}"
+          $build = "${{ steps.bump.outputs.build_number }}"
+          $date = Get-Date -Format "yyyy-MM-dd"
+
+          New-Item -ItemType Directory -Force -Path gh-pages | Out-Null
+
+          $json = @"
+          {
+            "appName": "Cartridge",
+            "description": "Isaac Mod Preset Manager",
+            "items": [
+              {
+                "version": "$version",
+                "shortVersion": $build,
+                "changes": [],
+                "date": "$date",
+                "mandatory": true,
+                "url": "https://teamhy.github.io/cartridge/$version+$build-windows",
+                "platform": "windows"
+              }
+            ]
+          }
+          "@
+          $json | Set-Content -Path gh-pages/app-archive.json -Encoding utf8
+
+          $archivePath = "dist/$build/$version+$build-windows"
+          if (Test-Path $archivePath) {
+            Copy-Item -Path $archivePath -Destination "gh-pages/$version+$build-windows" -Recurse -Force
+            Write-Host "Archive copied from $archivePath"
+          } else {
+            Write-Host "WARNING: Archive path not found at $archivePath"
+            Get-ChildItem -Path dist -Recurse | Select-Object FullName
+          }
+
       - name: Pack build output as versioned zip
         shell: pwsh
         run: |
+          $build = "${{ steps.bump.outputs.build_number }}"
+          $version = "${{ steps.bump.outputs.version }}"
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          $zip = "artifacts/cartridge-${{ steps.bump.outputs.version }}.zip"
+          $zip = "artifacts/cartridge-$version.zip"
           if (Test-Path $zip) { Remove-Item $zip -Force }
-          Compress-Archive `
-          -Path build/windows/x64/runner/Release/* `
-          -DestinationPath $zip
-      
+
+          $releasePath = "dist/$build/cartridge-$version+$build-windows"
+          if (Test-Path $releasePath) {
+            Compress-Archive -Path "$releasePath/*" -DestinationPath $zip
+          } else {
+            Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath $zip
+          }
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -96,3 +148,10 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gh-pages
+          keep_files: false

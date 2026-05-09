@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
+  desktop_updater
   gtk
   hotkey_manager_linux
   screen_retriever_linux

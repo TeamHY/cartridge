@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   audioplayers_windows
+  desktop_updater
   hotkey_manager_windows
   screen_retriever_windows
   sentry_flutter

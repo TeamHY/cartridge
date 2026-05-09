@@ -5,7 +5,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
-import 'package:pub_semver/pub_semver.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:window_manager/window_manager.dart';
@@ -13,7 +12,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'l10n/app_localizations.dart';
 
 late final PackageInfo packageInfo;
-late final Version currentVersion;
 
 void main() async {
   await dotenv.load(fileName: '.env');
@@ -36,7 +34,6 @@ void main() async {
 Future<void> _initAndRunApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   packageInfo = await PackageInfo.fromPlatform();
-  currentVersion = Version.parse(packageInfo.version);
 
   await hotKeyManager.unregisterAll();
   await windowManager.ensureInitialized();

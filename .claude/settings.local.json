@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/ahb03/Developments/cartridge/lib -name \"*.dart\" -exec grep -l \"github\\\\|http.get\\\\|release\\\\|version\" {} \\\\;)",
+      "WebFetch(domain:pub.dev)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  }
+}
