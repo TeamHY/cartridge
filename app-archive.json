@@ -1,15 +1,15 @@
 {
-  "appName": "Cartridge",
   "description": "Isaac Mod Preset Manager",
+  "appName": "Cartridge",
   "items": [
     {
-      "version": "4.26.0",
-      "shortVersion": 42600,
-      "changes": [],
       "date": "2026-05-09",
+      "changes": [],
+      "platform": "windows",
       "mandatory": true,
-      "url": "https://teamhy.github.io/cartridge/4.26.0+42600-windows",
-      "platform": "windows"
+      "version": "4.26.1",
+      "url": "https://teamhy.github.io/cartridge/4.26.1+42601-windows",
+      "shortVersion": 42601
     }
   ]
 }
