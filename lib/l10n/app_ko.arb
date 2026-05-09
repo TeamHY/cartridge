@@ -12,6 +12,7 @@
   "home_dialog_delete_description": "프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
   "home_dialog_update_title": "업데이트",
   "home_dialog_update_required": "이 버전은 사용할 수 없습니다. 새로운 버전을 사용해 주세요.",
+  "home_dialog_network_error": "인터넷 연결을 확인해 주세요.",
   "home_dialog_update_optional": "새로운 버전을 다운로드 받으시겠습니까?",
   "home_checkbox_rerun": "자동 재시작",
 

@@ -12,6 +12,7 @@
   "home_dialog_delete_description": "Once deleted, the preset cannot be recovered. Do you really want to delete it?",
   "home_dialog_update_title": "Update",
   "home_dialog_update_required": "This version is no longer supported. Please use the latest version.",
+  "home_dialog_network_error": "Please check your internet connection.",
   "home_dialog_update_optional": "Would you like to download the latest version?",
   "home_checkbox_rerun": "Auto Restart",
 
