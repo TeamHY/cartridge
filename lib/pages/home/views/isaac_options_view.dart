@@ -1,7 +1,13 @@
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
+import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/services/isaac_config_service.dart';
+import 'package:cartridge/services/process_util.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+const _optionsGuideUrl = 'https://cafe.naver.com/iwt2hw/10756';
 
 class _OptionDef {
   final String key;
@@ -95,20 +101,22 @@ Map<String, String> _getSectionLabels(AppLocalizations loc) => {
       'misc': loc.setting_isaac_options_section_misc,
     };
 
-class IsaacOptionsView extends StatefulWidget {
+class IsaacOptionsView extends ConsumerStatefulWidget {
   final VoidCallback? onBackPressed;
 
   const IsaacOptionsView({super.key, this.onBackPressed});
 
   @override
-  State<IsaacOptionsView> createState() => _IsaacOptionsViewState();
+  ConsumerState<IsaacOptionsView> createState() => _IsaacOptionsViewState();
 }
 
-class _IsaacOptionsViewState extends State<IsaacOptionsView> {
+class _IsaacOptionsViewState extends ConsumerState<IsaacOptionsView> {
   List<IsaacEdition> _editions = [];
   IsaacEdition? _selectedEdition;
   Map<String, String> _values = {};
   bool _loading = true;
+  bool _saving = false;
+  bool _isChanged = false;
 
   @override
   void initState() {
@@ -132,14 +140,30 @@ class _IsaacOptionsViewState extends State<IsaacOptionsView> {
     final values = await IsaacConfigService.getAllOptions(edition);
     setState(() {
       _values = values;
+      _isChanged = false;
     });
   }
 
-  Future<void> _setOption(String key, String value) async {
+  Future<void> _saveAndRestart() async {
     if (_selectedEdition == null) return;
-    await IsaacConfigService.setOption(_selectedEdition!, key, value);
+    final setting = ref.read(settingProvider);
+    setState(() => _saving = true);
+    await ProcessUtil.killIsaac();
+    await Future.delayed(Duration(milliseconds: setting.rerunDelay));
+    await IsaacConfigService.setAllOptions(_selectedEdition!, _values);
+    await ProcessUtil.launchIsaac(setting.isaacPath);
+    if (mounted) {
+      setState(() {
+        _saving = false;
+        _isChanged = false;
+      });
+    }
+  }
+
+  void _setOption(String key, String value) {
     setState(() {
       _values[key] = value;
+      _isChanged = true;
     });
   }
 
@@ -155,6 +179,23 @@ class _IsaacOptionsViewState extends State<IsaacOptionsView> {
           SubPageHeader(
             title: loc.setting_isaac_options_section,
             onBackPressed: widget.onBackPressed,
+            actions: [
+              Button(
+                onPressed: () => launchUrl(Uri.parse(_optionsGuideUrl)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 2),
+                      child: Icon(FluentIcons.info, size: 14),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(loc.setting_isaac_options_guide),
+                  ],
+                ),
+              ),
+            ],
           ),
           if (_loading)
             const Expanded(child: Center(child: ProgressRing()))
@@ -192,8 +233,50 @@ class _IsaacOptionsViewState extends State<IsaacOptionsView> {
                 children: _buildSections(sectionLabels),
               ),
             ),
+            _buildBottomBar(loc),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildBottomBar(AppLocalizations loc) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 2,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 4,
+          children: [
+            FilledButton(
+              onPressed: _saving || !_isChanged ? null : _saveAndRestart,
+              child: _saving
+                  ? const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: ProgressRing(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 8),
+                        Text('재시작 중...'),
+                      ],
+                    )
+                  : Text(loc.setting_isaac_options_save_restart),
+            ),
+          ],
+        ),
       ),
     );
   }

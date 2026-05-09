@@ -66,6 +66,8 @@
   "setting_isaac_options_section_gameplay": "Gameplay",
   "setting_isaac_options_section_input": "Input",
   "setting_isaac_options_section_misc": "Misc",
+  "setting_isaac_options_save_restart": "Save",
+  "setting_isaac_options_guide": "Options Guide",
 
   "@game_config": {
     "description": "Game Config Dialog"

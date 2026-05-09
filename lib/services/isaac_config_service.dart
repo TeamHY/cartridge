@@ -126,6 +126,20 @@ class IsaacConfigService {
     });
   }
 
+  static Future<void> setAllOptions(
+      IsaacEdition edition, Map<String, String> values) async {
+    await _updateOptionFile((line) {
+      final idx = line.indexOf('=');
+      if (idx > 0) {
+        final key = line.substring(0, idx);
+        if (values.containsKey(key)) {
+          return '$key=${values[key]}';
+        }
+      }
+      return line;
+    }, edition: edition);
+  }
+
   static Future<void> _updateOptionFile(
     String Function(String) transform, {
     IsaacEdition edition = IsaacEdition.repentancePlus,

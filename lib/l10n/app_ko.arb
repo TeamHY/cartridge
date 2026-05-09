@@ -66,6 +66,8 @@
   "setting_isaac_options_section_gameplay": "게임플레이",
   "setting_isaac_options_section_input": "입력",
   "setting_isaac_options_section_misc": "기타",
+  "setting_isaac_options_save_restart": "저장",
+  "setting_isaac_options_guide": "옵션 설명",
 
   "@game_config": {
     "description": "게임 설정 다이얼로그"
