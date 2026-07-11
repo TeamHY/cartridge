@@ -7,7 +7,7 @@
   "home_preset_placeholder": "새 프리셋",
   "home_button_record": "기록 모드",
   "home_button_slot_machine": "슬롯 머신",
-  "home_button_daily_run": "데일리 런",
+  "home_button_daily_run": "모드없이 실행",
   "home_dialog_delete_title": "프리셋 삭제",
   "home_dialog_delete_description": "프리셋을 삭제하면 복구할 수 없습니다. 정말 삭제하시겠습니까?",
   "home_dialog_update_title": "업데이트",
