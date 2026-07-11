@@ -101,6 +101,10 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
 
   void _next() {
     if (_index >= _questions.length - 1) {
+      if (_questions.length == 1) {
+        Navigator.pop(context);
+        return;
+      }
       setState(() => _index = _questions.length);
       return;
     }
@@ -258,7 +262,9 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                 onPressed: _next,
                 child: Text(
                   _index >= _questions.length - 1
-                      ? loc.quiz_finish
+                      ? (_questions.length == 1
+                          ? loc.quiz_exit
+                          : loc.quiz_finish)
                       : loc.quiz_next,
                 ),
               ),
