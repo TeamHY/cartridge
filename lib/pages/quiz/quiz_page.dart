@@ -8,6 +8,7 @@ import 'package:cartridge/providers/quiz_provider.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class QuizPage extends ConsumerWidget {
   const QuizPage({super.key});
@@ -33,6 +34,35 @@ class QuizPage extends ConsumerWidget {
       context,
       FluentPageRoute(
         builder: (context) => QuizPlayPage(categoryId: category.id),
+      ),
+    );
+  }
+
+  void _startRandomQuiz(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context);
+    final validCount = ref
+        .read(quizProvider)
+        .categories
+        .expand((c) => c.quizzes)
+        .where((q) => q.isComplete)
+        .length;
+
+    if (validCount == 0) {
+      displayInfoBar(
+        context,
+        builder: (context, close) => InfoBar(
+          title: Text(loc.quiz_start_empty),
+          severity: InfoBarSeverity.warning,
+          onClose: close,
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      FluentPageRoute(
+        builder: (context) => const QuizPlayPage(),
       ),
     );
   }
@@ -141,9 +171,18 @@ class QuizPage extends ConsumerWidget {
                         crossAxisSpacing: 16,
                         childAspectRatio: 1.0,
                       ),
-                      itemCount: quiz.categories.length,
+                      itemCount: quiz.categories.length + 1,
                       itemBuilder: (context, index) {
-                        final category = quiz.categories[index];
+                        if (index == 0) {
+                          return _AllRandomCard(
+                            questionCount: quiz.categories
+                                .expand((c) => c.quizzes)
+                                .where((q) => q.isComplete)
+                                .length,
+                            onTap: () => _startRandomQuiz(context, ref),
+                          );
+                        }
+                        final category = quiz.categories[index - 1];
                         return _CategoryCard(
                           category: category,
                           onTap: () => _startQuiz(context, ref, category),
@@ -152,6 +191,83 @@ class QuizPage extends ConsumerWidget {
                     ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AllRandomCard extends StatelessWidget {
+  const _AllRandomCard({
+    required this.questionCount,
+    required this.onTap,
+  });
+
+  final int questionCount;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
+    return material.Material(
+      color: Colors.transparent,
+      child: material.InkWell(
+        onTap: onTap,
+        mouseCursor: SystemMouseCursors.click,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF6366F1).withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  PhosphorIconsFill.shuffle,
+                  color: Colors.white,
+                  size: 36,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                loc.quiz_all_random,
+                style: const TextStyle(
+                  color: Color(0xFF1F2937),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '$questionCount ${loc.quiz_count_suffix}',
+                style: TextStyle(
+                  color: const Color(0xFF1F2937).withValues(alpha: 0.6),
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -174,68 +290,57 @@ class _CategoryCard extends StatelessWidget {
 
     return material.Material(
       color: Colors.transparent,
-      borderRadius: BorderRadius.circular(16),
-      child: material.Ink(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.black.withValues(alpha: 0.2),
-            width: 1,
-          ),
-        ),
-        child: material.InkWell(
-          onTap: onTap,
-          mouseCursor: SystemMouseCursors.click,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    color: color,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    quizCategoryIconData(category.iconName),
-                    color: Colors.white,
-                    size: 36,
-                  ),
+      child: material.InkWell(
+        onTap: onTap,
+        mouseCursor: SystemMouseCursors.click,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withValues(alpha: 0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  category.name,
-                  style: const TextStyle(
-                    color: Color(0xFF1F2937),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                child: Icon(
+                  quizCategoryIconData(category.iconName),
+                  color: Colors.white,
+                  size: 36,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${category.quizzes.length} ${loc.quiz_count_suffix}',
-                  style: TextStyle(
-                    color: const Color(0xFF1F2937).withValues(alpha: 0.6),
-                    fontSize: 12,
-                  ),
-                  textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                category.name,
+                style: const TextStyle(
+                  color: Color(0xFF1F2937),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-            ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${category.quizzes.where((q) => q.isComplete).length} ${loc.quiz_count_suffix}',
+                style: TextStyle(
+                  color: const Color(0xFF1F2937).withValues(alpha: 0.6),
+                  fontSize: 12,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),

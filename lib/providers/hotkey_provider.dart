@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cartridge/providers/setting_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cartridge/providers/music_player_provider.dart';
 import 'package:cartridge/services/hotkey_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,11 +15,25 @@ class HotkeyNotifier {
   final HotkeyService _hotkeyService = HotkeyService();
   Timer? _registerTimer;
 
+  VoidCallback? playPauseOverride;
+  VoidCallback? volumeUpOverride;
+  VoidCallback? volumeDownOverride;
+
+  void clearOverrides() {
+    playPauseOverride = null;
+    volumeUpOverride = null;
+    volumeDownOverride = null;
+  }
+
   void _init() {
     final setting = ref.read(settingProvider);
     final musicPlayer = ref.read(musicPlayerProvider);
 
     _hotkeyService.onPlayPause = () {
+      if (playPauseOverride != null) {
+        playPauseOverride!();
+        return;
+      }
       if (musicPlayer.isPlaying) {
         musicPlayer.pause();
       } else {
@@ -31,6 +46,10 @@ class HotkeyNotifier {
     };
 
     _hotkeyService.onVolumeUp = () {
+      if (volumeUpOverride != null) {
+        volumeUpOverride!();
+        return;
+      }
       final currentVolume = setting.musicVolume;
       setting.musicVolume =
           (currentVolume + setting.volumeStepSize).clamp(0.0, 1.0);
@@ -38,6 +57,10 @@ class HotkeyNotifier {
     };
 
     _hotkeyService.onVolumeDown = () {
+      if (volumeDownOverride != null) {
+        volumeDownOverride!();
+        return;
+      }
       final currentVolume = setting.musicVolume;
       setting.musicVolume =
           (currentVolume - setting.volumeStepSize).clamp(0.0, 1.0);

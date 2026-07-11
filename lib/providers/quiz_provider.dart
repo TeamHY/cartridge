@@ -14,6 +14,8 @@ class QuizNotifier extends ChangeNotifier {
 
   int get timeLimit => data.timeLimit;
   int get questionCount => data.questionCount;
+  String? get bgmPath => data.bgmPath;
+  double get bgmVolume => data.bgmVolume;
   List<QuizCategory> get categories => data.categories;
 
   Future<void> loadData() async {
@@ -33,6 +35,16 @@ class QuizNotifier extends ChangeNotifier {
 
   void setQuestionCount(int count) {
     data.questionCount = count;
+    _save();
+  }
+
+  void setBgmPath(String? path) {
+    data.bgmPath = path;
+    _save();
+  }
+
+  void setBgmVolume(double volume) {
+    data.bgmVolume = volume;
     _save();
   }
 
@@ -61,7 +73,14 @@ class QuizNotifier extends ChangeNotifier {
   }
 
   void removeCategory(String id) {
-    data.categories.removeWhere((e) => e.id == id);
+    final index = data.categories.indexWhere((e) => e.id == id);
+    if (index == -1) return;
+    for (final quiz in data.categories[index].quizzes) {
+      for (final path in quiz.imagePaths) {
+        QuizService.deleteImage(path);
+      }
+    }
+    data.categories.removeAt(index);
     _save();
   }
 
@@ -84,13 +103,24 @@ class QuizNotifier extends ChangeNotifier {
     final category = data.categories.firstWhere((e) => e.id == categoryId);
     final index = category.quizzes.indexWhere((e) => e.id == quiz.id);
     if (index == -1) return;
+    final newPaths = quiz.imagePaths.toSet();
+    for (final path in category.quizzes[index].imagePaths) {
+      if (!newPaths.contains(path)) {
+        QuizService.deleteImage(path);
+      }
+    }
     category.quizzes[index] = quiz;
     _save();
   }
 
   void removeQuiz(String categoryId, String quizId) {
     final category = data.categories.firstWhere((e) => e.id == categoryId);
-    category.quizzes.removeWhere((e) => e.id == quizId);
+    final index = category.quizzes.indexWhere((e) => e.id == quizId);
+    if (index == -1) return;
+    for (final path in category.quizzes[index].imagePaths) {
+      QuizService.deleteImage(path);
+    }
+    category.quizzes.removeAt(index);
     _save();
   }
 }

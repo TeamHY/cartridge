@@ -33,29 +33,24 @@ class Layout extends ConsumerWidget {
 
     Widget buildWindowsTitleBar(BuildContext context, WidgetRef ref) {
       return NavigationView(
-        appBar: NavigationAppBar(
-          height: 32,
-          automaticallyImplyLeading: false,
-          title: const DragToMoveArea(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text('Cartridge'),
-              ],
-            ),
-          ),
-          actions: Stack(
-            children: [
-              Row(
+        content: Column(
+          children: [
+            SizedBox(
+              height: 32,
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // const SizedBox(width: 4),
-                  // IconButton(
-                  //   icon: const PhosphorIcon(PhosphorIconsRegular.house,
-                  //       size: 16),
-                  //   onPressed: onHomePressed,
-                  // ),
-                  Expanded(child: Container()),
+                  const Expanded(
+                    child: DragToMoveArea(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 16),
+                          child: Text('Cartridge'),
+                        ),
+                      ),
+                    ),
+                  ),
                   IconButton(
                     icon: const PhosphorIcon(
                         PhosphorIconsRegular.arrowClockwise,
@@ -71,59 +66,68 @@ class Layout extends ConsumerWidget {
                   const SizedBox(width: 4),
                   const SizedBox(
                     width: 138,
-                    height: 50,
+                    height: 32,
                     child: WindowCaption(
                       backgroundColor: Colors.transparent,
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
-        ),
-        content: material.Material(
-          color: Colors.transparent,
-          child: child,
+            ),
+            Expanded(
+              child: material.Material(
+                color: Colors.transparent,
+                child: child,
+              ),
+            ),
+          ],
         ),
       );
     }
 
     Widget buildMacOSTitleBar(BuildContext context, WidgetRef ref) {
       return NavigationView(
-        appBar: NavigationAppBar(
-          automaticallyImplyLeading: false,
-          height: 30,
-          title: const DragToMoveArea(
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text('Cartridge'),
-            ]),
-          ),
-          actions: Stack(
-            children: [
-              Row(
+        content: Column(
+          children: [
+            SizedBox(
+              height: 30,
+              child: Stack(
                 children: [
-                  Expanded(child: Container()),
-                  IconButton(
-                    icon: const PhosphorIcon(
-                        PhosphorIconsRegular.arrowClockwise,
-                        size: 16),
-                    onPressed: onRefresh,
+                  const Positioned.fill(
+                    child: DragToMoveArea(
+                      child: Center(
+                        child: Text('Cartridge'),
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    icon: const PhosphorIcon(PhosphorIconsRegular.gearSix,
-                        size: 12),
-                    onPressed: onSettingPressed,
+                  Row(
+                    children: [
+                      Expanded(child: Container()),
+                      IconButton(
+                        icon: const PhosphorIcon(
+                            PhosphorIconsRegular.arrowClockwise,
+                            size: 16),
+                        onPressed: onRefresh,
+                      ),
+                      const SizedBox(width: 4),
+                      IconButton(
+                        icon: const PhosphorIcon(PhosphorIconsRegular.gearSix,
+                            size: 12),
+                        onPressed: onSettingPressed,
+                      ),
+                      const SizedBox(width: 8),
+                    ],
                   ),
-                  const SizedBox(width: 8),
                 ],
               ),
-            ],
-          ),
-        ),
-        content: material.Material(
-          color: Colors.transparent,
-          child: child,
+            ),
+            Expanded(
+              child: material.Material(
+                color: Colors.transparent,
+                child: child,
+              ),
+            ),
+          ],
         ),
       );
     }

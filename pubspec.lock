@@ -341,10 +341,10 @@ packages:
     dependency: "direct main"
     description:
       name: fluent_ui
-      sha256: e7804bf3bbb3ecf9e77d5498181dc36375f5ca736ccfb3862fea17c50050eb89
+      sha256: "79baa6b22876b0881d556e5b87ddb23fa7dad9f010c77638f3d4099f26cc6a8d"
       url: "https://pub.dev"
     source: hosted
-    version: "4.9.2"
+    version: "4.16.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -609,10 +609,10 @@ packages:
     dependency: transitive
     description:
       name: math_expressions
-      sha256: e32d803d758ace61cc6c4bdfed1226ff60a6a23646b35685670d28b5616139f8
+      sha256: "2e1ceb974c2b1893c809a68c7005f1b63f7324db0add800a0e792b1ac8ff9f03"
       url: "https://pub.dev"
     source: hosted
-    version: "2.6.0"
+    version: "3.1.0"
   meta:
     dependency: transitive
     description:
@@ -721,10 +721,10 @@ packages:
     dependency: transitive
     description:
       name: petitparser
-      sha256: c15605cd28af66339f8eb6fbe0e541bfe2d1b72d5825efc6598f3e0a31b9ad27
+      sha256: "91bd59303e9f769f108f8df05e371341b15d59e995e6806aefab827b58336675"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.2"
+    version: "7.0.2"
   phosphor_flutter:
     dependency: "direct main"
     description:
@@ -1263,10 +1263,10 @@ packages:
     dependency: "direct main"
     description:
       name: xml
-      sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226
+      sha256: "971043b3a0d3da28727e40ed3e0b5d18b742fa5a68665cca88e74b7876d5e025"
       url: "https://pub.dev"
     source: hosted
-    version: "6.5.0"
+    version: "6.6.1"
   yaml:
     dependency: transitive
     description:

@@ -214,7 +214,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
                                             FilledButton(
                                               style: ButtonStyle(
                                                 backgroundColor:
-                                                    ButtonState.all<Color>(
+                                                    WidgetStatePropertyAll(
                                                         Colors.red.dark),
                                               ),
                                               onPressed: () {

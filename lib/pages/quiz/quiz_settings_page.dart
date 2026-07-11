@@ -1,6 +1,8 @@
 import 'package:cartridge/constants/quiz_category_options.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/quiz_category.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as p;
 import 'package:cartridge/pages/quiz/components/quiz_editor_card.dart';
 import 'package:cartridge/pages/record/components/back_arrow_view.dart';
 import 'package:cartridge/providers/quiz_provider.dart';
@@ -218,6 +220,16 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
     }
   }
 
+  Future<void> _pickBgm() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a', 'aac'],
+    );
+    final path = result?.files.single.path;
+    if (path == null) return;
+    ref.read(quizProvider).setBgmPath(path);
+  }
+
   void _addQuiz(String categoryId) {
     final quiz = ref.read(quizProvider).addQuiz(categoryId);
     setState(() => _autofocusQuizId = quiz.id);
@@ -250,7 +262,43 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(loc.quiz_settings, style: typography.title),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Expanded(
+                  child: Text(loc.quiz_settings, style: typography.title),
+                ),
+                InfoLabel(
+                  label: loc.quiz_bgm_label,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Button(
+                        onPressed: _pickBgm,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(FluentIcons.music_note),
+                            const SizedBox(width: 6),
+                            Text(
+                              quiz.bgmPath == null
+                                  ? loc.quiz_bgm_select
+                                  : p.basename(quiz.bgmPath!),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (quiz.bgmPath != null)
+                        IconButton(
+                          icon: const Icon(FluentIcons.delete),
+                          onPressed: () =>
+                              ref.read(quizProvider).setBgmPath(null),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
             Expanded(
               child: Row(

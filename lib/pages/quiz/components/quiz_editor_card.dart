@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/quiz.dart';
+import 'package:cartridge/services/quiz_service.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
 class QuizEditorCard extends StatefulWidget {
@@ -26,23 +29,35 @@ class QuizEditorCard extends StatefulWidget {
 
 class _QuizEditorCardState extends State<QuizEditorCard> {
   late final TextEditingController _questionController;
+  late final TextEditingController _openAnswerController;
   late final List<TextEditingController> _choiceControllers;
   final _questionFocus = FocusNode();
 
   Timer? _debounce;
   late int _answerIndex;
+  late bool _isOpenEnded;
+  String? _imagePath;
+  late List<String?> _choiceImages;
 
   @override
   void initState() {
     super.initState();
     _questionController = TextEditingController(text: widget.quiz.question);
+    _openAnswerController =
+        TextEditingController(text: widget.quiz.openAnswer);
     _choiceControllers = List.generate(
-      5,
-      (i) => TextEditingController(
-        text: i < widget.quiz.choices.length ? widget.quiz.choices[i] : '',
-      ),
+      widget.quiz.choices.length,
+      (i) => TextEditingController(text: widget.quiz.choices[i]),
     );
     _answerIndex = widget.quiz.answerIndex;
+    _isOpenEnded = widget.quiz.isOpenEnded;
+    _imagePath = widget.quiz.imagePath;
+    _choiceImages = List<String?>.generate(
+      widget.quiz.choices.length,
+      (i) => i < widget.quiz.choiceImages.length
+          ? widget.quiz.choiceImages[i]
+          : null,
+    );
 
     if (widget.autofocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -55,6 +70,7 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
   void dispose() {
     _debounce?.cancel();
     _questionController.dispose();
+    _openAnswerController.dispose();
     for (final c in _choiceControllers) {
       c.dispose();
     }
@@ -63,17 +79,78 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
   }
 
   void _scheduleSave() {
+    setState(() {});
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 400), _commit);
   }
 
+  Quiz get _currentQuiz => Quiz(
+        id: widget.quiz.id,
+        question: _questionController.text,
+        choices: _choiceControllers.map((c) => c.text).toList(),
+        answerIndex: _answerIndex,
+        isOpenEnded: _isOpenEnded,
+        imagePath: _imagePath,
+        openAnswer: _openAnswerController.text,
+        choiceImages: List<String?>.of(_choiceImages),
+      );
+
   void _commit() {
-    widget.onChanged(Quiz(
-      id: widget.quiz.id,
-      question: _questionController.text,
-      choices: _choiceControllers.map((c) => c.text).toList(),
-      answerIndex: _answerIndex,
-    ));
+    widget.onChanged(_currentQuiz);
+  }
+
+  Future<String?> _importPickedImage() async {
+    final result = await FilePicker.platform.pickFiles(type: FileType.image);
+    final sourcePath = result?.files.single.path;
+    if (sourcePath == null) return null;
+    return QuizService.importImage(sourcePath);
+  }
+
+  Future<void> _pickQuestionImage() async {
+    final imported = await _importPickedImage();
+    if (imported == null || !mounted) return;
+    setState(() => _imagePath = imported);
+    _commit();
+  }
+
+  void _removeQuestionImage() {
+    setState(() => _imagePath = null);
+    _commit();
+  }
+
+  Future<void> _pickChoiceImage(int index) async {
+    final imported = await _importPickedImage();
+    if (imported == null || !mounted) return;
+    setState(() => _choiceImages[index] = imported);
+    _commit();
+  }
+
+  void _removeChoiceImage(int index) {
+    setState(() => _choiceImages[index] = null);
+    _commit();
+  }
+
+  void _addChoice() {
+    if (_choiceControllers.length >= 8) return;
+    setState(() {
+      _choiceControllers.add(TextEditingController());
+      _choiceImages.add(null);
+    });
+    _commit();
+  }
+
+  void _removeChoice(int index) {
+    if (_choiceControllers.length <= 2) return;
+    setState(() {
+      _choiceControllers.removeAt(index).dispose();
+      _choiceImages.removeAt(index);
+      if (_answerIndex == index) {
+        _answerIndex = 0;
+      } else if (_answerIndex > index) {
+        _answerIndex--;
+      }
+    });
+    _commit();
   }
 
   @override
@@ -83,6 +160,8 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
 
     return Card(
       padding: const EdgeInsets.all(16),
+      backgroundColor:
+          _currentQuiz.isComplete ? null : const Color(0xFFE4E4E4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -98,43 +177,195 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
                   onChanged: (_) => _scheduleSave(),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
+              Tooltip(
+                message: loc.quiz_question_image,
+                child: IconButton(
+                  icon: const Icon(FluentIcons.photo2_add),
+                  onPressed: _pickQuestionImage,
+                ),
+              ),
+              const SizedBox(width: 4),
               IconButton(
                 icon: const Icon(FluentIcons.delete),
                 onPressed: widget.onDelete,
               ),
             ],
           ),
+          if (_imagePath != null) ...[
+            const SizedBox(height: 8),
+            Text(loc.quiz_question_image, style: typography.caption),
+            const SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Tooltip(
+                message: loc.quiz_image_remove,
+                child: _RemovableImage(
+                  path: _imagePath!,
+                  height: 100,
+                  onRemove: _removeQuestionImage,
+                ),
+              ),
+            ),
+          ],
+          const SizedBox(height: 8),
+          ToggleSwitch(
+            checked: _isOpenEnded,
+            content: Text(loc.quiz_open_ended),
+            onChanged: (value) {
+              setState(() => _isOpenEnded = value);
+              _commit();
+            },
+          ),
           const SizedBox(height: 8),
           Text(loc.quiz_answer_label, style: typography.caption),
           const SizedBox(height: 4),
-          ...List.generate(5, (i) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                children: [
-                  RadioButton(
-                    checked: _answerIndex == i,
-                    onChanged: (checked) {
-                      if (checked) {
-                        setState(() => _answerIndex = i);
-                        _scheduleSave();
-                      }
-                    },
+          if (_isOpenEnded)
+            TextBox(
+              controller: _openAnswerController,
+              placeholder: loc.quiz_open_answer_hint,
+              onChanged: (_) => _scheduleSave(),
+            )
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RadioGroup<int>(
+                  groupValue: _answerIndex,
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _answerIndex = value);
+                    _scheduleSave();
+                  },
+                  child: Column(
+                    children: List.generate(_choiceControllers.length, (i) {
+                      final choiceImage = _choiceImages[i];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          children: [
+                            RadioButton<int>(value: i),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextBox(
+                                controller: _choiceControllers[i],
+                                placeholder:
+                                    '${loc.quiz_choice_hint} ${i + 1}',
+                                onChanged: (_) => _scheduleSave(),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            if (choiceImage != null)
+                              Tooltip(
+                                message: loc.quiz_image_remove,
+                                child: _RemovableImage(
+                                  path: choiceImage,
+                                  width: 32,
+                                  height: 32,
+                                  onRemove: () => _removeChoiceImage(i),
+                                ),
+                              )
+                            else
+                              Tooltip(
+                                message: loc.quiz_image_add,
+                                child: IconButton(
+                                  icon: const Icon(FluentIcons.photo2_add),
+                                  onPressed: () => _pickChoiceImage(i),
+                                ),
+                              ),
+                            if (_choiceControllers.length > 2) ...[
+                              const SizedBox(width: 4),
+                              IconButton(
+                                icon: const Icon(FluentIcons.chrome_close),
+                                onPressed: () => _removeChoice(i),
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    }),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextBox(
-                      controller: _choiceControllers[i],
-                      placeholder: '${loc.quiz_choice_hint} ${i + 1}',
-                      onChanged: (_) => _scheduleSave(),
+                ),
+                if (_choiceControllers.length < 8)
+                  Button(
+                    onPressed: _addChoice,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(FluentIcons.add),
+                        const SizedBox(width: 6),
+                        Text(loc.quiz_choice_add),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            );
-          }),
+              ],
+            ),
         ],
+      ),
+    );
+  }
+}
+
+class _RemovableImage extends StatefulWidget {
+  const _RemovableImage({
+    required this.path,
+    required this.height,
+    this.width,
+    required this.onRemove,
+  });
+
+  final String path;
+  final double height;
+  final double? width;
+  final VoidCallback onRemove;
+
+  @override
+  State<_RemovableImage> createState() => _RemovableImageState();
+}
+
+class _RemovableImageState extends State<_RemovableImage> {
+  bool _hovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovering = true),
+      onExit: (_) => setState(() => _hovering = false),
+      child: GestureDetector(
+        onTap: widget.onRemove,
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.file(
+                File(widget.path),
+                width: widget.width,
+                height: widget.height,
+                fit: widget.width != null ? BoxFit.cover : BoxFit.contain,
+                errorBuilder: (_, __, ___) => SizedBox(
+                  width: widget.width ?? widget.height,
+                  height: widget.height,
+                  child: const Icon(FluentIcons.file_image),
+                ),
+              ),
+            ),
+            if (_hovering)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Icon(
+                    FluentIcons.delete,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
