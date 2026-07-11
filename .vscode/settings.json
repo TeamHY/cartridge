@@ -97,6 +97,11 @@
     "execution": "cpp",
     "iostream": "cpp",
     "print": "cpp",
-    "algorithm": "cpp"
-  }
+    "algorithm": "cpp",
+    "*.asset": "yaml",
+    "*.meta": "yaml",
+    "*.prefab": "yaml",
+    "*.unity": "yaml"
+  },
+  "dart.flutterSdkPath": ".fvm/versions/stable"
 }

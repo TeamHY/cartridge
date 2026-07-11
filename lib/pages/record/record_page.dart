@@ -537,7 +537,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
           );
 
     return BackArrowView(
-      color: baseColor,
+      backgroundColor: baseColor,
       child: Row(
         children: [
           Flexible(

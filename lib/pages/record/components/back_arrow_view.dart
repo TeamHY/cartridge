@@ -3,17 +3,19 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 class BackArrowView extends StatelessWidget {
-  const BackArrowView({super.key, required this.child, this.color});
+  const BackArrowView({super.key, required this.child, this.controlColor = Colors.white, this.backgroundColor});
 
   final Widget child;
 
-  final Color? color;
+  final Color controlColor;
+
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
     return NavigationView(
       content: Container(
-        color: color,
+        color: backgroundColor,
         child: Column(
           children: [
             Row(
@@ -21,11 +23,11 @@ class BackArrowView extends StatelessWidget {
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   iconButtonMode: IconButtonMode.large,
-                  icon: const Padding(
-                    padding: EdgeInsets.all(12.0),
+                  icon: Padding(
+                    padding: const EdgeInsets.all(12.0),
                     child: PhosphorIcon(
                       PhosphorIconsBold.arrowLeft,
-                      color: Colors.white,
+                      color: controlColor,
                     ),
                   ),
                 ),
@@ -36,11 +38,11 @@ class BackArrowView extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   width: 138,
                   height: 50,
                   child: WindowCaption(
-                    brightness: Brightness.dark,
+                    brightness: controlColor == Colors.white ? Brightness.dark : Brightness.light,
                     backgroundColor: Colors.transparent,
                   ),
                 )

@@ -50,3 +50,6 @@ app.*.map.json
 .luarc.json
 
 .sentry-native
+
+# FVM Version Cache
+.fvm/

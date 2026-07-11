@@ -1,5 +1,6 @@
 import 'package:cartridge/constants/urls.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:cartridge/pages/quiz/quiz_page.dart';
 import 'package:cartridge/pages/record/record_page.dart';
 import 'package:cartridge/pages/slot_machine/slot_machine_page.dart';
 import 'package:cartridge/providers/store_provider.dart';
@@ -117,6 +118,26 @@ class HomeMainView extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildQuickActionButton(
+                        context,
+                        label: loc.home_button_quiz,
+                        icon: FluentIcons.education,
+                        color: Colors.white,
+                        textColor: const Color(0xFF14B8A6),
+                        onTap: () => Navigator.push(
+                          context,
+                          FluentPageRoute(
+                            builder: (context) => const QuizPage(),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
                     Expanded(
                       child: _buildQuickActionButton(
                         context,
