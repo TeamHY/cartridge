@@ -22,20 +22,26 @@ class _PlayChoice {
 
 class _PlayQuestion {
   _PlayQuestion({
+    required this.id,
     required this.question,
     required this.choices,
     required this.answerIndex,
     required this.isOpenEnded,
     required this.imagePath,
     required this.openAnswer,
+    required this.timeLimit,
+    required this.difficulty,
   });
 
+  final String id;
   final String question;
   final List<_PlayChoice> choices;
   final int answerIndex;
   final bool isOpenEnded;
   final String? imagePath;
   final String openAnswer;
+  final int? timeLimit;
+  final int difficulty;
 }
 
 class QuizPlayPage extends ConsumerStatefulWidget {
@@ -49,7 +55,7 @@ class QuizPlayPage extends ConsumerStatefulWidget {
 
 class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   late final List<List<Quiz>> _pools;
-  late final int _timeLimit;
+  late final int _defaultTimeLimit;
   late final int _questionCount;
   List<_PlayQuestion> _questions = [];
 
@@ -59,17 +65,31 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   bool _revealed = false;
   bool _paused = false;
   int _remaining = 0;
+  int _currentLimit = 1;
   Timer? _timer;
   final _openInputController = TextEditingController();
 
+  List<String> _bgmPaths = [];
   AudioPlayer? _bgmPlayer;
+  String? _correctSfxPath;
+  String? _wrongSfxPath;
   late final HotkeyNotifier _hotkeyNotifier;
 
-  void _judgeOpen(bool correct) {
+  void _judge(bool correct) {
     if (correct) {
       _correct++;
     }
+    _playSfx(correct);
     _next();
+  }
+
+  void _playSfx(bool correct) {
+    final path = correct ? _correctSfxPath : _wrongSfxPath;
+    if (path == null) return;
+    final volume = ref.read(quizProvider).bgmVolume;
+    final player = AudioPlayer();
+    player.onPlayerComplete.listen((_) => player.dispose());
+    player.play(DeviceFileSource(path), volume: volume);
   }
 
   @override
@@ -77,7 +97,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     super.initState();
 
     final quiz = ref.read(quizProvider);
-    _timeLimit = quiz.timeLimit;
+    _defaultTimeLimit = quiz.timeLimit;
     _questionCount = quiz.questionCount;
 
     if (widget.categoryId == null) {
@@ -95,17 +115,32 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     ref.read(musicPlayerProvider).pause();
 
     _draw();
-    _initBgm(quiz.bgmPath, quiz.bgmVolume);
+    _initBgm(quiz.bgmPaths, quiz.bgmVolume);
+    _correctSfxPath = _validSoundPath(quiz.correctSfxPath);
+    _wrongSfxPath = _validSoundPath(quiz.wrongSfxPath);
     _registerHotkeyOverrides();
 
     if (_questions.isNotEmpty) {
       _startTimer();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _markCurrentUsed());
     }
+  }
+
+  void _markCurrentUsed() {
+    if (widget.categoryId != null) return;
+    if (!mounted || _index >= _questions.length) return;
+    ref.read(quizProvider).markQuizUsed(_questions[_index].id);
   }
 
   void _draw() {
     final rng = Random();
-    final pools = _pools.map((pool) => List<Quiz>.of(pool)).toList();
+    final used = widget.categoryId == null
+        ? ref.read(quizProvider).usedQuizIds
+        : const <String>{};
+    final pools = _pools
+        .map((pool) => pool.where((q) => !used.contains(q.id)).toList())
+        .where((pool) => pool.isNotEmpty)
+        .toList();
     final result = <Quiz>[];
 
     while (result.length < _questionCount && pools.isNotEmpty) {
@@ -123,12 +158,15 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   _PlayQuestion _toPlayQuestion(Quiz quiz) {
     if (quiz.isOpenEnded) {
       return _PlayQuestion(
+        id: quiz.id,
         question: quiz.question,
         choices: const [],
         answerIndex: -1,
         isOpenEnded: true,
         imagePath: quiz.imagePath,
         openAnswer: quiz.openAnswer.trim(),
+        timeLimit: quiz.timeLimit,
+        difficulty: quiz.difficulty,
       );
     }
 
@@ -142,17 +180,24 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     final answer = choices[quiz.answerIndex];
     choices.shuffle();
     return _PlayQuestion(
+      id: quiz.id,
       question: quiz.question,
       choices: choices,
       answerIndex: choices.indexOf(answer),
       isOpenEnded: false,
       imagePath: quiz.imagePath,
       openAnswer: '',
+      timeLimit: quiz.timeLimit,
+      difficulty: quiz.difficulty,
     );
   }
 
-  void _initBgm(String? path, double volume) {
-    if (path == null || !File(path).existsSync()) return;
+  String? _validSoundPath(String? path) =>
+      path != null && File(path).existsSync() ? path : null;
+
+  void _initBgm(List<String> paths, double volume) {
+    _bgmPaths = paths.where((path) => File(path).existsSync()).toList();
+    if (_bgmPaths.isEmpty) return;
 
     final player = AudioPlayer();
     _bgmPlayer = player;
@@ -160,8 +205,16 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     player.setVolume(volume);
 
     if (_questions.isNotEmpty) {
-      player.play(DeviceFileSource(path));
+      _playRandomBgm();
     }
+  }
+
+  void _playRandomBgm() {
+    final player = _bgmPlayer;
+    if (player == null || _bgmPaths.isEmpty) return;
+    final path = _bgmPaths[Random().nextInt(_bgmPaths.length)];
+    player.stop();
+    player.play(DeviceFileSource(path));
   }
 
   void _registerHotkeyOverrides() {
@@ -186,14 +239,15 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   void _startTimer() {
     _timer?.cancel();
     _paused = false;
-    _remaining = _timeLimit;
+    _currentLimit = _questions[_index].timeLimit ?? _defaultTimeLimit;
+    _remaining = _currentLimit;
     _bgmPlayer?.resume();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_paused) return;
       if (_remaining <= 1) {
         timer.cancel();
         _remaining = 0;
-        _reveal(null);
+        _reveal();
       } else {
         setState(() => _remaining--);
       }
@@ -215,18 +269,18 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     }
   }
 
-  void _reveal(int? choiceIndex) {
+  void _selectChoice(int choiceIndex) {
+    if (_revealed) return;
+    setState(() => _selected = choiceIndex);
+  }
+
+  void _reveal() {
     if (_revealed) return;
     _timer?.cancel();
     _bgmPlayer?.pause();
     setState(() {
       _paused = false;
-      _selected = choiceIndex;
       _revealed = true;
-      if (choiceIndex != null &&
-          choiceIndex == _questions[_index].answerIndex) {
-        _correct++;
-      }
     });
   }
 
@@ -247,6 +301,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
       _selected = null;
       _revealed = false;
     });
+    _markCurrentUsed();
     _startTimer();
   }
 
@@ -259,6 +314,9 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
       _selected = null;
       _revealed = false;
     });
+    if (_questions.isEmpty) return;
+    _markCurrentUsed();
+    _playRandomBgm();
     _startTimer();
   }
 
@@ -272,7 +330,9 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   }
 
   Color? _choiceColor(int i) {
-    if (!_revealed) return null;
+    if (!_revealed) {
+      return i == _selected ? Colors.blue.lighter : null;
+    }
     final answerIndex = _questions[_index].answerIndex;
     if (i == answerIndex) return Colors.green.lighter;
     if (i == _selected) return Colors.red.lighter;
@@ -305,7 +365,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                   : WidgetStatePropertyAll(_choiceColor(i)),
               padding: const WidgetStatePropertyAll(EdgeInsets.all(8)),
             ),
-            onPressed: _revealed ? null : () => _reveal(i),
+            onPressed: _revealed ? null : () => _selectChoice(i),
             child: SizedBox.expand(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
@@ -337,7 +397,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                 EdgeInsets.symmetric(vertical: 14, horizontal: 16),
               ),
             ),
-            onPressed: _revealed ? null : () => _reveal(i),
+            onPressed: _revealed ? null : () => _selectChoice(i),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Row(
@@ -418,8 +478,6 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     }
 
     final question = _questions[_index];
-    final isLast = _index >= _questions.length - 1;
-    final exitInsteadOfResult = _questions.length == 1;
     final isUrgent = _remaining <= 5;
 
     return BackArrowView(
@@ -435,6 +493,17 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                   '${_index + 1} / ${_questions.length}',
                   style: typography.bodyStrong,
                 ),
+                if (question.difficulty > 0) ...[
+                  const SizedBox(width: 12),
+                  ...List.generate(
+                    question.difficulty,
+                    (_) => const Icon(
+                      FluentIcons.favorite_star_fill,
+                      size: 14,
+                      color: Color(0xFFF5A623),
+                    ),
+                  ),
+                ],
                 const Spacer(),
                 if (_bgmPlayer != null) ...[
                   const Icon(FluentIcons.volume2),
@@ -472,7 +541,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
             ),
             const SizedBox(height: 8),
             ProgressBar(
-              value: _remaining / _timeLimit * 100,
+              value: _remaining / _currentLimit * 100,
               activeColor: isUrgent ? Colors.red : null,
             ),
             const SizedBox(height: 24),
@@ -532,14 +601,14 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                         )
                       : _buildChoiceList(question),
             ),
-            if (question.isOpenEnded) ...[
-              const SizedBox(height: 8),
-              if (!_revealed)
-                FilledButton(
-                  onPressed: () => _reveal(null),
-                  child: Text(loc.quiz_reveal),
-                )
-              else ...[
+            const SizedBox(height: 8),
+            if (!_revealed)
+              FilledButton(
+                onPressed: _reveal,
+                child: Text(loc.quiz_reveal),
+              )
+            else ...[
+              if (question.isOpenEnded) ...[
                 if (question.openAnswer.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
@@ -548,56 +617,48 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                   ),
                   const SizedBox(height: 12),
                 ],
-                Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStatePropertyAll(Colors.green.dark),
-                        ),
-                        onPressed: () => _judgeOpen(true),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Text(loc.quiz_correct),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: FilledButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStatePropertyAll(Colors.red.dark),
-                        ),
-                        onPressed: () => _judgeOpen(false),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Text(loc.quiz_wrong),
-                        ),
-                      ),
-                    ),
-                  ],
+              ] else ...[
+                const SizedBox(height: 4),
+                Text(
+                  _selected == question.answerIndex
+                      ? loc.quiz_correct
+                      : (_selected == null
+                          ? loc.quiz_time_over
+                          : loc.quiz_wrong),
+                  style: typography.bodyStrong,
                 ),
+                const SizedBox(height: 12),
               ],
-            ] else if (_revealed) ...[
-              const SizedBox(height: 12),
-              Text(
-                _selected == question.answerIndex
-                    ? loc.quiz_correct
-                    : (_selected == null
-                        ? loc.quiz_time_over
-                        : loc.quiz_wrong),
-                style: typography.bodyStrong,
-              ),
-              const SizedBox(height: 8),
-              FilledButton(
-                onPressed: _next,
-                child: Text(
-                  isLast
-                      ? (exitInsteadOfResult ? loc.quiz_exit : loc.quiz_finish)
-                      : loc.quiz_next,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            WidgetStatePropertyAll(Colors.green.dark),
+                      ),
+                      onPressed: () => _judge(true),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Text(loc.quiz_correct),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            WidgetStatePropertyAll(Colors.red.dark),
+                      ),
+                      onPressed: () => _judge(false),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Text(loc.quiz_wrong),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ],

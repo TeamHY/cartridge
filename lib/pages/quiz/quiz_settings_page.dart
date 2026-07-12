@@ -224,10 +224,163 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a', 'aac'],
+      allowMultiple: true,
     );
-    final path = result?.files.single.path;
-    if (path == null) return;
-    ref.read(quizProvider).setBgmPath(path);
+    if (result == null) return;
+    for (final path in result.files.map((f) => f.path).whereType<String>()) {
+      ref.read(quizProvider).addBgmPath(path);
+    }
+  }
+
+  Future<String?> _pickSoundFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a', 'aac'],
+    );
+    return result?.files.single.path;
+  }
+
+  Widget _buildSfxRow({
+    required String? path,
+    required VoidCallback onPick,
+    required VoidCallback onClear,
+  }) {
+    final loc = AppLocalizations.of(context);
+    return Row(
+      children: [
+        Expanded(
+          child: Button(
+            onPressed: onPick,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(FluentIcons.music_note),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    path == null ? loc.quiz_bgm_select : p.basename(path),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (path != null)
+          IconButton(
+            icon: const Icon(FluentIcons.delete),
+            onPressed: onClear,
+          ),
+      ],
+    );
+  }
+
+  Future<void> _showSoundDialog() {
+    final loc = AppLocalizations.of(context);
+
+    return showDialog<void>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: Text(loc.quiz_sound_settings),
+        constraints: const BoxConstraints(maxWidth: 480),
+        content: Consumer(
+          builder: (context, ref, _) {
+            final quiz = ref.watch(quizProvider);
+            final paths = quiz.bgmPaths;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                InfoLabel(
+                  label: loc.quiz_bgm_label,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (paths.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(loc.quiz_bgm_empty),
+                        )
+                      else
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxHeight: 200),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: paths.length,
+                            itemBuilder: (context, index) {
+                              final path = paths[index];
+                              return ListTile(
+                                leading: const Icon(FluentIcons.music_note),
+                                title: Text(
+                                  p.basename(path),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(FluentIcons.delete),
+                                  onPressed: () => ref
+                                      .read(quizProvider)
+                                      .removeBgmPath(path),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+                      Button(
+                        onPressed: _pickBgm,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(FluentIcons.add),
+                            const SizedBox(width: 6),
+                            Text(loc.quiz_bgm_add),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                InfoLabel(
+                  label: loc.quiz_sfx_correct,
+                  child: _buildSfxRow(
+                    path: quiz.correctSfxPath,
+                    onPick: () async {
+                      final path = await _pickSoundFile();
+                      if (path == null) return;
+                      ref.read(quizProvider).setCorrectSfxPath(path);
+                    },
+                    onClear: () =>
+                        ref.read(quizProvider).setCorrectSfxPath(null),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                InfoLabel(
+                  label: loc.quiz_sfx_wrong,
+                  child: _buildSfxRow(
+                    path: quiz.wrongSfxPath,
+                    onPick: () async {
+                      final path = await _pickSoundFile();
+                      if (path == null) return;
+                      ref.read(quizProvider).setWrongSfxPath(path);
+                    },
+                    onClear: () =>
+                        ref.read(quizProvider).setWrongSfxPath(null),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        actions: [
+          FilledButton(
+            child: Text(loc.quiz_confirm),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
+      ),
+    );
   }
 
   void _addQuiz(String categoryId) {
@@ -268,33 +421,22 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                 Expanded(
                   child: Text(loc.quiz_settings, style: typography.title),
                 ),
-                InfoLabel(
-                  label: loc.quiz_bgm_label,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Button(
-                        onPressed: _pickBgm,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(FluentIcons.music_note),
-                            const SizedBox(width: 6),
-                            Text(
-                              quiz.bgmPath == null
-                                  ? loc.quiz_bgm_select
-                                  : p.basename(quiz.bgmPath!),
-                            ),
-                          ],
+                Button(
+                  onPressed: _showSoundDialog,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(FluentIcons.music_note),
+                        const SizedBox(width: 6),
+                        Text(
+                          quiz.bgmPaths.isEmpty
+                              ? loc.quiz_sound_settings
+                              : '${loc.quiz_sound_settings} (${quiz.bgmPaths.length})',
                         ),
-                      ),
-                      if (quiz.bgmPath != null)
-                        IconButton(
-                          icon: const Icon(FluentIcons.delete),
-                          onPressed: () =>
-                              ref.read(quizProvider).setBgmPath(null),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

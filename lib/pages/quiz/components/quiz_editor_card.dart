@@ -38,6 +38,8 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
   late bool _isOpenEnded;
   String? _imagePath;
   late List<String?> _choiceImages;
+  int? _timeLimit;
+  late int _difficulty;
 
   @override
   void initState() {
@@ -52,6 +54,8 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
     _answerIndex = widget.quiz.answerIndex;
     _isOpenEnded = widget.quiz.isOpenEnded;
     _imagePath = widget.quiz.imagePath;
+    _timeLimit = widget.quiz.timeLimit;
+    _difficulty = widget.quiz.difficulty;
     _choiceImages = List<String?>.generate(
       widget.quiz.choices.length,
       (i) => i < widget.quiz.choiceImages.length
@@ -93,6 +97,8 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
         imagePath: _imagePath,
         openAnswer: _openAnswerController.text,
         choiceImages: List<String?>.of(_choiceImages),
+        timeLimit: _timeLimit,
+        difficulty: _difficulty,
       );
 
   void _commit() {
@@ -209,13 +215,57 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
             ),
           ],
           const SizedBox(height: 8),
-          ToggleSwitch(
-            checked: _isOpenEnded,
-            content: Text(loc.quiz_open_ended),
-            onChanged: (value) {
-              setState(() => _isOpenEnded = value);
-              _commit();
-            },
+          Row(
+            children: [
+              ToggleSwitch(
+                checked: _isOpenEnded,
+                content: Text(loc.quiz_open_ended),
+                onChanged: (value) {
+                  setState(() => _isOpenEnded = value);
+                  _commit();
+                },
+              ),
+              const Spacer(),
+              Text(loc.quiz_difficulty_label, style: typography.caption),
+              const SizedBox(width: 4),
+              ...List.generate(5, (i) {
+                final filled = i < _difficulty;
+                return IconButton(
+                  icon: Icon(
+                    filled
+                        ? FluentIcons.favorite_star_fill
+                        : FluentIcons.favorite_star,
+                    size: 16,
+                    color: filled ? const Color(0xFFF5A623) : null,
+                  ),
+                  onPressed: () {
+                    setState(() =>
+                        _difficulty = _difficulty == i + 1 ? 0 : i + 1);
+                    _commit();
+                  },
+                );
+              }),
+              const SizedBox(width: 16),
+              Text(loc.quiz_time_limit_label, style: typography.caption),
+              const SizedBox(width: 6),
+              Tooltip(
+                message: loc.quiz_time_limit_custom_hint,
+                child: SizedBox(
+                  width: 110,
+                  child: NumberBox<int>(
+                    value: _timeLimit,
+                    min: 5,
+                    max: 600,
+                    mode: SpinButtonPlacementMode.none,
+                    placeholder: loc.quiz_time_limit_default,
+                    onChanged: (value) {
+                      _timeLimit = value;
+                      _scheduleSave();
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(loc.quiz_answer_label, style: typography.caption),

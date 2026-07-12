@@ -9,6 +9,8 @@ class Quiz {
   String? imagePath;
   String openAnswer;
   List<String?> choiceImages;
+  int? timeLimit;
+  int difficulty;
 
   Quiz({
     String? id,
@@ -19,6 +21,8 @@ class Quiz {
     this.imagePath,
     this.openAnswer = '',
     List<String?>? choiceImages,
+    this.timeLimit,
+    this.difficulty = 0,
   })  : id = id ?? const Uuid().v4(),
         choiceImages = choiceImages ??
             List<String?>.filled(choices.length, null, growable: true);
@@ -61,6 +65,8 @@ class Quiz {
       isOpenEnded: json['isOpenEnded'] ?? false,
       imagePath: json['imagePath'],
       openAnswer: json['openAnswer'] ?? '',
+      timeLimit: json['timeLimit'],
+      difficulty: json['difficulty'] ?? 0,
       choiceImages: List<String?>.generate(
         choices.length,
         (i) => i < images.length ? images[i] : null,
@@ -78,6 +84,8 @@ class Quiz {
       'imagePath': imagePath,
       'openAnswer': openAnswer,
       'choiceImages': choiceImages,
+      'timeLimit': timeLimit,
+      'difficulty': difficulty,
     };
   }
 }

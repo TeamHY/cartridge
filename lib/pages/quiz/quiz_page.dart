@@ -40,18 +40,22 @@ class QuizPage extends ConsumerWidget {
 
   void _startRandomQuiz(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context);
-    final validCount = ref
-        .read(quizProvider)
-        .categories
+    final quiz = ref.read(quizProvider);
+    final completeQuizzes = quiz.categories
         .expand((c) => c.quizzes)
         .where((q) => q.isComplete)
+        .toList();
+    final unusedCount = completeQuizzes
+        .where((q) => !quiz.usedQuizIds.contains(q.id))
         .length;
 
-    if (validCount == 0) {
+    if (unusedCount == 0) {
       displayInfoBar(
         context,
         builder: (context, close) => InfoBar(
-          title: Text(loc.quiz_start_empty),
+          title: Text(
+            completeQuizzes.isEmpty ? loc.quiz_start_empty : loc.quiz_all_used,
+          ),
           severity: InfoBarSeverity.warning,
           onClose: close,
         ),
@@ -132,6 +136,23 @@ class QuizPage extends ConsumerWidget {
                 ),
                 const SizedBox(width: 12),
                 Button(
+                  onPressed: quiz.usedQuizIds.isEmpty
+                      ? null
+                      : () => ref.read(quizProvider).resetUsedQuizzes(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(FluentIcons.refresh),
+                        const SizedBox(width: 8),
+                        Text(loc.quiz_reset_used),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Button(
                   onPressed: () => _openSettings(context),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 4),
@@ -174,11 +195,16 @@ class QuizPage extends ConsumerWidget {
                       itemCount: quiz.categories.length + 1,
                       itemBuilder: (context, index) {
                         if (index == 0) {
+                          final completeQuizzes = quiz.categories
+                              .expand((c) => c.quizzes)
+                              .where((q) => q.isComplete)
+                              .toList();
                           return _AllRandomCard(
-                            questionCount: quiz.categories
-                                .expand((c) => c.quizzes)
-                                .where((q) => q.isComplete)
+                            remainingCount: completeQuizzes
+                                .where(
+                                    (q) => !quiz.usedQuizIds.contains(q.id))
                                 .length,
+                            totalCount: completeQuizzes.length,
                             onTap: () => _startRandomQuiz(context, ref),
                           );
                         }
@@ -199,11 +225,13 @@ class QuizPage extends ConsumerWidget {
 
 class _AllRandomCard extends StatelessWidget {
   const _AllRandomCard({
-    required this.questionCount,
+    required this.remainingCount,
+    required this.totalCount,
     required this.onTap,
   });
 
-  final int questionCount;
+  final int remainingCount;
+  final int totalCount;
   final VoidCallback onTap;
 
   @override
@@ -259,7 +287,7 @@ class _AllRandomCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                '$questionCount ${loc.quiz_count_suffix}',
+                '$remainingCount / $totalCount ${loc.quiz_count_suffix}',
                 style: TextStyle(
                   color: const Color(0xFF1F2937).withValues(alpha: 0.6),
                   fontSize: 12,

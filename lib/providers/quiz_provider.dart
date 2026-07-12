@@ -14,9 +14,12 @@ class QuizNotifier extends ChangeNotifier {
 
   int get timeLimit => data.timeLimit;
   int get questionCount => data.questionCount;
-  String? get bgmPath => data.bgmPath;
+  List<String> get bgmPaths => data.bgmPaths;
   double get bgmVolume => data.bgmVolume;
+  String? get correctSfxPath => data.correctSfxPath;
+  String? get wrongSfxPath => data.wrongSfxPath;
   List<QuizCategory> get categories => data.categories;
+  Set<String> get usedQuizIds => data.usedQuizIds;
 
   Future<void> loadData() async {
     data = await QuizService.loadData();
@@ -38,8 +41,36 @@ class QuizNotifier extends ChangeNotifier {
     _save();
   }
 
-  void setBgmPath(String? path) {
-    data.bgmPath = path;
+  void addBgmPath(String path) {
+    if (data.bgmPaths.contains(path)) return;
+    data.bgmPaths.add(path);
+    _save();
+  }
+
+  void removeBgmPath(String path) {
+    data.bgmPaths.remove(path);
+    _save();
+  }
+
+  void setCorrectSfxPath(String? path) {
+    data.correctSfxPath = path;
+    _save();
+  }
+
+  void setWrongSfxPath(String? path) {
+    data.wrongSfxPath = path;
+    _save();
+  }
+
+  void markQuizUsed(String quizId) {
+    if (data.usedQuizIds.add(quizId)) {
+      _save();
+    }
+  }
+
+  void resetUsedQuizzes() {
+    if (data.usedQuizIds.isEmpty) return;
+    data.usedQuizIds.clear();
     _save();
   }
 
