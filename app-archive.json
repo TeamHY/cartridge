@@ -1,24 +1,20 @@
 {
-  "description": "Isaac Mod Preset Manager",
-  "appName": "Cartridge",
   "items": [
     {
+      "url": "https://teamhy.github.io/cartridge/4.29.0+42900-windows",
       "changes": [
         {
-          "type": "feat",
-          "message": "퀴즈 기능 개선"
-        },
-        {
-          "type": "feat",
-          "message": "퀴즈 한개일 경우 바로 나가기"
+          "message": "퀴즈 기능 업데이트",
+          "type": "feat"
         }
       ],
-      "date": "2026-07-11",
-      "version": "4.28.0",
+      "shortVersion": 42900,
       "mandatory": true,
-      "shortVersion": 42800,
-      "platform": "windows",
-      "url": "https://teamhy.github.io/cartridge/4.28.0+42800-windows"
+      "date": "2026-07-12",
+      "version": "4.29.0",
+      "platform": "windows"
     }
-  ]
+  ],
+  "appName": "Cartridge",
+  "description": "Isaac Mod Preset Manager"
 }
