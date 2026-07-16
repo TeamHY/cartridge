@@ -23,23 +23,27 @@ class _PlayChoice {
 class _PlayQuestion {
   _PlayQuestion({
     required this.id,
+    required this.categoryName,
     required this.question,
     required this.choices,
     required this.answerIndex,
     required this.isOpenEnded,
     required this.imagePath,
     required this.openAnswer,
+    required this.answerImagePath,
     required this.timeLimit,
     required this.difficulty,
   });
 
   final String id;
+  final String categoryName;
   final String question;
   final List<_PlayChoice> choices;
   final int answerIndex;
   final bool isOpenEnded;
   final String? imagePath;
   final String openAnswer;
+  final String? answerImagePath;
   final int? timeLimit;
   final int difficulty;
 }
@@ -55,6 +59,7 @@ class QuizPlayPage extends ConsumerStatefulWidget {
 
 class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   late final List<List<Quiz>> _pools;
+  late final Map<String, String> _categoryNames;
   late final int _defaultTimeLimit;
   late final int _questionCount;
   List<_PlayQuestion> _questions = [];
@@ -63,6 +68,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   int _correct = 0;
   int? _selected;
   bool _revealed = false;
+  bool _timeUp = false;
   bool _paused = false;
   int _remaining = 0;
   int _currentLimit = 1;
@@ -99,6 +105,10 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     final quiz = ref.read(quizProvider);
     _defaultTimeLimit = quiz.timeLimit;
     _questionCount = quiz.questionCount;
+    _categoryNames = {
+      for (final category in quiz.categories)
+        for (final q in category.quizzes) q.id: category.name,
+    };
 
     if (widget.categoryId == null) {
       _pools = quiz.categories
@@ -159,12 +169,14 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     if (quiz.isOpenEnded) {
       return _PlayQuestion(
         id: quiz.id,
+        categoryName: _categoryNames[quiz.id] ?? '',
         question: quiz.question,
         choices: const [],
         answerIndex: -1,
         isOpenEnded: true,
         imagePath: quiz.imagePath,
         openAnswer: quiz.openAnswer.trim(),
+        answerImagePath: quiz.answerImagePath,
         timeLimit: quiz.timeLimit,
         difficulty: quiz.difficulty,
       );
@@ -181,12 +193,14 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     choices.shuffle();
     return _PlayQuestion(
       id: quiz.id,
+      categoryName: _categoryNames[quiz.id] ?? '',
       question: quiz.question,
       choices: choices,
       answerIndex: choices.indexOf(answer),
       isOpenEnded: false,
       imagePath: quiz.imagePath,
       openAnswer: '',
+      answerImagePath: quiz.answerImagePath,
       timeLimit: quiz.timeLimit,
       difficulty: quiz.difficulty,
     );
@@ -239,6 +253,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   void _startTimer() {
     _timer?.cancel();
     _paused = false;
+    _timeUp = false;
     _currentLimit = _questions[_index].timeLimit ?? _defaultTimeLimit;
     _remaining = _currentLimit;
     _bgmPlayer?.resume();
@@ -246,8 +261,11 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
       if (_paused) return;
       if (_remaining <= 1) {
         timer.cancel();
-        _remaining = 0;
-        _reveal();
+        _bgmPlayer?.pause();
+        setState(() {
+          _remaining = 0;
+          _timeUp = true;
+        });
       } else {
         setState(() => _remaining--);
       }
@@ -257,6 +275,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   void _togglePause() {
     if (!mounted ||
         _revealed ||
+        _timeUp ||
         _questions.isEmpty ||
         _index >= _questions.length) {
       return;
@@ -300,6 +319,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
       _index++;
       _selected = null;
       _revealed = false;
+      _timeUp = false;
     });
     _markCurrentUsed();
     _startTimer();
@@ -313,6 +333,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
       _correct = 0;
       _selected = null;
       _revealed = false;
+      _timeUp = false;
     });
     if (_questions.isEmpty) return;
     _markCurrentUsed();
@@ -523,7 +544,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                   icon: Icon(
                     _paused ? FluentIcons.play : FluentIcons.pause,
                   ),
-                  onPressed: _revealed ? null : _togglePause,
+                  onPressed: _revealed || _timeUp ? null : _togglePause,
                 ),
                 const SizedBox(width: 12),
                 Icon(
@@ -545,7 +566,12 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
               activeColor: isUrgent ? Colors.red : null,
             ),
             const SizedBox(height: 24),
-            Text(question.question, style: typography.subtitle),
+            Text(
+              question.categoryName.isEmpty
+                  ? question.question
+                  : '[${question.categoryName}] ${question.question}',
+              style: typography.subtitle,
+            ),
             if (question.isOpenEnded && question.imagePath != null) ...[
               const SizedBox(height: 16),
               ConstrainedBox(
@@ -570,6 +596,32 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        if (_revealed) ...[
+                          if (question.answerImagePath != null) ...[
+                            Flexible(
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    File(question.answerImagePath!),
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (_, __, ___) =>
+                                        const SizedBox.shrink(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                          if (question.openAnswer.isNotEmpty) ...[
+                            Text(
+                              '${loc.quiz_answer_label}: ${question.openAnswer}',
+                              style: typography.subtitle,
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ],
                         TextBox(
                           controller: _openInputController,
                           placeholder: loc.quiz_open_input_hint,
@@ -602,22 +654,21 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                       : _buildChoiceList(question),
             ),
             const SizedBox(height: 8),
-            if (!_revealed)
+            if (!_revealed) ...[
+              if (_timeUp) ...[
+                Text(
+                  loc.quiz_time_over,
+                  style: typography.bodyStrong?.copyWith(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+              ],
               FilledButton(
                 onPressed: _reveal,
                 child: Text(loc.quiz_reveal),
-              )
-            else ...[
-              if (question.isOpenEnded) ...[
-                if (question.openAnswer.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    '${loc.quiz_answer_label}: ${question.openAnswer}',
-                    style: typography.subtitle,
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              ] else ...[
+              ),
+            ] else ...[
+              if (!question.isOpenEnded) ...[
                 const SizedBox(height: 4),
                 Text(
                   _selected == question.answerIndex

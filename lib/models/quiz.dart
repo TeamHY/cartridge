@@ -8,6 +8,7 @@ class Quiz {
   bool isOpenEnded;
   String? imagePath;
   String openAnswer;
+  String? answerImagePath;
   List<String?> choiceImages;
   int? timeLimit;
   int difficulty;
@@ -20,6 +21,7 @@ class Quiz {
     this.isOpenEnded = false,
     this.imagePath,
     this.openAnswer = '',
+    this.answerImagePath,
     List<String?>? choiceImages,
     this.timeLimit,
     this.difficulty = 0,
@@ -37,6 +39,7 @@ class Quiz {
 
   Iterable<String> get imagePaths => [
         imagePath,
+        answerImagePath,
         ...choiceImages,
       ].whereType<String>();
 
@@ -65,6 +68,7 @@ class Quiz {
       isOpenEnded: json['isOpenEnded'] ?? false,
       imagePath: json['imagePath'],
       openAnswer: json['openAnswer'] ?? '',
+      answerImagePath: json['answerImagePath'],
       timeLimit: json['timeLimit'],
       difficulty: json['difficulty'] ?? 0,
       choiceImages: List<String?>.generate(
@@ -83,6 +87,7 @@ class Quiz {
       'isOpenEnded': isOpenEnded,
       'imagePath': imagePath,
       'openAnswer': openAnswer,
+      'answerImagePath': answerImagePath,
       'choiceImages': choiceImages,
       'timeLimit': timeLimit,
       'difficulty': difficulty,

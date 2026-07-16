@@ -186,11 +186,11 @@ class QuizPage extends ConsumerWidget {
                     )
                   : GridView.builder(
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: 1.0,
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 190,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        mainAxisExtent: 168,
                       ),
                       itemCount: quiz.categories.length + 1,
                       itemBuilder: (context, index) {
@@ -245,7 +245,7 @@ class _AllRandomCard extends StatelessWidget {
         mouseCursor: SystemMouseCursors.click,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -273,7 +273,7 @@ class _AllRandomCard extends StatelessWidget {
                   size: 36,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Text(
                 loc.quiz_all_random,
                 style: const TextStyle(
@@ -323,7 +323,7 @@ class _CategoryCard extends StatelessWidget {
         mouseCursor: SystemMouseCursors.click,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -347,7 +347,7 @@ class _CategoryCard extends StatelessWidget {
                   size: 36,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               Text(
                 category.name,
                 style: const TextStyle(

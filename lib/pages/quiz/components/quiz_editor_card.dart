@@ -37,6 +37,7 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
   late int _answerIndex;
   late bool _isOpenEnded;
   String? _imagePath;
+  String? _answerImagePath;
   late List<String?> _choiceImages;
   int? _timeLimit;
   late int _difficulty;
@@ -54,6 +55,7 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
     _answerIndex = widget.quiz.answerIndex;
     _isOpenEnded = widget.quiz.isOpenEnded;
     _imagePath = widget.quiz.imagePath;
+    _answerImagePath = widget.quiz.answerImagePath;
     _timeLimit = widget.quiz.timeLimit;
     _difficulty = widget.quiz.difficulty;
     _choiceImages = List<String?>.generate(
@@ -96,6 +98,7 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
         isOpenEnded: _isOpenEnded,
         imagePath: _imagePath,
         openAnswer: _openAnswerController.text,
+        answerImagePath: _answerImagePath,
         choiceImages: List<String?>.of(_choiceImages),
         timeLimit: _timeLimit,
         difficulty: _difficulty,
@@ -112,6 +115,41 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
     return QuizService.importImage(sourcePath);
   }
 
+  Future<bool> _confirmDelete(String title, String message) async {
+    final loc = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          Button(
+            child: Text(loc.quiz_cancel),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          FilledButton(
+            child: Text(loc.quiz_delete),
+            onPressed: () => Navigator.pop(context, true),
+          ),
+        ],
+      ),
+    );
+    return confirmed == true && mounted;
+  }
+
+  Future<bool> _confirmRemoveImage() {
+    final loc = AppLocalizations.of(context);
+    return _confirmDelete(loc.quiz_image_remove, loc.quiz_image_remove_message);
+  }
+
+  Future<void> _deleteQuiz() async {
+    final loc = AppLocalizations.of(context);
+    if (!await _confirmDelete(loc.quiz_delete_title, loc.quiz_delete_message)) {
+      return;
+    }
+    widget.onDelete();
+  }
+
   Future<void> _pickQuestionImage() async {
     final imported = await _importPickedImage();
     if (imported == null || !mounted) return;
@@ -119,8 +157,22 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
     _commit();
   }
 
-  void _removeQuestionImage() {
+  Future<void> _removeQuestionImage() async {
+    if (!await _confirmRemoveImage()) return;
     setState(() => _imagePath = null);
+    _commit();
+  }
+
+  Future<void> _pickAnswerImage() async {
+    final imported = await _importPickedImage();
+    if (imported == null || !mounted) return;
+    setState(() => _answerImagePath = imported);
+    _commit();
+  }
+
+  Future<void> _removeAnswerImage() async {
+    if (!await _confirmRemoveImage()) return;
+    setState(() => _answerImagePath = null);
     _commit();
   }
 
@@ -131,7 +183,8 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
     _commit();
   }
 
-  void _removeChoiceImage(int index) {
+  Future<void> _removeChoiceImage(int index) async {
+    if (!await _confirmRemoveImage()) return;
     setState(() => _choiceImages[index] = null);
     _commit();
   }
@@ -145,8 +198,13 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
     _commit();
   }
 
-  void _removeChoice(int index) {
+  Future<void> _removeChoice(int index) async {
     if (_choiceControllers.length <= 2) return;
+    final loc = AppLocalizations.of(context);
+    if (!await _confirmDelete(
+        loc.quiz_choice_delete_title, loc.quiz_choice_delete_message)) {
+      return;
+    }
     setState(() {
       _choiceControllers.removeAt(index).dispose();
       _choiceImages.removeAt(index);
@@ -194,7 +252,7 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
               const SizedBox(width: 4),
               IconButton(
                 icon: const Icon(FluentIcons.delete),
-                onPressed: widget.onDelete,
+                onPressed: _deleteQuiz,
               ),
             ],
           ),
@@ -270,13 +328,43 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
           const SizedBox(height: 8),
           Text(loc.quiz_answer_label, style: typography.caption),
           const SizedBox(height: 4),
-          if (_isOpenEnded)
-            TextBox(
-              controller: _openAnswerController,
-              placeholder: loc.quiz_open_answer_hint,
-              onChanged: (_) => _scheduleSave(),
-            )
-          else
+          if (_isOpenEnded) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: TextBox(
+                    controller: _openAnswerController,
+                    placeholder: loc.quiz_open_answer_hint,
+                    onChanged: (_) => _scheduleSave(),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Tooltip(
+                  message: loc.quiz_answer_image,
+                  child: IconButton(
+                    icon: const Icon(FluentIcons.photo2_add),
+                    onPressed: _pickAnswerImage,
+                  ),
+                ),
+              ],
+            ),
+            if (_answerImagePath != null) ...[
+              const SizedBox(height: 8),
+              Text(loc.quiz_answer_image, style: typography.caption),
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Tooltip(
+                  message: loc.quiz_image_remove,
+                  child: _RemovableImage(
+                    path: _answerImagePath!,
+                    height: 100,
+                    onRemove: _removeAnswerImage,
+                  ),
+                ),
+              ),
+            ],
+          ] else
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
