@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cartridge/constants/quiz_category_options.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/quiz.dart';
 import 'package:cartridge/pages/record/components/back_arrow_view.dart';
@@ -24,6 +25,7 @@ class _PlayQuestion {
   _PlayQuestion({
     required this.id,
     required this.categoryName,
+    required this.categoryColor,
     required this.question,
     required this.choices,
     required this.answerIndex,
@@ -37,6 +39,7 @@ class _PlayQuestion {
 
   final String id;
   final String categoryName;
+  final int categoryColor;
   final String question;
   final List<_PlayChoice> choices;
   final int answerIndex;
@@ -58,10 +61,14 @@ class QuizPlayPage extends ConsumerStatefulWidget {
 }
 
 class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
+  static const _autoAdvanceSeconds = 4;
+
   late final List<List<Quiz>> _pools;
   late final Map<String, String> _categoryNames;
+  late final Map<String, int> _categoryColors;
   late final int _defaultTimeLimit;
   late final int _questionCount;
+  late final bool _autoMode;
   List<_PlayQuestion> _questions = [];
 
   int _index = 0;
@@ -72,7 +79,9 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   bool _paused = false;
   int _remaining = 0;
   int _currentLimit = 1;
+  int _autoAdvanceRemaining = 0;
   Timer? _timer;
+  Timer? _autoAdvanceTimer;
   final _openInputController = TextEditingController();
 
   List<String> _bgmPaths = [];
@@ -104,10 +113,14 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
 
     final quiz = ref.read(quizProvider);
     _defaultTimeLimit = quiz.timeLimit;
-    _questionCount = quiz.questionCount;
+    _autoMode = quiz.autoAdvance;
     _categoryNames = {
       for (final category in quiz.categories)
         for (final q in category.quizzes) q.id: category.name,
+    };
+    _categoryColors = {
+      for (final category in quiz.categories)
+        for (final q in category.quizzes) q.id: category.colorValue,
     };
 
     if (widget.categoryId == null) {
@@ -121,6 +134,10 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
           (category?.quizzes ?? []).where((q) => q.isComplete).toList();
       _pools = pool.isEmpty ? [] : [pool];
     }
+
+    _questionCount = _autoMode
+        ? _pools.fold(0, (sum, pool) => sum + pool.length)
+        : quiz.questionCount;
 
     ref.read(musicPlayerProvider).pause();
 
@@ -170,6 +187,8 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
       return _PlayQuestion(
         id: quiz.id,
         categoryName: _categoryNames[quiz.id] ?? '',
+        categoryColor:
+            _categoryColors[quiz.id] ?? defaultQuizCategoryColor,
         question: quiz.question,
         choices: const [],
         answerIndex: -1,
@@ -194,6 +213,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     return _PlayQuestion(
       id: quiz.id,
       categoryName: _categoryNames[quiz.id] ?? '',
+      categoryColor: _categoryColors[quiz.id] ?? defaultQuizCategoryColor,
       question: quiz.question,
       choices: choices,
       answerIndex: choices.indexOf(answer),
@@ -266,6 +286,9 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
           _remaining = 0;
           _timeUp = true;
         });
+        if (_autoMode) {
+          _reveal();
+        }
       } else {
         setState(() => _remaining--);
       }
@@ -301,10 +324,27 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
       _paused = false;
       _revealed = true;
     });
+    if (_autoMode) {
+      _startAutoAdvanceCountdown();
+    }
+  }
+
+  void _startAutoAdvanceCountdown() {
+    _autoAdvanceTimer?.cancel();
+    setState(() => _autoAdvanceRemaining = _autoAdvanceSeconds);
+    _autoAdvanceTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_autoAdvanceRemaining <= 1) {
+        timer.cancel();
+        _next();
+      } else {
+        setState(() => _autoAdvanceRemaining--);
+      }
+    });
   }
 
   void _next() {
     _timer?.cancel();
+    _autoAdvanceTimer?.cancel();
     if (_index >= _questions.length - 1) {
       _bgmPlayer?.pause();
       if (_questions.length == 1) {
@@ -344,6 +384,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   @override
   void dispose() {
     _timer?.cancel();
+    _autoAdvanceTimer?.cancel();
     _bgmPlayer?.dispose();
     _openInputController.dispose();
     _hotkeyNotifier.clearOverrides();
@@ -499,7 +540,10 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     }
 
     final question = _questions[_index];
-    final isUrgent = _remaining <= 5;
+    final inAutoAdvance = _autoMode && _revealed;
+    final displayRemaining = inAutoAdvance ? _autoAdvanceRemaining : _remaining;
+    final displayLimit = inAutoAdvance ? _autoAdvanceSeconds : _currentLimit;
+    final isUrgent = !inAutoAdvance && _remaining <= 5;
 
     return BackArrowView(
       controlColor: Colors.black,
@@ -553,7 +597,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  '$_remaining',
+                  '$displayRemaining',
                   style: typography.bodyStrong?.copyWith(
                     color: isUrgent ? Colors.red : null,
                   ),
@@ -562,16 +606,26 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
             ),
             const SizedBox(height: 8),
             ProgressBar(
-              value: _remaining / _currentLimit * 100,
+              value: displayRemaining / displayLimit * 100,
               activeColor: isUrgent ? Colors.red : null,
             ),
             const SizedBox(height: 24),
-            Text(
-              question.categoryName.isEmpty
-                  ? question.question
-                  : '[${question.categoryName}] ${question.question}',
-              style: typography.subtitle,
-            ),
+            question.categoryName.isEmpty
+                ? Text(question.question, style: typography.subtitle)
+                : Text.rich(
+                    TextSpan(
+                      style: typography.subtitle,
+                      children: [
+                        TextSpan(
+                          text: '[${question.categoryName}]',
+                          style: TextStyle(
+                            color: Color(question.categoryColor),
+                          ),
+                        ),
+                        TextSpan(text: '\n${question.question}'),
+                      ],
+                    ),
+                  ),
             if (question.isOpenEnded && question.imagePath != null) ...[
               const SizedBox(height: 16),
               ConstrainedBox(
@@ -654,7 +708,8 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                       : _buildChoiceList(question),
             ),
             const SizedBox(height: 8),
-            if (!_revealed) ...[
+            if (_autoMode) ...[
+            ] else if (!_revealed) ...[
               if (_timeUp) ...[
                 Text(
                   loc.quiz_time_over,

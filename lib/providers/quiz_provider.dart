@@ -20,6 +20,7 @@ class QuizNotifier extends ChangeNotifier {
   String? get wrongSfxPath => data.wrongSfxPath;
   List<QuizCategory> get categories => data.categories;
   Set<String> get usedQuizIds => data.usedQuizIds;
+  bool get autoAdvance => data.autoAdvance;
 
   Future<void> loadData() async {
     data = await QuizService.loadData();
@@ -76,6 +77,11 @@ class QuizNotifier extends ChangeNotifier {
 
   void setBgmVolume(double volume) {
     data.bgmVolume = volume;
+    _save();
+  }
+
+  void setAutoAdvance(bool value) {
+    data.autoAdvance = value;
     _save();
   }
 

@@ -317,6 +317,7 @@
   "quiz_count_suffix": "문제",
   "quiz_time_limit_label": "제한 시간(초)",
   "quiz_question_count_label": "문제 수",
+  "quiz_auto_advance": "자동 퀴즈 진행",
   "quiz_all_random": "전체 랜덤",
   "quiz_open_ended": "주관식",
   "quiz_open_answer_hint": "정답 (선택 사항)",

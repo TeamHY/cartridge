@@ -99,6 +99,13 @@ class QuizPage extends ConsumerWidget {
                 Expanded(
                   child: Text(loc.quiz_title, style: typography.title),
                 ),
+                ToggleSwitch(
+                  checked: quiz.autoAdvance,
+                  onChanged: (value) =>
+                      ref.read(quizProvider).setAutoAdvance(value),
+                  content: Text(loc.quiz_auto_advance),
+                ),
+                const SizedBox(width: 12),
                 SizedBox(
                   width: 140,
                   child: InfoLabel(
@@ -108,11 +115,13 @@ class QuizPage extends ConsumerWidget {
                       min: 1,
                       max: 100,
                       mode: SpinButtonPlacementMode.inline,
-                      onChanged: (value) {
-                        if (value != null) {
-                          ref.read(quizProvider).setQuestionCount(value);
-                        }
-                      },
+                      onChanged: quiz.autoAdvance
+                          ? null
+                          : (value) {
+                              if (value != null) {
+                                ref.read(quizProvider).setQuestionCount(value);
+                              }
+                            },
                     ),
                   ),
                 ),

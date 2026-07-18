@@ -9,6 +9,7 @@ class QuizData {
   String? wrongSfxPath;
   List<QuizCategory> categories;
   Set<String> usedQuizIds;
+  bool autoAdvance;
 
   QuizData({
     this.timeLimit = 30,
@@ -19,6 +20,7 @@ class QuizData {
     this.wrongSfxPath,
     List<QuizCategory>? categories,
     Set<String>? usedQuizIds,
+    this.autoAdvance = false,
   })  : bgmPaths = bgmPaths ?? [],
         categories = categories ?? [],
         usedQuizIds = usedQuizIds ?? {};
@@ -39,6 +41,7 @@ class QuizData {
       usedQuizIds:
           (json['usedQuizIds'] as List<dynamic>?)?.cast<String>().toSet() ??
               {},
+      autoAdvance: json['autoAdvance'] ?? false,
     );
   }
 
@@ -52,6 +55,7 @@ class QuizData {
       'wrongSfxPath': wrongSfxPath,
       'categories': categories.map((e) => e.toJson()).toList(),
       'usedQuizIds': usedQuizIds.toList(),
+      'autoAdvance': autoAdvance,
     };
   }
 }

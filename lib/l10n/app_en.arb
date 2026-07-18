@@ -317,6 +317,7 @@
   "quiz_count_suffix": "questions",
   "quiz_time_limit_label": "Time Limit (sec)",
   "quiz_question_count_label": "Question Count",
+  "quiz_auto_advance": "Auto Quiz Mode",
   "quiz_all_random": "All Random",
   "quiz_open_ended": "Open-ended",
   "quiz_open_answer_hint": "Answer (optional)",
