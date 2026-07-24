@@ -61,14 +61,16 @@ class QuizPlayPage extends ConsumerStatefulWidget {
 }
 
 class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
-  static const _autoAdvanceSeconds = 4;
-
   late final List<List<Quiz>> _pools;
   late final Map<String, String> _categoryNames;
   late final Map<String, int> _categoryColors;
   late final int _defaultTimeLimit;
   late final int _questionCount;
   late final bool _autoMode;
+  late final int _autoAdvanceSeconds;
+  late final double _fontScale;
+  late final TextAlign _textAlign;
+  late final double _alignX;
   List<_PlayQuestion> _questions = [];
 
   int _index = 0;
@@ -114,6 +116,18 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     final quiz = ref.read(quizProvider);
     _defaultTimeLimit = quiz.timeLimit;
     _autoMode = quiz.autoAdvance;
+    _autoAdvanceSeconds = quiz.autoAdvanceSeconds;
+    _fontScale = quiz.questionFontScale;
+    _textAlign = switch (quiz.questionTextAlign) {
+      'center' => TextAlign.center,
+      'right' => TextAlign.right,
+      _ => TextAlign.left,
+    };
+    _alignX = switch (quiz.questionTextAlign) {
+      'center' => 0.0,
+      'right' => 1.0,
+      _ => -1.0,
+    };
     _categoryNames = {
       for (final category in quiz.categories)
         for (final q in category.quizzes) q.id: category.name,
@@ -391,6 +405,11 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     super.dispose();
   }
 
+  Alignment _hAlign([double y = 0]) => Alignment(_alignX, y);
+
+  TextStyle? _scaled(TextStyle? style) =>
+      style?.copyWith(fontSize: (style.fontSize ?? 14) * _fontScale);
+
   Color? _choiceColor(int i) {
     if (!_revealed) {
       return i == _selected ? Colors.blue.lighter : null;
@@ -461,7 +480,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
             ),
             onPressed: _revealed ? null : () => _selectChoice(i),
             child: Align(
-              alignment: Alignment.centerLeft,
+              alignment: _hAlign(),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -480,7 +499,8 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                   Flexible(
                     child: Text(
                       choice.text,
-                      style: typography.body,
+                      style: _scaled(typography.body),
+                      textAlign: _textAlign,
                     ),
                   ),
                 ],
@@ -611,10 +631,14 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
             ),
             const SizedBox(height: 24),
             question.categoryName.isEmpty
-                ? Text(question.question, style: typography.subtitle)
+                ? Text(
+                    question.question,
+                    style: _scaled(typography.subtitle),
+                    textAlign: _textAlign,
+                  )
                 : Text.rich(
                     TextSpan(
-                      style: typography.subtitle,
+                      style: _scaled(typography.subtitle),
                       children: [
                         TextSpan(
                           text: '[${question.categoryName}]',
@@ -625,13 +649,14 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                         TextSpan(text: '\n${question.question}'),
                       ],
                     ),
+                    textAlign: _textAlign,
                   ),
             if (question.isOpenEnded && question.imagePath != null) ...[
               const SizedBox(height: 16),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 280),
                 child: Align(
-                  alignment: Alignment.centerLeft,
+                  alignment: _hAlign(),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: Image.file(
@@ -654,7 +679,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                           if (question.answerImagePath != null) ...[
                             Flexible(
                               child: Align(
-                                alignment: Alignment.centerLeft,
+                                alignment: _hAlign(),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.file(
@@ -671,7 +696,8 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                           if (question.openAnswer.isNotEmpty) ...[
                             Text(
                               '${loc.quiz_answer_label}: ${question.openAnswer}',
-                              style: typography.subtitle,
+                              style: _scaled(typography.subtitle),
+                              textAlign: _textAlign,
                             ),
                             const SizedBox(height: 16),
                           ],
@@ -679,7 +705,8 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                         TextBox(
                           controller: _openInputController,
                           placeholder: loc.quiz_open_input_hint,
-                          style: typography.subtitle,
+                          style: _scaled(typography.subtitle),
+                          textAlign: _textAlign,
                         ),
                       ],
                     )
@@ -694,7 +721,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                                   child: Image.file(
                                     File(question.imagePath!),
                                     fit: BoxFit.contain,
-                                    alignment: Alignment.topLeft,
+                                    alignment: _hAlign(-1),
                                     errorBuilder: (_, __, ___) =>
                                         const SizedBox.shrink(),
                                   ),

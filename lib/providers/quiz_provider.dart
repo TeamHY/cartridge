@@ -21,6 +21,9 @@ class QuizNotifier extends ChangeNotifier {
   List<QuizCategory> get categories => data.categories;
   Set<String> get usedQuizIds => data.usedQuizIds;
   bool get autoAdvance => data.autoAdvance;
+  int get autoAdvanceSeconds => data.autoAdvanceSeconds;
+  double get questionFontScale => data.questionFontScale;
+  String get questionTextAlign => data.questionTextAlign;
 
   Future<void> loadData() async {
     data = await QuizService.loadData();
@@ -82,6 +85,21 @@ class QuizNotifier extends ChangeNotifier {
 
   void setAutoAdvance(bool value) {
     data.autoAdvance = value;
+    _save();
+  }
+
+  void setAutoAdvanceSeconds(int seconds) {
+    data.autoAdvanceSeconds = seconds;
+    _save();
+  }
+
+  void setQuestionFontScale(double scale) {
+    data.questionFontScale = scale;
+    _save();
+  }
+
+  void setQuestionTextAlign(String align) {
+    data.questionTextAlign = align;
     _save();
   }
 

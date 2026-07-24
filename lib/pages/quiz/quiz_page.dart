@@ -1,6 +1,7 @@
 import 'package:cartridge/constants/quiz_category_options.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/quiz_category.dart';
+import 'package:cartridge/pages/quiz/components/quiz_play_options_dialog.dart';
 import 'package:cartridge/pages/quiz/quiz_play_page.dart';
 import 'package:cartridge/pages/quiz/quiz_settings_page.dart';
 import 'package:cartridge/pages/record/components/back_arrow_view.dart';
@@ -126,20 +127,17 @@ class QuizPage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                SizedBox(
-                  width: 140,
-                  child: InfoLabel(
-                    label: loc.quiz_time_limit_label,
-                    child: NumberBox<int>(
-                      value: quiz.timeLimit,
-                      min: 5,
-                      max: 600,
-                      mode: SpinButtonPlacementMode.inline,
-                      onChanged: (value) {
-                        if (value != null) {
-                          ref.read(quizProvider).setTimeLimit(value);
-                        }
-                      },
+                Button(
+                  onPressed: () => showQuizPlayOptionsDialog(context),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(FluentIcons.equalizer),
+                        const SizedBox(width: 8),
+                        Text(loc.quiz_play_options),
+                      ],
                     ),
                   ),
                 ),

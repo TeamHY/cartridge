@@ -10,6 +10,9 @@ class QuizData {
   List<QuizCategory> categories;
   Set<String> usedQuizIds;
   bool autoAdvance;
+  int autoAdvanceSeconds;
+  double questionFontScale;
+  String questionTextAlign;
 
   QuizData({
     this.timeLimit = 30,
@@ -21,6 +24,9 @@ class QuizData {
     List<QuizCategory>? categories,
     Set<String>? usedQuizIds,
     this.autoAdvance = false,
+    this.autoAdvanceSeconds = 4,
+    this.questionFontScale = 1.0,
+    this.questionTextAlign = 'left',
   })  : bgmPaths = bgmPaths ?? [],
         categories = categories ?? [],
         usedQuizIds = usedQuizIds ?? {};
@@ -42,6 +48,10 @@ class QuizData {
           (json['usedQuizIds'] as List<dynamic>?)?.cast<String>().toSet() ??
               {},
       autoAdvance: json['autoAdvance'] ?? false,
+      autoAdvanceSeconds: json['autoAdvanceSeconds'] ?? 4,
+      questionFontScale:
+          (json['questionFontScale'] as num?)?.toDouble() ?? 1.0,
+      questionTextAlign: json['questionTextAlign'] ?? 'left',
     );
   }
 
@@ -56,6 +66,9 @@ class QuizData {
       'categories': categories.map((e) => e.toJson()).toList(),
       'usedQuizIds': usedQuizIds.toList(),
       'autoAdvance': autoAdvance,
+      'autoAdvanceSeconds': autoAdvanceSeconds,
+      'questionFontScale': questionFontScale,
+      'questionTextAlign': questionTextAlign,
     };
   }
 }
