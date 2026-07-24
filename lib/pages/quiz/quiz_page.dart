@@ -100,12 +100,12 @@ class QuizPage extends ConsumerWidget {
                 Expanded(
                   child: Text(loc.quiz_title, style: typography.title),
                 ),
-                ToggleSwitch(
+                SizedBox(height: 37, child: ToggleSwitch(
                   checked: quiz.autoAdvance,
                   onChanged: (value) =>
                       ref.read(quizProvider).setAutoAdvance(value),
                   content: Text(loc.quiz_auto_advance),
-                ),
+                )),
                 const SizedBox(width: 12),
                 SizedBox(
                   width: 140,
