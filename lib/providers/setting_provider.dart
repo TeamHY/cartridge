@@ -42,6 +42,15 @@ class SettingNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  int _musicTrackDelay = 0;
+
+  int get musicTrackDelay => _musicTrackDelay;
+
+  set musicTrackDelay(int delay) {
+    _musicTrackDelay = delay < 0 ? 0 : delay;
+    notifyListeners();
+  }
+
   int _rerunDelay = 1000;
 
   int get rerunDelay => _rerunDelay;
@@ -118,6 +127,7 @@ class SettingNotifier extends ChangeNotifier {
     String? isaacPath,
     String? musicPlaylistPath,
     double? musicVolume,
+    int? musicTrackDelay,
     int? rerunDelay,
     String? languageCode,
     bool? isGridView,
@@ -130,6 +140,9 @@ class SettingNotifier extends ChangeNotifier {
     if (isaacPath != null) _isaacPath = isaacPath;
     if (musicPlaylistPath != null) _musicPlaylistPath = musicPlaylistPath;
     if (musicVolume != null) _musicVolume = musicVolume.clamp(0.0, 1.0);
+    if (musicTrackDelay != null) {
+      _musicTrackDelay = musicTrackDelay < 0 ? 0 : musicTrackDelay;
+    }
     if (rerunDelay != null) _rerunDelay = rerunDelay;
     if (languageCode != null) _languageCode = languageCode;
     if (isGridView != null) _isGridView = isGridView;
@@ -157,6 +170,8 @@ class SettingNotifier extends ChangeNotifier {
     _musicPlaylistPath =
         json['musicPlaylistPath'] as String? ?? _musicPlaylistPath;
     _musicVolume = (json['musicVolume'] as num?)?.toDouble() ?? 0.0;
+    final musicTrackDelay = json['musicTrackDelay'] as int? ?? 0;
+    _musicTrackDelay = musicTrackDelay < 0 ? 0 : musicTrackDelay;
     _rerunDelay = json['rerunDelay'] as int? ?? 1000;
     _languageCode = json['languageCode'] as String?;
     _isGridView = json['isGridView'] as bool? ?? false;
@@ -179,6 +194,7 @@ class SettingNotifier extends ChangeNotifier {
         'isaacPath': _isaacPath,
         'musicPlaylistPath': _musicPlaylistPath,
         'musicVolume': _musicVolume,
+        'musicTrackDelay': _musicTrackDelay,
         'rerunDelay': _rerunDelay,
         'languageCode': _languageCode,
         'isGridView': _isGridView,

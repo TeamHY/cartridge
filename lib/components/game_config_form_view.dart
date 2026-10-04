@@ -1,4 +1,5 @@
 import 'package:cartridge/models/game_config.dart';
+import 'package:cartridge/components/save_button.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
@@ -438,9 +439,10 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
                 child: Text(loc.common_close),
               ),
         const SizedBox(width: 8),
-        FilledButton(
+        SaveButton(
           onPressed: _isFormValid && hasChanges
               ? () {
+                  if (!_isFormValid || !widget.hasUnsavedChanges()) return;
                   _validateForm();
                   if (_isFormValid) {
                     widget.onSave();

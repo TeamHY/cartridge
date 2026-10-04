@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/components/save_button.dart';
 import 'package:flutter/services.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
@@ -185,9 +186,13 @@ class _HotkeyRecordDialogState extends State<HotkeyRecordDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(loc.common_cancel),
         ),
-        FilledButton(
+        SaveButton(
           onPressed: _displayText.isNotEmpty && !_isRecording
-              ? () => Navigator.pop(context, _displayText)
+              ? () {
+                  if (_displayText.isNotEmpty && !_isRecording) {
+                    Navigator.pop(context, _displayText);
+                  }
+                }
               : null,
           child: Text(loc.common_save),
         ),

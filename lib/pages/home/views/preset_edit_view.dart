@@ -5,6 +5,7 @@ import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/components/dialogs/game_config_dialog.dart';
 import 'package:cartridge/components/dialogs/mod_group_dialog.dart';
+import 'package:cartridge/components/save_button.dart';
 import 'package:cartridge/pages/home/components/mod_item.dart';
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -556,7 +557,7 @@ class _PresetEditViewState extends ConsumerState<PresetEditView> {
               onPressed: widget.onCancel,
               child: Text(loc.common_cancel),
             ),
-            FilledButton(
+            SaveButton(
               onPressed: () {
                 final mods = <Mod>[];
 

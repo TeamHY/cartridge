@@ -1,4 +1,5 @@
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
+import 'package:cartridge/components/save_button.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/services/isaac_config_service.dart';
 import 'package:cartridge/services/process_util.dart';
@@ -145,7 +146,7 @@ class _IsaacOptionsViewState extends ConsumerState<IsaacOptionsView> {
   }
 
   Future<void> _saveAndRestart() async {
-    if (_selectedEdition == null) return;
+    if (_saving || !_isChanged || _selectedEdition == null) return;
     final setting = ref.read(settingProvider);
     setState(() => _saving = true);
     await ProcessUtil.killIsaac();
@@ -258,7 +259,7 @@ class _IsaacOptionsViewState extends ConsumerState<IsaacOptionsView> {
           mainAxisAlignment: MainAxisAlignment.end,
           spacing: 4,
           children: [
-            FilledButton(
+            SaveButton(
               onPressed: _saving || !_isChanged ? null : _saveAndRestart,
               child: _saving
                   ? const Row(

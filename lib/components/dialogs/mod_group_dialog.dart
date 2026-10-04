@@ -1,4 +1,5 @@
 import 'package:cartridge/providers/store_provider.dart';
+import 'package:cartridge/components/save_button.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -95,7 +96,7 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: Text(AppLocalizations.of(context).common_cancel),
         ),
-        FilledButton(
+        SaveButton(
           onPressed: _handleCreate,
           child: Text(widget.isEdit
               ? AppLocalizations.of(context).common_update
