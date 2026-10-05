@@ -1,20 +1,20 @@
 {
   "appName": "Cartridge",
+  "description": "Isaac Mod Preset Manager",
   "items": [
     {
-      "platform": "windows",
-      "mandatory": true,
       "changes": [
         {
-          "message": "퀴즈 설정 업데이트",
-          "type": "feat"
+          "type": "ci",
+          "message": "pin release SDK versions for desktop_updater compatibility"
         }
       ],
-      "date": "2026-07-24",
-      "url": "https://teamhy.github.io/cartridge/4.32.0+43200-windows",
-      "shortVersion": 43200,
-      "version": "4.32.0"
+      "platform": "windows",
+      "url": "https://teamhy.github.io/cartridge/4.33.1+43301-windows",
+      "mandatory": true,
+      "date": "2026-10-05",
+      "shortVersion": 43301,
+      "version": "4.33.1"
     }
-  ],
-  "description": "Isaac Mod Preset Manager"
+  ]
 }
