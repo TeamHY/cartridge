@@ -29,6 +29,12 @@ class MusicPlayerNotifier extends ChangeNotifier {
   PlayerState? _playerState;
   Duration? _duration;
   Duration? _position;
+  Timer? _nextTrackTimer;
+  String? _pendingTrackPath;
+  bool _waitingForNextTrack = false;
+  int _playbackRequest = 0;
+  Future<void> _playbackOperation = Future.value();
+  final List<StreamSubscription> _eventSubscriptions = [];
 
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
@@ -39,7 +45,8 @@ class MusicPlayerNotifier extends ChangeNotifier {
   PlayerState? get playerState => _playerState;
   Duration? get duration => _duration;
   Duration? get position => _position;
-  bool get isPlaying => _playerState == PlayerState.playing;
+  bool get isPlaying =>
+      _waitingForNextTrack || _playerState == PlayerState.playing;
   String? get currentTrackTitle => _currentTrackTitle;
   MusicPlaylist? get currentPlaylist => _currentPlaylist;
 
@@ -90,21 +97,25 @@ class MusicPlayerNotifier extends ChangeNotifier {
 
     final isaacEventManager = ref.read(isaacEventManagerProvider);
 
-    isaacEventManager.stageEnteredStream.listen((event) {
+    _eventSubscriptions.add(
+        isaacEventManager.stageEnteredStream.listen((event) {
       _handleStageEntered(event.stage);
-    });
+    }));
 
-    isaacEventManager.roomEnteredStream.listen((event) {
+    _eventSubscriptions.add(
+        isaacEventManager.roomEnteredStream.listen((event) {
       _handleRoomEntered(event.roomType, event.isCleared);
-    });
+    }));
 
-    isaacEventManager.roomClearedStream.listen((event) {
+    _eventSubscriptions.add(
+        isaacEventManager.roomClearedStream.listen((event) {
       _handleRoomCleared(event.roomType);
-    });
+    }));
 
-    isaacEventManager.bossClearedStream.listen((event) {
+    _eventSubscriptions.add(
+        isaacEventManager.bossClearedStream.listen((event) {
       _handleBossCleared(event.bossType);
-    });
+    }));
   }
 
   void _debugPrintStack() {
@@ -241,10 +252,60 @@ class MusicPlayerNotifier extends ChangeNotifier {
     _debugPrintStack();
   }
 
-  Future<void> _updatePlayback({bool forcePlay = false}) async {
+  void _cancelPendingPlayback({bool keepTrack = false}) {
+    _playbackRequest++;
+    _nextTrackTimer?.cancel();
+    _nextTrackTimer = null;
+    _waitingForNextTrack = false;
+    if (!keepTrack) _pendingTrackPath = null;
+  }
+
+  Future<void> _runPlaybackOperation(
+      int request, Future<void> Function() action) {
+    final operation = _playbackOperation.then((_) async {
+      if (request == _playbackRequest) await action();
+    });
+    _playbackOperation = operation.catchError((Object _) {});
+    return operation;
+  }
+
+  Future<void> _playTrack(String path, int request) async {
+    if (_audioPlayer.state == PlayerState.playing) {
+      await _audioPlayer.pause();
+      if (request != _playbackRequest) return;
+    }
+
+    await _audioPlayer.setSource(DeviceFileSource(path));
+    if (request == _playbackRequest) await _audioPlayer.resume();
+  }
+
+  Future<void> _playPendingTrack(int request) async {
+    if (request != _playbackRequest) return;
+
+    _nextTrackTimer = null;
+    await _runPlaybackOperation(request, () async {
+      final path = _pendingTrackPath;
+      _waitingForNextTrack = false;
+      notifyListeners();
+
+      if (path != null && request == _playbackRequest) {
+        await _playTrack(path, request);
+        if (request == _playbackRequest) _pendingTrackPath = null;
+      }
+    });
+  }
+
+  Future<void> _updatePlayback({
+    bool forcePlay = false,
+    bool delayPlayback = true,
+  }) async {
     if (_playlistStack.isEmpty) {
+      _cancelPendingPlayback();
+      final request = _playbackRequest;
       _currentPlaylist = null;
-      await _audioPlayer.release();
+      _currentTrackTitle = null;
+      notifyListeners();
+      await _runPlaybackOperation(request, _audioPlayer.release);
       debugPrint('[MusicStack] No playlists available');
       return;
     }
@@ -257,11 +318,15 @@ class MusicPlayerNotifier extends ChangeNotifier {
       return;
     }
 
+    _cancelPendingPlayback();
+    final request = _playbackRequest;
     _currentPlaylist = targetPlaylist;
     final track = targetPlaylist.getRandomTrack();
 
     if (track == null) {
       _currentTrackTitle = null;
+      notifyListeners();
+      await _runPlaybackOperation(request, _audioPlayer.stop);
       debugPrint(
           '[MusicStack] No tracks in current playlist: ${targetPlaylist.id}');
       return;
@@ -270,23 +335,50 @@ class MusicPlayerNotifier extends ChangeNotifier {
     _currentTrackTitle = track.title;
     debugPrint(
         '[MusicStack] Playing: ${track.title} from ${targetPlaylist.id}');
-    await _audioPlayer.play(DeviceFileSource(track.filePath));
+    _pendingTrackPath = track.filePath;
+    final delay = ref.read(settingProvider).musicTrackDelay;
+    if (delayPlayback && delay > 0) {
+      _waitingForNextTrack = true;
+      _position = Duration.zero;
+      _duration = null;
+      notifyListeners();
+      await _runPlaybackOperation(request, _audioPlayer.stop);
+      if (request != _playbackRequest) return;
+
+      _nextTrackTimer = Timer(Duration(milliseconds: delay), () {
+        _playPendingTrack(request);
+      });
+    } else {
+      notifyListeners();
+      await _playPendingTrack(request);
+    }
   }
 
   Future<void> play() async {
-    await _audioPlayer.resume();
+    _cancelPendingPlayback(keepTrack: true);
+    if (_pendingTrackPath != null) {
+      await _playPendingTrack(_playbackRequest);
+    } else {
+      await _runPlaybackOperation(_playbackRequest, _audioPlayer.resume);
+    }
   }
 
   Future<void> playNext() async {
-    await _updatePlayback(forcePlay: true);
+    await _updatePlayback(forcePlay: true, delayPlayback: false);
   }
 
   Future<void> pause() async {
-    await _audioPlayer.pause();
+    _cancelPendingPlayback(keepTrack: true);
+    final request = _playbackRequest;
+    notifyListeners();
+    await _runPlaybackOperation(request, _audioPlayer.pause);
   }
 
   Future<void> stop() async {
-    await _audioPlayer.stop();
+    _cancelPendingPlayback(keepTrack: true);
+    final request = _playbackRequest;
+    notifyListeners();
+    await _runPlaybackOperation(request, _audioPlayer.stop);
   }
 
   Future<void> seek(Duration position) async {
@@ -294,7 +386,11 @@ class MusicPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> playSource(String source) async {
-    await _audioPlayer.play(DeviceFileSource(source));
+    _cancelPendingPlayback();
+    final request = _playbackRequest;
+    _pendingTrackPath = source;
+    notifyListeners();
+    await _playPendingTrack(request);
   }
 
   void resetMusicStack() {
@@ -407,11 +503,15 @@ class MusicPlayerNotifier extends ChangeNotifier {
 
   @override
   void dispose() {
+    _cancelPendingPlayback();
+    for (final subscription in _eventSubscriptions) {
+      subscription.cancel();
+    }
     _durationSubscription?.cancel();
     _positionSubscription?.cancel();
     _playerCompleteSubscription?.cancel();
     _playerStateChangeSubscription?.cancel();
-    _audioPlayer.dispose();
+    _playbackOperation.then((_) => _audioPlayer.dispose());
     musicSettingSubscription?.close();
     super.dispose();
   }

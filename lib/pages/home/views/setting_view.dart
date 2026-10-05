@@ -1,9 +1,11 @@
+import 'package:cartridge/components/save_button.dart';
 import 'package:cartridge/main.dart';
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/components/hotkey_input_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:cartridge/l10n/app_localizations.dart';
 
@@ -21,6 +23,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
 
   late TextEditingController _pathController;
   late TextEditingController _rerunDelayController;
+  late TextEditingController _musicTrackDelayController;
   late TextEditingController _playPauseHotkeyController;
   late TextEditingController _nextTrackHotkeyController;
   late TextEditingController _volumeUpHotkeyController;
@@ -36,6 +39,8 @@ class _SettingViewState extends ConsumerState<SettingView> {
     _pathController = TextEditingController(text: settings.isaacPath);
     _rerunDelayController =
         TextEditingController(text: settings.rerunDelay.toString());
+    _musicTrackDelayController =
+        TextEditingController(text: settings.musicTrackDelay.toString());
     _playPauseHotkeyController =
         TextEditingController(text: settings.playPauseHotkey);
     _nextTrackHotkeyController =
@@ -53,6 +58,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
   void dispose() {
     _pathController.dispose();
     _rerunDelayController.dispose();
+    _musicTrackDelayController.dispose();
     _playPauseHotkeyController.dispose();
     _nextTrackHotkeyController.dispose();
     _volumeUpHotkeyController.dispose();
@@ -64,6 +70,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final musicTrackDelay = int.tryParse(_musicTrackDelayController.text);
 
     return Column(
       children: [
@@ -93,6 +100,22 @@ class _SettingViewState extends ConsumerState<SettingView> {
                     onChanged: (_) => setState(() => _isChanged = true),
                   ),
                 ),
+                const SizedBox(height: 16.0),
+                InfoLabel(
+                  label: loc.setting_music_track_delay_label,
+                  child: TextBox(
+                    controller: _musicTrackDelayController,
+                    placeholder: loc.setting_music_track_delay_hint,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    onChanged: (_) => setState(() => _isChanged = true),
+                  ),
+                ),
+                if (musicTrackDelay == null)
+                  Text(
+                    loc.setting_music_track_delay_error,
+                    style: TextStyle(color: Colors.red),
+                  ),
                 const SizedBox(height: 16.0),
                 InfoLabel(
                   label: loc.setting_language_label,
@@ -202,14 +225,18 @@ class _SettingViewState extends ConsumerState<SettingView> {
               mainAxisAlignment: MainAxisAlignment.end,
               spacing: 4,
               children: [
-                FilledButton(
-                  onPressed: _isChanged
+                SaveButton(
+                  onPressed: _isChanged && musicTrackDelay != null
                       ? () {
+                          final musicTrackDelay =
+                              int.tryParse(_musicTrackDelayController.text);
+                          if (!_isChanged || musicTrackDelay == null) return;
                           final setting = ref.read(settingProvider);
 
                           setting.updateSettings(
                             isaacPath: _pathController.text,
                             rerunDelay: int.parse(_rerunDelayController.text),
+                            musicTrackDelay: musicTrackDelay,
                             languageCode: _selectedLanguageCode,
                             playPauseHotkey: _playPauseHotkeyController.text,
                             nextTrackHotkey: _nextTrackHotkeyController.text,
