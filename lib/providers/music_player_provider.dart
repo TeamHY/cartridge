@@ -12,6 +12,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MusicPlayerNotifier extends ChangeNotifier {
+  static const Duration _suspendFadeOutDuration = Duration(milliseconds: 150);
+  static const Duration _suspendFadeInDuration = Duration(milliseconds: 300);
+  static const Duration _fadeInterval = Duration(milliseconds: 30);
+
   MusicPlayerNotifier(this.ref) {
     _initAudioPlayer();
   }
@@ -36,6 +40,13 @@ class MusicPlayerNotifier extends ChangeNotifier {
   Future<void> _playbackOperation = Future.value();
   final List<StreamSubscription> _eventSubscriptions = [];
 
+  bool _isSuspended = false;
+  bool _resumeAfterSuspend = false;
+  Timer? _suspendTimer;
+  DateTime? _suspendUntil;
+  Timer? _fadeTimer;
+  Completer<bool>? _fadeCompleter;
+
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
   StreamSubscription? _playerCompleteSubscription;
@@ -45,8 +56,10 @@ class MusicPlayerNotifier extends ChangeNotifier {
   PlayerState? get playerState => _playerState;
   Duration? get duration => _duration;
   Duration? get position => _position;
-  bool get isPlaying =>
-      _waitingForNextTrack || _playerState == PlayerState.playing;
+  bool get isPlaying => _isSuspended
+      ? _resumeAfterSuspend
+      : _waitingForNextTrack || _playerState == PlayerState.playing;
+  bool get isSuspended => _isSuspended;
   String? get currentTrackTitle => _currentTrackTitle;
   MusicPlaylist? get currentPlaylist => _currentPlaylist;
 
@@ -86,7 +99,9 @@ class MusicPlayerNotifier extends ChangeNotifier {
     musicSettingSubscription = ref.listen(settingProvider, (previous, next) {
       loadPlaylists();
 
-      if (_audioPlayer.volume != next.musicVolume) {
+      if (!_isSuspended &&
+          _fadeTimer == null &&
+          _audioPlayer.volume != next.musicVolume) {
         _audioPlayer.setVolume(next.musicVolume);
       }
     });
@@ -115,6 +130,11 @@ class MusicPlayerNotifier extends ChangeNotifier {
     _eventSubscriptions.add(
         isaacEventManager.bossClearedStream.listen((event) {
       _handleBossCleared(event.bossType);
+    }));
+
+    _eventSubscriptions.add(
+        isaacEventManager.musicPauseStream.listen((event) {
+      suspendFor(event.duration);
     }));
   }
 
@@ -276,7 +296,118 @@ class MusicPlayerNotifier extends ChangeNotifier {
     }
 
     await _audioPlayer.setSource(DeviceFileSource(path));
-    if (request == _playbackRequest) await _audioPlayer.resume();
+    if (request != _playbackRequest) return;
+
+    if (_isSuspended) {
+      _resumeAfterSuspend = true;
+      return;
+    }
+
+    await _audioPlayer.resume();
+  }
+
+  Future<void> _runSuspendOperation(Future<void> Function() action) {
+    _playbackOperation =
+        _playbackOperation.then((_) => action()).catchError((Object _) {});
+    return _playbackOperation;
+  }
+
+  Future<void> suspendFor(Duration duration) async {
+    if (duration <= Duration.zero) {
+      await _endSuspend();
+      return;
+    }
+
+    final until = DateTime.now().add(duration);
+
+    final suspendUntil = _suspendUntil;
+
+    if (_isSuspended && suspendUntil != null && suspendUntil.isAfter(until)) {
+      return;
+    }
+
+    _suspendUntil = until;
+    _suspendTimer?.cancel();
+    _suspendTimer = Timer(duration, _endSuspend);
+
+    if (_isSuspended) return;
+
+    _isSuspended = true;
+    _resumeAfterSuspend = _audioPlayer.state == PlayerState.playing;
+    debugPrint('[MusicSuspend] Suspended for ${duration.inMilliseconds}ms');
+    notifyListeners();
+
+    if (_resumeAfterSuspend) {
+      final faded = await _fadeVolume(() => 0, _suspendFadeOutDuration);
+      if (!faded || !_isSuspended) return;
+    }
+
+    await _runSuspendOperation(_audioPlayer.pause);
+  }
+
+  Future<void> _endSuspend() async {
+    _suspendTimer?.cancel();
+    _suspendTimer = null;
+    _suspendUntil = null;
+
+    if (!_isSuspended) return;
+
+    final shouldResume = _resumeAfterSuspend;
+    _isSuspended = false;
+    _resumeAfterSuspend = false;
+    debugPrint('[MusicSuspend] Ended (resume: $shouldResume)');
+    notifyListeners();
+
+    if (!shouldResume) {
+      _cancelFade();
+      await _audioPlayer.setVolume(_musicVolume);
+      return;
+    }
+
+    await _runSuspendOperation(() async {
+      if (_audioPlayer.state != PlayerState.playing) {
+        await _audioPlayer.setVolume(0);
+      }
+      await _audioPlayer.resume();
+    });
+
+    if (!_isSuspended) {
+      await _fadeVolume(() => _musicVolume, _suspendFadeInDuration);
+    }
+  }
+
+  double get _musicVolume => ref.read(settingProvider).musicVolume;
+
+  void _cancelFade() {
+    _fadeTimer?.cancel();
+    _fadeTimer = null;
+    _fadeCompleter?.complete(false);
+    _fadeCompleter = null;
+  }
+
+  Future<bool> _fadeVolume(double Function() target, Duration duration) {
+    _cancelFade();
+
+    final from = _audioPlayer.volume;
+    final completer = Completer<bool>();
+    final stopwatch = Stopwatch()..start();
+    _fadeCompleter = completer;
+
+    _fadeTimer = Timer.periodic(_fadeInterval, (timer) {
+      final progress = (stopwatch.elapsedMicroseconds /
+              duration.inMicroseconds)
+          .clamp(0.0, 1.0);
+      _audioPlayer.setVolume(from + (target() - from) * progress);
+
+      if (progress >= 1) {
+        timer.cancel();
+        _fadeTimer = null;
+        _fadeCompleter = null;
+        completer.complete(true);
+      }
+    });
+
+    return completer.future;
   }
 
   Future<void> _playPendingTrack(int request) async {
@@ -355,6 +486,12 @@ class MusicPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> play() async {
+    if (_isSuspended && _pendingTrackPath == null) {
+      _resumeAfterSuspend = true;
+      notifyListeners();
+      return;
+    }
+
     _cancelPendingPlayback(keepTrack: true);
     if (_pendingTrackPath != null) {
       await _playPendingTrack(_playbackRequest);
@@ -368,6 +505,7 @@ class MusicPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> pause() async {
+    _resumeAfterSuspend = false;
     _cancelPendingPlayback(keepTrack: true);
     final request = _playbackRequest;
     notifyListeners();
@@ -375,6 +513,7 @@ class MusicPlayerNotifier extends ChangeNotifier {
   }
 
   Future<void> stop() async {
+    _resumeAfterSuspend = false;
     _cancelPendingPlayback(keepTrack: true);
     final request = _playbackRequest;
     notifyListeners();
@@ -504,6 +643,8 @@ class MusicPlayerNotifier extends ChangeNotifier {
   @override
   void dispose() {
     _cancelPendingPlayback();
+    _suspendTimer?.cancel();
+    _cancelFade();
     for (final subscription in _eventSubscriptions) {
       subscription.cancel();
     }

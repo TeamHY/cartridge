@@ -17,6 +17,8 @@ typedef RoomClearedParams = ({IsaacRoomType roomType});
 
 typedef BossClearedParams = ({IsaacBossType bossType});
 
+typedef MusicPauseParams = ({Duration duration});
+
 class IsaacEventManager {
   static const String _prefix = '[Cartridge]';
 
@@ -44,6 +46,9 @@ class IsaacEventManager {
   final _bossClearedStreamController =
       StreamController<BossClearedParams>.broadcast();
 
+  final _musicPauseStreamController =
+      StreamController<MusicPauseParams>.broadcast();
+
   final _recorderStreamController =
       StreamController<(String, List<String>)>.broadcast();
 
@@ -58,6 +63,9 @@ class IsaacEventManager {
 
   Stream<BossClearedParams> get bossClearedStream =>
       _bossClearedStreamController.stream;
+
+  Stream<MusicPauseParams> get musicPauseStream =>
+      _musicPauseStreamController.stream;
 
   Stream<(String, List<String>)> get recorderStream =>
       _recorderStreamController.stream;
@@ -210,6 +218,14 @@ class IsaacEventManager {
             }
           }
           break;
+        case 'MusicPause':
+          final milliseconds = int.tryParse(eventParams[0]);
+
+          if (milliseconds != null && milliseconds >= 0) {
+            _musicPauseStreamController
+                .add((duration: Duration(milliseconds: milliseconds)));
+          }
+          break;
         default:
           if (kDebugMode) {
             print('Unknown event type: $eventType');
@@ -228,6 +244,7 @@ class IsaacEventManager {
     _logFile.dispose();
     _stageEnteredStreamController.close();
     _roomEnteredStreamController.close();
+    _musicPauseStreamController.close();
     _recorderStreamController.close();
   }
 }
