@@ -1,20 +1,20 @@
 {
-  "appName": "Cartridge",
   "description": "Isaac Mod Preset Manager",
   "items": [
     {
+      "mandatory": true,
+      "url": "https://teamhy.github.io/cartridge/4.34.0+43400-windows",
+      "date": "2026-10-10",
+      "version": "4.34.0",
+      "platform": "windows",
+      "shortVersion": 43400,
       "changes": [
         {
-          "type": "ci",
-          "message": "pin release SDK versions for desktop_updater compatibility"
+          "message": "게임 효과음 재생 시 BGM 일시정지 추가",
+          "type": "feat"
         }
-      ],
-      "platform": "windows",
-      "url": "https://teamhy.github.io/cartridge/4.33.1+43301-windows",
-      "mandatory": true,
-      "date": "2026-10-05",
-      "shortVersion": 43301,
-      "version": "4.33.1"
+      ]
     }
-  ]
+  ],
+  "appName": "Cartridge"
 }
