@@ -1,6 +1,9 @@
 import 'package:cartridge/components/save_button.dart';
 import 'package:cartridge/main.dart';
+import 'package:cartridge/models/game_launch_mode.dart';
+import 'package:cartridge/pages/home/components/repentogon_settings_section.dart';
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
+import 'package:cartridge/providers/repentogon_provider.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/components/hotkey_input_field.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -30,6 +33,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
   late TextEditingController _volumeDownHotkeyController;
   late TextEditingController _volumeStepController;
   late String _selectedLanguageCode;
+  late GameLaunchMode _selectedLaunchMode;
 
   @override
   void initState() {
@@ -52,6 +56,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
     _volumeStepController = TextEditingController(
         text: (settings.volumeStepSize * 100).toStringAsFixed(0));
     _selectedLanguageCode = settings.languageCode ?? 'ko';
+    _selectedLaunchMode = settings.launchMode;
   }
 
   @override
@@ -92,6 +97,41 @@ class _SettingViewState extends ConsumerState<SettingView> {
                     onChanged: (_) => setState(() => _isChanged = true),
                   ),
                 ),
+                const SizedBox(height: 16.0),
+                InfoLabel(
+                  label: loc.setting_launch_mode_label,
+                  child: ComboBox<GameLaunchMode>(
+                    value: _selectedLaunchMode,
+                    items: [
+                      ComboBoxItem(
+                        value: GameLaunchMode.vanilla,
+                        child: Text(loc.setting_launch_mode_vanilla),
+                      ),
+                      ComboBoxItem(
+                        value: GameLaunchMode.repentogon,
+                        child: Text(loc.setting_launch_mode_repentogon),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedLaunchMode = value;
+                          _isChanged = true;
+                        });
+                      }
+                    },
+                  ),
+                ),
+                if (_selectedLaunchMode == GameLaunchMode.repentogon) ...[
+                  const SizedBox(height: 8.0),
+                  if (RepentogonNotifier.isSupported)
+                    const RepentogonSettingsSection()
+                  else
+                    Text(
+                      loc.setting_launch_mode_windows_only,
+                      style: TextStyle(color: Colors.red),
+                    ),
+                ],
                 const SizedBox(height: 16.0),
                 InfoLabel(
                   label: loc.setting_rerun_delay_label,
@@ -236,6 +276,7 @@ class _SettingViewState extends ConsumerState<SettingView> {
                           setting.updateSettings(
                             isaacPath: _pathController.text,
                             rerunDelay: int.parse(_rerunDelayController.text),
+                            launchMode: _selectedLaunchMode,
                             musicTrackDelay: musicTrackDelay,
                             languageCode: _selectedLanguageCode,
                             playPauseHotkey: _playPauseHotkeyController.text,

@@ -1,8 +1,11 @@
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
+import 'package:cartridge/components/dialogs/error_dialog.dart';
 import 'package:cartridge/components/save_button.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/services/isaac_config_service.dart';
+import 'package:cartridge/services/game_launcher_service.dart';
 import 'package:cartridge/services/process_util.dart';
+import 'package:cartridge/utils/repentogon_error_text.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -152,7 +155,17 @@ class _IsaacOptionsViewState extends ConsumerState<IsaacOptionsView> {
     await ProcessUtil.killIsaac();
     await Future.delayed(Duration(milliseconds: setting.rerunDelay));
     await IsaacConfigService.setAllOptions(_selectedEdition!, _values);
-    await ProcessUtil.launchIsaac(setting.isaacPath);
+    try {
+      await GameLauncherService.startIsaac(
+        isaacPath: setting.isaacPath,
+        launchMode: setting.launchMode,
+      );
+    } catch (e) {
+      if (mounted) {
+        showErrorDialog(
+            context, describeRepentogonError(AppLocalizations.of(context), e));
+      }
+    }
     if (mounted) {
       setState(() {
         _saving = false;

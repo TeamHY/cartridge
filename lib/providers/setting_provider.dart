@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cartridge/models/game_launch_mode.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -48,6 +49,15 @@ class SettingNotifier extends ChangeNotifier {
 
   set musicTrackDelay(int delay) {
     _musicTrackDelay = delay < 0 ? 0 : delay;
+    notifyListeners();
+  }
+
+  GameLaunchMode _launchMode = GameLaunchMode.vanilla;
+
+  GameLaunchMode get launchMode => _launchMode;
+
+  set launchMode(GameLaunchMode mode) {
+    _launchMode = mode;
     notifyListeners();
   }
 
@@ -129,6 +139,7 @@ class SettingNotifier extends ChangeNotifier {
     double? musicVolume,
     int? musicTrackDelay,
     int? rerunDelay,
+    GameLaunchMode? launchMode,
     String? languageCode,
     bool? isGridView,
     String? playPauseHotkey,
@@ -144,6 +155,7 @@ class SettingNotifier extends ChangeNotifier {
       _musicTrackDelay = musicTrackDelay < 0 ? 0 : musicTrackDelay;
     }
     if (rerunDelay != null) _rerunDelay = rerunDelay;
+    if (launchMode != null) _launchMode = launchMode;
     if (languageCode != null) _languageCode = languageCode;
     if (isGridView != null) _isGridView = isGridView;
     if (playPauseHotkey != null) _playPauseHotkey = playPauseHotkey;
@@ -173,6 +185,7 @@ class SettingNotifier extends ChangeNotifier {
     final musicTrackDelay = json['musicTrackDelay'] as int? ?? 0;
     _musicTrackDelay = musicTrackDelay < 0 ? 0 : musicTrackDelay;
     _rerunDelay = json['rerunDelay'] as int? ?? 1000;
+    _launchMode = GameLaunchMode.fromName(json['launchMode'] as String?);
     _languageCode = json['languageCode'] as String?;
     _isGridView = json['isGridView'] as bool? ?? false;
     _playPauseHotkey = json['playPauseHotkey'] as String? ?? 'ctrl+alt+p';
@@ -196,6 +209,7 @@ class SettingNotifier extends ChangeNotifier {
         'musicVolume': _musicVolume,
         'musicTrackDelay': _musicTrackDelay,
         'rerunDelay': _rerunDelay,
+        'launchMode': _launchMode.name,
         'languageCode': _languageCode,
         'isGridView': _isGridView,
         'playPauseHotkey': _playPauseHotkey,

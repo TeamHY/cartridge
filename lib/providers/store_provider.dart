@@ -9,7 +9,10 @@ import 'package:cartridge/services/mod_service.dart'
     hide cartridgeSupporterName;
 import 'package:cartridge/services/preset_service.dart';
 import 'package:cartridge/services/game_launcher_service.dart';
+import 'package:cartridge/services/repentogon_cli_service.dart';
+import 'package:cartridge/utils/app_navigator.dart';
 import 'package:cartridge/utils/presets_parser.dart';
+import 'package:cartridge/utils/repentogon_error_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -142,12 +145,20 @@ class StoreNotifier extends ChangeNotifier {
     await IsaacConfigService.setDebugConsole(isDebugConsole);
 
     if (isRerun || isForceRerun) {
-      await GameLauncherService.launchGame(
-        isaacPath: setting.isaacPath,
-        rerunDelay: setting.rerunDelay,
-        isForceUpdate: isForceUpdate,
-        isNoDelay: isNoDelay,
-      );
+      try {
+        await GameLauncherService.launchGame(
+          isaacPath: setting.isaacPath,
+          rerunDelay: setting.rerunDelay,
+          launchMode: setting.launchMode,
+          isForceUpdate: isForceUpdate,
+          isNoDelay: isNoDelay,
+        );
+      } on RgonCliException catch (e) {
+        showGlobalErrorDialog((loc) => describeRepentogonError(loc, e));
+      } catch (e, stackTrace) {
+        await Sentry.captureException(e, stackTrace: stackTrace);
+        showGlobalErrorDialog((loc) => describeRepentogonError(loc, e));
+      }
     }
   }
 

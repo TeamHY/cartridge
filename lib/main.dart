@@ -1,5 +1,6 @@
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/pages/home/home_page.dart';
+import 'package:cartridge/utils/app_navigator.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -75,6 +76,7 @@ class MyApp extends ConsumerWidget {
     // ref.read(hotkeyProvider).init();
 
     return FluentApp(
+      navigatorKey: appNavigatorKey,
       title: 'Cartridge',
       debugShowCheckedModeBanner: false,
       locale: Locale(languageCode),
