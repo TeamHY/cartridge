@@ -6,25 +6,24 @@ import 'package:cartridge/pages/quiz/quiz_play_page.dart';
 import 'package:cartridge/pages/quiz/quiz_settings_page.dart';
 import 'package:cartridge/pages/record/components/back_arrow_view.dart';
 import 'package:cartridge/providers/quiz_provider.dart';
-import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class QuizPage extends ConsumerWidget {
   const QuizPage({super.key});
 
-  void _startQuiz(
-      BuildContext context, WidgetRef ref, QuizCategory category) {
+  void _startQuiz(BuildContext context, WidgetRef ref, QuizCategory category) {
     final loc = AppLocalizations.of(context);
     final validCount = category.quizzes.where((q) => q.isComplete).length;
 
     if (validCount == 0) {
-      displayInfoBar(
+      showAppNotice(
         context,
-        builder: (context, close) => InfoBar(
+        builder: (context, close) => AppNotice(
           title: Text(loc.quiz_start_empty),
-          severity: InfoBarSeverity.warning,
+          severity: AppNoticeSeverity.warning,
           onClose: close,
         ),
       );
@@ -33,7 +32,7 @@ class QuizPage extends ConsumerWidget {
 
     Navigator.push(
       context,
-      FluentPageRoute(
+      MaterialPageRoute(
         builder: (context) => QuizPlayPage(categoryId: category.id),
       ),
     );
@@ -46,18 +45,17 @@ class QuizPage extends ConsumerWidget {
         .expand((c) => c.quizzes)
         .where((q) => q.isComplete)
         .toList();
-    final unusedCount = completeQuizzes
-        .where((q) => !quiz.usedQuizIds.contains(q.id))
-        .length;
+    final unusedCount =
+        completeQuizzes.where((q) => !quiz.usedQuizIds.contains(q.id)).length;
 
     if (unusedCount == 0) {
-      displayInfoBar(
+      showAppNotice(
         context,
-        builder: (context, close) => InfoBar(
+        builder: (context, close) => AppNotice(
           title: Text(
             completeQuizzes.isEmpty ? loc.quiz_start_empty : loc.quiz_all_used,
           ),
-          severity: InfoBarSeverity.warning,
+          severity: AppNoticeSeverity.warning,
           onClose: close,
         ),
       );
@@ -66,7 +64,7 @@ class QuizPage extends ConsumerWidget {
 
     Navigator.push(
       context,
-      FluentPageRoute(
+      MaterialPageRoute(
         builder: (context) => const QuizPlayPage(),
       ),
     );
@@ -75,7 +73,7 @@ class QuizPage extends ConsumerWidget {
   void _openSettings(BuildContext context) {
     Navigator.push(
       context,
-      FluentPageRoute(
+      MaterialPageRoute(
         builder: (context) => const QuizSettingsPage(),
       ),
     );
@@ -84,11 +82,10 @@ class QuizPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final loc = AppLocalizations.of(context);
-    final typography = FluentTheme.of(context).typography;
     final quiz = ref.watch(quizProvider);
 
     return BackArrowView(
-      controlColor: Colors.black,
+      controlColor: AppColors.of(context).ink,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -98,24 +95,28 @@ class QuizPage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: Text(loc.quiz_title, style: typography.title),
+                  child: Text(loc.quiz_title, style: AppTextStyles.title),
                 ),
-                SizedBox(height: 37, child: ToggleSwitch(
-                  checked: quiz.autoAdvance,
-                  onChanged: (value) =>
-                      ref.read(quizProvider).setAutoAdvance(value),
-                  content: Text(loc.quiz_auto_advance),
-                )),
+                SizedBox(
+                  height: appControlHeight,
+                  child: Center(
+                    child: AppSwitch(
+                      value: quiz.autoAdvance,
+                      onChanged: (value) =>
+                          ref.read(quizProvider).setAutoAdvance(value),
+                      content: Text(loc.quiz_auto_advance),
+                    ),
+                  ),
+                ),
                 const SizedBox(width: 12),
                 SizedBox(
                   width: 140,
-                  child: InfoLabel(
+                  child: AppLabeled(
                     label: loc.quiz_question_count_label,
-                    child: NumberBox<int>(
+                    child: AppNumberField(
                       value: quiz.questionCount,
                       min: 1,
                       max: 100,
-                      mode: SpinButtonPlacementMode.inline,
                       onChanged: quiz.autoAdvance
                           ? null
                           : (value) {
@@ -127,51 +128,31 @@ class QuizPage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Button(
+                AppButton(
                   onPressed: () => showQuizPlayOptionsDialog(context),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(FluentIcons.equalizer),
-                        const SizedBox(width: 8),
-                        Text(loc.quiz_play_options),
-                      ],
-                    ),
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  icon: const PhosphorIcon(
+                      PhosphorIconsRegular.slidersHorizontal),
+                  child: Text(loc.quiz_play_options),
                 ),
                 const SizedBox(width: 12),
-                Button(
+                AppButton(
                   onPressed: quiz.usedQuizIds.isEmpty
                       ? null
                       : () => ref.read(quizProvider).resetUsedQuizzes(),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(FluentIcons.refresh),
-                        const SizedBox(width: 8),
-                        Text(loc.quiz_reset_used),
-                      ],
-                    ),
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  icon: const PhosphorIcon(PhosphorIconsRegular.arrowClockwise),
+                  child: Text(loc.quiz_reset_used),
                 ),
                 const SizedBox(width: 12),
-                Button(
+                AppButton(
                   onPressed: () => _openSettings(context),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(FluentIcons.settings),
-                        const SizedBox(width: 8),
-                        Text(loc.quiz_settings),
-                      ],
-                    ),
-                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  icon: const PhosphorIcon(PhosphorIconsRegular.gear),
+                  child: Text(loc.quiz_settings),
                 ),
               ],
             ),
@@ -182,9 +163,10 @@ class QuizPage extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(loc.quiz_category_empty, style: typography.body),
+                          Text(loc.quiz_category_empty,
+                              style: AppTextStyles.body),
                           const SizedBox(height: 16),
-                          FilledButton(
+                          AppButton.primary(
                             onPressed: () => _openSettings(context),
                             child: Text(loc.quiz_settings),
                           ),
@@ -208,8 +190,7 @@ class QuizPage extends ConsumerWidget {
                               .toList();
                           return _AllRandomCard(
                             remainingCount: completeQuizzes
-                                .where(
-                                    (q) => !quiz.usedQuizIds.contains(q.id))
+                                .where((q) => !quiz.usedQuizIds.contains(q.id))
                                 .length,
                             totalCount: completeQuizzes.length,
                             onTap: () => _startRandomQuiz(context, ref),
@@ -244,10 +225,11 @@ class _AllRandomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final c = AppColors.of(context);
 
-    return material.Material(
+    return Material(
       color: Colors.transparent,
-      child: material.InkWell(
+      child: InkWell(
         onTap: onTap,
         mouseCursor: SystemMouseCursors.click,
         borderRadius: BorderRadius.circular(16),
@@ -283,8 +265,8 @@ class _AllRandomCard extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 loc.quiz_all_random,
-                style: const TextStyle(
-                  color: Color(0xFF1F2937),
+                style: TextStyle(
+                  color: c.ink,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -296,7 +278,7 @@ class _AllRandomCard extends StatelessWidget {
               Text(
                 '$remainingCount / $totalCount ${loc.quiz_count_suffix}',
                 style: TextStyle(
-                  color: const Color(0xFF1F2937).withValues(alpha: 0.6),
+                  color: c.ink3,
                   fontSize: 12,
                 ),
                 textAlign: TextAlign.center,
@@ -322,10 +304,11 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final color = Color(category.colorValue);
+    final c = AppColors.of(context);
 
-    return material.Material(
+    return Material(
       color: Colors.transparent,
-      child: material.InkWell(
+      child: InkWell(
         onTap: onTap,
         mouseCursor: SystemMouseCursors.click,
         borderRadius: BorderRadius.circular(16),
@@ -357,8 +340,8 @@ class _CategoryCard extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 category.name,
-                style: const TextStyle(
-                  color: Color(0xFF1F2937),
+                style: TextStyle(
+                  color: c.ink,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -370,7 +353,7 @@ class _CategoryCard extends StatelessWidget {
               Text(
                 '${category.quizzes.where((q) => q.isComplete).length} ${loc.quiz_count_suffix}',
                 style: TextStyle(
-                  color: const Color(0xFF1F2937).withValues(alpha: 0.6),
+                  color: c.ink3,
                   fontSize: 12,
                 ),
                 textAlign: TextAlign.center,

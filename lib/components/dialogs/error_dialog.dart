@@ -1,8 +1,9 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
 void showErrorDialog(BuildContext context, String text) {
-  showDialog(
+  showAppDialog(
     context: context,
     builder: (context) {
       return ErrorDialog(text: text);
@@ -19,11 +20,12 @@ class ErrorDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    return ContentDialog(
+    return AppDialog(
+      constraints: const BoxConstraints(maxWidth: 368),
       title: Text(loc.common_error),
       content: Text(text),
       actions: [
-        FilledButton(
+        AppButton.primary(
           onPressed: () {
             Navigator.pop(context);
           },

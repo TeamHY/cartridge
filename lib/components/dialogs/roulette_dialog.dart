@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:cartridge/models/preset.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:roulette/roulette.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
@@ -20,7 +21,7 @@ class Arrow extends StatelessWidget {
 
 class _ArrowPainter extends CustomPainter {
   final _paint = Paint()
-    ..color = Colors.orange.light
+    ..color = const Color(0xFFF87A30)
     ..style = PaintingStyle.fill;
 
   @override
@@ -62,7 +63,7 @@ class _RouletteDialogState extends State<RouletteDialog>
     controller = RouletteController(
       group: RouletteGroup.uniform(
         widget.presets.length,
-        colorBuilder: (index) => Colors.blue.lightest,
+        colorBuilder: (index) => const Color(0xFF60ABE4),
         textBuilder: (index) => widget.presets[index].name,
         textStyleBuilder: (index) => const TextStyle(
           color: Colors.black,
@@ -85,7 +86,8 @@ class _RouletteDialogState extends State<RouletteDialog>
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    return ContentDialog(
+    return AppDialog(
+      constraints: const BoxConstraints(maxWidth: 368),
       title: Text(loc.roulette_dialog_title),
       content: Stack(alignment: Alignment.topCenter, children: [
         Padding(
@@ -100,32 +102,33 @@ class _RouletteDialogState extends State<RouletteDialog>
         const Arrow()
       ]),
       actions: [
-        Button(
+        AppButton(
           onPressed: () {
             Navigator.pop(context);
           },
           child: Text(loc.common_cancel),
         ),
-        FilledButton(
+        AppButton.primary(
           onPressed: () {
             setState(() {
               index = random.nextInt(widget.presets.length);
             });
 
             controller.rollTo(index, offset: random.nextDouble()).then(
-                  (value) => showDialog(
+                  (value) => showAppDialog(
                     context: context,
-                    builder: (context) => ContentDialog(
+                    builder: (context) => AppDialog(
+                      constraints: const BoxConstraints(maxWidth: 368),
                       title: Text(widget.presets[index].name),
                       content: Text(loc.roulette_result_confirm),
                       actions: [
-                        Button(
+                        AppButton(
                           onPressed: () {
                             Navigator.pop(context);
                           },
                           child: Text(loc.common_cancel),
                         ),
-                        FilledButton(
+                        AppButton.primary(
                           onPressed: () {
                             widget.onApply(widget.presets[index]);
                             Navigator.pop(context);

@@ -2,8 +2,10 @@ import 'package:cartridge/components/dialogs/mod_group_selector_dialog.dart';
 import 'package:cartridge/providers/slot_machine_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/pages/slot_machine/components/slot_view.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
@@ -68,8 +70,8 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
         SizedBox(
           width: 40,
           height: 40,
-          child: IconButton(
-            icon: const Icon(FluentIcons.add),
+          child: AppIconButton(
+            icon: const PhosphorIcon(PhosphorIconsRegular.plus),
             onPressed: () {
               final loc = AppLocalizations.of(context);
               ref.read(slotMachineProvider).addSlot(loc.slot_default);
@@ -80,77 +82,42 @@ class _SlotMachinePageState extends ConsumerState<SlotMachinePage>
         SizedBox(
           width: 40,
           height: 40,
-          child: Tooltip(
-            message: AppLocalizations.of(context).slot_add_from_mod_group,
-            child: IconButton(
-              icon: const Icon(FluentIcons.tag_group),
-              onPressed: () async {
-                final groupName = await showDialog<String>(
-                  context: context,
-                  builder: (context) => const ModGroupSelectorDialog(),
-                );
+          child: AppIconButton(
+            tooltip: AppLocalizations.of(context).slot_add_from_mod_group,
+            icon: const PhosphorIcon(PhosphorIconsRegular.tag),
+            onPressed: () async {
+              final groupName = await showAppDialog<String>(
+                context: context,
+                builder: (context) => const ModGroupSelectorDialog(),
+              );
 
-                if (groupName != null) {
-                  ref.read(slotMachineProvider).addGroupSlot(groupName);
-                }
-              },
-            ),
+              if (groupName != null) {
+                ref.read(slotMachineProvider).addGroupSlot(groupName);
+              }
+            },
           ),
         ),
       ],
     ));
 
-    return NavigationView(
-      content: Stack(
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const DragToMoveArea(child: SizedBox.expand()),
-          Center(
-            child: Column(
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: children,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                IconButton(
-                  icon: const Icon(
-                    FluentIcons.sync,
-                    size: 20,
-                  ),
-                  iconButtonMode: IconButtonMode.large,
-                  onPressed: () => controllers.forEach((e) => e.start?.call()),
-                ),
-              ],
+              children: children,
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () => Navigator.pop(context),
-                iconButtonMode: IconButtonMode.large,
-                icon: const Padding(
-                  padding: EdgeInsets.all(12.0),
-                  child: Icon(
-                    FluentIcons.back,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              const SizedBox(
-                width: 138,
-                height: 50,
-                child: WindowCaption(
-                  brightness: Brightness.dark,
-                  backgroundColor: Colors.transparent,
-                ),
-              )
-            ],
-          )
+          const SizedBox(height: 16),
+          AppIconButton(
+            icon: const PhosphorIcon(PhosphorIconsRegular.arrowsClockwise),
+            size: 40,
+            iconSize: 20,
+            onPressed: () => controllers.forEach((e) => e.start?.call()),
+          ),
         ],
       ),
     );

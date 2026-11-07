@@ -11,8 +11,10 @@ import 'package:cartridge/providers/hotkey_provider.dart';
 import 'package:cartridge/providers/music_player_provider.dart';
 import 'package:cartridge/providers/quiz_provider.dart';
 import 'package:cartridge/providers/setting_provider.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class _PlayChoice {
   _PlayChoice({required this.text, required this.imagePath});
@@ -201,8 +203,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
       return _PlayQuestion(
         id: quiz.id,
         categoryName: _categoryNames[quiz.id] ?? '',
-        categoryColor:
-            _categoryColors[quiz.id] ?? defaultQuizCategoryColor,
+        categoryColor: _categoryColors[quiz.id] ?? defaultQuizCategoryColor,
         question: quiz.question,
         choices: const [],
         answerIndex: -1,
@@ -274,8 +275,8 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
 
   void _adjustVolume(int direction) {
     final step = ref.read(settingProvider).volumeStepSize;
-    final volume = (ref.read(quizProvider).bgmVolume + direction * step)
-        .clamp(0.0, 1.0);
+    final volume =
+        (ref.read(quizProvider).bgmVolume + direction * step).clamp(0.0, 1.0);
     _setVolume(volume);
   }
 
@@ -410,19 +411,41 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   TextStyle? _scaled(TextStyle? style) =>
       style?.copyWith(fontSize: (style.fontSize ?? 14) * _fontScale);
 
-  Color? _choiceColor(int i) {
+  (Color, Color)? _choiceColors(AppColors c, int i) {
     if (!_revealed) {
-      return i == _selected ? Colors.blue.lighter : null;
+      return i == _selected ? (c.accent, c.accentSoft) : null;
     }
     final answerIndex = _questions[_index].answerIndex;
-    if (i == answerIndex) return Colors.green.lighter;
-    if (i == _selected) return Colors.red.lighter;
+    if (i == answerIndex) return (c.success, c.successSoft);
+    if (i == _selected) return (c.danger, c.dangerSoft);
     return null;
   }
 
-  Widget _buildChoiceList(_PlayQuestion question) {
-    final typography = FluentTheme.of(context).typography;
+  Widget _choiceTile(int i, EdgeInsetsGeometry padding, Widget child) {
+    return AppPressable(
+      onPressed: _revealed ? null : () => _selectChoice(i),
+      builder: (context, states) {
+        final c = AppColors.of(context);
+        final colors = _choiceColors(c, i);
+        return Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: colors?.$2 ??
+                (states.contains(WidgetState.hovered)
+                    ? c.surface3
+                    : Colors.transparent),
+            border: Border.all(
+              color: colors?.$1 ?? (_revealed ? c.line : c.lineStrong),
+            ),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: child,
+        );
+      },
+    );
+  }
 
+  Widget _buildChoiceList(_PlayQuestion question) {
     final allImageOnly = question.choices.isNotEmpty &&
         question.choices.every(
           (c) => c.imagePath != null && c.text.trim().isEmpty,
@@ -439,15 +462,10 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
         itemCount: question.choices.length,
         itemBuilder: (context, i) {
           final choice = question.choices[i];
-          return Button(
-            style: ButtonStyle(
-              backgroundColor: _choiceColor(i) == null
-                  ? null
-                  : WidgetStatePropertyAll(_choiceColor(i)),
-              padding: const WidgetStatePropertyAll(EdgeInsets.all(8)),
-            ),
-            onPressed: _revealed ? null : () => _selectChoice(i),
-            child: SizedBox.expand(
+          return _choiceTile(
+            i,
+            const EdgeInsets.all(8),
+            SizedBox.expand(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: Image.file(
@@ -469,17 +487,10 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
         final choice = question.choices[i];
         return SizedBox(
           width: double.infinity,
-          child: Button(
-            style: ButtonStyle(
-              backgroundColor: _choiceColor(i) == null
-                  ? null
-                  : WidgetStatePropertyAll(_choiceColor(i)),
-              padding: const WidgetStatePropertyAll(
-                EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-              ),
-            ),
-            onPressed: _revealed ? null : () => _selectChoice(i),
-            child: Align(
+          child: _choiceTile(
+            i,
+            const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            Align(
               alignment: _hAlign(),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -499,7 +510,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                   Flexible(
                     child: Text(
                       choice.text,
-                      style: _scaled(typography.body),
+                      style: _scaled(AppTextStyles.body),
                       textAlign: _textAlign,
                     ),
                   ),
@@ -515,39 +526,39 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final typography = FluentTheme.of(context).typography;
+    final c = AppColors.of(context);
     final bgmVolume = ref.watch(quizProvider).bgmVolume;
 
     if (_questions.isEmpty) {
       return BackArrowView(
-        controlColor: Colors.black,
+        controlColor: c.ink,
         child: Center(child: Text(loc.quiz_start_empty)),
       );
     }
 
     if (_index >= _questions.length) {
       return BackArrowView(
-        controlColor: Colors.black,
+        controlColor: c.ink,
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(loc.quiz_result_title, style: typography.title),
+              Text(loc.quiz_result_title, style: AppTextStyles.title),
               const SizedBox(height: 16),
               Text(
                 '$_correct / ${_questions.length} ${loc.quiz_score_suffix}',
-                style: typography.subtitle,
+                style: AppTextStyles.section,
               ),
               const SizedBox(height: 24),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Button(
+                  AppButton(
                     onPressed: _retry,
                     child: Text(loc.quiz_retry),
                   ),
                   const SizedBox(width: 12),
-                  FilledButton(
+                  AppButton.primary(
                     onPressed: () => Navigator.pop(context),
                     child: Text(loc.quiz_exit),
                   ),
@@ -566,7 +577,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
     final isUrgent = !inAutoAdvance && _remaining <= 5;
 
     return BackArrowView(
-      controlColor: Colors.black,
+      controlColor: c.ink,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -576,14 +587,14 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
               children: [
                 Text(
                   '${_index + 1} / ${_questions.length}',
-                  style: typography.bodyStrong,
+                  style: AppTextStyles.bodyStrong,
                 ),
                 if (question.difficulty > 0) ...[
                   const SizedBox(width: 12),
                   ...List.generate(
                     question.difficulty,
-                    (_) => const Icon(
-                      FluentIcons.favorite_star_fill,
+                    (_) => const PhosphorIcon(
+                      PhosphorIconsFill.star,
                       size: 14,
                       color: Color(0xFFF5A623),
                     ),
@@ -591,7 +602,7 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                 ],
                 const Spacer(),
                 if (_bgmPlayer != null) ...[
-                  const Icon(FluentIcons.volume2),
+                  const PhosphorIcon(PhosphorIconsRegular.speakerHigh),
                   const SizedBox(width: 4),
                   SizedBox(
                     width: 120,
@@ -604,41 +615,45 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                   ),
                   const SizedBox(width: 12),
                 ],
-                IconButton(
-                  icon: Icon(
-                    _paused ? FluentIcons.play : FluentIcons.pause,
+                AppIconButton(
+                  icon: PhosphorIcon(
+                    _paused
+                        ? PhosphorIconsRegular.play
+                        : PhosphorIconsRegular.pause,
                   ),
                   onPressed: _revealed || _timeUp ? null : _togglePause,
                 ),
                 const SizedBox(width: 12),
-                Icon(
-                  FluentIcons.timer,
-                  color: isUrgent ? Colors.red : null,
+                PhosphorIcon(
+                  PhosphorIconsRegular.timer,
+                  color: isUrgent ? c.danger : null,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   '$displayRemaining',
-                  style: typography.bodyStrong?.copyWith(
-                    color: isUrgent ? Colors.red : null,
+                  style: AppTextStyles.bodyStrong.copyWith(
+                    color: isUrgent ? c.danger : null,
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            ProgressBar(
-              value: displayRemaining / displayLimit * 100,
-              activeColor: isUrgent ? Colors.red : null,
+            LinearProgressIndicator(
+              value: displayRemaining / displayLimit,
+              minHeight: 4,
+              borderRadius: BorderRadius.circular(2),
+              color: isUrgent ? c.danger : null,
             ),
             const SizedBox(height: 24),
             question.categoryName.isEmpty
                 ? Text(
                     question.question,
-                    style: _scaled(typography.subtitle),
+                    style: _scaled(AppTextStyles.title),
                     textAlign: _textAlign,
                   )
                 : Text.rich(
                     TextSpan(
-                      style: _scaled(typography.subtitle),
+                      style: _scaled(AppTextStyles.title),
                       children: [
                         TextSpan(
                           text: '[${question.categoryName}]',
@@ -696,16 +711,16 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                           if (question.openAnswer.isNotEmpty) ...[
                             Text(
                               '${loc.quiz_answer_label}: ${question.openAnswer}',
-                              style: _scaled(typography.subtitle),
+                              style: _scaled(AppTextStyles.title),
                               textAlign: _textAlign,
                             ),
                             const SizedBox(height: 16),
                           ],
                         ],
-                        TextBox(
+                        AppTextField(
                           controller: _openInputController,
                           placeholder: loc.quiz_open_input_hint,
-                          style: _scaled(typography.subtitle),
+                          style: _scaled(AppTextStyles.title),
                           textAlign: _textAlign,
                         ),
                       ],
@@ -735,17 +750,18 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                       : _buildChoiceList(question),
             ),
             const SizedBox(height: 8),
-            if (_autoMode) ...[
-            ] else if (!_revealed) ...[
+            if (_autoMode)
+              ...[]
+            else if (!_revealed) ...[
               if (_timeUp) ...[
                 Text(
                   loc.quiz_time_over,
-                  style: typography.bodyStrong?.copyWith(color: Colors.red),
+                  style: AppTextStyles.bodyStrong.copyWith(color: c.danger),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
               ],
-              FilledButton(
+              AppButton.primary(
                 onPressed: _reveal,
                 child: Text(loc.quiz_reveal),
               ),
@@ -758,37 +774,27 @@ class _QuizPlayPageState extends ConsumerState<QuizPlayPage> {
                       : (_selected == null
                           ? loc.quiz_time_over
                           : loc.quiz_wrong),
-                  style: typography.bodyStrong,
+                  style: AppTextStyles.bodyStrong,
                 ),
                 const SizedBox(height: 12),
               ],
               Row(
                 children: [
                   Expanded(
-                    child: FilledButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(Colors.green.dark),
-                      ),
+                    child: AppButton.primary(
                       onPressed: () => _judge(true),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Text(loc.quiz_correct),
-                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      child: Text(loc.quiz_correct),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: FilledButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            WidgetStatePropertyAll(Colors.red.dark),
-                      ),
+                    child: AppButton.danger(
                       onPressed: () => _judge(false),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Text(loc.quiz_wrong),
-                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      child: Text(loc.quiz_wrong),
                     ),
                   ),
                 ],

@@ -42,6 +42,12 @@
   "setting_language_label": "Language",
   "setting_language_ko": "Korean",
   "setting_language_en": "English",
+  "setting_theme_label": "Theme",
+  "setting_theme_system": "System",
+  "setting_theme_light": "Light",
+  "setting_theme_dark": "Dark",
+  "preset_edit_view_list": "List",
+  "preset_edit_view_grid": "Grid",
   "setting_hotkey_section": "Music Player Hotkeys",
   "setting_hotkey_play_pause_label": "Play/Pause",
   "setting_hotkey_next_track_label": "Next Track",
@@ -76,7 +82,6 @@
   "setting_launch_mode_label": "Launch mode",
   "setting_launch_mode_vanilla": "Vanilla",
   "setting_launch_mode_repentogon": "REPENTOGON",
-  "setting_launch_mode_windows_only": "REPENTOGON can only be launched on Windows.",
   "repentogon_section": "REPENTOGON",
   "repentogon_status_unchecked": "Status not checked yet.",
   "repentogon_status_checking": "Checking...",
@@ -98,7 +103,7 @@
   "repentogon_error_unknown": "Unexpected REPENTOGON error: {detail}",
   "repentogon_error_invalid_isaac": "No valid Isaac executable was found. Check the Isaac installation path in the settings.",
   "repentogon_error_isaac_incompatible": "This game version is not compatible with REPENTOGON.",
-  "repentogon_error_not_installed": "REPENTOGON is not installed. Install it from the settings, or switch the launch mode to vanilla.",
+  "repentogon_error_not_installed": "REPENTOGON is not installed. Install it from the settings, or switch the preset's launch mode to vanilla.",
   "repentogon_error_incompatible": "The REPENTOGON game copy is not compatible. Repair REPENTOGON from the settings.",
   "repentogon_error_launch_failed": "The game could not be started with REPENTOGON.",
   "repentogon_error_busy": "Another REPENTOGON installation is already running.",
@@ -262,6 +267,12 @@
   "preset_edit_select_message": "Please select a preset",
   "preset_edit_no_presets": "No saved presets",
   "preset_edit_create_new": "You can create a new preset below",
+  "preset_edit_game_window_label": "Game window",
+  "preset_edit_game_window_none": "None",
+  "music_island_playlists": "Playlists",
+  "nav_presets": "Presets",
+  "nav_music": "Music",
+  "nav_all_clear_save": "All-clear save",
 
   "@game_config_management": {
     "description": "Game configuration management"
@@ -278,7 +289,6 @@
   "game_config_save": "Save",
   "game_config_select_or_create": "Please select a configuration or create a new one",
   "game_config_edit": "Edit",
-  "game_config_clear_selection": "Clear Selection",
 
   "@validation": {
     "description": "Form validation messages"

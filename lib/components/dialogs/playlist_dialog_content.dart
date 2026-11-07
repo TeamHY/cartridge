@@ -1,5 +1,6 @@
 import 'package:cartridge/constants/isaac_enums.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 
 class PlaylistDialogContent extends StatelessWidget {
   final TextEditingController nameController;
@@ -22,48 +23,28 @@ class PlaylistDialogContent extends StatelessWidget {
     final isSelected = conditionType == value;
     return Expanded(
       child: isSelected
-          ? FilledButton(
+          ? AppButton.primary(
               onPressed: () => onConditionTypeChanged(value),
-              style: ButtonStyle(
-                shape: WidgetStateProperty.all(
-                  RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              child: Text(label),
+              child: Center(child: Text(label)),
             )
-          : Button(
+          : AppButton(
               onPressed: () => onConditionTypeChanged(value),
-              style: ButtonStyle(
-                shape: WidgetStateProperty.all(
-                  RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                ),
-              ),
-              child: Text(label),
+              child: Center(child: Text(label)),
             ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('플레이리스트 이름'),
         const SizedBox(height: 8),
-        TextBox(
+        AppTextField(
           controller: nameController,
           onChanged: (value) => onNameChanged(),
           placeholder: '플레이리스트 이름을 입력하세요',
@@ -72,8 +53,8 @@ class PlaylistDialogContent extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+            color: c.surface1,
+            border: Border.all(color: c.line),
             borderRadius: BorderRadius.circular(8),
           ),
           padding: const EdgeInsets.all(16),
@@ -118,6 +99,7 @@ class StageSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final stageGroups = <String, List<IsaacStage>>{
       '1~2': [
         IsaacStage.basement,
@@ -161,7 +143,7 @@ class StageSettings extends StatelessWidget {
           children: [
             const Text('스테이지 선택 (복수 선택 가능)',
                 style: TextStyle(fontWeight: FontWeight.bold)),
-            Button(
+            AppButton(
               onPressed: onToggleAll,
               child: Text(
                 selectedStages.length == IsaacStage.values.length
@@ -182,9 +164,9 @@ class StageSettings extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+                border: Border.all(color: c.line),
                 borderRadius: BorderRadius.circular(6),
-                color: Colors.white,
+                color: c.surface1,
               ),
               padding: const EdgeInsets.all(10),
               child: Column(
@@ -197,20 +179,17 @@ class StageSettings extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: Colors.grey[140],
+                          color: c.ink2,
                         ),
                       ),
                       const SizedBox(width: 8),
-                      FilledButton(
+                      AppButton(
+                        variant: allSelected
+                            ? AppButtonVariant.secondary
+                            : AppButtonVariant.primary,
                         onPressed: () => onGroupToggle(stages, allSelected),
-                        style: ButtonStyle(
-                          padding: WidgetStateProperty.all(
-                              const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4)),
-                          backgroundColor: WidgetStateProperty.all(
-                            allSelected ? Colors.grey[60] : Colors.blue.light,
-                          ),
-                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         child: Text(
                           allSelected ? '전체 해제' : '전체 선택',
                           style: const TextStyle(fontSize: 11),
@@ -223,16 +202,12 @@ class StageSettings extends StatelessWidget {
                     spacing: 6,
                     runSpacing: 6,
                     children: stages.map((stage) {
-                      final isSelected = selectedStages.contains(stage);
-                      return ToggleButton(
-                        checked: isSelected,
+                      return AppToggleButton(
+                        checked: selectedStages.contains(stage),
                         onChanged: (value) => onStageToggle(stage, value),
                         child: Text(
                           stage.toDisplayString(),
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isSelected ? Colors.white : null,
-                          ),
+                          style: const TextStyle(fontSize: 11),
                         ),
                       );
                     }).toList(),
@@ -265,6 +240,7 @@ class RoomSettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final normalRoomTypes = IsaacRoomType.values
         .where((roomType) =>
             roomType != IsaacRoomType.null_ &&
@@ -297,9 +273,9 @@ class RoomSettings extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 12),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black.withValues(alpha: 0.1)),
+            border: Border.all(color: c.line),
             borderRadius: BorderRadius.circular(6),
-            color: Colors.white,
+            color: c.surface1,
           ),
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -312,20 +288,17 @@ class RoomSettings extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey[140],
+                      color: c.ink2,
                     ),
                   ),
                   const SizedBox(width: 8),
-                  FilledButton(
+                  AppButton(
+                    variant: allSelected
+                        ? AppButtonVariant.secondary
+                        : AppButtonVariant.primary,
                     onPressed: () => onRoomGroupToggle(roomTypes, allSelected),
-                    style: ButtonStyle(
-                      padding: WidgetStateProperty.all(
+                    padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      ),
-                      backgroundColor: WidgetStateProperty.all(
-                        allSelected ? Colors.grey[60] : Colors.blue.light,
-                      ),
-                    ),
                     child: Text(
                       allSelected ? '전체 해제' : '전체 선택',
                       style: const TextStyle(fontSize: 11),
@@ -338,16 +311,12 @@ class RoomSettings extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: roomTypes.map((roomType) {
-                  final isSelected = selectedRoomTypes.contains(roomType);
-                  return ToggleButton(
-                    checked: isSelected,
+                  return AppToggleButton(
+                    checked: selectedRoomTypes.contains(roomType),
                     onChanged: (value) => onRoomTypeToggle(roomType, value),
                     child: Text(
                       roomType.toDisplayString(),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isSelected ? Colors.white : null,
-                      ),
+                      style: const TextStyle(fontSize: 12),
                     ),
                   );
                 }).toList(),
@@ -368,19 +337,14 @@ class RoomSettings extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold)),
             Row(
               children: [
-                FilledButton(
+                AppButton(
+                  variant: areAllRoomTypesSelected
+                      ? AppButtonVariant.secondary
+                      : AppButtonVariant.primary,
                   onPressed: () =>
                       onRoomGroupToggle(allRoomTypes, areAllRoomTypesSelected),
-                  style: ButtonStyle(
-                    padding: WidgetStateProperty.all(
+                  padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    ),
-                    backgroundColor: WidgetStateProperty.all(
-                      areAllRoomTypesSelected
-                          ? Colors.grey[60]
-                          : Colors.blue.light,
-                    ),
-                  ),
                   child: Text(
                     areAllRoomTypesSelected ? '전체 해제' : '전체 선택',
                     style: const TextStyle(fontSize: 11),
@@ -395,8 +359,8 @@ class RoomSettings extends StatelessWidget {
         buildRoomGroup('엔딩 보스 방', bossRoomTypes),
         buildRoomGroup('거울 방', mirrorRoomTypes),
         const SizedBox(height: 12),
-        Checkbox(
-          checked: isOnlyUncleared,
+        AppCheckbox(
+          value: isOnlyUncleared,
           onChanged: onUnclearedChanged,
           content: const Text('클리어 전까지만 재생'),
         ),
@@ -427,16 +391,12 @@ class BossSettings extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: IsaacBossExtension.sortedValues.map((bossType) {
-            final isSelected = selectedBossTypes.contains(bossType);
-            return ToggleButton(
-              checked: isSelected,
+            return AppToggleButton(
+              checked: selectedBossTypes.contains(bossType),
               onChanged: (value) => onBossTypeToggle(bossType, value),
               child: Text(
                 bossType.toDisplayString(),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isSelected ? Colors.white : null,
-                ),
+                style: const TextStyle(fontSize: 12),
               ),
             );
           }).toList(),

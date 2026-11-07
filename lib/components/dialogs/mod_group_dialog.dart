@@ -1,6 +1,7 @@
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/components/save_button.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
@@ -65,7 +66,8 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return ContentDialog(
+    return AppDialog(
+      constraints: const BoxConstraints(maxWidth: 368),
       title: Text(widget.isEdit
           ? AppLocalizations.of(context).group_rename_title
           : AppLocalizations.of(context).group_create_title),
@@ -73,7 +75,7 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TextBox(
+          AppTextField(
             controller: _groupNameController,
             placeholder: AppLocalizations.of(context).group_name_placeholder,
             autofocus: true,
@@ -84,7 +86,7 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
             Text(
               _errorMessage!,
               style: TextStyle(
-                color: Colors.red,
+                color: AppColors.of(context).danger,
                 fontSize: 12,
               ),
             ),
@@ -92,7 +94,7 @@ class _ModGroupDialogState extends ConsumerState<ModGroupDialog> {
         ],
       ),
       actions: [
-        Button(
+        AppButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(AppLocalizations.of(context).common_cancel),
         ),

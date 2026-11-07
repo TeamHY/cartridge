@@ -1,6 +1,6 @@
 import 'package:cartridge/components/dialogs/error_dialog.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 
 /// Navigator of the app, for code that has no BuildContext (providers).
 final appNavigatorKey = GlobalKey<NavigatorState>();

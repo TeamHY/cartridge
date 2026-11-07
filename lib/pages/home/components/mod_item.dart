@@ -2,10 +2,11 @@ import 'dart:io';
 import 'package:cartridge/constants/urls.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:fluent_ui/fluent_ui.dart' as fluent;
+import 'package:cartridge/ui/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,7 +31,7 @@ class ModItem extends ConsumerStatefulWidget {
 }
 
 class _ModItemState extends ConsumerState<ModItem> {
-  final fluent.FlyoutController _flyoutController = fluent.FlyoutController();
+  final MenuController _menuController = MenuController();
 
   void _openModFolder() async {
     try {
@@ -52,103 +53,81 @@ class _ModItemState extends ConsumerState<ModItem> {
         Uri.parse('${AppUrls.steamWorkshopDetail}/?id=${widget.mod.id}'));
   }
 
-  void _showContextMenu(Offset position) {
+  List<Widget> _buildMenuItems(BuildContext context) {
     final store = ref.read(storeProvider);
     final currentGroup = store.getModGroup(widget.mod.name);
+    final loc = AppLocalizations.of(context);
 
-    _flyoutController.showFlyout(
-      position: position,
-      barrierDismissible: true,
-      dismissWithEsc: true,
-      builder: (context) => fluent.MenuFlyout(
-        items: [
-          fluent.MenuFlyoutItem(
-            leading: const Icon(fluent.FluentIcons.folder_open),
-            text: Text(AppLocalizations.of(context).mod_open_folder),
-            onPressed: () {
-              fluent.Flyout.of(context).close();
-              _openModFolder();
-            },
-          ),
-          if (widget.mod.id != null) ...[
-            fluent.MenuFlyoutItem(
-              leading: const Icon(fluent.FluentIcons.link),
-              text: Text(AppLocalizations.of(context).mod_open_workshop),
-              onPressed: () {
-                fluent.Flyout.of(context).close();
-                _openModWorkshop();
-              },
-            ),
-          ],
-          if (widget.onMoveToGroup != null) ...[
-            const fluent.MenuFlyoutSeparator(),
-            fluent.MenuFlyoutSubItem(
-              leading: const Icon(fluent.FluentIcons.move),
-              text: Text(AppLocalizations.of(context).mod_move_to_group),
-              items: (context) => [
-                ...store.groups.keys
-                    .where((group) => group != currentGroup)
-                    .map(
-                      (groupName) => fluent.MenuFlyoutItem(
-                        text: Text(groupName),
-                        onPressed: () {
-                          fluent.Flyout.of(context).close();
-                          widget.onMoveToGroup!(groupName);
-                        },
-                      ),
-                    ),
-                if (currentGroup != null)
-                  fluent.MenuFlyoutItem(
-                    text: Text(
-                      AppLocalizations.of(context).mod_remove_from_group,
-                      style: TextStyle(color: fluent.Colors.red),
-                    ),
-                    onPressed: () {
-                      fluent.Flyout.of(context).close();
-                      widget.onMoveToGroup!(null);
-                    },
-                  ),
-              ],
-            ),
-          ],
-        ],
+    return [
+      MenuItemButton(
+        leadingIcon: const PhosphorIcon(PhosphorIconsRegular.folderOpen),
+        onPressed: _openModFolder,
+        child: Text(loc.mod_open_folder),
       ),
-    );
+      if (widget.mod.id != null) ...[
+        MenuItemButton(
+          leadingIcon: const PhosphorIcon(PhosphorIconsRegular.link),
+          onPressed: _openModWorkshop,
+          child: Text(loc.mod_open_workshop),
+        ),
+      ],
+      if (widget.onMoveToGroup != null) ...[
+        const Divider(),
+        SubmenuButton(
+          leadingIcon:
+              const PhosphorIcon(PhosphorIconsRegular.arrowsOutCardinal),
+          menuChildren: [
+            ...store.groups.keys.where((group) => group != currentGroup).map(
+                  (groupName) => MenuItemButton(
+                    onPressed: () => widget.onMoveToGroup!(groupName),
+                    child: Text(groupName),
+                  ),
+                ),
+            if (currentGroup != null)
+              MenuItemButton(
+                style: ButtonStyle(
+                  foregroundColor:
+                      WidgetStatePropertyAll(AppColors.of(context).danger),
+                ),
+                onPressed: () => widget.onMoveToGroup!(null),
+                child: Text(loc.mod_remove_from_group),
+              ),
+          ],
+          child: Text(loc.mod_move_to_group),
+        ),
+      ],
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     final bool enabled = !widget.mod.isDisable;
+    final c = AppColors.of(context);
 
-    Widget child = fluent.FlyoutTarget(
-      controller: _flyoutController,
-      child: fluent.Tooltip(
+    Widget child = MenuAnchor(
+      controller: _menuController,
+      menuChildren: _buildMenuItems(context),
+      child: Tooltip(
         message: widget.mod.name,
-        useMousePosition: true,
-        child: GestureDetector(
+        child: AppPressable(
+          onPressed: () => widget.onChanged(widget.mod.isDisable),
           onSecondaryTapUp: (details) =>
-              _showContextMenu(details.globalPosition),
-          child: InkWell(
-            onTap: () => widget.onChanged(widget.mod.isDisable),
-            mouseCursor: SystemMouseCursors.click,
-            borderRadius: BorderRadius.circular(12),
-            splashColor: enabled
-                ? Colors.green.withValues(alpha: 0.2)
-                : Colors.grey.withValues(alpha: 0.1),
-            highlightColor: enabled
-                ? Colors.green.withValues(alpha: 0.1)
-                : Colors.grey.withValues(alpha: 0.05),
-            child: Container(
+              _menuController.open(position: details.localPosition),
+          focusRadius: 12,
+          builder: (context, states) {
+            final hovered = states.contains(WidgetState.hovered);
+
+            return Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: enabled
-                    ? Colors.green.withValues(alpha: 0.08)
-                    : Colors.grey.withValues(alpha: 0.05),
+                    ? c.enabledSoft
+                    : (hovered ? c.surface3 : Colors.transparent),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: enabled
-                      ? Colors.green.withValues(alpha: 0.3)
-                      : Colors.grey.withValues(alpha: 0.2),
+                      ? (hovered ? c.enabled : c.enabledLine)
+                      : (hovered ? c.lineStrong : c.line),
                   width: 1,
                 ),
               ),
@@ -174,8 +153,7 @@ class _ModItemState extends ConsumerState<ModItem> {
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 14,
-                            color:
-                                enabled ? Colors.green[700] : Colors.grey[600],
+                            color: enabled ? c.enabledInk : c.ink2,
                           ),
                         ),
                         Padding(
@@ -188,24 +166,24 @@ class _ModItemState extends ConsumerState<ModItem> {
                                     .mod_version_unknown,
                             style: TextStyle(
                               fontSize: 12,
-                              color: enabled
-                                  ? Colors.green[600]
-                                  : Colors.grey[500],
+                              color: enabled ? c.enabled : c.ink3,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(
-                    enabled ? Icons.check_circle : Icons.radio_button_unchecked,
+                  PhosphorIcon(
+                    enabled
+                        ? PhosphorIconsFill.checkCircle
+                        : PhosphorIconsRegular.circle,
                     size: 20,
-                    color: enabled ? Colors.green[600] : Colors.grey[400],
+                    color: enabled ? c.enabled : c.lineStrong,
                   ),
                 ],
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
@@ -219,13 +197,11 @@ class _ModItemState extends ConsumerState<ModItem> {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: enabled
-                    ? Colors.green.withValues(alpha: 0.2)
-                    : Colors.grey.withValues(alpha: 0.2),
+                color: enabled ? c.enabledSoft : c.surface3,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
+                    color: c.shadowMenu,
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -237,7 +213,7 @@ class _ModItemState extends ConsumerState<ModItem> {
                 style: TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
-                  color: enabled ? Colors.green[700] : Colors.grey[600],
+                  color: enabled ? c.enabledInk : c.ink2,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,

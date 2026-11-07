@@ -1,5 +1,6 @@
 import 'package:cartridge/components/dialogs/hotkey_record_dialog.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class HotkeyInputField extends StatelessWidget {
@@ -19,20 +20,19 @@ class HotkeyInputField extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: TextBox(
+          child: AppTextField(
             controller: controller,
             placeholder: placeholder,
+            mono: true,
             onChanged: (_) => onChanged(),
           ),
         ),
         const SizedBox(width: 8),
-        IconButton(
-          icon: const PhosphorIcon(
-            PhosphorIconsFill.record,
-            size: 20,
-          ),
+        AppIconButton(
+          icon: const PhosphorIcon(PhosphorIconsFill.record),
+          iconSize: 20,
           onPressed: () async {
-            final result = await showDialog<String>(
+            final result = await showAppDialog<String>(
               context: context,
               builder: (context) => HotkeyRecordDialog(
                 initialHotkey: controller.text,

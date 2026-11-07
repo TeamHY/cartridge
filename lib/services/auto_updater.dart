@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:desktop_updater/updater_controller.dart';
 import 'package:cartridge/constants/urls.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AutoUpdater {
@@ -43,16 +44,16 @@ class AutoUpdater {
   static void _showOfflineDialog(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    showDialog(
+    showAppDialog(
       context: context,
-      dismissWithEsc: false,
       barrierDismissible: false,
       builder: (context) {
-        return ContentDialog(
+        return AppDialog(
+          constraints: const BoxConstraints(maxWidth: 368),
           title: Text(loc.home_dialog_update_title),
           content: Text(loc.home_dialog_network_error),
           actions: [
-            FilledButton(
+            AppButton.primary(
               onPressed: () => exit(0),
               child: Text(loc.common_confirm),
             ),
@@ -67,9 +68,8 @@ class AutoUpdater {
 
     _controller!.downloadUpdate();
 
-    showDialog(
+    showAppDialog(
       context: context,
-      dismissWithEsc: false,
       barrierDismissible: false,
       builder: (context) {
         return ListenableBuilder(
@@ -82,7 +82,8 @@ class AutoUpdater {
             final notes = _controller!.releaseNotes;
             final version = _controller!.appVersion;
 
-            return ContentDialog(
+            return AppDialog(
+              constraints: const BoxConstraints(maxWidth: 368),
               title: Text(
                 '${loc.home_dialog_update_title} ${version ?? ''}',
               ),
@@ -95,8 +96,7 @@ class AutoUpdater {
                     const SizedBox(height: 12),
                     ...notes.map((note) {
                       if (note == null) return const SizedBox.shrink();
-                      final prefix =
-                          note.type != null ? '[${note.type}] ' : '';
+                      final prefix = note.type != null ? '[${note.type}] ' : '';
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text('• $prefix${note.message}'),
@@ -104,7 +104,11 @@ class AutoUpdater {
                     }),
                   ],
                   const SizedBox(height: 16),
-                  ProgressBar(value: _controller!.downloadProgress * 100),
+                  LinearProgressIndicator(
+                    value: _controller!.downloadProgress,
+                    minHeight: 4,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ],
               ),
             );

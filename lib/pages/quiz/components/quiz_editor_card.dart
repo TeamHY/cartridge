@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/quiz.dart';
 import 'package:cartridge/services/quiz_service.dart';
+import 'package:cartridge/ui/ui.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class QuizEditorCard extends StatefulWidget {
   const QuizEditorCard({
@@ -46,8 +48,7 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
   void initState() {
     super.initState();
     _questionController = TextEditingController(text: widget.quiz.question);
-    _openAnswerController =
-        TextEditingController(text: widget.quiz.openAnswer);
+    _openAnswerController = TextEditingController(text: widget.quiz.openAnswer);
     _choiceControllers = List.generate(
       widget.quiz.choices.length,
       (i) => TextEditingController(text: widget.quiz.choices[i]),
@@ -117,17 +118,18 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
 
   Future<bool> _confirmDelete(String title, String message) async {
     final loc = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
-      builder: (context) => ContentDialog(
+      builder: (context) => AppDialog(
         title: Text(title),
         content: Text(message),
+        constraints: const BoxConstraints(maxWidth: 368),
         actions: [
-          Button(
+          AppButton(
             child: Text(loc.quiz_cancel),
             onPressed: () => Navigator.pop(context, false),
           ),
-          FilledButton(
+          AppButton.danger(
             child: Text(loc.quiz_delete),
             onPressed: () => Navigator.pop(context, true),
           ),
@@ -220,21 +222,20 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final typography = FluentTheme.of(context).typography;
+    final c = AppColors.of(context);
 
-    return Card(
+    return AppCard(
       padding: const EdgeInsets.all(16),
-      backgroundColor:
-          _currentQuiz.isComplete ? null : const Color(0xFFE4E4E4),
+      color: _currentQuiz.isComplete ? null : c.surface3,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Text('${widget.index + 1}', style: typography.bodyStrong),
+              Text('${widget.index + 1}', style: AppTextStyles.bodyStrong),
               const SizedBox(width: 8),
               Expanded(
-                child: TextBox(
+                child: AppTextField(
                   controller: _questionController,
                   focusNode: _questionFocus,
                   placeholder: loc.quiz_question_hint,
@@ -242,23 +243,22 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
                 ),
               ),
               const SizedBox(width: 4),
-              Tooltip(
-                message: loc.quiz_question_image,
-                child: IconButton(
-                  icon: const Icon(FluentIcons.photo2_add),
-                  onPressed: _pickQuestionImage,
-                ),
+              AppIconButton(
+                tooltip: loc.quiz_question_image,
+                icon: const PhosphorIcon(PhosphorIconsRegular.image),
+                onPressed: _pickQuestionImage,
               ),
               const SizedBox(width: 4),
-              IconButton(
-                icon: const Icon(FluentIcons.delete),
+              AppIconButton(
+                icon: const PhosphorIcon(PhosphorIconsRegular.trash),
+                tone: AppIconButtonTone.danger,
                 onPressed: _deleteQuiz,
               ),
             ],
           ),
           if (_imagePath != null) ...[
             const SizedBox(height: 8),
-            Text(loc.quiz_question_image, style: typography.caption),
+            Text(loc.quiz_question_image, style: AppTextStyles.caption),
             const SizedBox(height: 4),
             Align(
               alignment: Alignment.centerLeft,
@@ -275,8 +275,8 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
           const SizedBox(height: 8),
           Row(
             children: [
-              ToggleSwitch(
-                checked: _isOpenEnded,
+              AppSwitch(
+                value: _isOpenEnded,
                 content: Text(loc.quiz_open_ended),
                 onChanged: (value) {
                   setState(() => _isOpenEnded = value);
@@ -284,37 +284,35 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
                 },
               ),
               const Spacer(),
-              Text(loc.quiz_difficulty_label, style: typography.caption),
+              Text(loc.quiz_difficulty_label, style: AppTextStyles.caption),
               const SizedBox(width: 4),
               ...List.generate(5, (i) {
                 final filled = i < _difficulty;
-                return IconButton(
-                  icon: Icon(
-                    filled
-                        ? FluentIcons.favorite_star_fill
-                        : FluentIcons.favorite_star,
+                return AppIconButton(
+                  icon: PhosphorIcon(
+                    filled ? PhosphorIconsFill.star : PhosphorIconsRegular.star,
                     size: 16,
                     color: filled ? const Color(0xFFF5A623) : null,
                   ),
                   onPressed: () {
-                    setState(() =>
-                        _difficulty = _difficulty == i + 1 ? 0 : i + 1);
+                    setState(
+                        () => _difficulty = _difficulty == i + 1 ? 0 : i + 1);
                     _commit();
                   },
                 );
               }),
               const SizedBox(width: 16),
-              Text(loc.quiz_time_limit_label, style: typography.caption),
+              Text(loc.quiz_time_limit_label, style: AppTextStyles.caption),
               const SizedBox(width: 6),
               Tooltip(
                 message: loc.quiz_time_limit_custom_hint,
                 child: SizedBox(
                   width: 110,
-                  child: NumberBox<int>(
+                  child: AppNumberField(
                     value: _timeLimit,
                     min: 5,
                     max: 600,
-                    mode: SpinButtonPlacementMode.none,
+                    showSpinButtons: false,
                     placeholder: loc.quiz_time_limit_default,
                     onChanged: (value) {
                       _timeLimit = value;
@@ -326,31 +324,29 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(loc.quiz_answer_label, style: typography.caption),
+          Text(loc.quiz_answer_label, style: AppTextStyles.caption),
           const SizedBox(height: 4),
           if (_isOpenEnded) ...[
             Row(
               children: [
                 Expanded(
-                  child: TextBox(
+                  child: AppTextField(
                     controller: _openAnswerController,
                     placeholder: loc.quiz_open_answer_hint,
                     onChanged: (_) => _scheduleSave(),
                   ),
                 ),
                 const SizedBox(width: 4),
-                Tooltip(
-                  message: loc.quiz_answer_image,
-                  child: IconButton(
-                    icon: const Icon(FluentIcons.photo2_add),
-                    onPressed: _pickAnswerImage,
-                  ),
+                AppIconButton(
+                  tooltip: loc.quiz_answer_image,
+                  icon: const PhosphorIcon(PhosphorIconsRegular.image),
+                  onPressed: _pickAnswerImage,
                 ),
               ],
             ),
             if (_answerImagePath != null) ...[
               const SizedBox(height: 8),
-              Text(loc.quiz_answer_image, style: typography.caption),
+              Text(loc.quiz_answer_image, style: AppTextStyles.caption),
               const SizedBox(height: 4),
               Align(
                 alignment: Alignment.centerLeft,
@@ -368,73 +364,64 @@ class _QuizEditorCardState extends State<QuizEditorCard> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                RadioGroup<int>(
-                  groupValue: _answerIndex,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() => _answerIndex = value);
-                    _scheduleSave();
-                  },
-                  child: Column(
-                    children: List.generate(_choiceControllers.length, (i) {
-                      final choiceImage = _choiceImages[i];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Row(
-                          children: [
-                            RadioButton<int>(value: i),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: TextBox(
-                                controller: _choiceControllers[i],
-                                placeholder:
-                                    '${loc.quiz_choice_hint} ${i + 1}',
-                                onChanged: (_) => _scheduleSave(),
-                              ),
+                Column(
+                  children: List.generate(_choiceControllers.length, (i) {
+                    final choiceImage = _choiceImages[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Row(
+                        children: [
+                          AppRadio(
+                            checked: _answerIndex == i,
+                            onChanged: (_) {
+                              setState(() => _answerIndex = i);
+                              _scheduleSave();
+                            },
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: AppTextField(
+                              controller: _choiceControllers[i],
+                              placeholder: '${loc.quiz_choice_hint} ${i + 1}',
+                              onChanged: (_) => _scheduleSave(),
                             ),
+                          ),
+                          const SizedBox(width: 4),
+                          if (choiceImage != null)
+                            Tooltip(
+                              message: loc.quiz_image_remove,
+                              child: _RemovableImage(
+                                path: choiceImage,
+                                width: 32,
+                                height: 32,
+                                onRemove: () => _removeChoiceImage(i),
+                              ),
+                            )
+                          else
+                            AppIconButton(
+                              tooltip: loc.quiz_image_add,
+                              icon: const PhosphorIcon(
+                                  PhosphorIconsRegular.image),
+                              onPressed: () => _pickChoiceImage(i),
+                            ),
+                          if (_choiceControllers.length > 2) ...[
                             const SizedBox(width: 4),
-                            if (choiceImage != null)
-                              Tooltip(
-                                message: loc.quiz_image_remove,
-                                child: _RemovableImage(
-                                  path: choiceImage,
-                                  width: 32,
-                                  height: 32,
-                                  onRemove: () => _removeChoiceImage(i),
-                                ),
-                              )
-                            else
-                              Tooltip(
-                                message: loc.quiz_image_add,
-                                child: IconButton(
-                                  icon: const Icon(FluentIcons.photo2_add),
-                                  onPressed: () => _pickChoiceImage(i),
-                                ),
-                              ),
-                            if (_choiceControllers.length > 2) ...[
-                              const SizedBox(width: 4),
-                              IconButton(
-                                icon: const Icon(FluentIcons.chrome_close),
-                                onPressed: () => _removeChoice(i),
-                              ),
-                            ],
+                            AppIconButton(
+                              icon: const PhosphorIcon(PhosphorIconsRegular.x),
+                              tone: AppIconButtonTone.danger,
+                              onPressed: () => _removeChoice(i),
+                            ),
                           ],
-                        ),
-                      );
-                    }),
-                  ),
+                        ],
+                      ),
+                    );
+                  }),
                 ),
                 if (_choiceControllers.length < 8)
-                  Button(
+                  AppButton(
                     onPressed: _addChoice,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(FluentIcons.add),
-                        const SizedBox(width: 6),
-                        Text(loc.quiz_choice_add),
-                      ],
-                    ),
+                    icon: const PhosphorIcon(PhosphorIconsRegular.plus),
+                    child: Text(loc.quiz_choice_add),
                   ),
               ],
             ),
@@ -466,6 +453,8 @@ class _RemovableImageState extends State<_RemovableImage> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovering = true),
@@ -484,7 +473,7 @@ class _RemovableImageState extends State<_RemovableImage> {
                 errorBuilder: (_, __, ___) => SizedBox(
                   width: widget.width ?? widget.height,
                   height: widget.height,
-                  child: const Icon(FluentIcons.file_image),
+                  child: const PhosphorIcon(PhosphorIconsRegular.fileImage),
                 ),
               ),
             ),
@@ -492,11 +481,11 @@ class _RemovableImageState extends State<_RemovableImage> {
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.45),
+                    color: c.scrim,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Icon(
-                    FluentIcons.delete,
+                  child: const PhosphorIcon(
+                    PhosphorIconsRegular.trash,
                     color: Colors.white,
                     size: 16,
                   ),

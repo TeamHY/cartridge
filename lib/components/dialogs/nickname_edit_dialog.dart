@@ -1,5 +1,6 @@
 import 'package:cartridge/components/dialogs/error_dialog.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -65,7 +66,8 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    return ContentDialog(
+    return AppDialog(
+      constraints: const BoxConstraints(maxWidth: 368),
       title: Text(loc.nickname_dialog_title),
       content: Form(
         key: _formKey,
@@ -73,9 +75,9 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InfoLabel(
+            AppLabeled(
               label: loc.nickname_label,
-              child: TextFormBox(
+              child: AppTextField(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc.nickname_hint;
@@ -90,13 +92,13 @@ class _NicknameEditDialogState extends ConsumerState<NicknameEditDialog> {
         ),
       ),
       actions: [
-        Button(
+        AppButton(
           onPressed: () {
             Navigator.pop(context);
           },
           child: Text(loc.common_cancel),
         ),
-        FilledButton(
+        AppButton.primary(
           onPressed: () => onSubmit(context),
           child: Text(loc.common_update),
         ),

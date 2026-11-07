@@ -1,7 +1,8 @@
 import 'package:cartridge/models/game_config.dart';
 import 'package:cartridge/components/save_button.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 
 class GameConfigFormView extends StatefulWidget {
   final GameConfig? config;
@@ -148,20 +149,24 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
 
     final width = int.tryParse(_windowWidthController.text);
     if (width == null || width < 320) {
-      errors['windowWidth'] = AppLocalizations.of(context).validation_width_minimum;
+      errors['windowWidth'] =
+          AppLocalizations.of(context).validation_width_minimum;
     }
 
     final height = int.tryParse(_windowHeightController.text);
     if (height == null || height < 240) {
-      errors['windowHeight'] = AppLocalizations.of(context).validation_height_minimum;
+      errors['windowHeight'] =
+          AppLocalizations.of(context).validation_height_minimum;
     }
 
     if (int.tryParse(_windowPosXController.text) == null) {
-      errors['windowPosX'] = AppLocalizations.of(context).validation_number_required;
+      errors['windowPosX'] =
+          AppLocalizations.of(context).validation_number_required;
     }
 
     if (int.tryParse(_windowPosYController.text) == null) {
-      errors['windowPosY'] = AppLocalizations.of(context).validation_number_required;
+      errors['windowPosY'] =
+          AppLocalizations.of(context).validation_number_required;
     }
 
     setState(() {
@@ -202,7 +207,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
         child: Center(
           child: Text(
             AppLocalizations.of(context).game_config_select_or_create,
-            style: FluentTheme.of(context).typography.body,
+            style: AppTextStyles.body,
           ),
         ),
       );
@@ -238,9 +243,9 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        InfoLabel(
+        AppLabeled(
           label: loc.game_config_name_label,
-          child: TextBox(
+          child: AppTextField(
             controller: _nameController,
             focusNode: _nameFocusNode,
             placeholder: loc.game_config_fallback_name,
@@ -256,7 +261,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
           Text(
             _validationErrors['name']!,
             style: TextStyle(
-              color: Colors.red,
+              color: AppColors.of(context).danger,
               fontSize: 12,
             ),
           ),
@@ -271,7 +276,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
       children: [
         Text(
           loc.game_config_window_size_title,
-          style: FluentTheme.of(context).typography.subtitle,
+          style: AppTextStyles.title,
         ),
         const SizedBox(height: 12),
         Row(
@@ -281,9 +286,9 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  InfoLabel(
+                  AppLabeled(
                     label: loc.game_config_window_width_label,
-                    child: TextBox(
+                    child: AppTextField(
                       controller: _windowWidthController,
                       focusNode: _widthFocusNode,
                       placeholder: '960',
@@ -299,7 +304,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
                     Text(
                       _validationErrors['windowWidth']!,
                       style: TextStyle(
-                        color: Colors.red,
+                        color: AppColors.of(context).danger,
                         fontSize: 12,
                       ),
                     ),
@@ -312,9 +317,9 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  InfoLabel(
+                  AppLabeled(
                     label: loc.game_config_window_height_label,
-                    child: TextBox(
+                    child: AppTextField(
                       controller: _windowHeightController,
                       focusNode: _heightFocusNode,
                       placeholder: '540',
@@ -330,7 +335,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
                     Text(
                       _validationErrors['windowHeight']!,
                       style: TextStyle(
-                        color: Colors.red,
+                        color: AppColors.of(context).danger,
                         fontSize: 12,
                       ),
                     ),
@@ -350,7 +355,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
       children: [
         Text(
           loc.game_config_window_position_title,
-          style: FluentTheme.of(context).typography.subtitle,
+          style: AppTextStyles.title,
         ),
         const SizedBox(height: 12),
         Row(
@@ -360,9 +365,9 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  InfoLabel(
+                  AppLabeled(
                     label: loc.game_config_window_pos_x_label,
-                    child: TextBox(
+                    child: AppTextField(
                       controller: _windowPosXController,
                       focusNode: _posXFocusNode,
                       placeholder: '100',
@@ -378,7 +383,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
                     Text(
                       _validationErrors['windowPosX']!,
                       style: TextStyle(
-                        color: Colors.red,
+                        color: AppColors.of(context).danger,
                         fontSize: 12,
                       ),
                     ),
@@ -391,9 +396,9 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  InfoLabel(
+                  AppLabeled(
                     label: loc.game_config_window_pos_y_label,
-                    child: TextBox(
+                    child: AppTextField(
                       controller: _windowPosYController,
                       focusNode: _posYFocusNode,
                       placeholder: '100',
@@ -409,7 +414,7 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
                     Text(
                       _validationErrors['windowPosY']!,
                       style: TextStyle(
-                        color: Colors.red,
+                        color: AppColors.of(context).danger,
                         fontSize: 12,
                       ),
                     ),
@@ -430,11 +435,11 @@ class _GameConfigFormViewState extends State<GameConfigFormView> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         hasChanges
-            ? Button(
+            ? AppButton(
                 onPressed: widget.onReset,
                 child: Text(loc.common_cancel),
               )
-            : Button(
+            : AppButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(loc.common_close),
               ),

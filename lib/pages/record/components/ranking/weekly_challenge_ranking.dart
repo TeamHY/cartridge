@@ -2,7 +2,7 @@ import 'package:cartridge/models/daily_record.dart';
 import 'package:cartridge/models/weekly_challenge.dart';
 import 'package:cartridge/utils/format_util.dart';
 import 'package:cartridge/pages/record/components/ranking/base_ranking.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:week_of_year/week_of_year.dart';

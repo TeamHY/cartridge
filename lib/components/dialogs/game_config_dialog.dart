@@ -2,7 +2,8 @@ import 'package:cartridge/models/game_config.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/components/game_config_list_view.dart';
 import 'package:cartridge/components/game_config_form_view.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
@@ -136,19 +137,20 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
   void _showUnsavedChangesDialog(VoidCallback onContinue) {
     final loc = AppLocalizations.of(context);
 
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (context) => ContentDialog(
+      builder: (context) => AppDialog(
+        constraints: const BoxConstraints(maxWidth: 368),
         title: Text(
             AppLocalizations.of(context).game_config_unsaved_changes_title),
         content: Text(
             AppLocalizations.of(context).game_config_unsaved_changes_message),
         actions: [
-          Button(
+          AppButton(
             onPressed: () => Navigator.pop(context),
             child: Text(AppLocalizations.of(context).game_config_back),
           ),
-          Button(
+          AppButton(
             onPressed: () {
               Navigator.pop(context);
               _onResetConfig();
@@ -156,7 +158,7 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
             },
             child: Text(AppLocalizations.of(context).game_config_discard),
           ),
-          FilledButton(
+          AppButton.primary(
             onPressed: () {
               Navigator.pop(context);
               _onSaveConfig();
@@ -207,7 +209,7 @@ class _GameConfigDialogState extends ConsumerState<GameConfigDialog> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    return ContentDialog(
+    return AppDialog(
       constraints: const BoxConstraints(
         maxWidth: 800,
         maxHeight: 600,

@@ -1,4 +1,5 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class SubPageHeader extends StatelessWidget {
@@ -21,16 +22,14 @@ class SubPageHeader extends StatelessWidget {
         spacing: 4,
         children: [
           if (onBackPressed != null)
-            IconButton(
-              icon: const PhosphorIcon(
-                PhosphorIconsRegular.arrowLeft,
-                size: 20,
-              ),
+            AppIconButton(
+              icon: const PhosphorIcon(PhosphorIconsRegular.arrowLeft),
+              iconSize: 20,
               onPressed: onBackPressed,
             ),
           Text(
             title,
-            style: FluentTheme.of(context).typography.subtitle,
+            style: AppTextStyles.title,
           ),
           Expanded(child: Container()),
           if (actions != null) ...actions!,

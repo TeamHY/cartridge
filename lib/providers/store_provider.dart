@@ -1,5 +1,7 @@
+import 'package:cartridge/components/dialogs/repentogon_install_dialog.dart';
 import 'package:cartridge/models/mod.dart';
 import 'package:cartridge/models/game_config.dart';
+import 'package:cartridge/models/game_launch_mode.dart';
 import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/services/isaac_config_service.dart';
@@ -47,6 +49,8 @@ class StoreNotifier extends ChangeNotifier {
   String? astroRemoteVersion;
 
   String? selectedGameConfigId;
+
+  GameLaunchMode lastLaunchMode = GameLaunchMode.vanilla;
 
   bool get isAstroOutdated =>
       astroLocalVersion != astroRemoteVersion ||
@@ -120,6 +124,7 @@ class StoreNotifier extends ChangeNotifier {
   }) async {
     final setting = ref.read(settingProvider);
     await setting.loadSetting();
+    lastLaunchMode = preset?.launchMode ?? GameLaunchMode.vanilla;
 
     if (preset != null) {
       final loadedMods = await ModService.loadMods(setting.isaacPath);
@@ -149,7 +154,8 @@ class StoreNotifier extends ChangeNotifier {
         await GameLauncherService.launchGame(
           isaacPath: setting.isaacPath,
           rerunDelay: setting.rerunDelay,
-          launchMode: setting.launchMode,
+          launchMode: lastLaunchMode,
+          installRepentogon: installRepentogonForLaunch,
           isForceUpdate: isForceUpdate,
           isNoDelay: isNoDelay,
         );

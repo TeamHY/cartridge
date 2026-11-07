@@ -64,10 +64,10 @@ class RepentogonNotifier extends ChangeNotifier {
   }
 
   /// Refresh [status] without downloading rgon-cli when it is missing.
-  Future<void> refreshIfInstalled() async {
+  Future<void> refreshIfInstalled({bool checkCliUpdate = false}) async {
     if (!isSupported || isBusy) return;
     if (await RepentogonCliService.installedTag() == null) return;
-    await refresh(checkCliUpdate: false);
+    await refresh(checkCliUpdate: checkCliUpdate);
   }
 
   /// Install, update or repair REPENTOGON.

@@ -1,13 +1,13 @@
 import 'package:cartridge/pages/home/components/sub_page_header.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:cartridge/services/steam_save_service.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class SaveApplyView extends ConsumerStatefulWidget {
-  final VoidCallback? onBackPressed;
-
-  const SaveApplyView({super.key, this.onBackPressed});
+  const SaveApplyView({super.key});
 
   @override
   ConsumerState<SaveApplyView> createState() => _SaveApplyViewState();
@@ -187,7 +187,7 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
 
   @override
   Widget build(BuildContext context) {
-    final typography = FluentTheme.of(context).typography;
+    final c = AppColors.of(context);
 
     SteamUser? selectedUser;
     for (final user in _users) {
@@ -198,12 +198,11 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
     }
 
     return Container(
-      color: Colors.white,
+      color: c.surface1,
       child: Column(
         children: [
           SubPageHeader(
             title: '올클 세이브 적용',
-            onBackPressed: widget.onBackPressed,
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -211,28 +210,29 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     '세이브 적용 대상 선택',
-                    style: typography.bodyStrong,
+                    style: AppTextStyles.bodyStrong,
                   ),
                   const SizedBox(height: 8.0),
-                  Card(
+                  AppCard(
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          InfoLabel(
+                          AppLabeled(
                             label: '스팀 설치 경로',
-                            child: TextBox(
+                            child: AppTextField(
                               controller: _steamPathController,
+                              mono: true,
                               placeholder: r'C:\Program Files (x86)\Steam',
                             ),
                           ),
                           const SizedBox(height: 10.0),
                           Row(
                             children: [
-                              Button(
+                              AppButton(
                                 onPressed: _isLoadingUsers
                                     ? null
                                     : _detectSteamPathAndLoadUsers,
@@ -245,23 +245,23 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  Card(
+                  AppCard(
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          InfoLabel(
+                          AppLabeled(
                             label: '적용할 스팀 유저',
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: ComboBox<String>(
+                                  child: AppSelect<String>(
                                     value: _selectedUserId,
                                     isExpanded: true,
                                     items: _users
                                         .map(
-                                          (user) => ComboBoxItem<String>(
+                                          (user) => AppSelectItem<String>(
                                             value: user.id,
                                             child: Text(
                                               '${user.displayName}${user.isMostRecent ? ' (최근 로그인)' : ''}',
@@ -283,13 +283,12 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
                                   ),
                                 ),
                                 const SizedBox(width: 8.0),
-                                Tooltip(
-                                  message: '유저 새로고침',
-                                  child: IconButton(
-                                    icon: const Icon(FluentIcons.refresh),
-                                    onPressed:
-                                        _isLoadingUsers ? null : _loadUsers,
-                                  ),
+                                AppIconButton(
+                                  tooltip: '유저 새로고침',
+                                  icon: const PhosphorIcon(
+                                      PhosphorIconsRegular.arrowClockwise),
+                                  onPressed:
+                                      _isLoadingUsers ? null : _loadUsers,
                                 ),
                               ],
                             ),
@@ -298,18 +297,18 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
                             const SizedBox(height: 8.0),
                             Text(
                               '선택된 유저: ${selectedUser.displayName}',
-                              style: typography.caption,
+                              style: AppTextStyles.caption,
                             ),
                           ],
                           const SizedBox(height: 16.0),
-                          InfoLabel(
+                          AppLabeled(
                             label: '덮어쓸 슬롯',
-                            child: ComboBox<int>(
+                            child: AppSelect<int>(
                               value: _selectedSlot,
                               items: const [
-                                ComboBoxItem(value: 1, child: Text('슬롯 1')),
-                                ComboBoxItem(value: 2, child: Text('슬롯 2')),
-                                ComboBoxItem(value: 3, child: Text('슬롯 3')),
+                                AppSelectItem(value: 1, child: Text('슬롯 1')),
+                                AppSelectItem(value: 2, child: Text('슬롯 2')),
+                                AppSelectItem(value: 3, child: Text('슬롯 3')),
                               ],
                               onChanged: _isApplying
                                   ? null
@@ -329,10 +328,10 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
                   ),
                   const SizedBox(height: 16.0),
                   if (_statusMessage != null) ...[
-                    InfoBar(
+                    AppNotice(
                       severity: _isError
-                          ? InfoBarSeverity.error
-                          : InfoBarSeverity.success,
+                          ? AppNoticeSeverity.error
+                          : AppNoticeSeverity.success,
                       title: Text(_isError ? '실패' : '완료'),
                       content: Text(_statusMessage!),
                     ),
@@ -343,10 +342,10 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
           ),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: c.surface1,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: c.line,
                   blurRadius: 2,
                   offset: const Offset(0, -2),
                 ),
@@ -357,7 +356,7 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  FilledButton(
+                  AppButton.primary(
                     onPressed:
                         _isApplying || _isLoadingUsers ? null : _applySave,
                     child: _isApplying
@@ -367,7 +366,8 @@ class _SaveApplyViewState extends ConsumerState<SaveApplyView> {
                               SizedBox(
                                 width: 14,
                                 height: 14,
-                                child: ProgressRing(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               ),
                               SizedBox(width: 8),
                               Text('적용 중...'),

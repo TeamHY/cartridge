@@ -1,13 +1,29 @@
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/providers/repentogon_provider.dart';
+import 'package:cartridge/utils/app_navigator.dart';
 import 'package:cartridge/utils/repentogon_error_text.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 
+Future<bool> installRepentogonForLaunch() async {
+  final context = appNavigatorKey.currentContext;
+  if (context == null || !context.mounted) return false;
+
+  final outcome = await showAppDialog<RepentogonInstallOutcome>(
+    context: context,
+    builder: (context) => const RepentogonInstallDialog(closeOnSuccess: true),
+  );
+  return outcome == RepentogonInstallOutcome.installed ||
+      outcome == RepentogonInstallOutcome.upToDate;
+}
+
 /// Runs a REPENTOGON install / update / repair and shows its progress.
 class RepentogonInstallDialog extends ConsumerStatefulWidget {
-  const RepentogonInstallDialog({super.key});
+  const RepentogonInstallDialog({super.key, this.closeOnSuccess = false});
+
+  final bool closeOnSuccess;
 
   @override
   ConsumerState<RepentogonInstallDialog> createState() =>
@@ -23,7 +39,12 @@ class _RepentogonInstallDialogState
     super.initState();
     Future.microtask(() async {
       final outcome = await ref.read(repentogonProvider).install();
-      if (mounted) setState(() => _outcome = outcome);
+      if (!mounted) return;
+      if (widget.closeOnSuccess && outcome != RepentogonInstallOutcome.failed) {
+        Navigator.pop(context, outcome);
+        return;
+      }
+      setState(() => _outcome = outcome);
     });
   }
 
@@ -37,6 +58,7 @@ class _RepentogonInstallDialogState
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final c = AppColors.of(context);
     final repentogon = ref.watch(repentogonProvider);
     final isDone = _outcome != null;
 
@@ -45,7 +67,11 @@ class _RepentogonInstallDialogState
       case null:
         header = Row(
           children: [
-            const SizedBox(width: 16, height: 16, child: ProgressRing()),
+            const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2.5),
+            ),
             const SizedBox(width: 8),
             Text(loc.repentogon_install_in_progress),
           ],
@@ -58,7 +84,7 @@ class _RepentogonInstallDialogState
         header = Text(
           describeRepentogonError(
               loc, repentogon.lastError ?? loc.repentogon_error_install_failed),
-          style: TextStyle(color: Colors.red),
+          style: TextStyle(color: c.danger),
         );
     }
 
@@ -69,7 +95,7 @@ class _RepentogonInstallDialogState
             p.basename(entry.key), _formatBytes(entry.value)),
     ];
 
-    return ContentDialog(
+    return AppDialog(
       constraints: const BoxConstraints(maxWidth: 640),
       title: Text(loc.repentogon_install_dialog_title),
       content: Column(
@@ -83,7 +109,7 @@ class _RepentogonInstallDialogState
             width: double.infinity,
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
+              color: c.surface3,
               borderRadius: BorderRadius.circular(4),
             ),
             child: ListView.builder(
@@ -99,8 +125,8 @@ class _RepentogonInstallDialogState
         ],
       ),
       actions: [
-        Button(
-          onPressed: isDone ? () => Navigator.pop(context) : null,
+        AppButton(
+          onPressed: isDone ? () => Navigator.pop(context, _outcome) : null,
           child: Text(loc.common_close),
         ),
       ],

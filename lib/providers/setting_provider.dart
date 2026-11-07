@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cartridge/models/game_launch_mode.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -43,21 +43,21 @@ class SettingNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  double _musicVolumeBeforeMute = 0.5;
+
+  double get musicVolumeBeforeMute => _musicVolumeBeforeMute;
+
+  set musicVolumeBeforeMute(double volume) {
+    _musicVolumeBeforeMute = volume.clamp(0.01, 1.0);
+    notifyListeners();
+  }
+
   int _musicTrackDelay = 0;
 
   int get musicTrackDelay => _musicTrackDelay;
 
   set musicTrackDelay(int delay) {
     _musicTrackDelay = delay < 0 ? 0 : delay;
-    notifyListeners();
-  }
-
-  GameLaunchMode _launchMode = GameLaunchMode.vanilla;
-
-  GameLaunchMode get launchMode => _launchMode;
-
-  set launchMode(GameLaunchMode mode) {
-    _launchMode = mode;
     notifyListeners();
   }
 
@@ -76,6 +76,15 @@ class SettingNotifier extends ChangeNotifier {
 
   set languageCode(String? code) {
     _languageCode = code;
+    notifyListeners();
+  }
+
+  ThemeMode _themeMode = ThemeMode.system;
+
+  ThemeMode get themeMode => _themeMode;
+
+  set themeMode(ThemeMode mode) {
+    _themeMode = mode;
     notifyListeners();
   }
 
@@ -139,8 +148,8 @@ class SettingNotifier extends ChangeNotifier {
     double? musicVolume,
     int? musicTrackDelay,
     int? rerunDelay,
-    GameLaunchMode? launchMode,
     String? languageCode,
+    ThemeMode? themeMode,
     bool? isGridView,
     String? playPauseHotkey,
     String? nextTrackHotkey,
@@ -155,8 +164,8 @@ class SettingNotifier extends ChangeNotifier {
       _musicTrackDelay = musicTrackDelay < 0 ? 0 : musicTrackDelay;
     }
     if (rerunDelay != null) _rerunDelay = rerunDelay;
-    if (launchMode != null) _launchMode = launchMode;
     if (languageCode != null) _languageCode = languageCode;
+    if (themeMode != null) _themeMode = themeMode;
     if (isGridView != null) _isGridView = isGridView;
     if (playPauseHotkey != null) _playPauseHotkey = playPauseHotkey;
     if (nextTrackHotkey != null) _nextTrackHotkey = nextTrackHotkey;
@@ -182,11 +191,14 @@ class SettingNotifier extends ChangeNotifier {
     _musicPlaylistPath =
         json['musicPlaylistPath'] as String? ?? _musicPlaylistPath;
     _musicVolume = (json['musicVolume'] as num?)?.toDouble() ?? 0.0;
+    _musicVolumeBeforeMute =
+        (json['musicVolumeBeforeMute'] as num?)?.toDouble() ?? 0.5;
     final musicTrackDelay = json['musicTrackDelay'] as int? ?? 0;
     _musicTrackDelay = musicTrackDelay < 0 ? 0 : musicTrackDelay;
     _rerunDelay = json['rerunDelay'] as int? ?? 1000;
-    _launchMode = GameLaunchMode.fromName(json['launchMode'] as String?);
     _languageCode = json['languageCode'] as String?;
+    _themeMode =
+        ThemeMode.values.asNameMap()[json['themeMode']] ?? ThemeMode.system;
     _isGridView = json['isGridView'] as bool? ?? false;
     _playPauseHotkey = json['playPauseHotkey'] as String? ?? 'ctrl+alt+p';
     _nextTrackHotkey = json['nextTrackHotkey'] as String? ?? 'ctrl+alt+n';
@@ -207,10 +219,11 @@ class SettingNotifier extends ChangeNotifier {
         'isaacPath': _isaacPath,
         'musicPlaylistPath': _musicPlaylistPath,
         'musicVolume': _musicVolume,
+        'musicVolumeBeforeMute': _musicVolumeBeforeMute,
         'musicTrackDelay': _musicTrackDelay,
         'rerunDelay': _rerunDelay,
-        'launchMode': _launchMode.name,
         'languageCode': _languageCode,
+        'themeMode': _themeMode.name,
         'isGridView': _isGridView,
         'playPauseHotkey': _playPauseHotkey,
         'nextTrackHotkey': _nextTrackHotkey,

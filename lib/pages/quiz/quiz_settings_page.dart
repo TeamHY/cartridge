@@ -6,8 +6,10 @@ import 'package:path/path.dart' as p;
 import 'package:cartridge/pages/quiz/components/quiz_editor_card.dart';
 import 'package:cartridge/pages/record/components/back_arrow_view.dart';
 import 'package:cartridge/providers/quiz_provider.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class QuizSettingsPage extends ConsumerStatefulWidget {
   const QuizSettingsPage({super.key});
@@ -27,8 +29,7 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
     super.dispose();
   }
 
-  Future<({String name, String iconName, int colorValue})?>
-      _showCategoryDialog(
+  Future<({String name, String iconName, int colorValue})?> _showCategoryDialog(
     String title, {
     String? initialName,
     String? initialIcon,
@@ -40,10 +41,12 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
     var selectedColor = initialColor ?? defaultQuizCategoryColor;
     final iconEntries = quizCategoryIcons.entries.toList();
 
-    return showDialog<({String name, String iconName, int colorValue})>(
+    return showAppDialog<({String name, String iconName, int colorValue})>(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
+          final c = AppColors.of(context);
+
           void submit() {
             Navigator.pop(context, (
               name: controller.text,
@@ -52,21 +55,21 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
             ));
           }
 
-          return ContentDialog(
+          return AppDialog(
             title: Text(title),
             constraints: const BoxConstraints(maxWidth: 480),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextBox(
+                AppTextField(
                   controller: controller,
                   placeholder: loc.quiz_category_name_label,
                   autofocus: true,
                   onSubmitted: (_) => submit(),
                 ),
                 const SizedBox(height: 16),
-                InfoLabel(
+                AppLabeled(
                   label: loc.quiz_color_label,
                   child: Wrap(
                     spacing: 8,
@@ -77,8 +80,7 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                       return MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
-                          onTap: () =>
-                              setState(() => selectedColor = value),
+                          onTap: () => setState(() => selectedColor = value),
                           child: Container(
                             width: 28,
                             height: 28,
@@ -86,12 +88,12 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                               color: color,
                               shape: BoxShape.circle,
                               border: isSelected
-                                  ? Border.all(color: Colors.black, width: 2)
+                                  ? Border.all(color: c.ink, width: 2)
                                   : null,
                             ),
                             child: isSelected
-                                ? const Icon(
-                                    FluentIcons.check_mark,
+                                ? const PhosphorIcon(
+                                    PhosphorIconsBold.check,
                                     color: Colors.white,
                                     size: 12,
                                   )
@@ -103,7 +105,7 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                InfoLabel(
+                AppLabeled(
                   label: loc.quiz_icon_label,
                   child: SizedBox(
                     height: 220,
@@ -118,23 +120,33 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                       itemBuilder: (context, index) {
                         final entry = iconEntries[index];
                         final isSelected = entry.key == selectedIcon;
-                        return IconButton(
-                          style: isSelected
-                              ? ButtonStyle(
-                                  backgroundColor: WidgetStatePropertyAll(
-                                    Color(selectedColor)
-                                        .withValues(alpha: 0.2),
-                                  ),
-                                )
-                              : null,
-                          icon: Icon(
-                            entry.value,
-                            size: 20,
-                            color:
-                                isSelected ? Color(selectedColor) : null,
-                          ),
+                        return AppPressable(
                           onPressed: () =>
                               setState(() => selectedIcon = entry.key),
+                          builder: (context, states) {
+                            final hovered =
+                                states.contains(WidgetState.hovered);
+                            return Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Color(selectedColor)
+                                        .withValues(alpha: 0.2)
+                                    : (hovered
+                                        ? c.surface3
+                                        : Colors.transparent),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.md),
+                              ),
+                              child: Icon(
+                                entry.value,
+                                size: 20,
+                                color: isSelected
+                                    ? Color(selectedColor)
+                                    : (hovered ? c.ink : c.ink2),
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
@@ -143,11 +155,11 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
               ],
             ),
             actions: [
-              Button(
+              AppButton(
                 child: Text(loc.quiz_cancel),
                 onPressed: () => Navigator.pop(context),
               ),
-              FilledButton(
+              AppButton.primary(
                 onPressed: submit,
                 child: Text(loc.quiz_confirm),
               ),
@@ -194,17 +206,18 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
   Future<void> _deleteCategory(QuizCategory category) async {
     final loc = AppLocalizations.of(context);
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
-      builder: (context) => ContentDialog(
+      builder: (context) => AppDialog(
         title: Text(loc.quiz_category_delete_title),
         content: Text(loc.quiz_category_delete_message),
+        constraints: const BoxConstraints(maxWidth: 368),
         actions: [
-          Button(
+          AppButton(
             child: Text(loc.quiz_cancel),
             onPressed: () => Navigator.pop(context, false),
           ),
-          FilledButton(
+          AppButton.danger(
             child: Text(loc.quiz_delete),
             onPressed: () => Navigator.pop(context, true),
           ),
@@ -249,26 +262,19 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
     return Row(
       children: [
         Expanded(
-          child: Button(
+          child: AppButton(
             onPressed: onPick,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(FluentIcons.music_note),
-                const SizedBox(width: 6),
-                Flexible(
-                  child: Text(
-                    path == null ? loc.quiz_bgm_select : p.basename(path),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
+            icon: const PhosphorIcon(PhosphorIconsRegular.musicNote),
+            child: Text(
+              path == null ? loc.quiz_bgm_select : p.basename(path),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
         if (path != null)
-          IconButton(
-            icon: const Icon(FluentIcons.delete),
+          AppIconButton(
+            icon: const PhosphorIcon(PhosphorIconsRegular.trash),
+            tone: AppIconButtonTone.danger,
             onPressed: onClear,
           ),
       ],
@@ -278,9 +284,9 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
   Future<void> _showSoundDialog() {
     final loc = AppLocalizations.of(context);
 
-    return showDialog<void>(
+    return showAppDialog<void>(
       context: context,
-      builder: (context) => ContentDialog(
+      builder: (context) => AppDialog(
         title: Text(loc.quiz_sound_settings),
         constraints: const BoxConstraints(maxWidth: 480),
         content: Consumer(
@@ -291,7 +297,7 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                InfoLabel(
+                AppLabeled(
                   label: loc.quiz_bgm_label,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -309,14 +315,17 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                             itemCount: paths.length,
                             itemBuilder: (context, index) {
                               final path = paths[index];
-                              return ListTile(
-                                leading: const Icon(FluentIcons.music_note),
+                              return AppListRow(
+                                leading: const PhosphorIcon(
+                                    PhosphorIconsRegular.musicNote),
                                 title: Text(
                                   p.basename(path),
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                trailing: IconButton(
-                                  icon: const Icon(FluentIcons.delete),
+                                trailing: AppIconButton(
+                                  icon: const PhosphorIcon(
+                                      PhosphorIconsRegular.trash),
+                                  tone: AppIconButtonTone.danger,
                                   onPressed: () => ref
                                       .read(quizProvider)
                                       .removeBgmPath(path),
@@ -326,23 +335,16 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                           ),
                         ),
                       const SizedBox(height: 8),
-                      Button(
+                      AppButton(
                         onPressed: _pickBgm,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(FluentIcons.add),
-                            const SizedBox(width: 6),
-                            Text(loc.quiz_bgm_add),
-                          ],
-                        ),
+                        icon: const PhosphorIcon(PhosphorIconsRegular.plus),
+                        child: Text(loc.quiz_bgm_add),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                InfoLabel(
+                AppLabeled(
                   label: loc.quiz_sfx_correct,
                   child: _buildSfxRow(
                     path: quiz.correctSfxPath,
@@ -356,7 +358,7 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                InfoLabel(
+                AppLabeled(
                   label: loc.quiz_sfx_wrong,
                   child: _buildSfxRow(
                     path: quiz.wrongSfxPath,
@@ -365,8 +367,7 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                       if (path == null) return;
                       ref.read(quizProvider).setWrongSfxPath(path);
                     },
-                    onClear: () =>
-                        ref.read(quizProvider).setWrongSfxPath(null),
+                    onClear: () => ref.read(quizProvider).setWrongSfxPath(null),
                   ),
                 ),
               ],
@@ -374,7 +375,7 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
           },
         ),
         actions: [
-          FilledButton(
+          AppButton.primary(
             child: Text(loc.quiz_confirm),
             onPressed: () => Navigator.pop(context),
           ),
@@ -401,15 +402,15 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final typography = FluentTheme.of(context).typography;
     final quiz = ref.watch(quizProvider);
     final categories = quiz.categories;
 
-    final selected = categories.where((c) => c.id == _selectedCategoryId).firstOrNull ??
-        categories.firstOrNull;
+    final selected =
+        categories.where((c) => c.id == _selectedCategoryId).firstOrNull ??
+            categories.firstOrNull;
 
     return BackArrowView(
-      controlColor: Colors.black,
+      controlColor: AppColors.of(context).ink,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -419,24 +420,17 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: Text(loc.quiz_settings, style: typography.title),
+                  child: Text(loc.quiz_settings, style: AppTextStyles.title),
                 ),
-                Button(
+                AppButton(
                   onPressed: _showSoundDialog,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(FluentIcons.music_note),
-                        const SizedBox(width: 6),
-                        Text(
-                          quiz.bgmPaths.isEmpty
-                              ? loc.quiz_sound_settings
-                              : '${loc.quiz_sound_settings} (${quiz.bgmPaths.length})',
-                        ),
-                      ],
-                    ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  icon: const PhosphorIcon(PhosphorIconsRegular.musicNote),
+                  child: Text(
+                    quiz.bgmPaths.isEmpty
+                        ? loc.quiz_sound_settings
+                        : '${loc.quiz_sound_settings} (${quiz.bgmPaths.length})',
                   ),
                 ),
               ],
@@ -451,19 +445,12 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        FilledButton(
+                        AppButton.primary(
                           onPressed: _addCategory,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(FluentIcons.add),
-                                const SizedBox(width: 8),
-                                Text(loc.quiz_category_add),
-                              ],
-                            ),
-                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          icon: const PhosphorIcon(PhosphorIconsRegular.plus),
+                          child: Text(loc.quiz_category_add),
                         ),
                         const SizedBox(height: 12),
                         Expanded(
@@ -471,7 +458,7 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                               ? Center(
                                   child: Text(
                                     loc.quiz_category_empty,
-                                    style: typography.body,
+                                    style: AppTextStyles.body,
                                     textAlign: TextAlign.center,
                                   ),
                                 )
@@ -481,9 +468,9 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                                       const SizedBox(height: 4),
                                   itemBuilder: (context, index) {
                                     final category = categories[index];
-                                    return ListTile.selectable(
+                                    return AppListRow(
                                       selected: category.id == selected?.id,
-                                      onSelectionChange: (_) => setState(() =>
+                                      onPressed: () => setState(() =>
                                           _selectedCategoryId = category.id),
                                       leading: Container(
                                         width: 32,
@@ -507,15 +494,17 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          IconButton(
-                                            icon:
-                                                const Icon(FluentIcons.edit),
+                                          AppIconButton(
+                                            icon: const PhosphorIcon(
+                                                PhosphorIconsRegular
+                                                    .pencilSimple),
                                             onPressed: () =>
                                                 _editCategory(category),
                                           ),
-                                          IconButton(
-                                            icon:
-                                                const Icon(FluentIcons.delete),
+                                          AppIconButton(
+                                            icon: const PhosphorIcon(
+                                                PhosphorIconsRegular.trash),
+                                            tone: AppIconButtonTone.danger,
                                             onPressed: () =>
                                                 _deleteCategory(category),
                                           ),
@@ -534,20 +523,20 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                         ? Center(
                             child: Text(
                               loc.quiz_select_category,
-                              style: typography.body,
+                              style: AppTextStyles.body,
                             ),
                           )
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(selected.name, style: typography.subtitle),
+                              Text(selected.name, style: AppTextStyles.section),
                               const SizedBox(height: 12),
                               Expanded(
                                 child: selected.quizzes.isEmpty
                                     ? Center(
                                         child: Text(
                                           loc.quiz_empty,
-                                          style: typography.body,
+                                          style: AppTextStyles.body,
                                         ),
                                       )
                                     : ListView.separated(
@@ -561,35 +550,26 @@ class _QuizSettingsPageState extends ConsumerState<QuizSettingsPage> {
                                             key: ValueKey(q.id),
                                             index: index,
                                             quiz: q,
-                                            autofocus:
-                                                q.id == _autofocusQuizId,
+                                            autofocus: q.id == _autofocusQuizId,
                                             onChanged: (updated) => ref
                                                 .read(quizProvider)
                                                 .updateQuiz(
                                                     selected.id, updated),
                                             onDelete: () => ref
                                                 .read(quizProvider)
-                                                .removeQuiz(
-                                                    selected.id, q.id),
+                                                .removeQuiz(selected.id, q.id),
                                           );
                                         },
                                       ),
                               ),
                               const SizedBox(height: 12),
-                              FilledButton(
+                              AppButton.primary(
                                 onPressed: () => _addQuiz(selected.id),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 8),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(FluentIcons.add),
-                                      const SizedBox(width: 8),
-                                      Text(loc.quiz_add),
-                                    ],
-                                  ),
-                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 6),
+                                icon: const PhosphorIcon(
+                                    PhosphorIconsRegular.plus),
+                                child: Text(loc.quiz_add),
                               ),
                             ],
                           ),

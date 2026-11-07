@@ -1,5 +1,6 @@
 import 'package:cartridge/components/dialogs/error_dialog.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -64,7 +65,8 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    return ContentDialog(
+    return AppDialog(
+      constraints: const BoxConstraints(maxWidth: 368),
       title: Text(loc.signin_dialog_title),
       content: Form(
         key: _formKey,
@@ -72,9 +74,9 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InfoLabel(
+            AppLabeled(
               label: loc.signin_email_label,
-              child: TextFormBox(
+              child: AppTextField(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc.signin_email_hint;
@@ -86,9 +88,10 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
               ),
             ),
             const SizedBox(height: 16.0),
-            InfoLabel(
+            AppLabeled(
               label: loc.signin_password_label,
-              child: PasswordFormBox(
+              child: AppTextField(
+                obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc.signin_password_hint;
@@ -97,20 +100,20 @@ class _SignInDialogState extends ConsumerState<SignInDialog> {
                   return null;
                 },
                 controller: _passwordController,
-                onFieldSubmitted: (_) => onSubmit(context),
+                onSubmitted: (_) => onSubmit(context),
               ),
             ),
           ],
         ),
       ),
       actions: [
-        Button(
+        AppButton(
           onPressed: () {
             Navigator.pop(context);
           },
           child: Text(loc.common_cancel),
         ),
-        FilledButton(
+        AppButton.primary(
           onPressed: () => onSubmit(context),
           child: Text(loc.signin_submit),
         ),

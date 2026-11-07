@@ -2,7 +2,8 @@ import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/daily_record.dart';
 import 'package:cartridge/components/dialogs/error_dialog.dart';
 import 'package:cartridge/pages/record/components/ranking/ranking_item.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -58,7 +59,7 @@ abstract class BaseRankingState<T extends BaseRanking>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              IconButton(
+              AppIconButton(
                 icon: const PhosphorIcon(PhosphorIconsBold.arrowLeft, size: 20),
                 onPressed: onPreviousPeriod,
               ),
@@ -74,7 +75,7 @@ abstract class BaseRankingState<T extends BaseRanking>
                       fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
-                  IconButton(
+                  AppIconButton(
                     icon: const PhosphorIcon(
                       PhosphorIconsBold.arrowClockwise,
                       size: 20,
@@ -83,7 +84,7 @@ abstract class BaseRankingState<T extends BaseRanking>
                   ),
                 ],
               ),
-              IconButton(
+              AppIconButton(
                 icon:
                     const PhosphorIcon(PhosphorIconsBold.arrowRight, size: 20),
                 onPressed: onNextPeriod,

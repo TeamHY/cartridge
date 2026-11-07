@@ -1,6 +1,6 @@
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/utils/format_util.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 
 class RankingItem extends StatelessWidget {
   const RankingItem({

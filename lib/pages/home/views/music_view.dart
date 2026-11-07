@@ -4,14 +4,13 @@ import 'package:cartridge/pages/home/components/sub_page_header.dart';
 import 'package:cartridge/providers/music_player_provider.dart';
 import 'package:cartridge/providers/setting_provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class MusicView extends ConsumerStatefulWidget {
-  final VoidCallback? onBackPressed;
-
-  const MusicView({super.key, this.onBackPressed});
+  const MusicView({super.key});
 
   @override
   ConsumerState<MusicView> createState() => _MusicViewState();
@@ -53,7 +52,6 @@ class _MusicViewState extends ConsumerState<MusicView> {
       children: [
         SubPageHeader(
           title: '음악 플레이어',
-          onBackPressed: widget.onBackPressed,
           actions: [
             if (musicPlaylistPath.isNotEmpty)
               Expanded(
@@ -62,26 +60,22 @@ class _MusicViewState extends ConsumerState<MusicView> {
                   child: Text(
                     musicPlaylistPath,
                     overflow: TextOverflow.ellipsis,
-                    style: FluentTheme.of(context).typography.caption,
+                    style: AppTextStyles.caption,
                     textAlign: TextAlign.end,
                   ),
                 ),
               ),
-            IconButton(
-              icon: const PhosphorIcon(
-                PhosphorIconsRegular.folderOpen,
-                size: 20,
-              ),
+            AppIconButton(
+              icon: const PhosphorIcon(PhosphorIconsRegular.folderOpen),
+              iconSize: 20,
               onPressed: _isPickingFolder ? null : _pickFolder,
             ),
             if (musicPlaylistPath.isNotEmpty)
-              IconButton(
-                icon: const PhosphorIcon(
-                  PhosphorIconsRegular.plus,
-                  size: 20,
-                ),
+              AppIconButton(
+                icon: const PhosphorIcon(PhosphorIconsRegular.plus),
+                iconSize: 20,
                 onPressed: () {
-                  showDialog(
+                  showAppDialog(
                     context: context,
                     builder: (context) => const CreatePlaylistDialog(),
                   );
@@ -95,7 +89,7 @@ class _MusicViewState extends ConsumerState<MusicView> {
             child: Column(
               spacing: 8,
               children: playlists.map((playlist) {
-                return Card(
+                return AppCard(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
@@ -106,18 +100,17 @@ class _MusicViewState extends ConsumerState<MusicView> {
                             Expanded(
                               child: Text(
                                 playlist.id,
-                                style: FluentTheme.of(context).typography.body,
+                                style: AppTextStyles.body,
                               ),
                             ),
                             Text('${playlist.tracks.length}'),
                             const SizedBox(width: 8),
-                            IconButton(
+                            AppIconButton(
                               icon: const PhosphorIcon(
-                                PhosphorIconsRegular.pencil,
-                                size: 20,
-                              ),
+                                  PhosphorIconsRegular.pencil),
+                              iconSize: 20,
                               onPressed: () {
-                                showDialog(
+                                showAppDialog(
                                   context: context,
                                   builder: (context) => EditPlaylistDialog(
                                     playlist: playlist,
@@ -125,11 +118,10 @@ class _MusicViewState extends ConsumerState<MusicView> {
                                 );
                               },
                             ),
-                            IconButton(
+                            AppIconButton(
                               icon: const PhosphorIcon(
-                                PhosphorIconsRegular.folder,
-                                size: 20,
-                              ),
+                                  PhosphorIconsRegular.folder),
+                              iconSize: 20,
                               onPressed: () {
                                 playlist.openFolder();
                               },

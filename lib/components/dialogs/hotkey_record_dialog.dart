@@ -1,4 +1,5 @@
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:cartridge/components/save_button.dart';
 import 'package:flutter/services.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -114,8 +115,10 @@ class _HotkeyRecordDialogState extends State<HotkeyRecordDialog> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final c = AppColors.of(context);
 
-    return ContentDialog(
+    return AppDialog(
+      constraints: const BoxConstraints(maxWidth: 368),
       title: Text(loc.hotkey_record_dialog_title),
       content: KeyboardListener(
         focusNode: FocusNode()..requestFocus(),
@@ -144,18 +147,16 @@ class _HotkeyRecordDialogState extends State<HotkeyRecordDialog> {
               _isRecording
                   ? loc.hotkey_record_dialog_recording
                   : loc.hotkey_record_dialog_prompt,
-              style: FluentTheme.of(context).typography.body,
+              style: AppTextStyles.body,
             ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[20],
+                color: c.surface3,
                 borderRadius: BorderRadius.circular(4),
                 border: Border.all(
-                  color: _isRecording
-                      ? FluentTheme.of(context).accentColor
-                      : Colors.grey[60],
+                  color: _isRecording ? c.accent : c.lineStrong,
                   width: 2,
                 ),
               ),
@@ -167,22 +168,24 @@ class _HotkeyRecordDialogState extends State<HotkeyRecordDialog> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: _displayText.isEmpty ? Colors.grey[100] : null,
+                    color: _displayText.isEmpty ? c.ink3 : null,
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
             if (!_isRecording)
-              Button(
+              AppButton(
                 onPressed: _startRecording,
-                child: Text(loc.hotkey_record_dialog_start_recording),
+                child: Center(
+                  child: Text(loc.hotkey_record_dialog_start_recording),
+                ),
               ),
           ],
         ),
       ),
       actions: [
-        Button(
+        AppButton(
           onPressed: () => Navigator.pop(context),
           child: Text(loc.common_cancel),
         ),

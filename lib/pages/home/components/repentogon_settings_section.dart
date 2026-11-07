@@ -3,7 +3,8 @@ import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/models/repentogon_status.dart';
 import 'package:cartridge/providers/repentogon_provider.dart';
 import 'package:cartridge/utils/repentogon_error_text.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// REPENTOGON status and install / update / repair actions.
@@ -55,6 +56,7 @@ class _RepentogonSettingsSectionState
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final c = AppColors.of(context);
     final repentogon = ref.watch(repentogonProvider);
     final status = repentogon.status;
 
@@ -67,7 +69,7 @@ class _RepentogonSettingsSectionState
         status.isaacValid &&
         status.isaacCompatible;
 
-    return InfoLabel(
+    return AppLabeled(
       label: loc.repentogon_section,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +77,11 @@ class _RepentogonSettingsSectionState
           Row(
             children: [
               if (repentogon.isBusy) ...[
-                const SizedBox(width: 14, height: 14, child: ProgressRing()),
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                ),
                 const SizedBox(width: 8),
               ],
               Expanded(
@@ -83,9 +89,9 @@ class _RepentogonSettingsSectionState
                   _statusText(loc, repentogon),
                   style: TextStyle(
                     color: repentogon.lastError != null
-                        ? Colors.red
+                        ? c.danger
                         : isHealthy
-                            ? Colors.green
+                            ? c.success
                             : null,
                   ),
                 ),
@@ -95,17 +101,16 @@ class _RepentogonSettingsSectionState
           const SizedBox(height: 8),
           Row(
             children: [
-              Button(
+              AppButton(
                 onPressed:
                     repentogon.isBusy ? null : () => repentogon.refresh(),
                 child: Text(loc.repentogon_button_check),
               ),
               const SizedBox(width: 8),
-              FilledButton(
+              AppButton.primary(
                 onPressed: canInstall
-                    ? () => showDialog(
+                    ? () => showAppDialog(
                           context: context,
-                          dismissWithEsc: false,
                           barrierDismissible: false,
                           builder: (context) => const RepentogonInstallDialog(),
                         )
@@ -116,8 +121,7 @@ class _RepentogonSettingsSectionState
                 const SizedBox(width: 12),
                 Text(
                   loc.repentogon_cli_version(repentogon.cliTag!),
-                  style:
-                      const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 12, color: c.ink3),
                 ),
               ],
             ],

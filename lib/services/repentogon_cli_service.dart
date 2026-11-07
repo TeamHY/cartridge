@@ -86,6 +86,39 @@ class RepentogonCliService {
   static const sha256AssetName = 'rgon-cli.zip.sha256';
   static const executableName = 'rgon-cli.exe';
 
+  static const _launchFlags = {'--luadebug'};
+  static const _launchValueOptions = {
+    '--luaheapsize',
+    '--set-stage',
+    '--set-stage-type',
+    '--load-room',
+  };
+
+  static List<String> launchArgsFromSteamOptions(String options) {
+    final tokens = RegExp(r'"([^"]*)"|(\S+)')
+        .allMatches(options)
+        .map((match) => match.group(1) ?? match.group(2)!)
+        .toList();
+    final args = <String>[];
+
+    for (var i = 0; i < tokens.length; i++) {
+      final token = tokens[i];
+      if (_launchFlags.contains(token)) {
+        args.add(token);
+      } else if (_launchValueOptions.contains(token.split('=').first)) {
+        if (token.contains('=')) {
+          args.add(token);
+        } else if (i + 1 < tokens.length && !tokens[i + 1].startsWith('-')) {
+          args
+            ..add(token)
+            ..add(tokens[++i]);
+        }
+      }
+    }
+
+    return args;
+  }
+
   static const _releaseFileName = '.cartridge-release';
   static const _requestTimeout = Duration(seconds: 15);
   static const _downloadTimeout = Duration(minutes: 5);
@@ -379,7 +412,8 @@ class RepentogonCliService {
   }
 
   /// Start the game with REPENTOGON. Returns once the game is running.
-  static Future<void> launch(String isaacPath, {bool console = false}) async {
+  static Future<void> launch(String isaacPath,
+      {bool console = false, List<String> extraArgs = const []}) async {
     final result = await run([
       'launch',
       '--isaac',
@@ -387,6 +421,7 @@ class RepentogonCliService {
       '--launch-mode',
       'repentogon',
       if (console) '--console',
+      ...extraArgs,
     ]);
 
     if (!result.ok) {

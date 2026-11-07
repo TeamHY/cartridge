@@ -1,11 +1,18 @@
+import 'game_launch_mode.dart';
 import 'mod.dart';
 
 class Preset {
   String name;
   List<Mod> mods;
   String? gameConfigId;
+  GameLaunchMode launchMode;
 
-  Preset({required this.name, required this.mods, this.gameConfigId});
+  Preset({
+    required this.name,
+    required this.mods,
+    this.gameConfigId,
+    this.launchMode = GameLaunchMode.vanilla,
+  });
 
   factory Preset.fromJson(Map<String, dynamic> json) {
     return Preset(
@@ -14,6 +21,7 @@ class Preset {
           .map((mod) => Mod.fromJson(mod as Map<String, dynamic>))
           .toList(),
       gameConfigId: json['gameConfigId'] ?? json['optionPresetId'],
+      launchMode: GameLaunchMode.fromName(json['launchMode'] as String?),
     );
   }
 
@@ -22,6 +30,7 @@ class Preset {
       'name': name,
       'mods': mods.map((e) => e.toJson()).toList(),
       'gameConfigId': gameConfigId,
+      'launchMode': launchMode.name,
     };
   }
 }

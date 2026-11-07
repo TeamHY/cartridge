@@ -1,12 +1,13 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:cartridge/components/dialogs/mod_group_selector_dialog.dart';
 import 'package:cartridge/pages/slot_machine/components/slot_item.dart';
 import 'package:cartridge/providers/slot_machine_provider.dart';
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
 class SlotViewController {
@@ -77,6 +78,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final c = AppColors.of(context);
     final items = resolvedItems;
     final slotMachine = ref.watch(slotMachineProvider);
     final isGroup = slotMachine.isGroupSlot(widget.items);
@@ -92,7 +94,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
               height: 100,
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color.fromRGBO(255, 255, 255, 0.85),
+                  color: c.surface3,
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
@@ -120,13 +122,13 @@ class _SlotViewState extends ConsumerState<SlotView> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.8),
+                    color: c.accent.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     slotMachine.getGroupName(widget.items) ?? '',
-                    style: const TextStyle(
-                      color: Colors.black,
+                    style: TextStyle(
+                      color: c.onAccent,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -151,24 +153,26 @@ class _SlotViewState extends ConsumerState<SlotView> {
                           opacity: value,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: const Color.fromRGBO(255, 255, 255, 0.85),
+                              color: c.surface3.withValues(alpha: 0.85),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Center(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  IconButton(
-                                    icon: const Icon(FluentIcons.sync),
+                                  AppIconButton(
+                                    icon: const PhosphorIcon(
+                                        PhosphorIconsRegular.arrowsClockwise),
                                     onPressed: onStart,
                                   ),
                                   const SizedBox(width: 8),
-                                  IconButton(
-                                    icon: const Icon(FluentIcons.edit),
+                                  AppIconButton(
+                                    icon: const PhosphorIcon(
+                                        PhosphorIconsRegular.pencilSimple),
                                     onPressed: () async {
                                       if (isGroup) {
                                         final newGroupName =
-                                            await showDialog<String>(
+                                            await showAppDialog<String>(
                                           context: context,
                                           builder: (context) =>
                                               const ModGroupSelectorDialog(),
@@ -179,7 +183,7 @@ class _SlotViewState extends ConsumerState<SlotView> {
                                               ['${groupPrefix}$newGroupName']);
                                         }
                                       } else {
-                                        showDialog(
+                                        showAppDialog(
                                           context: context,
                                           builder: (context) {
                                             return SlotDialog(
@@ -192,31 +196,27 @@ class _SlotViewState extends ConsumerState<SlotView> {
                                     },
                                   ),
                                   const SizedBox(width: 8),
-                                  IconButton(
-                                    icon: Icon(
-                                      FluentIcons.delete,
-                                      color: Colors.red.dark,
-                                    ),
-                                    onPressed: () => showDialog(
+                                  AppIconButton(
+                                    icon: const PhosphorIcon(
+                                        PhosphorIconsRegular.trash),
+                                    tone: AppIconButtonTone.danger,
+                                    onPressed: () => showAppDialog(
                                       context: context,
                                       builder: (context) {
-                                        return ContentDialog(
+                                        return AppDialog(
                                           title: Text(loc.slot_delete_title),
+                                          constraints: const BoxConstraints(
+                                              maxWidth: 368),
                                           content:
                                               Text(loc.slot_delete_message),
                                           actions: [
-                                            Button(
+                                            AppButton(
                                               onPressed: () {
                                                 Navigator.pop(context);
                                               },
                                               child: Text(loc.common_cancel),
                                             ),
-                                            FilledButton(
-                                              style: ButtonStyle(
-                                                backgroundColor:
-                                                    WidgetStatePropertyAll(
-                                                        Colors.red.dark),
-                                              ),
+                                            AppButton.danger(
                                               onPressed: () {
                                                 Navigator.pop(context);
                                                 widget.onDeleted();
@@ -272,7 +272,7 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    return ContentDialog(
+    return AppDialog(
       title: Text(loc.slot_edit_title),
       constraints: const BoxConstraints(maxWidth: 368, maxHeight: 600),
       content: SingleChildScrollView(
@@ -283,16 +283,15 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(FluentIcons.remove),
+                    AppIconButton(
+                      icon: const PhosphorIcon(PhosphorIconsRegular.minus),
                       onPressed: () => setState(() {
                         newItems.removeAt(i);
                       }),
                     ),
                     const SizedBox(width: 4),
-                    SizedBox(
-                      width: 298,
-                      child: TextBox(
+                    Expanded(
+                      child: AppTextField(
                         onChanged: (value) {
                           // setState를 의도해서 사용하지 않았음
                           newItems[i] = value;
@@ -305,8 +304,8 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
                   ],
                 ),
               ),
-            IconButton(
-              icon: const Icon(FluentIcons.add),
+            AppIconButton(
+              icon: const PhosphorIcon(PhosphorIconsRegular.plus),
               onPressed: () {
                 setState(() {
                   newItems.add('');
@@ -317,13 +316,13 @@ class _SlotDialogState extends ConsumerState<SlotDialog> {
         ),
       ),
       actions: [
-        Button(
+        AppButton(
           onPressed: () {
             Navigator.pop(context);
           },
           child: Text(loc.common_cancel),
         ),
-        FilledButton(
+        AppButton.primary(
           onPressed: () {
             widget.onEdit(newItems);
             Navigator.pop(context);

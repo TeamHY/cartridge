@@ -1,6 +1,6 @@
 import 'package:cartridge/models/preset.dart';
-import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' as material;
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -77,18 +77,23 @@ class _PresetItemState extends State<PresetItem>
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final theme = FluentTheme.of(context);
+    final c = AppColors.of(context);
 
-    return Card(
-      backgroundColor: widget.isSelected
-          ? theme.accentColor.withValues(alpha: 0.1)
-          : Colors.transparent,
-      borderColor: widget.isSelected ? theme.accentColor : Colors.transparent,
-      padding: EdgeInsetsGeometry.zero,
-      child: material.InkWell(
-        onTap: widget.onTap,
-        mouseCursor: SystemMouseCursors.click,
-        borderRadius: BorderRadius.circular(4),
+    return AppPressable(
+      onPressed: widget.onTap,
+      focusRadius: 4,
+      builder: (context, states) => Container(
+        decoration: BoxDecoration(
+          color: widget.isSelected
+              ? c.accentSoft
+              : (states.contains(WidgetState.hovered)
+                  ? c.surface3
+                  : Colors.transparent),
+          border: Border.all(
+            color: widget.isSelected ? c.accent : Colors.transparent,
+          ),
+          borderRadius: BorderRadius.circular(4),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -101,7 +106,7 @@ class _PresetItemState extends State<PresetItem>
                     fontWeight:
                         widget.isSelected ? FontWeight.w600 : FontWeight.normal,
                     fontSize: 14,
-                    color: widget.isSelected ? theme.accentColor : null,
+                    color: widget.isSelected ? c.accent : null,
                   ),
                 ),
               ),
@@ -111,49 +116,29 @@ class _PresetItemState extends State<PresetItem>
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
+                      AppIconButton(
                         onPressed: () => widget.onApply(widget.preset),
                         icon: const PhosphorIcon(
                           PhosphorIconsRegular.play,
                           size: 16,
                         ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.hovered)) {
-                              return theme.accentColor.withValues(alpha: 0.1);
-                            }
-                            return Colors.transparent;
-                          }),
-                          foregroundColor:
-                              WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.hovered)) {
-                              return theme.accentColor;
-                            }
-                            return Colors.black.withAlpha(230);
-                          }),
-                        ),
                       ),
-                      IconButton(
-                        onPressed: () => showDialog(
+                      AppIconButton(
+                        onPressed: () => showAppDialog(
                           context: context,
                           builder: (context) {
-                            return ContentDialog(
+                            return AppDialog(
+                              constraints: const BoxConstraints(maxWidth: 368),
                               title: Text(loc.preset_delete_title),
                               content: Text(loc.preset_delete_message),
                               actions: [
-                                Button(
+                                AppButton(
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
                                   child: Text(loc.common_cancel),
                                 ),
-                                FilledButton(
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        WidgetStatePropertyAll<Color>(
-                                            Colors.red.dark),
-                                  ),
+                                AppButton.danger(
                                   onPressed: () {
                                     Navigator.pop(context);
                                     widget.onDelete(widget.preset);
@@ -168,22 +153,7 @@ class _PresetItemState extends State<PresetItem>
                           PhosphorIconsRegular.trash,
                           size: 16,
                         ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.hovered)) {
-                              return Colors.red.withValues(alpha: 0.1);
-                            }
-                            return Colors.transparent;
-                          }),
-                          foregroundColor:
-                              WidgetStateProperty.resolveWith((states) {
-                            if (states.contains(WidgetState.hovered)) {
-                              return Colors.red.dark.withAlpha(200);
-                            }
-                            return Colors.black.withAlpha(230);
-                          }),
-                        ),
+                        tone: AppIconButtonTone.danger,
                       ),
                     ],
                   );

@@ -6,7 +6,8 @@ import 'package:cartridge/models/music_playlist.dart';
 import 'package:cartridge/models/music_trigger_condition.dart';
 import 'package:cartridge/providers/music_player_provider.dart';
 import 'package:cartridge/providers/setting_provider.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as path;
 
@@ -74,7 +75,7 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
     } catch (e) {
       if (mounted) {
         Navigator.of(context).pop();
-        showDialog(
+        showAppDialog(
           context: context,
           builder: (context) => const ErrorDialog(
             text: '플레이리스트 생성 실패',
@@ -90,7 +91,7 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return ContentDialog(
+    return AppDialog(
       constraints: const BoxConstraints(
         maxWidth: 800,
         minHeight: 600,
@@ -112,11 +113,11 @@ class _CreatePlaylistDialogState extends ConsumerState<CreatePlaylistDialog> {
         ),
       ),
       actions: [
-        Button(
+        AppButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('취소'),
         ),
-        FilledButton(
+        AppButton.primary(
           onPressed: (_nameController.text.isEmpty) ? null : _createPlaylist,
           child: const Text('만들기'),
         ),

@@ -1,5 +1,6 @@
 import 'package:cartridge/components/dialogs/error_dialog.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
@@ -69,7 +70,8 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
 
-    return ContentDialog(
+    return AppDialog(
+      constraints: const BoxConstraints(maxWidth: 368),
       title: Text(loc.signup_dialog_title),
       content: Form(
         key: _formKey,
@@ -77,9 +79,9 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InfoLabel(
+            AppLabeled(
               label: loc.signup_email_label,
-              child: TextFormBox(
+              child: AppTextField(
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc.signup_email_hint;
@@ -91,9 +93,10 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
               ),
             ),
             const SizedBox(height: 16.0),
-            InfoLabel(
+            AppLabeled(
               label: loc.signup_password_label,
-              child: PasswordFormBox(
+              child: AppTextField(
+                obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc.signup_password_hint;
@@ -109,9 +112,10 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
               ),
             ),
             const SizedBox(height: 16.0),
-            InfoLabel(
+            AppLabeled(
               label: loc.signup_password_confirm_label,
-              child: PasswordFormBox(
+              child: AppTextField(
+                obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return loc.signup_password_hint;
@@ -130,13 +134,13 @@ class _SignUpDialogState extends ConsumerState<SignUpDialog> {
         ),
       ),
       actions: [
-        Button(
+        AppButton(
           onPressed: () {
             Navigator.pop(context);
           },
           child: Text(loc.common_cancel),
         ),
-        FilledButton(
+        AppButton.primary(
           onPressed: () => onSubmit(context),
           child: Text(loc.signup_submit),
         ),

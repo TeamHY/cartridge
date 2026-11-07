@@ -110,6 +110,28 @@ class SteamSaveService {
     return fallbackUsers;
   }
 
+  Future<String?> readLaunchOptions({
+    required String appId,
+    String? isaacPath,
+  }) async {
+    try {
+      final steamPath = await detectSteamPath(isaacPath: isaacPath);
+      if (steamPath == null) return null;
+
+      for (final user in await getLoggedInUsers(steamPath: steamPath)) {
+        final config = File(
+          p.join(steamPath, 'userdata', user.id, 'config', 'localconfig.vdf'),
+        );
+        if (await config.exists()) {
+          return launchOptionsFromLocalConfig(
+              await config.readAsString(), appId);
+        }
+      }
+    } catch (_) {}
+
+    return null;
+  }
+
   Future<void> applyAllCompletionSave({
     required String steamPath,
     required String userId,
@@ -305,6 +327,37 @@ class SteamSaveService {
     final userdata = Directory(p.join(path, 'userdata'));
     return steamExe.existsSync() || userdata.existsSync();
   }
+}
+
+String? launchOptionsFromLocalConfig(String vdf, String appId) {
+  final blockStart = RegExp('"${RegExp.escape(appId)}"\\s*\\{');
+  final option = RegExp(r'"LaunchOptions"\s+"((?:[^"\\]|\\.)*)"');
+
+  for (final match in blockStart.allMatches(vdf)) {
+    var depth = 1;
+    var quoted = false;
+    var end = match.end;
+    while (depth > 0 && end < vdf.length) {
+      final char = vdf[end];
+      if (char == '"' && vdf[end - 1] != r'\') {
+        quoted = !quoted;
+      } else if (!quoted && char == '{') {
+        depth++;
+      } else if (!quoted && char == '}') {
+        depth--;
+      }
+      end++;
+    }
+
+    final found = option.firstMatch(vdf.substring(match.end, end));
+    if (found != null) {
+      return found
+          .group(1)!
+          .replaceAllMapped(RegExp(r'\\(.)'), (escaped) => escaped.group(1)!);
+    }
+  }
+
+  return null;
 }
 
 class _SaveAsset {

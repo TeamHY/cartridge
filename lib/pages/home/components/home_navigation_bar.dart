@@ -2,7 +2,8 @@ import 'package:cartridge/pages/record/record_page.dart';
 import 'package:cartridge/pages/slot_machine/slot_machine_page.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeNavigationBar extends ConsumerWidget {
@@ -15,27 +16,27 @@ class HomeNavigationBar extends ConsumerWidget {
 
     return Row(
       children: [
-        Button(
+        AppButton(
           onPressed: () => Navigator.push(
             context,
-            FluentPageRoute(
+            MaterialPageRoute(
               builder: (context) => const RecordPage(),
             ),
           ),
           child: Text(loc.home_button_record),
         ),
         const SizedBox(width: 4),
-        Button(
+        AppButton(
           onPressed: () => Navigator.push(
             context,
-            FluentPageRoute(
+            MaterialPageRoute(
               builder: (context) => const SlotMachinePage(),
             ),
           ),
           child: Text(loc.home_button_slot_machine),
         ),
         const SizedBox(width: 4),
-        Button(
+        AppButton(
           onPressed: () => store.applyPreset(
             null,
             isEnableMods: false,

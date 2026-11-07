@@ -2,8 +2,10 @@ import 'package:cartridge/models/preset.dart';
 import 'package:cartridge/pages/home/components/preset_item.dart';
 import 'package:cartridge/providers/store_provider.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class PresetList extends ConsumerWidget {
   final Preset? selectedPreset;
@@ -21,6 +23,7 @@ class PresetList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final store = ref.watch(storeProvider);
     final loc = AppLocalizations.of(context);
+    final c = AppColors.of(context);
 
     if (store.presets.isEmpty) {
       return Center(
@@ -29,10 +32,10 @@ class PresetList extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                FluentIcons.playlist_music,
+              PhosphorIcon(
+                PhosphorIconsRegular.playlist,
                 size: 48,
-                color: Colors.grey.withValues(alpha: 0.5),
+                color: c.lineStrong,
               ),
               const SizedBox(height: 16),
               Text(
@@ -40,7 +43,7 @@ class PresetList extends ConsumerWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: Colors.grey.withValues(alpha: 0.7),
+                  color: c.ink3,
                 ),
               ),
               const SizedBox(height: 8),
@@ -49,7 +52,7 @@ class PresetList extends ConsumerWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.withValues(alpha: 0.6),
+                  color: c.ink3,
                 ),
               ),
             ],

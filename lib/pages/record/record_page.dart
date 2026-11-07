@@ -20,8 +20,10 @@ import 'package:cartridge/components/dialogs/sign_in_dialog.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 import 'package:cartridge/components/dialogs/sign_up_dialog.dart';
 import 'package:cartridge/pages/record/components/ranking/weekly_challenge_ranking.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
@@ -141,16 +143,17 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
     final loc = AppLocalizations.of(context);
 
     if (context.mounted) {
-      showDialog(
+      showAppDialog(
         context: context,
         builder: (context) {
-          return ContentDialog(
+          return AppDialog(
             title: Text(loc.record_record_complete_title),
+            constraints: const BoxConstraints(maxWidth: 368),
             content: Text(
               FormatUtil.getTimeString(Duration(milliseconds: time)),
             ),
             actions: [
-              FilledButton(
+              AppButton.primary(
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -313,11 +316,51 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Colors.blue.lightest;
+    const baseColor = Color(0xFF60ABE4);
+    final c = AppColors.of(context);
 
     final time = _stopwatch.elapsed;
     final session = _authService.currentSession;
     final loc = AppLocalizations.of(context);
+
+    Widget link(String label, VoidCallback onPressed) => AppPressable(
+          onPressed: onPressed,
+          focusRadius: AppRadius.sm,
+          builder: (context, states) => Container(
+            padding: const EdgeInsets.fromLTRB(11, 5, 11, 6),
+            decoration: BoxDecoration(
+              color: states.contains(WidgetState.hovered)
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w200,
+                fontFamily: 'Pretendard',
+              ),
+            ),
+          ),
+        );
+
+    Widget tab(int index, String label) => AppPressable(
+          onPressed: () => setState(() => _rankingTabIndex = index),
+          focusRadius: AppRadius.sm,
+          builder: (context, states) => Container(
+            padding: const EdgeInsets.fromLTRB(11, 5, 11, 6),
+            decoration: BoxDecoration(
+              color: _rankingTabIndex == index ? c.surface1 : c.surface3,
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+            ),
+            child: Text(
+              label,
+              style: AppTextStyles.bodyStrong.copyWith(color: c.accent),
+            ),
+          ),
+        );
 
     final stopwatchView = (session == null || session.isExpired)
         ? Column(
@@ -333,33 +376,17 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                 ),
               ),
               const SizedBox(height: 40),
-              HyperlinkButton(
-                child: Text(
-                  loc.record_signin,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w200,
-                    fontFamily: 'Pretendard',
-                  ),
-                ),
-                onPressed: () => showDialog(
+              link(
+                loc.record_signin,
+                () => showAppDialog(
                   context: context,
                   builder: (context) => const SignInDialog(),
                 ),
               ),
               const SizedBox(height: 16),
-              HyperlinkButton(
-                child: Text(
-                  loc.record_signup,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w200,
-                    fontFamily: 'Pretendard',
-                  ),
-                ),
-                onPressed: () => showDialog(
+              link(
+                loc.record_signup,
+                () => showAppDialog(
                   context: context,
                   builder: (context) => const SignUpDialog(),
                 ),
@@ -369,11 +396,10 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
         : Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FilledButton(
+              AppButton.primary(
                 child: Text(
                   loc.record_check_rules,
                   style: const TextStyle(
-                    color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Pretendard',
@@ -387,34 +413,18 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  HyperlinkButton(
-                    child: Text(
-                      loc.record_nickname_edit,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w200,
-                        fontFamily: 'Pretendard',
-                      ),
-                    ),
-                    onPressed: () {
-                      showDialog(
+                  link(
+                    loc.record_nickname_edit,
+                    () {
+                      showAppDialog(
                         context: context,
                         builder: (context) => const NicknameEditDialog(),
                       );
                     },
                   ),
-                  HyperlinkButton(
-                    child: Text(
-                      loc.record_signout,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w200,
-                        fontFamily: 'Pretendard',
-                      ),
-                    ),
-                    onPressed: () async {
+                  link(
+                    loc.record_signout,
+                    () async {
                       await _authService.signOut();
                     },
                   ),
@@ -511,25 +521,16 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 40),
-                  IconButton(
-                    style: const ButtonStyle(
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.zero,
-                          side: BorderSide(width: 1, color: Colors.white),
-                        ),
-                      ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white),
                     ),
-                    icon: const Padding(
-                      padding: EdgeInsets.all(4.0),
-                      child: Icon(
-                        FluentIcons.play_solid,
-                        color: Colors.white,
-                        size: 16,
-                      ),
+                    child: AppIconButton(
+                      icon: const PhosphorIcon(PhosphorIconsFill.play),
+                      size: 40,
+                      color: Colors.white,
+                      onPressed: _startGame,
                     ),
-                    iconButtonMode: IconButtonMode.large,
-                    onPressed: _startGame,
                   ),
                 ],
               ),
@@ -546,7 +547,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
           Flexible(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.grey[30],
+                color: c.surface3,
                 borderRadius:
                     const BorderRadius.only(topLeft: Radius.circular(8)),
               ),
@@ -555,42 +556,14 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      HyperlinkButton(
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(
-                            _rankingTabIndex == 0
-                                ? Colors.white
-                                : Colors.grey[30],
-                          ),
-                        ),
-                        child: Text(loc.record_daily_ranking),
-                        onPressed: () {
-                          setState(() {
-                            _rankingTabIndex = 0;
-                          });
-                        },
-                      ),
-                      HyperlinkButton(
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStatePropertyAll(
-                            _rankingTabIndex == 1
-                                ? Colors.white
-                                : Colors.grey[30],
-                          ),
-                        ),
-                        child: Text(loc.record_weekly_ranking),
-                        onPressed: () {
-                          setState(() {
-                            _rankingTabIndex = 1;
-                          });
-                        },
-                      ),
+                      tab(0, loc.record_daily_ranking),
+                      tab(1, loc.record_weekly_ranking),
                     ],
                   ),
                   if (_rankingTabIndex == 0) ...[
                     Expanded(
                         child: Container(
-                      color: Colors.white,
+                      color: c.surface1,
                       child: DailyChallengeRanking(
                         isAdmin: _isAdmin,
                       ),
@@ -598,7 +571,7 @@ class _RecordPageState extends ConsumerState<RecordPage> with WindowListener {
                   ] else ...[
                     Expanded(
                         child: Container(
-                      color: Colors.white,
+                      color: c.surface1,
                       child: WeeklyChallengeRanking(
                         isAdmin: _isAdmin,
                       ),

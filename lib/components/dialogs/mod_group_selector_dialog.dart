@@ -1,5 +1,6 @@
 import 'package:cartridge/providers/store_provider.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:cartridge/ui/ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
 
@@ -11,7 +12,8 @@ class ModGroupSelectorDialog extends ConsumerWidget {
     final store = ref.watch(storeProvider);
     final groups = store.groups;
 
-    return ContentDialog(
+    return AppDialog(
+      constraints: const BoxConstraints(maxWidth: 368),
       title: Text(AppLocalizations.of(context).select_mod_group),
       content: SizedBox(
         width: 400,
@@ -26,7 +28,7 @@ class ModGroupSelectorDialog extends ConsumerWidget {
                   final groupName = groups.keys.elementAt(index);
                   final modCount = groups[groupName]?.length ?? 0;
 
-                  return ListTile.selectable(
+                  return AppListRow(
                     title: Text(groupName),
                     subtitle: Text('$modCount mods'),
                     onPressed: () => Navigator.of(context).pop(groupName),
@@ -35,7 +37,7 @@ class ModGroupSelectorDialog extends ConsumerWidget {
               ),
       ),
       actions: [
-        Button(
+        AppButton(
           onPressed: () => Navigator.of(context).pop(),
           child: Text(AppLocalizations.of(context).common_cancel),
         ),
