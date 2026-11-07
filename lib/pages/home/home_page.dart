@@ -62,7 +62,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(hotkeyProvider);
-      ref.read(repentogonProvider).refreshIfInstalled(checkCliUpdate: true);
+      ref.read(repentogonProvider).refreshIfInstalled(checkUpdates: true);
     });
 
     AutoUpdater.checkAndUpdate(context);

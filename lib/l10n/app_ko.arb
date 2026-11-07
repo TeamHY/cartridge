@@ -94,6 +94,8 @@
   "repentogon_button_check": "상태 확인",
   "repentogon_button_install": "설치",
   "repentogon_button_update": "업데이트 확인",
+  "repentogon_button_update_now": "업데이트",
+  "repentogon_update_available": "새 버전 {version}",
   "repentogon_button_repair": "복구",
   "repentogon_install_dialog_title": "리펜토곤 설치",
   "repentogon_install_in_progress": "설치 중입니다. 잠시만 기다려 주세요...",

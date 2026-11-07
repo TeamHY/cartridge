@@ -94,6 +94,8 @@
   "repentogon_button_check": "Check status",
   "repentogon_button_install": "Install",
   "repentogon_button_update": "Check for updates",
+  "repentogon_button_update_now": "Update",
+  "repentogon_update_available": "New version {version}",
   "repentogon_button_repair": "Repair",
   "repentogon_install_dialog_title": "REPENTOGON installation",
   "repentogon_install_in_progress": "Installing, please wait...",

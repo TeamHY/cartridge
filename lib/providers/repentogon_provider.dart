@@ -22,6 +22,9 @@ class RepentogonNotifier extends ChangeNotifier {
   /// Installed rgon-cli release tag.
   String? cliTag;
 
+  /// Latest REPENTOGON release when it differs from the installed one.
+  String? availableUpdate;
+
   bool isBusy = false;
   Object? lastError;
 
@@ -43,8 +46,9 @@ class RepentogonNotifier extends ChangeNotifier {
     return setting.isaacPath;
   }
 
-  /// Update rgon-cli if needed, then refresh [status].
-  Future<void> refresh({bool checkCliUpdate = true}) async {
+  /// Refresh [status]. With [checkUpdates], rgon-cli is updated first and
+  /// [availableUpdate] is checked.
+  Future<void> refresh({bool checkUpdates = true}) async {
     if (!isSupported || isBusy) return;
 
     isBusy = true;
@@ -52,9 +56,10 @@ class RepentogonNotifier extends ChangeNotifier {
     _notify();
 
     try {
-      cliTag = await RepentogonCliService.ensureInstalled(
-          checkUpdate: checkCliUpdate);
+      cliTag =
+          await RepentogonCliService.ensureInstalled(checkUpdate: checkUpdates);
       status = await RepentogonCliService.status(await _isaacPath());
+      if (checkUpdates) availableUpdate = await _findUpdate();
     } catch (e) {
       lastError = e;
     } finally {
@@ -64,10 +69,27 @@ class RepentogonNotifier extends ChangeNotifier {
   }
 
   /// Refresh [status] without downloading rgon-cli when it is missing.
-  Future<void> refreshIfInstalled({bool checkCliUpdate = false}) async {
+  Future<void> refreshIfInstalled({bool checkUpdates = false}) async {
     if (!isSupported || isBusy) return;
     if (await RepentogonCliService.installedTag() == null) return;
-    await refresh(checkCliUpdate: checkCliUpdate);
+    await refresh(checkUpdates: checkUpdates);
+  }
+
+  Future<String?> _findUpdate() async {
+    final installed = status?.zhlVersion;
+    if (status?.installed != true ||
+        installed == null ||
+        installed == 'nightly' ||
+        installed == 'dev') {
+      return null;
+    }
+
+    try {
+      final latest = await RepentogonCliService.fetchLatestRepentogonVersion();
+      return latest == installed ? null : latest;
+    } catch (_) {
+      return availableUpdate;
+    }
   }
 
   /// Install, update or repair REPENTOGON.
@@ -108,6 +130,8 @@ class RepentogonNotifier extends ChangeNotifier {
         lastError = result.toException();
         return RepentogonInstallOutcome.failed;
       }
+
+      availableUpdate = null;
 
       return result.json['outcome'] == 'up_to_date'
           ? RepentogonInstallOutcome.upToDate

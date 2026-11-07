@@ -81,6 +81,7 @@ class RgonCliRelease {
 /// built from TeamHY/RepentogonLauncher.
 class RepentogonCliService {
   static const repository = 'TeamHY/RepentogonLauncher';
+  static const repentogonRepository = 'TeamREPENTOGON/REPENTOGON';
   static const tagPrefix = 'cli-v';
   static const zipAssetName = 'rgon-cli.zip';
   static const sha256AssetName = 'rgon-cli.zip.sha256';
@@ -120,6 +121,10 @@ class RepentogonCliService {
   }
 
   static const _releaseFileName = '.cartridge-release';
+  static const _githubHeaders = {
+    'Accept': 'application/vnd.github+json',
+    'User-Agent': 'Cartridge',
+  };
   static const _requestTimeout = Duration(seconds: 15);
   static const _downloadTimeout = Duration(minutes: 5);
 
@@ -152,14 +157,13 @@ class RepentogonCliService {
 
   /// Latest published rgon-cli release, or null if none exists.
   static Future<RgonCliRelease?> fetchLatestRelease() async {
-    final response = await http.get(
-      Uri.https(
-          'api.github.com', '/repos/$repository/releases', {'per_page': '30'}),
-      headers: const {
-        'Accept': 'application/vnd.github+json',
-        'User-Agent': 'Cartridge',
-      },
-    ).timeout(_requestTimeout);
+    final response = await http
+        .get(
+          Uri.https('api.github.com', '/repos/$repository/releases',
+              {'per_page': '30'}),
+          headers: _githubHeaders,
+        )
+        .timeout(_requestTimeout);
 
     if (response.statusCode != 200) {
       throw RgonCliException(
@@ -195,6 +199,25 @@ class RepentogonCliService {
     }
 
     return null;
+  }
+
+  /// Name of the latest stable REPENTOGON release.
+  static Future<String> fetchLatestRepentogonVersion() async {
+    final response = await http
+        .get(
+          Uri.https(
+              'api.github.com', '/repos/$repentogonRepository/releases/latest'),
+          headers: _githubHeaders,
+        )
+        .timeout(_requestTimeout);
+
+    if (response.statusCode != 200) {
+      throw RgonCliException(
+          'check_updates_failed', 'GitHub API returned ${response.statusCode}');
+    }
+
+    return (jsonDecode(response.body) as Map<String, dynamic>)['name']
+        as String;
   }
 
   /// Make sure rgon-cli is installed.

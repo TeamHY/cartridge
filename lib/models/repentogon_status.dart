@@ -10,6 +10,7 @@ class RepentogonStatus {
     required this.launchable,
     required this.state,
     this.version,
+    this.zhlVersion,
   });
 
   final bool isaacValid;
@@ -26,6 +27,10 @@ class RepentogonStatus {
   /// One of none, broken, legacy, modern.
   final String state;
   final String? version;
+
+  /// Compared with the latest release name to find updates, like the
+  /// official launcher does.
+  final String? zhlVersion;
 
   factory RepentogonStatus.fromJson(Map<String, dynamic> json) {
     final isaac = json['isaac'] as Map<String, dynamic>? ?? const {};
@@ -45,6 +50,7 @@ class RepentogonStatus {
       launchable: repentogon['launchable'] as bool? ?? false,
       state: repentogon['state'] as String? ?? 'none',
       version: nonEmpty(repentogon['version']),
+      zhlVersion: nonEmpty(repentogon['zhlVersion']),
     );
   }
 }

@@ -29,6 +29,7 @@ void main() {
           'launchable': true,
           'state': 'modern',
           'version': '1.1.2',
+          'zhlVersion': '1.1.2',
         },
       });
 
@@ -39,6 +40,7 @@ void main() {
       expect(status.launchable, isTrue);
       expect(status.state, 'modern');
       expect(status.version, '1.1.2');
+      expect(status.zhlVersion, '1.1.2');
     });
 
     test('defaults missing fields to a non installed state', () {

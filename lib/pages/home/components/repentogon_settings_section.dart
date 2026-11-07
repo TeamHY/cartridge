@@ -1,6 +1,5 @@
 import 'package:cartridge/components/dialogs/repentogon_install_dialog.dart';
 import 'package:cartridge/l10n/app_localizations.dart';
-import 'package:cartridge/models/repentogon_status.dart';
 import 'package:cartridge/providers/repentogon_provider.dart';
 import 'package:cartridge/utils/repentogon_error_text.dart';
 import 'package:cartridge/ui/ui.dart';
@@ -44,13 +43,15 @@ class _RepentogonSettingsSectionState
     return loc.repentogon_status_not_launchable;
   }
 
-  String _installLabel(AppLocalizations loc, RepentogonStatus? status) {
+  String _installLabel(AppLocalizations loc, RepentogonNotifier repentogon) {
+    final status = repentogon.status;
     if (status == null || status.state == 'none') {
       return loc.repentogon_button_install;
     }
-    return status.launchable
-        ? loc.repentogon_button_update
-        : loc.repentogon_button_repair;
+    if (!status.launchable) return loc.repentogon_button_repair;
+    return repentogon.availableUpdate != null
+        ? loc.repentogon_button_update_now
+        : loc.repentogon_button_update;
   }
 
   @override
@@ -64,6 +65,7 @@ class _RepentogonSettingsSectionState
         status.launchable &&
         repentogon.lastError == null &&
         !repentogon.isBusy;
+    final availableUpdate = isHealthy ? repentogon.availableUpdate : null;
     final canInstall = !repentogon.isBusy &&
         status != null &&
         status.isaacValid &&
@@ -84,7 +86,7 @@ class _RepentogonSettingsSectionState
                 ),
                 const SizedBox(width: 8),
               ],
-              Expanded(
+              Flexible(
                 child: Text(
                   _statusText(loc, repentogon),
                   style: TextStyle(
@@ -96,6 +98,13 @@ class _RepentogonSettingsSectionState
                   ),
                 ),
               ),
+              if (availableUpdate != null) ...[
+                const SizedBox(width: 8),
+                Text(
+                  loc.repentogon_update_available(availableUpdate),
+                  style: TextStyle(color: c.accent),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -115,7 +124,7 @@ class _RepentogonSettingsSectionState
                           builder: (context) => const RepentogonInstallDialog(),
                         )
                     : null,
-                child: Text(_installLabel(loc, status)),
+                child: Text(_installLabel(loc, repentogon)),
               ),
               if (repentogon.cliTag != null) ...[
                 const SizedBox(width: 12),
