@@ -1,20 +1,32 @@
 {
-  "description": "Isaac Mod Preset Manager",
-  "appName": "Cartridge",
   "items": [
     {
+      "shortVersion": 43600,
+      "url": "https://teamhy.github.io/cartridge/4.36.0+43600-windows",
+      "platform": "windows",
+      "mandatory": true,
+      "version": "4.36.0",
       "changes": [
         {
-          "message": "리펜토곤 런처 자동 업데이트와 새 버전 확인 추가",
+          "message": "오디오 경합과 로그 감시, 업데이트 재시작 안정화",
+          "type": "fix"
+        },
+        {
+          "message": "라이센스 인증과 계정 메뉴, 관리 화면, 닉네임 규칙 추가",
           "type": "feat"
+        },
+        {
+          "message": "비공개 저장소에서 빌드해 공개 저장소로 릴리스",
+          "type": "ci"
+        },
+        {
+          "message": "Supabase 테이블 권한과 함수 접근 제한",
+          "type": "fix"
         }
       ],
-      "version": "4.35.1",
-      "mandatory": true,
-      "platform": "windows",
-      "date": "2026-11-07",
-      "shortVersion": 43501,
-      "url": "https://teamhy.github.io/cartridge/4.35.1+43501-windows"
+      "date": "2026-11-16"
     }
-  ]
+  ],
+  "appName": "Cartridge",
+  "description": "Isaac Mod Preset Manager"
 }
