@@ -1,1 +1,0 @@
-const cartridgeSupporterName = 'cartridge-supporter';
